@@ -475,6 +475,7 @@
       transition: opacity 0.3s, transform 0.3s;
     }
     .tag.show { opacity: 1; transform: translateY(0); }
+    .tag:hover { background: rgba(255,107,0,0.25); border-color: rgba(255,107,0,0.5); transform: translateY(-1px); }
 
     .note-a { margin: 0 13px 6px; }
     .note-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-mono); }
@@ -1049,29 +1050,46 @@ function renderInferredTags(data) {
   container.innerHTML = '';
 
   const fields = [
-    { key: 'nombre_cliente', label: '👤' },
-    { key: 'placa',          label: '🪪' },
-    { key: 'marca',          label: '🚗' },
-    { key: 'modelo',         label: '🔖' },
-    { key: 'año',            label: '📅' },
-    { key: 'color',          label: '🎨' },
-    { key: 'tipo_asistencia',label: '🔧' },
-    { key: 'ubicación',      label: '📍' },
-    { key: 'motivo_llamada', label: '📞' },
+    { key: 'nombre_cliente', label: '👤', hint: 'Nombre',    action: applyNombre },
+    { key: 'placa',          label: '🪪', hint: 'Placa',     action: d => setField('f-plate', d) },
+    { key: 'marca',          label: '🚗', hint: 'Marca',     action: d => setSelect('f-make', d) },
+    { key: 'modelo',         label: '🔖', hint: 'Modelo',    action: d => setSelect('f-model', d) },
+    { key: 'año',            label: '📅', hint: 'Año',       action: d => setSelect('f-year', d) },
+    { key: 'color',          label: '🎨', hint: 'Color',     action: d => setField('f-color', d) },
+    { key: 'ubicación',      label: '📍', hint: 'Ubicación', action: d => setField('f-location', d) },
+    { key: 'tipo_asistencia',label: '🔧', hint: 'Asistencia',action: d => {} },
+    { key: 'motivo_llamada', label: '📞', hint: 'Motivo',    action: d => {} },
   ];
 
   let delay = 0;
   fields.forEach(f => {
     const val = data[f.key];
-    if (!val || val === '' || val === 'N/A') return;
+    if (!val || val.trim() === '' || val === 'N/A') return;
     const tag = document.createElement('div');
     tag.className = 'tag';
+    tag.title = 'Click para cargar: ' + f.hint;
+    tag.style.cursor = 'pointer';
     tag.textContent = f.label + ' ' + val;
     tag.style.transitionDelay = delay + 'ms';
+    tag.addEventListener('click', () => {
+      f.action(val);
+      tag.style.background = 'rgba(34,197,94,0.15)';
+      tag.style.borderColor = 'rgba(34,197,94,0.4)';
+      tag.style.color = '#16a34a';
+      showToast('✓ ' + f.hint + ' cargado');
+    });
     container.appendChild(tag);
     requestAnimationFrame(() => tag.classList.add('show'));
     delay += 80;
   });
+}
+
+function applyNombre(fullName) {
+  const parts = fullName.trim().split(' ');
+  const fname = parts[0] || '';
+  const lname = parts.slice(1).join(' ') || '';
+  setField('f-fname', fname);
+  if (lname) setField('f-lname', lname);
 }
 
 /* ════════════════════════════════════════════════
@@ -1107,29 +1125,34 @@ function applyAnalysis() {
   }
 
   const a = lastAnalysis;
+  let filled = 0;
 
-  // Split name
-  const fullName = (a.nombre_cliente || '').trim();
-  const nameParts = fullName.split(' ');
-  const fname = nameParts[0] || '';
-  const lname = nameParts.slice(1).join(' ') || '';
+  // Nombre cliente
+  if (a.nombre_cliente && a.nombre_cliente.trim()) {
+    applyNombre(a.nombre_cliente);
+    filled++;
+  }
 
-  setField('f-fname',    fname);
-  setField('f-lname',    lname);
-  setField('f-color',    a.color    || '');
-  setField('f-plate',    a.placa    || '');
-  setField('f-vin',      a.vin      || '');
-  setField('f-location', a.ubicación|| '');
+  // Vehículo
+  if (a.placa    && a.placa.trim())   { setField('f-plate',    a.placa);    filled++; }
+  if (a.color    && a.color.trim())   { setField('f-color',    a.color);    filled++; }
+  if (a.vin      && a.vin.trim())     { setField('f-vin',      a.vin);      filled++; }
+  if (a.ubicación&& a.ubicación.trim()){ setField('f-location', a.ubicación); filled++; }
 
-  // Vehicle selects
-  setSelect('f-year',  a.año   || '');
-  setSelect('f-make',  a.marca || '');
-  setSelect('f-model', a.modelo|| '');
+  // Selects de vehículo
+  if (a.año    && a.año.trim())    { setSelect('f-year',  a.año);    filled++; }
+  if (a.marca  && a.marca.trim())  { setSelect('f-make',  a.marca);  filled++; }
+  if (a.modelo && a.modelo.trim()) { setSelect('f-model', a.modelo); filled++; }
 
   const btn = document.getElementById('btn-analyze');
-  btn.textContent = '✓ Datos cargados';
-  btn.classList.add('success');
-  showToast('✓ SmartFill AI aplicado correctamente');
+  if (filled > 0) {
+    btn.textContent = '✓ ' + filled + ' campos cargados';
+    btn.classList.add('success');
+    showToast('✓ SmartFill AI aplicó ' + filled + ' campos');
+  } else {
+    btn.textContent = '⚠ Sin datos suficientes';
+    showToast('⚠ OpenAI no detectó datos en la conversación aún');
+  }
 
   setTimeout(() => {
     btn.textContent = '✦ ANALIZAR CON SMARTFILL AI';
