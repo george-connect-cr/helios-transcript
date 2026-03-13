@@ -890,7 +890,7 @@
    ════════════════════════════════════════════════ */
 const CONFIG = {
   NEGOTIATE_URL:  'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
-  FUNCTION_URL:   'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt',
+  FUNCTION_URL:   'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
   RECONNECT_MS:   5000,
 };
@@ -941,24 +941,39 @@ async function connectWebPubSub() {
     } else {
       // Fallback: raw WebSocket
       const ws = new WebSocket(wsUrl);
+      window._ws = ws;
 
       ws.onopen = () => {
         setConnectionStatus('conectado', '#22c55e');
         showToast('✓ WebPubSub conectado');
+        console.log('✅ WebSocket abierto');
       };
-      ws.onclose = () => {
+      ws.onclose = (e) => {
         setConnectionStatus('desconectado', '#ef4444');
+        console.warn('WS cerrado:', e.code, e.reason);
         setTimeout(connectWebPubSub, CONFIG.RECONNECT_MS);
       };
-      ws.onerror = () => {
+      ws.onerror = (e) => {
         setConnectionStatus('error', '#ef4444');
+        console.error('WS error:', e);
       };
       ws.onmessage = (e) => {
+        console.log('WS message raw:', e.data);
         try {
-          const payload = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+          const raw = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+          console.log('WS parsed envelope:', JSON.stringify(raw));
+          let payload;
+          if (raw.data !== undefined) {
+            payload = typeof raw.data === 'string' ? JSON.parse(raw.data) : raw.data;
+          } else if (raw.message !== undefined) {
+            payload = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
+          } else {
+            payload = raw;
+          }
+          console.log('WS payload final:', JSON.stringify(payload));
           handleMessage(payload);
         } catch(err) {
-          console.error('WS parse error', err);
+          console.error('WS parse error:', err, 'raw:', e.data);
         }
       };
     }
