@@ -963,7 +963,10 @@ async function connectWebPubSub() {
           const raw = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
           console.log('WS parsed envelope:', JSON.stringify(raw));
           let payload;
-          if (raw.data !== undefined) {
+          // WebPubSub wraps messages as { content: "...", contentType: "application/json" }
+          if (raw.content !== undefined) {
+            payload = typeof raw.content === 'string' ? JSON.parse(raw.content) : raw.content;
+          } else if (raw.data !== undefined) {
             payload = typeof raw.data === 'string' ? JSON.parse(raw.data) : raw.data;
           } else if (raw.message !== undefined) {
             payload = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
