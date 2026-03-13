@@ -127,7 +127,7 @@ body.dark .spk.ag{background:rgba(96,165,250,.12);color:#60a5fa;border-color:rgb
 body.dark .spk.cl{background:rgba(251,146,60,.12);color:#fb923c;border-color:rgba(251,146,60,.2);}
 .stxt{color:var(--t1);font-size:12px;line-height:1.6;}
 
-.tptags{padding:4px 14px 10px;display:flex;flex-wrap:wrap;gap:5px;}
+.tptags{display:none!important;}
 .tag{background:var(--acc-d);border:1px solid var(--acc-m);color:var(--acc);font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:20px;cursor:pointer;opacity:0;transform:scale(.88);transition:opacity .25s,transform .25s,background .15s,border-color .15s,color .15s;}
 .tag.show{opacity:1;transform:scale(1);}
 .tag:hover{background:rgba(249,115,22,.22);}
@@ -156,13 +156,136 @@ body.dark .noteta{background:rgba(255,255,255,.04);border-color:rgba(255,255,255
 .btana.ok{background:var(--grn);}
 
 /* INSIGHT */
-.insight{position:absolute;bottom:14px;left:14px;max-width:250px;background:rgba(255,255,255,.84);border:1px solid rgba(255,255,255,.95);border-radius:12px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:11px 14px;font-size:11px;line-height:1.55;color:var(--t1);display:none;animation:fsin .4s ease;box-shadow:0 4px 16px rgba(0,0,0,.07);}
-body.dark .insight{background:rgba(26,26,24,.84);border-color:rgba(255,255,255,.07);}
-.insighttitle{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--acc);text-transform:uppercase;margin-bottom:5px;}
+.insight{
+  position:absolute;bottom:96px;left:14px;
+  max-width:260px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(255,255,255,.92);
+  border-left:3px solid var(--acc);
+  border-radius:12px;
+  backdrop-filter:blur(20px) saturate(1.6);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  padding:10px 13px;
+  font-size:11px;line-height:1.6;color:var(--t1);
+  display:none;
+  animation:fsin .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+body.dark .insight{background:rgba(26,26,24,.72);border-color:rgba(255,255,255,.07);border-left-color:var(--acc);}
+.insighttitle{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:8px;letter-spacing:1px;
+  color:var(--acc);text-transform:uppercase;margin-bottom:6px;font-weight:500;
+}
+.insighttitle::before{content:'✦';font-size:10px;}
+.insight-close{
+  position:absolute;top:8px;right:10px;
+  background:none;border:none;color:var(--t3);
+  font-size:13px;cursor:pointer;line-height:1;padding:2px;
+  border-radius:4px;transition:color .15s;
+}
+.insight-close:hover{color:var(--t1);}
 
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--t1);color:var(--bg);padding:9px 20px;border-radius:10px;font-size:11px;font-family:var(--mono);z-index:200;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── SMARTFILL BUBBLES — left of transcript, transparent glass ── */
+.sfwrap{position:absolute;top:14px;right:326px;width:200px;display:flex;flex-direction:column;gap:5px;z-index:30;pointer-events:none;}
+.sfb{
+  position:relative;display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.58);
+  backdrop-filter:blur(16px) saturate(1.6);
+  -webkit-backdrop-filter:blur(16px) saturate(1.6);
+  border:1px solid rgba(255,255,255,0.88);
+  border-radius:20px;
+  padding:8px 13px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  cursor:pointer;pointer-events:all;
+  opacity:0;transform:translateX(8px);
+  animation:sfbin .22s ease forwards;
+  transition:box-shadow .15s,transform .12s;
+}
+body.dark .sfb{
+  background:rgba(26,26,24,0.58);
+  border-color:rgba(255,255,255,0.09);
+}
+@keyframes sfbin{to{opacity:1;transform:translateX(0);}}
+.sfb:hover{box-shadow:0 3px 16px rgba(249,115,22,.18);transform:translateX(-2px);}
+.sfb-ico{font-size:15px;flex-shrink:0;line-height:1;}
+.sfb-lbl{display:none;}
+.sfb-body{flex:1;min-width:0;}
+.sfb-lbl{font-family:var(--mono);font-size:8px;color:var(--acc);letter-spacing:.8px;text-transform:uppercase;margin-bottom:1px;}
+.sfb-val{font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* analyzing pill */
+.sfanalyzing{
+  position:absolute;top:14px;right:326px;
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,0.68);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.9);
+  border-radius:20px;padding:6px 12px;
+  font-family:var(--mono);font-size:10px;color:var(--t2);
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:31;
+}
+body.dark .sfanalyzing{background:rgba(26,26,24,0.68);border-color:rgba(255,255,255,0.07);}
+.sfanalyzing.show{opacity:1;}
+.sfspin{width:10px;height:10px;border:2px solid rgba(249,115,22,.2);border-top-color:var(--acc);border-radius:50%;animation:sfspin .6s linear infinite;}
+@keyframes sfspin{to{transform:rotate(360deg);}}
+/* flash on field apply */
+.fi.sfok,.fi.sfok{border-color:var(--acc)!important;background:var(--acc-d)!important;animation:sfflash .8s ease;}
+@keyframes sfflash{0%{box-shadow:0 0 0 0 rgba(249,115,22,0)}40%{box-shadow:0 0 0 3px rgba(249,115,22,.3)}100%{box-shadow:0 0 0 0 rgba(249,115,22,0)}}
+
+/* ── AGENT BAR — floating bottom-left over map ── */
+.agbar{
+  position:absolute;bottom:14px;left:14px;
+  display:flex;align-items:stretch;
+  background:rgba(255,255,255,0.62);
+  backdrop-filter:blur(20px) saturate(1.6);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  border:1px solid rgba(255,255,255,0.9);
+  border-radius:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.07);
+  overflow:hidden;z-index:20;
+}
+body.dark .agbar{background:rgba(26,26,24,0.68);border-color:rgba(255,255,255,0.07);}
+.agbar-agent{
+  padding:9px 13px;display:flex;align-items:center;gap:9px;
+  border-right:1px solid rgba(0,0,0,0.06);
+}
+body.dark .agbar-agent{border-right-color:rgba(255,255,255,0.06);}
+.agbar-av{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--acc-d);border:1.5px solid var(--acc);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.agbar-info{display:flex;flex-direction:column;gap:1px;}
+.agbar-name{font-size:11px;font-weight:600;color:var(--t1);line-height:1.2;white-space:nowrap;}
+.agbar-shift{font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.3px;}
+.agbar-sep{width:1px;background:rgba(0,0,0,0.06);align-self:stretch;}
+body.dark .agbar-sep{background:rgba(255,255,255,0.06);}
+/* Goal segment */
+.agbar-goal{padding:9px 13px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:88px;}
+.agbar-goal-row{display:flex;align-items:baseline;gap:3px;}
+.ag-big{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--acc);line-height:1;}
+.ag-tot{font-family:var(--mono);font-size:11px;color:var(--t3);}
+.ag-star{font-size:14px;margin-left:3px;filter:grayscale(1) opacity(.25);transition:filter .5s,transform .3s;}
+.ag-star.earned{filter:grayscale(0) opacity(1);transform:scale(1.2);animation:starpop .5s ease;}
+@keyframes starpop{0%{transform:scale(.4) rotate(-20deg)}65%{transform:scale(1.35) rotate(6deg)}100%{transform:scale(1.2)}}
+.ag-bar-bg{height:3px;background:rgba(0,0,0,0.08);border-radius:3px;overflow:hidden;}
+body.dark .ag-bar-bg{background:rgba(255,255,255,0.1);}
+.ag-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--acc),#fb923c);transition:width .9s ease;}
+.ag-bar-fill.done{background:linear-gradient(90deg,#16a34a,#4ade80);}
+.ag-lbl{font-family:var(--mono);font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;}
+/* KPI segments */
+.agbar-kpi{padding:9px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.agkv{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--t1);line-height:1;}
+.agkv.good{color:#16a34a;}
+.agkv.warn{color:#f59e0b;}
+.agkl{font-family:var(--mono);font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;}
+
 </style>
 </head>
 <body>
@@ -341,6 +464,42 @@ body.dark .insight{background:rgba(26,26,24,.84);border-color:rgba(255,255,255,.
       <text class="map-lbl" x="700" y="80"  text-anchor="middle" font-size="8" fill="#999" font-family="Arial">Calle 3</text>
     </svg>
 
+    <!-- Agent bar -->
+    <div class="agbar">
+      <div class="agbar-agent">
+        <div class="agbar-av">👤</div>
+        <div class="agbar-info">
+          <div class="agbar-name">Agente Activo</div>
+          <div class="agbar-shift">T. 08:00–16:00</div>
+        </div>
+      </div>
+      <div class="agbar-sep"></div>
+      <div class="agbar-goal">
+        <div class="agbar-goal-row">
+          <span class="ag-big" id="ag-done">12</span>
+          <span class="ag-tot">/<span id="ag-goal">20</span></span>
+          <span class="ag-star" id="ag-star">⭐</span>
+        </div>
+        <div class="ag-bar-bg"><div class="ag-bar-fill" id="ag-bar" style="width:60%"></div></div>
+        <div class="ag-lbl">Meta del día</div>
+      </div>
+      <div class="agbar-sep"></div>
+      <div class="agbar-kpi">
+        <div class="agkv good" id="ag-sat">4.8</div>
+        <div class="agkl">Satisfac.</div>
+      </div>
+      <div class="agbar-sep"></div>
+      <div class="agbar-kpi">
+        <div class="agkv warn" id="ag-aht">4:32</div>
+        <div class="agkl">T. prom.</div>
+      </div>
+      <div class="agbar-sep"></div>
+      <div class="agbar-kpi">
+        <div class="agkv" id="ag-fcr">87%</div>
+        <div class="agkl">Resoluc.</div>
+      </div>
+    </div>
+
     <div class="mptop">4935 S.W. DISPATCH · ALL · COSTA RICA</div>
     <div class="mctrl">
       <div class="mc">+</div>
@@ -350,9 +509,15 @@ body.dark .insight{background:rgba(26,26,24,.84);border-color:rgba(255,255,255,.
 
     <!-- Insight card -->
     <div class="insight" id="insight">
-      <div class="insighttitle">✦ Insight del agente</div>
+      <button class="insight-close" onclick="document.getElementById('insight').style.display='none'">✕</button>
+      <div class="insighttitle">Recomendación</div>
       <div id="insighttxt"></div>
     </div>
+
+    <!-- SmartFill analyzing pill -->
+    <div class="sfanalyzing" id="sfanalyzing"><div class="sfspin"></div> Analizando...</div>
+    <!-- SmartFill bubbles -->
+    <div class="sfwrap" id="sfwrap"></div>
 
     <!-- TRANSCRIPT PANEL -->
     <div class="tp">
@@ -613,6 +778,158 @@ function showToast(msg){
 }
 
 window.addEventListener('DOMContentLoaded',connectWebPubSub);
+
+/* ══════════════════════════════════════════
+   SMARTFILL BUBBLE ENGINE
+   ══════════════════════════════════════════ */
+const SF = (() => {
+  // field map: key → {id, label, icon}
+  const FIELDS = {
+    nombre_cliente: {id:'f-fname', label:'Nombre',    icon:'👤', split:true},
+    placa:          {id:'f-plate', label:'Placa',     icon:'🪪'},
+    marca:          {id:'f-make',  label:'Marca',     icon:'🚗'},
+    modelo:         {id:'f-model', label:'Modelo',    icon:'🔖'},
+    año:            {id:'f-year',  label:'Año',       icon:'📅'},
+    color:          {id:'f-color', label:'Color',     icon:'🎨'},
+    ubicación:      {id:'f-location', label:'Ubicación', icon:'📍'},
+  };
+
+  let _pending = {}; // key → {val, rendered}
+
+  function _applyField(key, val) {
+    const f = FIELDS[key];
+    if (!f) return;
+    if (f.split) {
+      // nombre_cliente → fname + lname
+      const parts = val.trim().split(' ');
+      const fn = document.getElementById('f-fname');
+      const ln = document.getElementById('f-lname');
+      if (fn) { fn.value = parts[0]||''; fn.classList.remove('hl'); fn.classList.add('ok'); _flashField(fn); }
+      if (ln && parts.length>1) { ln.value = parts.slice(1).join(' '); ln.classList.remove('hl'); ln.classList.add('ok'); _flashField(ln); }
+    } else {
+      const el = document.getElementById(f.id);
+      if (!el) return;
+      el.value = val;
+      el.classList.remove('hl');
+      el.classList.add('ok');
+      _flashField(el);
+    }
+  }
+
+  function _flashField(el) {
+    el.classList.remove('sfok'); void el.offsetWidth;
+    el.classList.add('sfok');
+    setTimeout(() => el.classList.remove('sfok'), 900);
+  }
+
+  function _removeBubble(key) {
+    const b = document.getElementById('sfb_' + key);
+    if (!b) return;
+    b.onclick = null;
+    b.style.transition = 'opacity .26s ease, transform .26s ease, max-height .28s ease .1s, margin .28s ease .1s';
+    b.style.opacity = '0';
+    b.style.transform = 'translateX(8px)';
+    b.style.maxHeight = b.offsetHeight + 'px';
+    requestAnimationFrame(() => {
+      b.style.maxHeight = '0';
+      b.style.marginBottom = '0';
+    });
+    setTimeout(() => b.remove(), 380);
+  }
+
+  function render(data) {
+    // data = lastAnalysis object
+    const wrap = document.getElementById('sfwrap');
+    if (!wrap) return;
+    // show analyzing briefly
+    const pill = document.getElementById('sfanalyzing');
+    if (pill) { pill.classList.add('show'); setTimeout(() => pill.classList.remove('show'), 1200); }
+
+    let delay = 200;
+    Object.keys(FIELDS).forEach(key => {
+      const val = data[key];
+      if (!val || !String(val).trim() || val === 'N/A') return;
+      if (_pending[key]) return; // already rendered
+
+      _pending[key] = val;
+      const f = FIELDS[key];
+
+      setTimeout(() => {
+        // Don't render if already applied
+        if (document.getElementById('sfb_' + key)) return;
+
+        const b = document.createElement('div');
+        b.className = 'sfb';
+        b.id = 'sfb_' + key;
+        b.innerHTML = '<div class="sfb-ico">' + f.icon + '</div><div class="sfb-body"><div class="sfb-lbl">' + f.label + '</div><div class="sfb-val">' + String(val) + '</div></div>';
+        b.onclick = () => {
+          _applyField(key, String(val));
+          _removeBubble(key);
+          showToast('✓ ' + f.label + ' aplicado');
+          AgentBar.checkComplete(data);
+        };
+        wrap.appendChild(b);
+      }, delay);
+      delay += 90;
+    });
+  }
+
+  function reset() {
+    _pending = {};
+    const wrap = document.getElementById('sfwrap');
+    if (wrap) wrap.innerHTML = '';
+  }
+
+  return { render, reset };
+})();
+
+/* ══════════════════════════════════════════
+   AGENT BAR METRICS
+   ══════════════════════════════════════════ */
+const AgentBar = (() => {
+  let done = 12, goal = 20;
+  let _appliedKeys = new Set();
+
+  function sync() {
+    const pct = Math.round(done / goal * 100);
+    const dEl = document.getElementById('ag-done');
+    const bEl = document.getElementById('ag-bar');
+    const sEl = document.getElementById('ag-star');
+    if (dEl) dEl.textContent = done;
+    if (bEl) {
+      bEl.style.width = Math.min(pct, 100) + '%';
+      if (pct >= 100) bEl.classList.add('done');
+    }
+    if (sEl && pct >= 80 && !sEl.classList.contains('earned')) {
+      sEl.classList.add('earned');
+      showToast('⭐ ¡Meta alcanzada! Excelente trabajo');
+    }
+  }
+
+  function checkComplete(data) {
+    // count how many FIELDS from data are applied
+    const keys = ['nombre_cliente','placa','marca','modelo','año','color','ubicación'];
+    const available = keys.filter(k => data[k]?.trim && data[k].trim() && data[k] !== 'N/A');
+    const remainBubbles = document.querySelectorAll('#sfwrap .sfb').length;
+    if (available.length > 0 && remainBubbles === 0) {
+      done = Math.min(done + 1, goal);
+      sync();
+      showToast('✦ Llamada completada — campo #' + done + '/' + goal);
+    }
+  }
+
+  function init() { sync(); }
+  return { init, checkComplete };
+})();
+
+/* patch renderTags to also show bubbles */
+const _origRenderTags = renderTags;
+renderTags = function(data) {
+  _origRenderTags(data);
+  SF.render(data);
+};
+
+AgentBar.init();
 </script>
 </body>
 </html>
