@@ -134,11 +134,14 @@ body.dark .spk.cl{background:rgba(251,146,60,.12);color:#fb923c;border-color:rgb
 .tag.done{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#16a34a;}
 body.dark .tag.done{color:#4ade80;}
 
-.sentrow{display:none;align-items:center;gap:8px;padding:0 14px 10px;}
-.slbl2{font-family:var(--mono);font-size:9px;color:var(--t3);min-width:50px;letter-spacing:.2px;}
-.strack{flex:1;height:3px;background:var(--b1);border-radius:3px;overflow:hidden;}
-.sfill{height:100%;border-radius:3px;width:50%;transition:width .6s,background .4s;}
-.sdesc{font-family:var(--mono);font-size:9px;color:var(--t2);min-width:24px;text-align:right;}
+.sentrow{display:none;flex-direction:column;gap:6px;padding:0 14px 12px;}
+.sent-top{display:flex;align-items:center;justify-content:space-between;}
+.sent-emoji{font-size:22px;line-height:1;transition:transform .3s;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.sent-text{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.4px;}
+.sent-desc-txt{font-size:10px;color:var(--t2);line-height:1.4;font-style:italic;}
+.strack{width:100%;height:6px;background:var(--b1);border-radius:6px;overflow:hidden;}
+.sfill{height:100%;border-radius:6px;width:50%;transition:width .8s cubic-bezier(.4,0,.2,1),background .5s;}
 
 .tpnote{padding:0 14px 10px;}
 .notelbl{font-family:var(--mono);font-size:9px;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;margin-bottom:5px;}
@@ -368,9 +371,12 @@ body.dark .insight{background:rgba(26,26,24,.84);border-color:rgba(255,255,255,.
       <div class="tptags" id="t-inferred"></div>
 
       <div class="sentrow" id="sentiment-row">
-        <span class="slbl2" id="sentiment-label">Neutro</span>
+        <div class="sent-top">
+          <span class="sent-emoji" id="sent-emoji">😐</span>
+          <span class="sent-text" id="sentiment-label" style="color:var(--t2);">Neutro</span>
+        </div>
         <div class="strack"><div class="sfill" id="sentiment-fill"></div></div>
-        <span class="sdesc" id="sentiment-val"></span>
+        <div class="sent-desc-txt" id="sentiment-val"></div>
       </div>
 
       <div class="tpnote">
@@ -505,11 +511,23 @@ function renderSentiment(sent){
   const row=document.getElementById('sentiment-row');
   row.style.display='flex';
   const v=Number(sent.valor);
-  document.getElementById('sentiment-label').textContent=v===-1?'Molesto':v===0?'Neutro':'Satisfecho';
-  document.getElementById('sentiment-val').textContent=sent.descripcion?sent.descripcion.substring(0,16)+'…':'';
-  const fill=document.getElementById('sentiment-fill');
-  fill.style.width=(v===-1?10:v===0?50:88)+'%';
-  fill.style.background=v===-1?'#ef4444':v===0?'#f59e0b':'#22c55e';
+  const cfg={
+    '-1':{ emoji:'😠', label:'Molesto',    color:'#ef4444', pct:10, gradient:'linear-gradient(90deg,#ef4444,#f87171)' },
+     '0':{ emoji:'😐', label:'Neutro',     color:'#f59e0b', pct:50, gradient:'linear-gradient(90deg,#f59e0b,#fcd34d)' },
+     '1':{ emoji:'😊', label:'Satisfecho', color:'#22c55e', pct:88, gradient:'linear-gradient(90deg,#22c55e,#4ade80)' },
+  };
+  const c = cfg[String(v)] || cfg['0'];
+  const emoji = document.getElementById('sent-emoji');
+  emoji.textContent = c.emoji;
+  emoji.style.animation = 'none';
+  requestAnimationFrame(()=>{ emoji.style.animation=''; });
+  const lbl = document.getElementById('sentiment-label');
+  lbl.textContent = c.label;
+  lbl.style.color = c.color;
+  document.getElementById('sentiment-val').textContent = sent.descripcion || '';
+  const fill = document.getElementById('sentiment-fill');
+  fill.style.width = c.pct + '%';
+  fill.style.background = c.gradient;
 }
 
 function showInsight(text){
