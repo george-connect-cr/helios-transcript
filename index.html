@@ -387,21 +387,32 @@
       top: 12px;
       right: 12px;
       width: 320px;
-      background: var(--tp-bg);
-      border: 1px solid var(--tp-border);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 16px;
       overflow: hidden;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
       transition: background 0.3s, border-color 0.3s;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+    body.dark .transcript-panel {
+      background: rgba(30,30,28,0.60);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.35);
     }
     .t-header {
-      background: var(--tp-header);
+      background: rgba(255,255,255,0.4);
       padding: 10px 13px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--tp-border);
-      transition: background 0.3s, border-color 0.3s;
+      border-bottom: 1px solid rgba(255,255,255,0.5);
+      transition: background 0.3s;
+    }
+    body.dark .t-header {
+      background: rgba(20,20,18,0.5);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .t-title {
       font-size: 11px;
@@ -432,17 +443,39 @@
     .t-body {
       padding: 13px;
       font-size: 12.5px;
-      line-height: 1.75;
+      line-height: 1.8;
       color: var(--tp-text);
       min-height: 90px;
-      max-height: 180px;
+      max-height: 200px;
       overflow-y: auto;
       transition: color 0.3s;
     }
     .t-body::-webkit-scrollbar { width: 3px; }
-    .t-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    .t-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 
     .th { color: var(--tp-hl); font-weight: 600; }
+
+    /* Speaker colors */
+    .spk-agent    { color: #1a6eb5; font-weight: 600; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .spk-customer { color: #c2410c; font-weight: 600; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    body.dark .spk-agent    { color: #60a5fa; }
+    body.dark .spk-customer { color: #fb923c; }
+    .spk-text { color: var(--tp-text); font-weight: 400; }
+    .transcript-line { margin-bottom: 7px; display: flex; gap: 6px; align-items: baseline; }
+    .spk-bubble {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .spk-bubble.agent    { background: rgba(26,110,181,0.12); color: #1a6eb5; }
+    .spk-bubble.customer { background: rgba(194,65,12,0.12);  color: #c2410c; }
+    body.dark .spk-bubble.agent    { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    body.dark .spk-bubble.customer { background: rgba(251,146,60,0.15); color: #fb923c; }
 
     .t-inferred {
       padding: 0 13px 10px;
@@ -469,18 +502,25 @@
     .note-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-mono); }
     .note-ta {
       width: 100%;
-      background: var(--note-bg);
-      border: 1px solid var(--tp-border);
-      color: var(--note-color);
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.5);
+      color: var(--tp-text);
       padding: 7px;
       font-size: 11px;
-      border-radius: 6px;
+      border-radius: 8px;
       resize: none;
       height: 48px;
       font-family: var(--font-ui);
       outline: none;
-      transition: background 0.3s, border-color 0.3s;
+      backdrop-filter: blur(4px);
+      transition: border-color 0.2s;
     }
+    body.dark .note-ta {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: var(--tp-text);
+    }
+    .note-ta::placeholder { color: var(--text3); }
     .note-ta:focus { border-color: var(--accent); }
 
     .btn-analyze {
@@ -991,15 +1031,20 @@ function appendTranscript(speaker, text) {
   if (body.querySelector('span[style]')) body.innerHTML = '';
 
   const line = document.createElement('div');
-  line.style.cssText = 'margin-bottom:6px;';
+  line.className = 'transcript-line';
 
-  const spk = document.createElement('span');
-  spk.className = 'th';
-  spk.textContent = '[' + speaker + '] ';
+  const spkLower = (speaker || '').toLowerCase();
+  const isAgent = spkLower.includes('agent') || spkLower === 'agente' || spkLower === 'agent';
 
-  const txt = document.createTextNode(text);
+  const bubble = document.createElement('span');
+  bubble.className = 'spk-bubble ' + (isAgent ? 'agent' : 'customer');
+  bubble.textContent = isAgent ? 'Agente' : 'Cliente';
 
-  line.appendChild(spk);
+  const txt = document.createElement('span');
+  txt.className = 'spk-text';
+  txt.textContent = text;
+
+  line.appendChild(bubble);
   line.appendChild(txt);
   body.appendChild(line);
   body.scrollTop = body.scrollHeight;
