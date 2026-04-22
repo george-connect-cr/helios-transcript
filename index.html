@@ -950,7 +950,7 @@ const CONFIG={
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
   RECONNECT_MS:5000,
 };
-let wpsClient=null,lastAnalysis=null,isDark=false;
+let wpsClient=null,lastAnalysis=null,isDark=false,_retries=0;
 
 async function connectWebPubSub(){
   try{
@@ -960,14 +960,14 @@ async function connectWebPubSub(){
     const{url}=await res.json();
     if(window.WebPubSubClient){
       wpsClient=new WebPubSubClient(url);
-      wpsClient.on('connected',()=>setStatus('conectado','live'));
+      wpsClient.on('connected',()=>{setStatus('conectado','live');_retries=0;});
       wpsClient.on('disconnected',()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);});
       wpsClient.on('server-message',e=>handleMessage(e.message.data));
       await wpsClient.start();
     }else{
       const ws=new WebSocket(url);
       window._ws=ws;
-      ws.onopen=()=>{setStatus('conectado','live');showToast('✓ Conectado');};
+      ws.onopen=()=>{setStatus('conectado','live');showToast('✓ Conectado');_retries=0;};
       ws.onclose=()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);};
       ws.onerror=()=>setStatus('error','err');
       ws.onmessage=e=>{
@@ -1615,7 +1615,7 @@ const POBuilder = (() => {
   function _updateWait(){
     const el=document.getElementById('pb-wait'); if(!el||!_currentService){if(el)el.textContent='—';return;}
     const mins=WAIT[_currentService]||15;
-    const hr=new Date().getHours(); const rush=(hr>=7&&hr=17&&hr=25?' slow':'');
+    const hr=new Date().getHours(); const rush=(hr>=7&&hr<=17?'':hr>=8&&hr<=9||hr>=17&&hr<=19?' slow':'');
   }
   function _updateStatus(){
     const req=Object.entries(FIELDS).filter(([k,v])=>v.req.includes(_currentService||'grua')).map(([k])=>k);
@@ -1662,8 +1662,11 @@ function _buildScores(data,sent,proto,callDuration){
   if(callDuration&&callDuration!=='—'){
     const parts=callDuration.split(':');
     const mins=parseInt(parts[0]||0);
-    if(minsdata[k]&&String(data[k]).trim());
-  const completeness=Math.round(filled.length/required.length*100);
+
+    if(mins<3||mins>8){ ahtScore=Math.max(20, ahtScore-(Math.abs(mins-5)*8)); }
+  }
+  const required=['nombre_cliente','ubicación','tipo_asistencia','placa','marca','modelo'];
+  const filled=required.filter(k=>data[k]&&String(data[k]).trim());
 
   // Speech compliance: protocol + data
   const proto_ok=proto?.cumple===true;
@@ -1709,7 +1712,7 @@ function confirmPO(){
   const svcId=POBuilder._currentSvc?.id||null;
   const WAIT={grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
   const hr=now.getHours();
-  const rush=(hr>=7&&hr=17&&hrctr.style.transform='',260);}
+  const rush=(hr>=7&&hr<=17?'rush ':hr>=8&&hr<=9||hr>=17&&hr<=19?' slow':'');
   if(cnum)cnum.textContent=_poCount;
   _renderDrawerCard({num,ts,data});
   updateDrawerCount();
@@ -1836,27 +1839,30 @@ function openDetail(num){
   const sentEmoji=m.sentVal===1?'😊':m.sentVal===0?'😐':'😠';
   const sentCls=m.sentVal===1?'pos':m.sentVal===0?'neu':'neg';
   const sentLbl=m.sentVal===1?'Satisfecho':m.sentVal===0?'Neutro':'Molesto';
-  const waitCls=m.waitTime=25?'warn':'';
-  const durCls=(()=>{if(!m.callDuration||m.callDuration==='—')return '';const mins=parseInt(m.callDuration);return mins
-      Hora de creación
-      ${po.ts}
-      ${num}
-    
-    
-      Duración llamada
-      ${m.callDuration||'—'}
-      min:seg
-    
-    
-      T. despacho est.
-      ${m.waitTime?m.waitTime+' min':'—'}
-      ${m.waitTime>20?'Hora pico':'Normal'}
-    
-    
-      Sentimiento
-      ${sentEmoji}
-      ${sentLbl}
-    `;
+  const waitCls=m.waitTime>=25?'warn':'';
+  const durCls=(()=>{if(!m.callDuration||m.callDuration==='—')return '';const mins=parseInt(m.callDuration);return mins<=5?'good':mins<=8?'warn':'bad';})();
+  body.innerHTML += `
+    <div class="pd-metrics">
+      <div class="pd-metric">
+        <div class="pd-metric-lbl">Hora de creación</div>
+        <div class="pd-metric-val">${po.ts}</div>
+      </div>
+      <div class="pd-metric">
+        <div class="pd-metric-lbl">Duración llamada</div>
+        <div class="pd-metric-val ${durCls}">${m.callDuration||'—'}</div>
+        <div class="pd-metric-sub">min:seg</div>
+      </div>
+      <div class="pd-metric">
+        <div class="pd-metric-lbl">T. despacho est.</div>
+        <div class="pd-metric-val ${waitCls}">${m.waitTime?m.waitTime+' min':'—'}</div>
+        <div class="pd-metric-sub">${m.waitTime>=20?'Hora pico':'Normal'}</div>
+      </div>
+      <div class="pd-metric">
+        <div class="pd-metric-lbl">Sentimiento</div>
+        <div class="pd-metric-val" style="font-size:22px">${sentEmoji}</div>
+        <div class="pd-metric-sub">${sentLbl}</div>
+      </div>
+    </div>`;
   body.appendChild(metricsDiv);
 
   // ── Score bars ───────────────────────────────────────
@@ -1917,54 +1923,6 @@ function openMapFromDetail(){
   if(po?.data?.ubicación)
     window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(po.data.ubicación+', Costa Rica'),'_blank');
 }
-
-
-
-
-  
-    ←
-    HELIOS
-    ANÁLISIS DEL DÍA
-    
-  
-  
-    
-      
-        
-          
-          
-            —
-            SCORE
-          
-        
-        
-          —
-          —
-          
-        
-      
-      
-    
-    
-      
-        Calificación por área
-        
-      
-      
-        POs del día
-        
-        Sin POs esta sesión
-      
-    
-    
-      Cumplimiento de protocolo
-      
-    
-    
-      ✦ Recomendaciones personalizadas
-      
-    
-  
 
 
 
@@ -2075,1002 +2033,6 @@ function _buildDashboard(){
 
 function _genRecs(overall,sat,aht,comp,speech,n,wait){
   const recs=[];
-  if(sat22)recs.push({ico:'🚀',title:'Optimizar despacho en hora pico',body:'Los tiempos de espera son altos. Coordina con el equipo para priorizar casos urgentes en franjas críticas.',p:'media'});
-  if(n===0)recs.push({ico:'📊',title:'Crea POs durante las llamadas',body:'Sin POs no hay métricas de desempeño. Completa el formulario en cada llamada de asistencia.',p:'media'});
-  if(overall>=85)recs.push({ico:'⭐',title:'Mantén el nivel de excelencia',body:'Tu rendimiento supera el estándar del equipo. Considera compartir tus mejores prácticas.',p:'baja'});
-  if(!recs.length)recs.push({ico:'👍',title:'Buen trabajo general',body:'Tu desempeño es sólido. Busca consistencia y mejora continua día a día.',p:'baja'});
-  return recs.slice(0,5);
-}
-
-function _toggleDPO(idx){
-  const row=document.getElementById('dpo_'+idx);
-  const detail=document.getElementById('dpod_'+idx);
-  if(!row||!detail)return;
-  const isOpen=detail.classList.contains('show');
-  document.querySelectorAll('.dpo-row').forEach(r=>r.classList.remove('open'));
-  document.querySelectorAll('.dpo-detail').forEach(d=>d.classList.remove('show'));
-  if(isOpen)return;
-  row.classList.add('open');
-  detail.classList.add('show');
-  if(detail.innerHTML.trim())return;
-  const po=_poList[idx]; if(!po)return;
-  const m=po.meta||{};
-  const sc=m.scores||{satisfaction:70,ahtScore:80,completeness:75,speechScore:80,speechItems:[]};
-  const tot=Math.round(sc.satisfaction*.3+sc.ahtScore*.2+sc.completeness*.2+sc.speechScore*.3);
-  const gc=v=>v>=80?'var(--grn)':v>=65?'var(--ylw)':'var(--red)';
-  const sentLbl=m.sentVal===1?'😊 Satisfecho':m.sentVal===0?'😐 Neutro':'😠 Molesto';
-  let html=`
-    Score total${tot}%
-    Satisfacción${sc.satisfaction}%
-    Duración${m.callDuration||'—'}
-    Sentimiento${m.sentVal===1?'😊':m.sentVal===0?'😐':'😠'}
-  
-  
-    ${[{l:'Satisfacción',v:sc.satisfaction},{l:'AHT',v:sc.ahtScore},{l:'Completitud',v:sc.completeness},{l:'Speech',v:sc.speechScore}].map(b=>`${b.l}${b.v}%`).join('')}
-  `;
-  if(sc.speechItems?.length){
-    html+=`${sc.speechItems.map(i=>`${i.ok?'✓':'✗'} ${i.label}`).join('')}`;
-  }
-  detail.innerHTML=html;
-  setTimeout(()=>detail.querySelectorAll('.dpo-bar-fill').forEach(f=>f.style.width=f.dataset.w),50);
-}
-
-
-
--e
-</script>
-<script>
-const CONFIG={
-  NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
-  FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
-  AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
-  RECONNECT_MS:5000,
-};
-let wpsClient=null,lastAnalysis=null,isDark=false;
-
-async function connectWebPubSub(){
-  try{
-    setStatus('conectando','warn');
-    const res=await fetch(CONFIG.NEGOTIATE_URL+'?userId=viewer-'+Date.now(),{headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN}});
-    if(!res.ok)throw new Error('Negotiate '+res.status);
-    const{url}=await res.json();
-    if(window.WebPubSubClient){
-      wpsClient=new WebPubSubClient(url);
-      wpsClient.on('connected',()=>setStatus('conectado','live'));
-      wpsClient.on('disconnected',()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);});
-      wpsClient.on('server-message',e=>handleMessage(e.message.data));
-      await wpsClient.start();
-    }else{
-      const ws=new WebSocket(url);
-      window._ws=ws;
-      ws.onopen=()=>{setStatus('conectado','live');showToast('✓ Conectado');};
-      ws.onclose=()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);};
-      ws.onerror=()=>setStatus('error','err');
-      ws.onmessage=e=>{
-        try{
-          const raw=JSON.parse(e.data);
-          let p;
-          if(raw.content!==undefined) p=typeof raw.content==='string'?JSON.parse(raw.content):raw.content;
-          else if(raw.data!==undefined) p=typeof raw.data==='string'?JSON.parse(raw.data):raw.data;
-          else p=raw;
-          handleMessage(p);
-        }catch(err){console.error('WS parse:',err);}
-      };
-    }
-  }catch(err){
-    setStatus('error','err');
-    setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
-  }
-}
-
-function handleMessage(p){
-  if(!p)return;
-  if(p.transcript&&p.speaker){appendTranscript(p.speaker,p.transcript);return;}
-  if(p.type==='analysis'&&p.data){
-    try{
-      const parsed=JSON.parse(p.data.replace(/```json|```/g,'').trim());
-      lastAnalysis=parsed;
-      renderTags(parsed);
-      renderSentiment(parsed.sentimiento_cliente);
-      if(parsed.insight_atencion)showInsight(parsed.insight_atencion);
-      showToast('✦ Análisis listo — click en tags o Analizar');
-    }catch(e){console.warn('Analysis parse:',e);}
-  }
-}
-
-function appendTranscript(speaker,text){
-  const body=document.getElementById('t-body');
-  if(body.querySelector('span[style]'))body.innerHTML='';
-  const line=document.createElement('div');
-  line.className='tline';
-  const isAg=(speaker||'').toLowerCase().includes('agent')||(speaker||'').toLowerCase()==='agente';
-  const spk=document.createElement('span');
-  spk.className='spk '+(isAg?'ag':'cl');
-  spk.textContent=isAg?'Agente':'Cliente';
-  const txt=document.createElement('span');
-  txt.className='stxt';
-  txt.textContent=text;
-  line.appendChild(spk);line.appendChild(txt);
-  body.appendChild(line);
-  body.scrollTop=body.scrollHeight;
-}
-
-function renderTags(data){
-  setTimeout(()=>{ if(typeof POBuilder!=='undefined')_autoFillPO(data); },200);
-  const c=document.getElementById('t-inferred');
-  c.innerHTML='';
-  const map=[
-    {key:'nombre_cliente',icon:'👤',hint:'Nombre',fn:applyNombre},
-    {key:'placa',icon:'🪪',hint:'Placa',fn:v=>setField('f-plate',v)},
-    {key:'marca',icon:'🚗',hint:'Marca',fn:v=>setField('f-make',v)},
-    {key:'modelo',icon:'🔖',hint:'Modelo',fn:v=>setField('f-model',v)},
-    {key:'año',icon:'📅',hint:'Año',fn:v=>setField('f-year',v)},
-    {key:'color',icon:'🎨',hint:'Color',fn:v=>setField('f-color',v)},
-    {key:'ubicación',icon:'📍',hint:'Ubicación',fn:v=>setField('f-location',v)},
-    {key:'tipo_asistencia',icon:'🔧',hint:'Asistencia',fn:()=>{}},
-    {key:'motivo_llamada',icon:'📞',hint:'Motivo',fn:()=>{}},
-  ];
-  let d=0;
-  map.forEach(f=>{
-    const v=data[f.key];
-    if(!v||!v.trim()||v==='N/A')return;
-    const tag=document.createElement('div');
-    tag.className='tag';
-    tag.title='Click → '+f.hint;
-    tag.textContent=f.icon+' '+v;
-    tag.style.transitionDelay=d+'ms';
-    tag.addEventListener('click',()=>{
-      f.fn(v);tag.classList.add('done');
-      showToast('✓ '+f.hint+' aplicado');
-    });
-    c.appendChild(tag);
-    requestAnimationFrame(()=>tag.classList.add('show'));
-    d+=70;
-  });
-}
-
-function applyNombre(name){
-  const p=name.trim().split(' ');
-  setField('f-fname',p[0]||'');
-  if(p.length>1)setField('f-lname',p.slice(1).join(' '));
-}
-
-function renderSentiment(sent){
-  if(!sent)return;
-  const row=document.getElementById('sentiment-card');if(row)row.classList.add('show');
-  const v=Number(sent.valor);
-  const cfg={
-    '-1':{ emoji:'😠', label:'Molesto',    color:'#ef4444', pct:10, gradient:'linear-gradient(90deg,#ef4444,#f87171)' },
-     '0':{ emoji:'😐', label:'Neutro',     color:'#f59e0b', pct:50, gradient:'linear-gradient(90deg,#f59e0b,#fcd34d)' },
-     '1':{ emoji:'😊', label:'Satisfecho', color:'#22c55e', pct:88, gradient:'linear-gradient(90deg,#22c55e,#4ade80)' },
-  };
-  const c = cfg[String(v)] || cfg['0'];
-  const emoji = document.getElementById('sent-emoji');
-  emoji.textContent = c.emoji;
-  emoji.style.animation = 'none';
-  requestAnimationFrame(()=>{ emoji.style.animation=''; });
-  const lbl = document.getElementById('sentiment-label');
-  lbl.textContent = c.label;
-  lbl.style.color = c.color;
-  document.getElementById('sentiment-val').textContent = sent.descripcion || '';
-  const fill = document.getElementById('sentiment-fill');
-  fill.style.width = c.pct + '%';
-  fill.style.background = c.gradient;
-}
-
-function showInsight(text){
-  const card=document.getElementById('insight');
-  document.getElementById('insighttxt').textContent=text;
-  card.style.display='block';
-}
-
-function applyAnalysis(){
-  if(!lastAnalysis){showToast('⚠ Sin análisis disponible');return;}
-  const a=lastAnalysis;let n=0;
-  if(a.nombre_cliente?.trim()){applyNombre(a.nombre_cliente);n++;}
-  if(a.placa?.trim()){setField('f-plate',a.placa);n++;}
-  if(a.color?.trim()){setField('f-color',a.color);n++;}
-  if(a.año?.trim()){setField('f-year',a.año);n++;}
-  if(a.marca?.trim()){setField('f-make',a.marca);n++;}
-  if(a.modelo?.trim()){setField('f-model',a.modelo);n++;}
-  if(a.ubicación?.trim()){setField('f-location',a.ubicación);n++;}
-  if(a.vin?.trim()){setField('f-vin',a.vin);n++;}
-  document.querySelectorAll('.tag').forEach(t=>t.classList.add('done'));
-  const btn=document.getElementById('btn-analyze');
-  btn.textContent=n>0?'✓ '+n+' campos aplicados':'⚠ Sin datos suficientes';
-  btn.classList.toggle('ok',n>0);
-  showToast(n>0?'✓ SmartFill aplicó '+n+' campos':'⚠ Conversación sin datos aún');
-  setTimeout(()=>{btn.textContent='✦ ANALIZAR CON SMARTFILL AI';btn.classList.remove('ok');},3500);
-}
-
-function setField(id,val){
-  const el=document.getElementById(id);
-  if(!el||!val)return;
-  el.value=val;el.classList.remove('hl');el.classList.add('ok');
-}
-
-function triggerSmartFill(){
-  const payload={callUniqueId:'DEMO-'+Date.now(),transcript:'Hola buenos días, le llama Mariam Fernandez, cédula 101230456, teléfono 12345678, tengo un Land Rover Range Rover 97, gris, placa ARC123, me quedé varada cerca del Parque Central.',speaker:'cliente'};
-  appendTranscript(payload.speaker,payload.transcript);
-  setTimeout(()=>{
-    const demo={placa:'ARC123',marca:'Land Rover',modelo:'Range Rover',año:'1997',color:'Gris',nombre_cliente:'Mariam Fernandez',ubicación:'Parque Central, San José',tipo_asistencia:'Avería en vía',sentimiento_cliente:{valor:0,descripcion:'Tranquila pero urgente'},motivo_llamada:'Vehículo varado',protocolo_agente:{cumple:true,detalles:'Saludo correcto'},insight_atencion:'Zona céntrica con tráfico. Prioriza despacho rápido y confirma ETA al cliente.'};
-    lastAnalysis=demo;renderTags(demo);renderSentiment(demo.sentimiento_cliente);showInsight(demo.insight_atencion);
-    showToast('✦ Demo: análisis listo');
-  },1800);
-  fetch(CONFIG.FUNCTION_URL,{method:'POST',headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
-}
-
-function toggleTheme(){
-  isDark=!isDark;
-  document.body.classList.toggle('dark',isDark);
-  document.getElementById('thbtn').textContent=isDark?'☀️':'🌙';
-  updateMapTheme(isDark);
-}
-
-function updateMapTheme(dark){
-  const m={base:dark?'#272725':'#e8e0d0',b1:dark?'#303030':'#cce0b8',b2:dark?'#2e2e2c':'#e4e4d4',b3:dark?'#323230':'#d4e8c0',road:dark?'#2c2c2a':'#f0ead8',roadln:dark?'#3a3a38':'#c8c0b0',park:dark?'#2c3028':'#b8d4a8',parkt:dark?'#8aaa7a':'#4a7a3a',stad:dark?'#282c34':'#b8d4f8',stadt:dark?'#7a9aba':'#2a5a8a',lbl:dark?'#555553':'#999',city:dark?'rgba(200,200,190,0.05)':'rgba(80,80,80,0.09)',pin:dark?'#ccc':'#333'};
-  document.getElementById('mb').setAttribute('fill',m.base);
-  document.querySelectorAll('.map-block').forEach(el=>{
-    const f=el.getAttribute('fill');
-    if(f==='#cce0b8'||f===m.b1)el.setAttribute('fill',m.b1);
-    else if(f==='#d4e8c0'||f===m.b3)el.setAttribute('fill',m.b3);
-    else el.setAttribute('fill',m.b2);
-  });
-  document.querySelectorAll('.map-road').forEach(el=>el.setAttribute('fill',parseInt(el.getAttribute('height'))===2?m.roadln:m.road));
-  const q=s=>document.querySelector(s);
-  if(q('.map-park'))q('.map-park').setAttribute('fill',m.park);
-  if(q('.map-park-t'))q('.map-park-t').setAttribute('fill',m.parkt);
-  if(q('.map-stad'))q('.map-stad').setAttribute('fill',m.stad);
-  if(q('.map-stad-t'))q('.map-stad-t').setAttribute('fill',m.stadt);
-  document.querySelectorAll('.map-lbl').forEach(el=>el.setAttribute('fill',m.lbl));
-  if(q('.map-city-lbl'))q('.map-city-lbl').setAttribute('fill',m.city);
-  if(q('.map-pin-lbl'))q('.map-pin-lbl').setAttribute('fill',m.pin);
-}
-
-function setStatus(text,state){
-  const dot=document.getElementById('cdot');
-  const lbl=document.getElementById('clbl');
-  dot.className='cdot '+state;
-  lbl.textContent=text;
-}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-window.addEventListener('DOMContentLoaded',connectWebPubSub);
-
-/* ══════════════════════════════════════════
-   SMARTFILL BUBBLE ENGINE
-   ══════════════════════════════════════════ */
-const SF = (() => {
-  // field map: key → {id, label, icon}
-  const FIELDS = {
-    nombre_cliente: {id:'f-fname', label:'Nombre',    icon:'👤', split:true},
-    placa:          {id:'f-plate', label:'Placa',     icon:'🪪'},
-    marca:          {id:'f-make',  label:'Marca',     icon:'🚗'},
-    modelo:         {id:'f-model', label:'Modelo',    icon:'🔖'},
-    año:            {id:'f-year',  label:'Año',       icon:'📅'},
-    color:          {id:'f-color', label:'Color',     icon:'🎨'},
-    ubicación:      {id:'f-location', label:'Ubicación', icon:'📍'},
-  };
-
-  let _pending = {}; // key → {val, rendered}
-
-  function _applyField(key, val) {
-    const f = FIELDS[key];
-    if (!f) return;
-    if (f.split) {
-      // nombre_cliente → fname + lname
-      const parts = val.trim().split(' ');
-      const fn = document.getElementById('f-fname');
-      const ln = document.getElementById('f-lname');
-      if (fn) { fn.value = parts[0]||''; fn.classList.remove('hl'); fn.classList.add('ok'); _flashField(fn); }
-      if (ln && parts.length>1) { ln.value = parts.slice(1).join(' '); ln.classList.remove('hl'); ln.classList.add('ok'); _flashField(ln); }
-    } else {
-      const el = document.getElementById(f.id);
-      if (!el) return;
-      el.value = val;
-      el.classList.remove('hl');
-      el.classList.add('ok');
-      _flashField(el);
-    }
-  }
-
-  function _flashField(el) {
-    el.classList.remove('sfok'); void el.offsetWidth;
-    el.classList.add('sfok');
-    setTimeout(() => el.classList.remove('sfok'), 900);
-  }
-
-  function _removeBubble(key) {
-    const b = document.getElementById('sfb_' + key);
-    if (!b) return;
-    b.onclick = null;
-    b.style.transition = 'opacity .26s ease, transform .26s ease, max-height .28s ease .1s, margin .28s ease .1s';
-    b.style.opacity = '0';
-    b.style.transform = 'translateX(8px)';
-    b.style.maxHeight = b.offsetHeight + 'px';
-    requestAnimationFrame(() => {
-      b.style.maxHeight = '0';
-      b.style.marginBottom = '0';
-    });
-    setTimeout(() => b.remove(), 380);
-  }
-
-  function render(data) {
-    // data = lastAnalysis object
-    const wrap = document.getElementById('sfwrap');
-    if (!wrap) return;
-    // show analyzing briefly
-    const pill = document.getElementById('sfanalyzing');
-    if (pill) { pill.classList.add('show'); setTimeout(() => pill.classList.remove('show'), 1200); }
-
-    let delay = 200;
-    Object.keys(FIELDS).forEach(key => {
-      const val = data[key];
-      if (!val || !String(val).trim() || val === 'N/A') return;
-      if (_pending[key]) return; // already rendered
-
-      _pending[key] = val;
-      const f = FIELDS[key];
-
-      setTimeout(() => {
-        // Don't render if already applied
-        if (document.getElementById('sfb_' + key)) return;
-
-        const b = document.createElement('div');
-        b.className = 'sfb';
-        b.id = 'sfb_' + key;
-        b.innerHTML = '<div class="sfb-ico">' + f.icon + '</div><div class="sfb-body"><div class="sfb-lbl">' + f.label + '</div><div class="sfb-val">' + String(val) + '</div></div>';
-        b.onclick = () => {
-          _applyField(key, String(val));
-          _removeBubble(key);
-          showToast('✓ ' + f.label + ' aplicado');
-          AgentBar.checkComplete(data);
-        };
-        wrap.appendChild(b);
-      }, delay);
-      delay += 90;
-    });
-  }
-
-  function reset() {
-    _pending = {};
-    const wrap = document.getElementById('sfwrap');
-    if (wrap) wrap.innerHTML = '';
-  }
-
-  return { render, reset };
-})();
-
-/* ══════════════════════════════════════════
-   AGENT BAR METRICS
-   ══════════════════════════════════════════ */
-const AgentBar = (() => {
-  let done = 12, goal = 20;
-  let _appliedKeys = new Set();
-
-  function sync() {
-    const pct = Math.round(done / goal * 100);
-    const dEl = document.getElementById('ag-done');
-    const bEl = document.getElementById('ag-bar');
-    const sEl = document.getElementById('ag-star');
-    if (dEl) dEl.textContent = done;
-    if (bEl) {
-      bEl.style.width = Math.min(pct, 100) + '%';
-      if (pct >= 100) bEl.classList.add('done');
-    }
-    if (sEl && pct >= 80 && !sEl.classList.contains('earned')) {
-      sEl.classList.add('earned');
-      showToast('⭐ ¡Meta alcanzada! Excelente trabajo');
-    }
-  }
-
-  function checkComplete(data) {
-    // count how many FIELDS from data are applied
-    const keys = ['nombre_cliente','placa','marca','modelo','año','color','ubicación'];
-    const available = keys.filter(k => data[k]?.trim && data[k].trim() && data[k] !== 'N/A');
-    const remainBubbles = document.querySelectorAll('#sfwrap .sfb').length;
-    if (available.length > 0 && remainBubbles === 0) {
-      done = Math.min(done + 1, goal);
-      sync();
-      showToast('✦ Llamada completada — campo #' + done + '/' + goal);
-    }
-  }
-
-  function init() { sync(); }
-  return { init, checkComplete };
-})();
-
-/* patch renderTags to also show bubbles */
-const _origRenderTags = renderTags;
-renderTags = function(data) {
-  _origRenderTags(data);
-  SF.render(data);
-};
-
-AgentBar.init();
-function triggerDemo(){ triggerSmartFill(); }
-let _poList = [];
-let _activeDetail = -1;
-
-function setTheme(t){
-  isDark = (t === 'dark');
-  document.body.classList.toggle('light', !isDark);
-  const d = document.getElementById('th-dark');
-  const l = document.getElementById('th-light');
-  if(d) d.classList.toggle('on', isDark);
-  if(l) l.classList.toggle('on', !isDark);
-}
-
-function _autoFillPO(data){
-  const map=[
-    ['tipo_asistencia',data.tipo_asistencia],
-    ['nombre_cliente', data.nombre_cliente],
-    ['ubicación',      data.ubicación],
-    ['placa',          data.placa],
-    ['marca',          data.marca],
-    ['modelo',         data.modelo],
-    ['año',            data.año],
-    ['color',          data.color],
-  ];
-  let d=0;
-  map.forEach(([key,val])=>{
-    if(!val||val==='N/A')return;
-    setTimeout(()=>POBuilder.addField(key,val,true), d);
-    d+=110;
-  });
-  if(data.tipo_asistencia) ServiceDetector.analyze&&ServiceDetector.analyze(data.tipo_asistencia);
-}
-const CallTimer=(()=>{
-  let _s=null,_t=null,_on=false;
-  const W=4*60,A=6*60;
-  function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
-  function tick(){
-    if(!_on)return;
-    const s=Math.floor((Date.now()-_s)/1000);
-    const v=document.getElementById('call-timer-val');
-    const d=document.getElementById('t-dot');
-    const l=null; // timer-lbl removed from compact bar
-    const al=document.getElementById('t-alert');
-    if(v)v.textContent=fmt(s);
-    if(v&&d){
-      v.className='td-num';d.className='td-dot';
-      if(al)al.className='t-row-alert';
-      if(s>=A){v.classList.add('alert');d.classList.add('alert');if(l)l.textContent='';if(al)al.classList.add('on');}
-      else if(s>=W){v.classList.add('warn');d.classList.add('warn');if(l)l.textContent='Tiempo prolongado';}
-      else{if(l)l.textContent='En llamada';}
-    }
-    _t=setTimeout(tick,1000);
-  }
-  function start(){
-    if(_on)return;_on=true;_s=Date.now();
-    const row=document.getElementById('timer-row');if(row)row.classList.add('on');
-    tick();
-  }
-  function reset(){
-    _on=false;clearTimeout(_t);
-    const row=document.getElementById('timer-row');if(row)row.classList.remove('on');
-    const v=document.getElementById('call-timer-val');if(v){v.textContent='0:00';v.className='td-num';}
-    const d=document.getElementById('t-dot');if(d)d.className='td-dot';
-    const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
-    const al=document.getElementById('t-alert');if(al)al.className='t-row-alert';
-  }
-  return{start,reset};
-})();
-
-const FlashPill = (() => {
-  let _queue = [], _running = false;
-
-  function show(icon, label, value) {
-    _queue.push({icon, label, value});
-    if (!_running) _next();
-  }
-
-  function _next() {
-    if (!_queue.length) { _running = false; return; }
-    _running = true;
-    const {icon, label, value} = _queue.shift();
-    const stage = document.getElementById('flash-stage');
-    if (!stage) { _running = false; return; }
-
-    const pill = document.createElement('div');
-    pill.className = 'flash-pill';
-    pill.innerHTML = `${icon}${label}${value}`;
-    stage.appendChild(pill);
-
-    // auto-remove after 2s
-    setTimeout(() => {
-      pill.classList.add('out');
-      setTimeout(() => { pill.remove(); _next(); }, 300);
-    }, 1800);
-  }
-
-  return { show };
-})();
-
-const ServiceDetector=(()=>{
-  const S=[
-    {id:'grua',n:'Grúa / Remolque',i:'🚛',h:'Vehículo varado — necesita remolque',c:'hi',kw:[/\bgrú[a]?\b/i,/\bremolque\b/i,/\bvarad[oa]\b/i,/\bno arranca\b/i,/\bno enciende\b/i,/\baccidente\b/i,/\bchoc[oó]\b/i,/\batascad[oa]\b/i]},
-    {id:'bat',n:'Batería descargada',i:'🔋',h:'Arranque o cambio de batería',c:'hi',kw:[/\bbater[íi]a\b/i,/\bno prende\b/i,/\bdescargada\b/i,/\bjump\b/i,/\bcables\b/i]},
-    {id:'llanta',n:'Llanta ponchada',i:'🛞',h:'Cambio de neumático',c:'hi',kw:[/\bllanta\b/i,/\bponch[ae]\b/i,/\bneum[aá]tico\b/i,/\bdesinflad[oa]\b/i,/\breventó\b/i]},
-    {id:'gas',n:'Sin combustible',i:'⛽',h:'Suministro de gasolina o diesel',c:'hi',kw:[/\bgasolina\b/i,/\bcombustible\b/i,/\btanque vac[íi]o\b/i]},
-    {id:'llaves',n:'Apertura de vehículo',i:'🔑',h:'Llaves perdidas o encerradas',c:'hi',kw:[/\bllaves?\b/i,/\bencerr[aá]d[oa]\b/i,/\bno puedo abrir\b/i,/\bapertura\b/i]},
-    {id:'mec',n:'Asistencia mecánica',i:'🔧',h:'Falla mecánica en ruta',c:'md',kw:[/\bfalla\b/i,/\bhumo\b/i,/\brecalentad[oa]\b/i,/\bfrenos?\b/i,/\bgotea\b/i]},
-    {id:'info',n:'Consulta informativa',i:'ℹ️',h:'El cliente solicita información',c:'lo',kw:[/\bcuánto cuesta\b/i,/\bprecio\b/i,/\bcobertura\b/i,/\bpóliza\b/i]},
-  ];
-  let _det=null,_sc={};
-  function analyze(t){
-    const lo=t.toLowerCase();let best=null,bs=0;
-    S.forEach(s=>{
-      let sc=0;s.kw.forEach(r=>{if(r.test(lo))sc++;});
-      _sc[s.id]=(_sc[s.id]||0)+sc;
-      if(_sc[s.id]>bs){bs=_sc[s.id];best=s;}
-    });
-    if(best&&bs>0&&best.id!==_det){_det=best.id;_show(best);}
-  }
-  let _dismissTimer=null, _shownOnce=false;
-  function _show(s){
-    const pop=document.getElementById('svc-popup');
-    if(!pop)return;
-    // fill popup
-    document.getElementById('svc-ico').textContent=s.i;
-    document.getElementById('svc-name').textContent=s.n;
-    document.getElementById('svc-hint').textContent=s.h;
-    const conf=document.getElementById('svc-conf');
-    conf.textContent={hi:'Alta confianza',md:'Confianza media',lo:'Baja confianza'}[s.c];
-    conf.className='svc-pop-badge '+s.c;
-    // Only show popup if not already shown for this service
-    if(!_shownOnce){
-      _shownOnce=true;
-      clearTimeout(_dismissTimer);
-      pop.classList.add('show');
-      _dismissTimer=setTimeout(()=>{ pop.classList.remove('show'); }, 3000);
-    }
-    if(window.lastAnalysis)window.lastAnalysis.tipo_asistencia=s.n;
-    else window._detectedService=s.n;
-    document.getElementById('ca-empty').style.display='none';
-    POBuilder.setService(s.id, s.n);
-  }
-  function reset(){_det=null;_sc={};_shownOnce=false;clearTimeout(_dismissTimer);const p=document.getElementById('svc-popup');if(p)p.classList.remove('show');}
-  return{analyze,reset};
-})();
-
-const Recs=(()=>{
-  let _a=new Set();
-  const C=[
-    {id:'placa',ico:'🪪',lbl:'Placa',
-      txt:'Confirma la placa del vehículo con el cliente para evitar errores.',
-      trig:d=>!d.placa, done:d=>!!d.placa},
-    {id:'ubic_ref',ico:'📍',lbl:'Referencia',
-      txt:'Solicita un punto de referencia adicional para facilitar el despacho.',
-      trig:d=>!!d.ubicación&&d.ubicación.lengthd.ubicación&&d.ubicación.length>=22},
-    {id:'eta',ico:'⏱',lbl:'ETA',
-      txt:'Comunica el tiempo estimado de llegada antes de cerrar la llamada.',
-      trig:d=>!!d.tipo_asistencia&&!!d.ubicación, done:()=>false},
-    {id:'sent_neg',ico:'⚠️',lbl:'Cliente molesto',
-      txt:'El cliente parece molesto. Usa lenguaje empático y ofrece solución concreta.',
-      trig:(d,s)=>s&&Number(s.valor)===-1, done:()=>false},
-  ];
-  function check(data,sent){
-    C.forEach(c=>{
-      if(_a.has(c.id)){if(c.done(data,sent))_dismiss(c.id);}
-      else if(c.trig(data,sent)){_a.add(c.id);_show(c);}
-    });
-  }
-  function _show(c){
-    const s=document.getElementById('rec-stack');
-    if(!s||document.getElementById('rec_'+c.id))return;
-    const t=document.createElement('div');
-    t.className='rec-toast';t.id='rec_'+c.id;
-    t.innerHTML=`${c.ico}✦ ${c.lbl}${c.txt}✓`;
-    s.appendChild(t);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
-  }
-  function _dismiss(id){
-    const t=document.getElementById('rec_'+id);
-    if(t){t.classList.add('done');setTimeout(()=>t.remove(),260);}
-    _a.delete(id);
-  }
-  function dismiss(id){_dismiss(id);}
-  function showInsightText(text){
-    if(!text)return;
-    const id='ins_'+Date.now();
-    const s=document.getElementById('rec-stack');if(!s)return;
-    const t=document.createElement('div');t.className='rec-toast';t.id='rec_'+id;
-    t.innerHTML=`✦Recomendación IA${text}✓`;
-    s.appendChild(t);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
-    setTimeout(()=>_dismiss(id),14000);
-  }
-  function reset(){_a.clear();const s=document.getElementById('rec-stack');if(s)s.innerHTML='';}
-  return{check,dismiss,showInsightText,reset};
-})();
-
-const POBuilder = (() => {
-  let _data={}, _visible=false, _currentService=null;
-  const FIELDS={
-    nombre_cliente:{i:'👤',l:'Cliente',  req:['grua','bat','llanta','gas','llaves','mec']},
-    placa:         {i:'🪪',l:'Placa',    req:['grua','bat','llanta','gas','llaves','mec']},
-    marca:         {i:'🚗',l:'Marca',    req:['grua','bat','llanta','mec']},
-    modelo:        {i:'🔖',l:'Modelo',   req:['grua','bat','llanta','mec']},
-    año:           {i:'📅',l:'Año',      req:['grua','mec']},
-    color:         {i:'🎨',l:'Color',    req:['grua']},
-    ubicación:     {i:'📍',l:'Ubicación',req:['grua','bat','llanta','gas','llaves','mec']},
-    tipo_asistencia:{i:'🔧',l:'Servicio',req:['grua','bat','llanta','gas','llaves','mec']},
-  };
-  const SUGS={
-    grua:  [{i:'📍',t:'Punto de referencia',q:'¿Puede darme un punto de referencia cercano?'},{i:'🔢',t:'Cédula del cliente',q:'¿Me puede confirmar su número de cédula?'}],
-    bat:   [{i:'🔌',t:'¿Intentó arrancar?',q:'¿Ya intentó arrancar el vehículo?'},{i:'📍',t:'¿Vía pública?',q:'¿Está en vía pública o parqueo privado?'}],
-    llanta:[{i:'🛞',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'📍',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
-    gas:   [{i:'⛽',t:'Tipo combustible',q:'¿Su vehículo es gasolina o diesel?'},{i:'📐',t:'Cantidad necesaria',q:'¿Cuántos litros aproximadamente necesita?'}],
-    llaves:[{i:'🚪',t:'¿Tiene copia?',q:'¿Tiene una copia de la llave en casa?'},{i:'🔐',t:'¿Llave electrónica?',q:'¿Tiene seguro electrónico o llave convencional?'}],
-    mec:   [{i:'💨',t:'¿Sale humo?',q:'¿El vehículo emite humo o hay olores extraños?'},{i:'🌡️',t:'Luz advertencia',q:'¿Vio alguna luz de advertencia encendida?'}],
-    info:  [{i:'📄',t:'Número de póliza',q:'¿Me puede proporcionar su número de póliza?'}],
-  };
-  const WAIT={grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
-
-  function _showPanel(){
-    if(!_visible){_visible=true;
-      const empty=document.getElementById('pb-empty');
-      if(empty)empty.style.display='none';
-      const body=document.getElementById('pb-body');
-      if(body)body.style.display='flex';
-      const meta=document.getElementById('pb-meta-row');
-      if(meta)meta.style.display='flex';
-      const notes=document.querySelector('.po-notes');
-      if(notes)notes.classList.add('visible');
-    }
-  }
-  function addField(key,value){
-    const isNew=!_data[key]; _data[key]=value;
-    _showPanel(); _upsertRow(key,value,isNew);
-    _updateSugs(); _updateWait(); _updateStatus();
-    // Flash pill ONLY on first detection, not on edits/updates
-    if(isNew){ const f=FIELDS[key]; if(f) FlashPill.show(f.i,f.l,String(value).substring(0,26)); }
-  }
-  function setService(svcId,svcName){
-    const isNew = _currentService !== svcId;
-    _currentService=svcId; _data.tipo_asistencia=svcName;
-    _showPanel(); _upsertRow('tipo_asistencia',svcName,isNew);
-    _updateSugs(); _updateWait(); _updateStatus();
-    // FlashPill for service only on first detection
-    if(isNew) FlashPill.show('🔧','Servicio',svcName);
-  }
-  function _upsertRow(key,value,isNew){
-    const body=document.getElementById('pb-body'); if(!body)return;
-    const f=FIELDS[key]; if(!f)return;
-    let row=document.getElementById('pbr_'+key);
-    if(row){
-      const inp=row.querySelector('.pf-input');
-      if(inp&&document.activeElement!==inp){
-        inp.value=value;
-        row.classList.add('new'); setTimeout(()=>row.classList.remove('new'),600);
-      }
-      return;
-    }
-
-    // Determine layout
-    const WIDE=['nombre_cliente','ubicación','tipo_asistencia'];
-    const SECTIONS={
-      tipo_asistencia:'Servicio',
-      nombre_cliente:'Cliente',
-      placa:'Vehículo',
-    };
-
-    // Insert section divider if first field of section
-    if(SECTIONS[key]){
-      const existingSec=document.getElementById('pfsec_'+key);
-      if(!existingSec){
-        const sec=document.createElement('div');
-        sec.className='pf-section';sec.id='pfsec_'+key;
-        sec.textContent=SECTIONS[key];
-        body.appendChild(sec);
-      }
-    }
-
-    // Create grid wrapper for pair fields if needed
-    const isWide=WIDE.includes(key);
-    let container=body;
-    if(!isWide){
-      // Find or create current grid
-      let grid=body.querySelector('.pf-grid:last-child');
-      const gridKeys=['placa','marca','modelo','año','color'];
-      const gridIdx=gridKeys.indexOf(key);
-      // Create new grid if needed (first of grid group or grid is full)
-      if(!grid||grid.children.length>=4||gridIdx===0){
-        grid=document.createElement('div');
-        grid.className='pf-grid';
-        body.appendChild(grid);
-      }
-      container=grid;
-    }
-
-    row=document.createElement('div');
-    row.className='pf-row'+(isNew?' new':'')+(isWide?' wide':'');
-    row.id='pbr_'+key;
-    row.innerHTML=`${f.i}${f.l}`;
-    container.appendChild(row);
-    if(isNew) setTimeout(()=>row.classList.remove('new'),600);
-  }
-  function _edit(key,value){_data[key]=value;_updateStatus();}
-  function _updateSugs(){
-    const wrap=document.getElementById('pb-sug-wrap');
-    const list=document.getElementById('pb-sug-list');
-    if(!wrap||!list)return;
-    const sugs=(SUGS[_currentService]||[]).filter(s=>!(s.t.includes('referencia')&&_data.ubicación)&&!(s.t.includes('cédula')&&_data.nombre_cliente));
-    if(!sugs.length){wrap.style.display='none';return;}
-    list.innerHTML='';
-    sugs.slice(0,2).forEach(s=>{
-      const el=document.createElement('div'); el.className='pb-sug';
-      el.innerHTML=`${s.i}${s.t}›`;
-      el.onclick=()=>{showToast('💬 '+s.q);el.style.opacity='.4';el.style.pointerEvents='none';};
-      list.appendChild(el);
-    });
-    wrap.style.display='';
-  }
-  function _updateWait(){
-    const el=document.getElementById('pb-wait'); if(!el||!_currentService){if(el)el.textContent='—';return;}
-    const mins=WAIT[_currentService]||15;
-    const hr=new Date().getHours(); const rush=(hr>=7&&hr=17&&hr=25?' slow':'');
-  }
-  function _updateStatus(){
-    const req=Object.entries(FIELDS).filter(([k,v])=>v.req.includes(_currentService||'grua')).map(([k])=>k);
-    const filled=req.filter(k=>_data[k]&&String(_data[k]).trim());
-    const complete=filled.length>=req.length;
-    const st=document.getElementById('pb-status'); const cta=document.getElementById('pb-cta');
-    if(st){st.textContent=complete?'Listo':`${filled.length}/${req.length}`;st.className='po-badge'+(complete?' ready':'');}
-    if(cta)cta.style.display=complete?'flex':'none';
-  }
-  function loadFromAnalysis(data){
-    let d=0;
-    Object.keys(FIELDS).forEach(k=>{
-      const val=data[k]; if(val&&String(val).trim()&&val!=='N/A'){setTimeout(()=>addField(k,val),d);d+=130;}
-    });
-  }
-  function reset(){
-    _data={}; _visible=false; _currentService=null;
-    const empty=document.getElementById('pb-empty');if(empty)empty.style.display='flex';
-    const pbScroll=document.getElementById('pb-body');if(pbScroll){pbScroll.style.display='none';pbScroll.innerHTML='';}
-    const pbMeta=document.getElementById('pb-meta-row');if(pbMeta)pbMeta.style.display='none';
-    const poSugs=document.getElementById('pb-sug-wrap');if(poSugs)poSugs.style.display='none';
-    const b=document.getElementById('pb-body');if(b)b.innerHTML='';
-    const st=document.getElementById('pb-status');if(st){st.textContent='En curso';st.className='pb-status';}
-    const cta=document.getElementById('pb-cta');if(cta)cta.style.display='none';
-    const sw=document.getElementById('pb-sug-wrap');if(sw)sw.style.display='none';
-    const w=document.getElementById('pb-wait');if(w){w.textContent='—';w.className='pb-wait-val';}
-    const nt=document.getElementById('pb-notes-ta');if(nt)nt.value='';
-    const notes=document.querySelector('.po-notes');if(notes)notes.classList.remove('visible');
-  }
-  function getData(){return{..._data};}
-  return{addField,setService,loadFromAnalysis,reset,getData,_edit,get _currentSvc(){return _currentService?{id:_currentService}:null}};
-})();
-
-function confirmPO(){
-  const data=POBuilder.getData();
-  const noteEl=document.getElementById('pb-notes-ta');
-  if(noteEl&&noteEl.value.trim()) data.nota=noteEl.value.trim();
-  if(!lastAnalysis)lastAnalysis={};
-  Object.assign(lastAnalysis,data);
-  const num='PO-'+Math.floor(100000+Math.random()*900000);
-  const now=new Date();
-  const ts=now.toLocaleString('es-CR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-  const tsISO=now.toISOString();
-
-  // Capture call duration from timer
-  const timerEl=document.getElementById('call-timer-val');
-  const callDuration=timerEl?timerEl.textContent:'—';
-
-  // Capture sentiment from lastAnalysis
-  const sent=lastAnalysis?.sentimiento_cliente||null;
-  const sentVal=sent?Number(sent.valor):0;
-  const sentDesc=sent?.descripcion||'';
-
-  // Protocol compliance from lastAnalysis
-  const proto=lastAnalysis?.protocolo_agente||null;
-
-  // Build scores
-  const scores=_buildScores(data,sent,proto,callDuration);
-
-  // Estimated dispatch time
-  const svcId=POBuilder._currentSvc?.id||null;
-  const WAIT={grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
-  const hr=now.getHours();
-  const rush=(hr>=7&&hr=17&&hrctr.style.transform='',260);}
-
-function closePOConfirm(){document.getElementById('po-confirm-ov').classList.remove('show');}
-
-function openMapFromPO(){if(_poData.data?.ubicación)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(_poData.data.ubicación+', Costa Rica'),'_blank');}
-
-function resetPOBuilder(){POBuilder.reset();}
-
-function openDrawer(){
-  document.getElementById('po-drawer-ov').classList.add('show');
-}
-
-function closeDrawer(){
-  document.getElementById('po-drawer-ov').classList.remove('show');
-  closeDetail();
-}
-
-function renderDrawer(){
-  const list=document.getElementById('pd-list');
-  const empty=document.getElementById('pd-empty');
-  const cnt=document.getElementById('pdh-count');
-  if(cnt)cnt.textContent=_poList.length+' POs';
-  if(!_poList.length){if(empty)empty.style.display='flex';return;}
-  if(empty)empty.style.display='none';
-  list.innerHTML=_poList.map((po,i)=>`${po.num}${po.data.tipo_asistencia||'—'}${po.ts}${po.data.nombre_cliente?`👤${po.data.nombre_cliente}`:''} ${po.data.placa?`🪪${po.data.placa}`:''} ${po.data.ubicación?`📍${po.data.ubicación}`:''}`).join('');
-}
-
-function filterPOs(query){
-  const q=query.trim().toLowerCase();
-  const clear=document.getElementById('pd-search-clear');
-  if(clear) clear.classList.toggle('show', q.length>0);
-
-  const cards=document.querySelectorAll('.pd-card');
-  let visible=0;
-  cards.forEach(card=>{
-    const match = !q || card.textContent.toLowerCase().includes(q);
-    card.style.display = match ? '' : 'none';
-    if(match) visible++;
-  });
-  const empty=document.getElementById('pd-empty');
-  if(empty) empty.style.display = (visible===0 && _poList.length>0) ? 'flex' : 'none';
-  // update empty text
-  if(empty && q && visible===0) empty.querySelector('.pd-empty-t').textContent='Sin resultados para "'+query+'"';
-  else if(empty && _poList.length===0) { empty.style.display='flex'; empty.querySelector('.pd-empty-t').textContent='No hay POs creados aún'; }
-}
-
-function clearSearch(){
-  const inp=document.getElementById('pd-search-input');
-  if(inp){ inp.value=''; filterPOs(''); }
-}
-
-function openDetail(num){
-  const po=_poList.find(p=>p.num===num); if(!po) return;
-  _activeDetailId=num;
-  const m=po.meta||{};
-  const sc=m.scores||{satisfaction:70,ahtScore:80,completeness:75,speechScore:80,speechItems:[]};
-
-  document.querySelectorAll('.pd-card').forEach(c=>c.classList.remove('active'));
-  const activeCard=document.getElementById('pdc_'+num);
-  if(activeCard) activeCard.classList.add('active');
-
-  document.getElementById('pd-det-num').textContent=num;
-  document.getElementById('pd-det-ts').textContent=po.ts;
-
-  const body=document.getElementById('pd-det-body');
-  body.innerHTML='';
-
-  // ── Metrics grid ────────────────────────────────────
-  const sentEmoji=m.sentVal===1?'😊':m.sentVal===0?'😐':'😠';
-  const sentCls=m.sentVal===1?'pos':m.sentVal===0?'neu':'neg';
-  const sentLbl=m.sentVal===1?'Satisfecho':m.sentVal===0?'Neutro':'Molesto';
-  const waitCls=m.waitTime<=15?'good':m.waitTime>=25?'warn':'';
-  const durCls=(()=>{if(!m.callDuration||m.callDuration==='—')return '';const mins=parseInt(m.callDuration);return mins<=5?'good':mins<=8?'warn':'bad';})();
-
-  const metricsDiv=document.createElement('div');
-  metricsDiv.className='pd-metrics';
-  metricsDiv.innerHTML=`
-    <div class="pd-metric">
-      <div class="pd-metric-lbl">Hora de creación</div>
-      <div class="pd-metric-val" style="font-size:13px">${po.ts}</div>
-      <div class="pd-metric-sub">${num}</div>
-    </div>
-    <div class="pd-metric">
-      <div class="pd-metric-lbl">Duración llamada</div>
-      <div class="pd-metric-val ${durCls}">${m.callDuration||'—'}</div>
-      <div class="pd-metric-sub">min:seg</div>
-    </div>
-    <div class="pd-metric">
-      <div class="pd-metric-lbl">T. despacho est.</div>
-      <div class="pd-metric-val ${waitCls}">${m.waitTime?m.waitTime+' min':'—'}</div>
-      <div class="pd-metric-sub">${m.waitTime>20?'Hora pico':'Normal'}</div>
-    </div>
-    <div class="pd-metric">
-      <div class="pd-metric-lbl">Sentimiento</div>
-      <div class="pd-metric-val" style="font-size:18px">${sentEmoji}</div>
-      <div class="pd-sent-badge ${sentCls}">${sentLbl}</div>
-    </div>`;
-  body.appendChild(metricsDiv);
-
-  // ── Score bars ───────────────────────────────────────
-  const scoresDiv=document.createElement('div');
-  scoresDiv.className='pd-scores';
-  const scoreRows=[
-    {l:'Satisfacción', v:sc.satisfaction},
-    {l:'AHT',          v:sc.ahtScore},
-    {l:'Completitud',  v:sc.completeness},
-    {l:'Speech',       v:sc.speechScore},
-  ];
-  scoresDiv.innerHTML=scoreRows.map(s=>{
-    const cls=s.v>=80?'good':s.v>=60?'warn':'bad';
-    const color=s.v>=80?'var(--g)':s.v>=60?'var(--y)':'var(--r)';
-    return `<div class="pd-score-row">
-      <span class="pd-score-lbl">${s.l}</span>
-      <div class="pd-score-bar"><div class="pd-score-fill ${cls}" style="width:${s.v}%"></div></div>
-      <span class="pd-score-num" style="color:${color}">${s.v}%</span>
-    </div>`;
-  }).join('');
-  body.appendChild(scoresDiv);
-
-  // ── Speech checklist ─────────────────────────────────
-  if(sc.speechItems?.length){
-    const speechDiv=document.createElement('div');
-    speechDiv.className='pd-speech';
-    speechDiv.innerHTML=`<div class="pd-speech-title">Cumplimiento de speech</div>
-      <div class="pd-speech-items">${sc.speechItems.map(i=>`
-        <div class="pd-speech-item">
-          <div class="pd-speech-dot ${i.ok?'ok':'fail'}"></div>
-          <span>${i.label}</span>
-          <span style="margin-left:auto;font-family:var(--m);font-size:8px;color:${i.ok?'var(--g)':'var(--r)'}">${i.ok?'✓':'✗'}</span>
-        </div>`).join('')}
-      </div>`;
-    body.appendChild(speechDiv);
-  }
-
-  // ── Data fields ──────────────────────────────────────
-  Object.entries(FIELD_ICONS).forEach(([k,ico])=>{
-    const val=po.data[k]; if(!val||val==='N/A') return;
-    const isUbic=k==='ubicación';
-    const row=document.createElement('div'); row.className='pd-det-row';
-    row.innerHTML=`<div class="pd-det-i">${ico}</div><div style="flex:1;min-width:0"><div class="pd-det-lbl">${FIELD_LBLS[k]}</div><div class="pd-det-v${isUbic?' link':''}"${isUbic?` onclick="openMapFromDetail()"`:''}>${val}</div></div>`;
-    body.appendChild(row);
-  });
-
-  document.getElementById('pd-detail').classList.remove('hidden');
-}
-
-function closeDetail(){
-  _activeDetailId=null;
-  document.querySelectorAll('.pd-card').forEach(c=>c.classList.remove('active'));
-  document.getElementById('pd-detail').classList.add('hidden');
-}
-
-function openMapFromDetail(){
-  const po=_poList.find(p=>p.num===_activeDetailId);
-  if(po?.data?.ubicación)
-    window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(po.data.ubicación+', Costa Rica'),'_blank');
-}
-
-function openDashboard(){_buildDashboard();document.getElementById('dash-ov').classList.add('show');document.getElementById('dash-date').textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});}
-
-function closeDashboard(){document.getElementById('dash-ov').classList.remove('show');}
-
-function _buildDashboard(){
-  const pos=_poList,n=pos.length;
-  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
-  const satAvg=avg(pos.map(p=>p.meta?.scores?.satisfaction||0))||72;
-  const ahtAvg=avg(pos.map(p=>p.meta?.scores?.ahtScore||0))||80;
-  const compAvg=avg(pos.map(p=>p.meta?.scores?.completeness||0))||75;
-  const speechAvg=avg(pos.map(p=>p.meta?.scores?.speechScore||0))||78;
-  const waitAvg=avg(pos.map(p=>p.meta?.waitTime||0))||20;
-  const overall=Math.round(satAvg*.35+ahtAvg*.2+compAvg*.25+speechAvg*.2);
-  const ring=document.getElementById('dash-score-ring');
-  document.getElementById('dash-score-val').textContent=overall;
-  setTimeout(()=>{const c=overall>=80?'var(--grn)':overall>=60?'var(--ylw)':'var(--red)';ring.style.strokeDashoffset=251-(251*overall/100);ring.style.stroke=c;},80);
-  const R=[{min:88,lbl:'Desempeño Excelente',sub:'Superaste todos los estándares de calidad del equipo.'},{min:73,lbl:'Buen Desempeño',sub:'Cumpliste la mayoría de estándares con solidez.'},{min:55,lbl:'Desempeño Aceptable',sub:'Hay oportunidades de mejora importantes.'},{min:0,lbl:'Necesita Mejorar',sub:'Varios indicadores por debajo del estándar.'}];
-  const r=R.find(x=>overall>=x.min);
-  document.getElementById('dash-rating-lbl').textContent=r.lbl;
-  document.getElementById('dash-rating-sub').textContent=r.sub;
-  const bd=document.getElementById('dash-badges');bd.innerHTML='';
-  [[satAvg>=80,'😊 Alta satisfacción','var(--grn)'],[ahtAvg>=80,'⚡ AHT óptimo','var(--grn)'],[compAvg>=80,'✓ Datos completos','var(--grn)'],[n>=3,'📋 '+n+' POs','var(--acc)'],[speechAvg>=80,'🎤 Speech ✓','var(--vio)']].filter(x=>x[0]).forEach(([,l,c])=>{bd.innerHTML+=`<span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:${c}22;color:${c};border:1px solid ${c}44;">${l}</span>`;});
-  document.getElementById('dash-kpi-strip').innerHTML=[{l:'POs creados',v:n,u:'',c:'var(--acc)'},{l:'Satisfacción',v:satAvg,u:'%',c:satAvg>=80?'var(--grn)':'var(--ylw)'},{l:'Completitud',v:compAvg,u:'%',c:compAvg>=80?'var(--grn)':'var(--ylw)'},{l:'Espera prom.',v:waitAvg,u:' min',c:waitAvg<=15?'var(--grn)':waitAvg>=25?'var(--red)':'var(--ylw)'}].map((k,i)=>`<div style="padding:14px 18px;border-right:${i<3?'1px solid var(--ln)':'none'};text-align:center;"><div style="font-family:var(--m);font-size:20px;font-weight:700;color:${k.c};margin-bottom:2px;">${k.v}${k.u}</div><div style="font-family:var(--m);font-size:7px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;">${k.l}</div></div>`).join('');
-  document.getElementById('dash-scores').innerHTML=[{l:'Satisfacción cliente',v:satAvg,d:'Basado en sentimiento detectado'},{l:'AHT (Tiempo prom.)',v:ahtAvg,d:'Eficiencia en llamadas'},{l:'Completitud datos',v:compAvg,d:'Campos obligatorios capturados'},{l:'Protocolo speech',v:speechAvg,d:'Guión de atención seguido'}].map(s=>{const c=s.v>=80?'var(--grn)':s.v>=60?'var(--ylw)':'var(--red)';return `<div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:var(--t0);">${s.l}</span><span style="font-family:var(--m);font-size:11px;font-weight:700;color:${c};">${s.v}%</span></div><div style="height:4px;background:var(--p3);border-radius:4px;overflow:hidden;margin-bottom:3px;"><div style="height:100%;width:${s.v}%;background:${c};border-radius:4px;transition:width .9s ease;"></div></div><div style="font-size:10px;color:var(--t2);">${s.d}</div></div>`;}).join('');
-  const pl=document.getElementById('dash-po-list');pl.innerHTML='';
-  if(n){document.getElementById('dash-no-pos').style.display='none';pos.forEach((po,idx)=>{const e=po.meta?.sentVal===1?'😊':po.meta?.sentVal===0?'😐':'😠';const sc=po.meta?.scores?.satisfaction||0;const tot=po.meta?.scores?Math.round((po.meta.scores.satisfaction*.3+po.meta.scores.ahtScore*.2+po.meta.scores.completeness*.2+po.meta.scores.speechScore*.3)):sc;const cc=tot>=80?'var(--grn)':tot>=65?'var(--ylw)':'var(--red)';pl.innerHTML+=`<div class="dpo-row" id="dpo_${idx}" onclick="_toggleDPO(${idx})" style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;background:var(--p2);border:1px solid var(--ln);margin-bottom:0;"><span style="font-family:var(--m);font-size:10px;font-weight:700;color:var(--acc);flex-shrink:0;">${po.num}</span><span style="font-size:11px;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${po.data.nombre_cliente||'—'} · ${po.data.tipo_asistencia||'—'}</span><span>${e}</span><span style="font-family:var(--m);font-size:11px;font-weight:700;color:${cc};">${tot}%</span><span style="font-family:var(--m);font-size:9px;color:var(--t2);">${po.ts}</span><span class="dpo-chevron">›</span></div><div class="dpo-detail" id="dpod_${idx}"></div>`;});}
-  const allI={};pos.forEach(po=>(po.meta?.scores?.speechItems||[]).forEach(it=>{if(!allI[it.label])allI[it.label]={ok:0,total:0};allI[it.label].total++;if(it.ok)allI[it.label].ok++;}));
-  const defP=['Saludo de bienvenida','Identificación del cliente','Validación de ubicación','Confirmación de servicio','ETA comunicado al cliente'];
-  document.getElementById('dash-protocol').innerHTML=(Object.keys(allI).length?Object.keys(allI):defP).map(k=>{const d=allI[k]||{ok:0,total:Math.max(n,1)};const pct=Math.round(d.ok/d.total*100)||0;const c=pct>=80?'var(--grn)':pct>=50?'var(--ylw)':'var(--red)';return `<div style="background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:11px 13px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-family:var(--m);font-size:11px;font-weight:700;color:${c};">${pct>=80?'✓':pct>=50?'△':'✗'}</span><span style="font-size:11px;color:var(--t0);">${k}</span></div><div style="height:3px;background:var(--p3);border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:${pct}%;background:${c};border-radius:3px;"></div></div><span style="font-family:var(--m);font-size:9px;color:${c};font-weight:700;">${pct}%</span></div>`;}).join('');
-  document.getElementById('dash-recs').innerHTML=_genRecs(overall,satAvg,ahtAvg,compAvg,speechAvg,n,waitAvg).map(r=>{const pc={'alta':'var(--red)','media':'var(--ylw)','baja':'var(--grn)'}[r.p];return `<div style="display:flex;gap:11px;align-items:flex-start;padding:11px 13px;background:var(--p2);border:1px solid var(--ln);border-radius:9px;"><div style="width:30px;height:30px;border-radius:7px;background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.18);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${r.ico}</div><div style="flex:1;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:3px;">${r.title}</div><div style="font-size:11px;color:var(--t1);line-height:1.5;">${r.body}</div></div><span style="font-family:var(--m);font-size:7px;padding:2px 7px;border-radius:20px;background:${pc}18;color:${pc};border:1px solid ${pc}44;white-space:nowrap;flex-shrink:0;">${r.p}</span></div>`;}).join('');
-}
-
-function _genRecs(overall,sat,aht,comp,speech,n,wait){
-  const recs=[];
   if(sat<70)recs.push({ico:'😊',title:'Mejorar empatía con el cliente',body:'El índice de satisfacción está por debajo del estándar. Practica frases de empatía y confirma comprensión durante la llamada.',p:'alta'});
   if(aht<70)recs.push({ico:'⏱',title:'Reducir tiempo de atención',body:'El AHT supera el rango óptimo. Prepara las preguntas clave y evita silencios prolongados.',p:'alta'});
   if(comp<75)recs.push({ico:'📋',title:'Capturar todos los datos del PO',body:'Nombre, placa, ubicación y tipo de servicio son obligatorios. Completa el formulario en cada llamada.',p:'alta'});
@@ -3090,32 +2052,30 @@ function _toggleDPO(idx){
   document.querySelectorAll('.dpo-row').forEach(r=>r.classList.remove('open'));
   document.querySelectorAll('.dpo-detail').forEach(d=>d.classList.remove('show'));
   if(isOpen)return;
-  row.classList.add('open');
-  detail.classList.add('show');
+  row.classList.add('open'); detail.classList.add('show');
   if(detail.innerHTML.trim())return;
   const po=_poList[idx]; if(!po)return;
   const m=po.meta||{};
   const sc=m.scores||{satisfaction:70,ahtScore:80,completeness:75,speechScore:80,speechItems:[]};
   const tot=Math.round(sc.satisfaction*.3+sc.ahtScore*.2+sc.completeness*.2+sc.speechScore*.3);
-  const gc=v=>v>=80?'var(--grn)':v>=65?'var(--ylw)':'var(--red)';
+  const gc=v=>v>=80?'var(--g)':v>=65?'var(--y)':'var(--r)';
   const sentLbl=m.sentVal===1?'😊 Satisfecho':m.sentVal===0?'😐 Neutro':'😠 Molesto';
   let html=`<div class="dpo-grid">
-    <div class="dpo-metric"><div class="dpo-metric-lbl">Score total</div><div class="dpo-metric-val" style="color:${gc(tot)}">${tot}%</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Score</div><div class="dpo-metric-val" style="color:${gc(tot)}">${tot}%</div></div>
     <div class="dpo-metric"><div class="dpo-metric-lbl">Satisfacción</div><div class="dpo-metric-val" style="color:${gc(sc.satisfaction)}">${sc.satisfaction}%</div></div>
     <div class="dpo-metric"><div class="dpo-metric-lbl">Duración</div><div class="dpo-metric-val">${m.callDuration||'—'}</div></div>
     <div class="dpo-metric"><div class="dpo-metric-lbl">Sentimiento</div><div class="dpo-metric-val" style="font-size:18px">${m.sentVal===1?'😊':m.sentVal===0?'😐':'😠'}</div></div>
   </div>
   <div class="dpo-bars">
-    ${[{l:'Satisfacción',v:sc.satisfaction},{l:'AHT',v:sc.ahtScore},{l:'Completitud',v:sc.completeness},{l:'Speech',v:sc.speechScore}].map(b=>`<div class="dpo-bar-row"><span class="dpo-bar-lbl">${b.l}</span><div class="dpo-bar-bg"><div class="dpo-bar-fill" style="background:${gc(b.v)}" data-w="${b.v}%"></div></div><span class="dpo-bar-num" style="color:${gc(b.v)}">${b.v}%</span></div>`).join('')}
+    ${[{l:'Satisfacción',v:sc.satisfaction},{l:'AHT',v:sc.ahtScore},{l:'Completitud',v:sc.completeness},{l:'Speech',v:sc.speechScore}].map(b=>{const c=b.v>=80?'g':b.v>=65?'y':'r';return '<div class="dpo-bar-row"><span class="dpo-bar-lbl">'+b.l+'</span><div class="dpo-bar-bg"><div class="dpo-bar-fill '+c+'" style="width:0%" data-w="'+b.v+'%"></div></div><span class="dpo-bar-num">'+b.v+'%</span></div>';}).join('')}
   </div>`;
   if(sc.speechItems?.length){
-    html+=`<div class="dpo-speech">${sc.speechItems.map(i=>`<div class="dpo-speech-chip ${i.ok?'ok':'fail'}">${i.ok?'✓':'✗'} ${i.label}</div>`).join('')}</div>`;
+    html+=`<div class="dpo-speech">${sc.speechItems.map(i=>'<div class="dpo-speech-chip '+(i.ok?'ok':'fail')+'">'+(i.ok?'✓':'✗')+' '+i.label+'</div>').join('')}</div>`;
   }
   detail.innerHTML=html;
   setTimeout(()=>detail.querySelectorAll('.dpo-bar-fill').forEach(f=>f.style.width=f.dataset.w),50);
 }
 
-AgentBar.init();
-</script>
+AgentBar.init();</script>
 </body>
 </html>
