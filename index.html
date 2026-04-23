@@ -28,10 +28,10 @@ html,body{height:100%;overflow:hidden;}
   --gb:rgba(255,255,255,.055);
   --gb2:rgba(255,255,255,.1);
 
-  --t0:#f4f6ff;
-  --t1:#8892b8;
-  --t2:#454d6b;
-  --t3:#1e2338;
+  --t0:#ffffff;
+  --t1:#a0a8b8;
+  --t2:#7a8399;
+  --t3:#3a4155;
 
   --f:'Syne',sans-serif;
   --m:'JetBrains Mono',monospace;
@@ -70,14 +70,24 @@ body.light::before{
   border-bottom:1px solid var(--gb);position:relative;z-index:20;
 }
 body.light .nav{background:rgba(255,255,255,.8);}
-.nav::after{content:'';position:absolute;bottom:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,var(--a) 0%,rgba(255,92,0,.15) 30%,transparent 60%);}
+.nav::after{content:'';position:absolute;bottom:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,var(--gb2) 0%,transparent 60%);}
 
 /* Brand */
 .n-brand{
-  font-family:var(--f);font-size:17px;font-weight:800;letter-spacing:-.5px;
+  display:flex;align-items:baseline;gap:1px;
+  margin-right:16px;flex-shrink:0;line-height:1;
+}
+.n-brand-word{
+  font-family:var(--f);font-weight:900;letter-spacing:-1px;
+  font-size:18px;text-transform:uppercase;
   background:linear-gradient(135deg,var(--a),var(--a2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-right:16px;flex-shrink:0;
+}
+.n-brand-reg{
+  font-family:var(--f);font-weight:900;font-size:8px;
+  background:linear-gradient(135deg,var(--a),var(--a2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  vertical-align:super;
 }
 /* Connection — compact dot only */
 .n-conn{
@@ -93,8 +103,8 @@ body.light .nav{background:rgba(255,255,255,.8);}
 .n-agent{display:flex;align-items:center;gap:9px;margin-right:24px;}
 .n-av{
   width:28px;height:28px;border-radius:8px;
-  background:linear-gradient(135deg,rgba(255,92,0,.12),transparent);
-  border:1px solid rgba(255,92,0,.2);
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--gb2);
   display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
 }
 .n-name{font-size:12px;font-weight:600;color:var(--t0);}
@@ -118,8 +128,7 @@ body.light .nav{background:rgba(255,255,255,.8);}
 .n-goal{display:flex;align-items:center;gap:8px;margin-right:18px;}
 .n-gnum{
   font-family:var(--f);font-size:20px;font-weight:800;letter-spacing:-.5px;
-  background:linear-gradient(135deg,var(--a),var(--a2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  color:var(--t0);
   line-height:1;
 }
 .n-gof{font-family:var(--m);font-size:11px;color:var(--t2);}
@@ -127,8 +136,8 @@ body.light .nav{background:rgba(255,255,255,.8);}
 .n-gstar.on{filter:none;transform:scale(1.2);animation:sp .5s ease;}
 @keyframes sp{0%{transform:scale(.3)rotate(-15deg)}65%{transform:scale(1.3)rotate(5deg)}100%{transform:scale(1.2)}}
 .n-bar{width:72px;height:3px;background:var(--c4);border-radius:3px;overflow:hidden;}
-.n-fill{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:3px;transition:width .8s;}
-.n-fill.done{background:linear-gradient(90deg,var(--g),#44ffcc);}
+.n-fill{height:100%;background:var(--t2);border-radius:3px;transition:width .8s;}
+.n-fill.done{background:var(--g);}
 
 /* KPIs — minimal pills */
 .n-kpis{display:flex;align-items:center;gap:6px;}
@@ -139,7 +148,7 @@ body.light .nav{background:rgba(255,255,255,.8);}
   cursor:default;transition:background .15s;
 }
 .n-kp:hover{background:rgba(255,255,255,.07);}
-.n-kv{font-family:var(--m);font-size:13px;font-weight:700;color:var(--t0);line-height:1.2;}
+.n-kv{font-family:var(--m);font-size:13px;font-weight:700;color:var(--t1);line-height:1.2;}
 .n-kv.g{color:var(--g);}.n-kv.y{color:var(--y);}
 .n-kl{font-family:var(--m);font-size:7px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
 
@@ -147,71 +156,44 @@ body.light .nav{background:rgba(255,255,255,.8);}
 .n-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
 .po-counter{
   display:none;align-items:center;gap:5px;
-  background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);
+  background:var(--gb);border:1px solid var(--gb2);
   border-radius:20px;padding:5px 14px;cursor:pointer;
-  font-family:var(--m);font-size:12px;font-weight:600;color:var(--g);
+  font-family:var(--m);font-size:12px;font-weight:600;color:var(--t1);
   transition:all .2s;
 }
 .po-counter.show{display:flex;}
-.po-counter:hover{background:rgba(0,229,160,.14);}
+.po-counter:hover{background:var(--c2);}
 .po-counter-lbl{font-size:9px;opacity:.6;}
-/* ── NAV RIGHT CONTROLS — bicolor theme ── */
-/* Dark mode: white tones | Light mode: grey tones */
 .n-th{
   display:flex;align-items:center;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  background:var(--gb);border:1px solid var(--gb2);
   border-radius:20px;padding:2px;gap:1px;
 }
-body.light .n-th{
-  background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.1);
-}
-.n-to{
-  height:24px;padding:0 10px;border:none;background:transparent;
-  color:rgba(255,255,255,.45);font-size:12px;cursor:pointer;border-radius:18px;transition:all .15s;
-}
-body.light .n-to{color:rgba(0,0,0,.35);}
-.n-to:hover{color:rgba(255,255,255,.85);}
-body.light .n-to:hover{color:rgba(0,0,0,.65);}
-.n-to.on{
-  background:rgba(255,255,255,.15);color:#fff;
-  box-shadow:0 1px 6px rgba(0,0,0,.3);
-}
-body.light .n-to.on{
-  background:rgba(0,0,0,.08);color:rgba(0,0,0,.7);
-  box-shadow:0 1px 4px rgba(0,0,0,.12);
-}
+.n-to{height:24px;padding:0 10px;border:none;background:transparent;color:var(--t2);font-size:12px;cursor:pointer;border-radius:18px;transition:all .15s;filter:grayscale(1) brightness(10);opacity:.85;transition:filter .2s,opacity .2s;}
+
+.n-to:hover{color:var(--t0);filter:grayscale(1) contrast(0.8) brightness(0.85);opacity:1;}
+.n-to.on{background:var(--c1);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.2);filter:grayscale(1) brightness(3);opacity:1;}
+
 .n-dash{
   width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;
-  color:rgba(255,255,255,.7);font-size:16px;cursor:pointer;transition:all .15s;
-  filter:grayscale(1);
+  background:var(--gb);border:1px solid var(--gb2);
+  border-radius:8px;cursor:pointer;font-size:16px;
+  color:var(--t2);transition:all .15s;filter:grayscale(1);opacity:.6;
 }
-body.light .n-dash{
-  background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.1);
-  color:rgba(0,0,0,.5);
-}
-.n-dash:hover{
-  background:rgba(255,255,255,.15);color:#fff;filter:grayscale(0);
-}
-body.light .n-dash:hover{
-  background:rgba(0,0,0,.1);color:rgba(0,0,0,.75);filter:grayscale(0);
-}
+
+.n-dash:hover{background:var(--c2);color:var(--t0);filter:grayscale(1) brightness(3);opacity:1;}
+
+.n-dash:hover{background:var(--gb2);color:var(--t0);}
 .n-demo{
   height:36px;padding:0 18px;
-  background:linear-gradient(135deg,var(--a),var(--a2));
-  border:none;color:#fff;font-family:var(--f);
-  font-size:13px;font-weight:700;border-radius:8px;
-  cursor:pointer;letter-spacing:.2px;
-  box-shadow:0 4px 20px rgba(255,92,0,.3);
-  transition:all .2s;
+  background:var(--c2);
+  border:1px solid var(--gb2);color:var(--t1);font-family:var(--f);
+  font-size:13px;font-weight:600;border-radius:8px;
+  cursor:pointer;transition:all .15s;letter-spacing:.2px;
 }
-body.light .n-demo{
-  background:linear-gradient(135deg,#888,#aaa);
-  box-shadow:0 4px 16px rgba(0,0,0,.15);
-  color:#fff;
-}
+.n-demo:hover{background:var(--c3);border-color:var(--t2);color:var(--t0);}
+
 .n-demo:hover{box-shadow:0 6px 28px rgba(255,92,0,.45);transform:translateY(-1px);}
-body.light .n-demo:hover{box-shadow:0 6px 20px rgba(0,0,0,.22);transform:translateY(-1px);}
 
 /* ═══ BODY — 3 COLUMNS ═════════════════════════════ */
 .body{flex:1;display:flex;overflow:hidden;}
@@ -343,6 +325,7 @@ body.light .tp-hd{background:rgba(255,255,255,.4);}
 .col-r{
   width:340px;min-width:340px;display:flex;flex-direction:column;
   background:rgba(13,16,24,.5);backdrop-filter:blur(16px);
+  overflow:hidden;
 }
 body.light .col-r{background:rgba(255,255,255,.5);}
 
@@ -367,13 +350,13 @@ body.light .col-r{background:rgba(255,255,255,.5);}
 
 .po-empty{
   padding:32px 18px;display:flex;flex-direction:column;align-items:center;gap:8px;
-  color:var(--t2);text-align:center;
+  color:var(--t2);text-align:center;flex-shrink:0;
 }
 .po-empty-ico{font-size:28px;opacity:.1;}
 .po-empty-txt{font-family:var(--m);font-size:10px;letter-spacing:.2px;line-height:1.7;color:var(--t2);}
 
 /* fields */
-.po-fields{display:none;overflow-y:auto;flex:0 0 auto;}
+.po-fields{display:none;overflow-y:auto;flex:1;min-height:0;flex-direction:column;}
 .po-fields::-webkit-scrollbar{width:0;}
 
 .pf-row{
@@ -436,30 +419,51 @@ body.light .col-r{background:rgba(255,255,255,.5);}
 .po-notes-ta::placeholder{color:var(--t3);}
 
 .po-cta{
-  display:none;padding:12px 18px;gap:8px;
+  display:none;padding:8px 14px;gap:6px;
   border-top:1px solid var(--gb);flex-shrink:0;
 }
-.po-cta-btn{flex:1;padding:12px;border-radius:8px;font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;border:none;letter-spacing:.1px;}
+.po-cta-btn{flex:1;padding:7px 10px;border-radius:7px;font-family:var(--f);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.1px;}
 .po-cta-btn.main{
-  background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;
-  box-shadow:0 4px 20px rgba(255,92,0,.25);
+  background:var(--gb);
+  border:1px solid var(--gb2);
+  color:var(--t0);
+  box-shadow:none;
 }
-.po-cta-btn.main:hover{box-shadow:0 6px 28px rgba(255,92,0,.4);transform:translateY(-1px);}
-.po-cta-btn.sec{background:var(--gb);border:1px solid var(--gb2);color:var(--t2);}
-.po-cta-btn.sec:hover{color:var(--t0);}
+.po-cta-btn.main:hover,
+.po-cta-btn.main:focus,
+.po-cta-btn.main:active{
+  background:rgba(255,92,0,.08);
+  border-color:var(--a);
+  color:var(--a);
+  box-shadow:0 0 0 2px rgba(255,92,0,.2);
+}
+.po-cta-btn.sec{
+  background:var(--gb);
+  border:1px solid var(--gb2);
+  color:var(--t1);
+}
+.po-cta-btn.sec:hover,
+.po-cta-btn.sec:focus,
+.po-cta-btn.sec:active{
+  border-color:var(--a);
+  color:var(--a);
+  box-shadow:0 0 0 2px rgba(255,92,0,.15);
+}
 
 /* ═══ OVERLAYS & MODALS ═══════════════════════════ */
 
 /* Flash pills */
 .flash-stage{position:fixed;top:64px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:500;pointer-events:none;}
-.flash-pill{display:flex;align-items:center;gap:9px;background:rgba(20,24,36,.95);backdrop-filter:blur(20px);border:1px solid var(--gb2);border-radius:24px;padding:6px 16px;font-family:var(--m);font-size:11px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:pin .22s cubic-bezier(.34,1.56,.64,1) forwards;}
+.flash-pill{display:flex;align-items:center;gap:9px;background:rgba(245,244,241,.96);backdrop-filter:blur(20px);border:1px solid rgba(0,0,0,.08);border-radius:24px;padding:6px 14px 6px 10px;font-family:var(--m);font-size:11px;box-shadow:0 4px 16px rgba(0,0,0,.12);animation:pin .22s cubic-bezier(.34,1.56,.64,1) forwards;}
 .flash-pill.out{animation:pout .22s ease forwards;}
-.flash-ico{font-size:13px;}.flash-lbl{font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;}.flash-val{font-weight:600;color:var(--a);}
+.flash-ico{font-size:13px;filter:grayscale(1) brightness(10);opacity:.85;transition:filter .2s,opacity .2s;}
+.flash-lbl{font-size:8px;color:#6b6966;text-transform:uppercase;letter-spacing:.4px;}.flash-val{font-weight:600;color:#18181a;}
 @keyframes pin{from{opacity:0;transform:translateY(-6px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes pout{from{opacity:1}to{opacity:0;transform:translateY(5px)}}
 
 /* Service popup */
 .svc-popup{
+  display:none!important;
   position:fixed;top:64px;left:50%;
   transform:translateX(-50%) translateY(-8px);
   background:rgba(20,24,36,.95);backdrop-filter:blur(24px);
@@ -485,30 +489,30 @@ body.light .col-r{background:rgba(255,255,255,.5);}
 @keyframes fi{from{opacity:0}to{opacity:1}}
 .po-confirm-modal{
   background:rgba(13,16,24,.96);backdrop-filter:blur(30px);
-  border:1px solid var(--gb2);border-radius:16px;width:420px;max-width:96vw;overflow:hidden;
+  border:1px solid var(--gb2);border-radius:14px;width:340px;max-width:96vw;overflow:hidden;max-height:85vh;display:flex;flex-direction:column;
   box-shadow:0 24px 80px rgba(0,0,0,.6);
   animation:mu .28s cubic-bezier(.34,1.56,.64,1);
 }
 body.light .po-confirm-modal{background:rgba(255,255,255,.96);}
 @keyframes mu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.pcm-head{padding:24px 22px 18px;text-align:center;border-bottom:1px solid var(--gb);position:relative;overflow:hidden;}
+.pcm-head{padding:14px 18px 12px;text-align:center;border-bottom:1px solid var(--gb);position:relative;overflow:hidden;}
 .pcm-head::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),transparent);}
 .pcm-head-glow{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:120px;height:80px;background:radial-gradient(circle,rgba(0,229,160,.12),transparent);pointer-events:none;}
-.pcm-check{width:48px;height:48px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,.2),rgba(0,229,160,.04));border:1px solid rgba(0,229,160,.3);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 12px;animation:pop .4s cubic-bezier(.34,1.56,.64,1);}
+.pcm-check{width:36px;height:36px;border-radius:50%;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);display:flex;align-items:center;justify-content:center;font-size:16px;margin:0 auto 8px;animation:pop .4s cubic-bezier(.34,1.56,.64,1);}
 @keyframes pop{from{transform:scale(.15);opacity:0}to{transform:scale(1);opacity:1}}
-.pcm-title{font-size:15px;font-weight:600;color:var(--t0);margin-bottom:5px;}
-.pcm-po-num{font-family:var(--m);font-size:22px;font-weight:700;color:var(--g);letter-spacing:2px;margin:6px 0 3px;}
+.pcm-title{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:3px;}
+.pcm-po-num{font-family:var(--m);font-size:16px;font-weight:700;color:var(--g);letter-spacing:1.5px;margin:3px 0 2px;}
 .pcm-ts{font-family:var(--m);font-size:9px;color:var(--t2);}
-.pcm-body{padding:12px 20px;display:flex;flex-direction:column;}
-.pcm-field{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--gb);}
+.pcm-body{padding:6px 16px;display:flex;flex-direction:column;overflow-y:auto;flex:1;}
+.pcm-field{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gb);}
 .pcm-field:last-child{border-bottom:none;}
 .pcm-f-i{font-size:13px;width:17px;text-align:center;flex-shrink:0;opacity:.4;margin-top:1px;}
 .pcm-f-lbl{font-family:var(--m);font-size:7px;color:var(--t2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
-.pcm-f-v{font-size:13px;font-weight:400;color:var(--t0);}
+.pcm-f-v{font-size:12px;font-weight:500;color:var(--t0);}
 .pcm-f-v.link{color:var(--a);cursor:pointer;}
-.pcm-map{border-radius:8px;overflow:hidden;border:1px solid var(--gb);height:100px;background:var(--c2);margin-top:8px;}
-.pcm-foot{padding:12px 20px;border-top:1px solid var(--gb);display:flex;gap:8px;}
-.pcm-btn{flex:1;padding:10px;border-radius:8px;font-size:12px;font-weight:600;font-family:var(--f);cursor:pointer;transition:all .2s;}
+.pcm-map{display:flex;}
+.pcm-foot{padding:8px 16px;border-top:1px solid var(--gb);display:flex;gap:6px;flex-shrink:0;}
+.pcm-btn{flex:1;padding:7px 10px;border-radius:7px;font-size:11px;font-weight:600;font-family:var(--f);cursor:pointer;transition:all .15s;}
 .pcm-btn.sec{background:var(--gb);border:1px solid var(--gb2);color:var(--t1);}
 .pcm-btn.sec:hover{color:var(--t0);}
 .pcm-btn.pri{background:linear-gradient(135deg,var(--a),var(--a2));border:none;color:#fff;box-shadow:0 4px 16px rgba(255,92,0,.25);}
@@ -738,7 +742,7 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
 }
 .pf-row.wide:last-child{border-bottom:none;}
 /* section divider inside PO */
-.pf-section{
+.pf-section{flex-shrink:0;
   grid-column:1/-1;
   padding:8px 18px 5px;
   font-family:var(--m);font-size:8px;color:var(--t2);
@@ -751,59 +755,248 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
 
 
 /* ── AGENT CARD ─────────────────────────────── */
-.agent-card{
-  display:flex;align-items:center;gap:11px;
-  padding:14px;
-  background:rgba(255,92,0,.05);
-  border:1px solid rgba(255,92,0,.12);
-  border-radius:12px;
-  position:relative;overflow:hidden;
+/* ── AGENT STRIP (compact single row) ────── */
+.agent-strip{
+  display:flex;align-items:center;gap:0;flex-shrink:0;
+  background:rgba(15,18,28,.12);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--gb);
+  border-bottom:1px solid var(--gb);
+  min-height:46px;overflow:hidden;
 }
-.agent-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,var(--a),transparent);
+body.light .agent-strip{
+  background:rgba(255,255,255,.35);
+  border-color:rgba(0,0,0,.08);
+  box-shadow:0 1px 8px rgba(0,0,0,.05);
 }
-.ac-av{
-  width:36px;height:36px;border-radius:10px;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(255,92,0,.18),rgba(255,92,0,.04));
-  border:1px solid rgba(255,92,0,.25);
-  display:flex;align-items:center;justify-content:center;font-size:17px;
+
+.as-av{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;margin:7px 0 7px 12px;
+  background:linear-gradient(135deg,rgba(255,92,0,.2),rgba(255,92,0,.06));
+  border:1.5px solid rgba(255,92,0,.3);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
 }
-.ac-info{flex:1;min-width:0;}
-.ac-name{font-size:13px;font-weight:600;color:var(--t0);margin-bottom:2px;}
-.ac-shift{font-family:var(--m);font-size:9px;color:var(--t2);}
-.ac-goal{display:flex;align-items:center;gap:5px;flex-shrink:0;}
-.ac-gn{
-  font-family:var(--f);font-size:22px;font-weight:800;line-height:1;letter-spacing:-.5px;
+.as-info{padding:5px 10px 5px 8px;min-width:0;}
+.as-name{font-size:13px;font-weight:600;color:var(--t0);white-space:nowrap;}
+.as-shift{font-family:var(--m);font-size:9px;color:var(--t2);margin-top:1px;}
+.as-sep{width:1px;background:var(--gb);align-self:stretch;flex-shrink:0;opacity:.5;}
+.as-goal{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 10px;flex-shrink:0;
+}
+.as-gn{
+  font-family:var(--m);font-size:19px;font-weight:700;line-height:1;
   background:linear-gradient(135deg,var(--a),var(--a2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.ac-gd{font-family:var(--m);font-size:10px;color:var(--t2);}
-.ac-bar{width:52px;height:3px;background:var(--c4);border-radius:3px;overflow:hidden;margin-top:3px;}
-.ac-fill{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:3px;transition:width .8s;}
-.ac-fill.done{background:linear-gradient(90deg,var(--g),#44ffcc);}
-
-/* ── KPI ROW ────────────────────────────────── */
-.kpi-row{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:6px;
+.as-gd{font-family:var(--m);font-size:11px;color:var(--t2);}
+.as-star{font-size:10px;filter:grayscale(1) opacity(.2);transition:filter .4s,transform .3s;}
+.as-star.on{filter:none;transform:scale(1.2);}
+.as-bar-wrap{display:flex;flex-direction:column;gap:2px;}
+.as-bar-lbl{font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
+.as-bar-bg{width:52px;height:2px;background:var(--c4);border-radius:2px;overflow:hidden;}
+.as-bar-fill{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:3px;transition:width .8s;}
+.as-bar-fill.done{background:linear-gradient(90deg,var(--g),#44ffcc);}
+.as-kpi{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:5px 0;gap:2px;flex:1;
 }
-.kpi-cell{
-  display:flex;flex-direction:column;align-items:center;
-  padding:10px 8px;
-  background:var(--gb);border:1px solid var(--gb2);border-radius:8px;
-}
-.kpi-v{font-family:var(--m);font-size:16px;font-weight:700;color:var(--t0);line-height:1;margin-bottom:4px;}
-.kpi-v.g{color:var(--g);}.kpi-v.y{color:var(--y);}
-.kpi-l{font-family:var(--m);font-size:7px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
+.as-kv{font-family:var(--m);font-size:15px;font-weight:700;color:var(--t0);line-height:1;}
+.as-kv.g{color:var(--g);}.as-kv.y{color:var(--y);}
+.as-kl{font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
 
+
+/* ── PO Validation Popup ─────────────────────────────── */
+.po-validate-popup{
+  position:fixed;
+  bottom:80px;right:20px;
+  width:340px;
+  max-height:calc(100vh - 100px);
+  display:flex;flex-direction:column;
+  background:rgba(13,16,24,.97);
+  border:1px solid var(--gb2);
+  border-top:2px solid var(--a);
+  border-radius:14px;
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+  z-index:600;
+  transform:translateY(20px);opacity:0;pointer-events:none;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+}
+.po-validate-popup.show{
+  transform:translateY(0);opacity:1;pointer-events:all;
+}
+body.light .po-validate-popup{
+  background:rgba(255,255,255,.97);
+  border-color:rgba(0,0,0,.08);
+  border-top-color:var(--a);
+  box-shadow:0 12px 40px rgba(0,0,0,.15);
+}
+.pvp-head{
+  padding:12px 16px 10px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--gb);flex-shrink:0;
+}
+.pvp-icon{font-size:18px;}
+.pvp-title{
+  font-family:var(--f);font-size:13px;font-weight:700;
+  color:var(--t0);flex:1;
+}
+.pvp-close{
+  background:none;border:none;color:var(--t2);
+  cursor:pointer;font-size:14px;padding:2px;border-radius:4px;
+  transition:color .15s;
+}
+.pvp-close:hover{color:var(--t0);}
+.pvp-fields{padding:8px 16px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;flex:1;min-height:0;}
+.pvp-field{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border-radius:8px;
+  transition:background .15s;
+}
+.pvp-field.ok{background:rgba(0,229,160,.05);}
+.pvp-field.miss{background:rgba(255,68,102,.05);}
+.pvp-field-ico{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.pvp-field-info{flex:1;min-width:0;}
+.pvp-field-lbl{font-family:var(--m);font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--t2);}
+.pvp-field-val{font-size:12px;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pvp-field-val.empty{color:var(--t2);font-style:italic;}
+.pvp-status{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.pvp-status.ok{background:rgba(0,229,160,.15);color:var(--g);}
+.pvp-status.miss{background:rgba(255,68,102,.15);color:var(--r);}
+.pvp-foot{padding:8px 16px 12px;display:flex;gap:8px;flex-shrink:0;}
+.pvp-btn{
+  flex:1;padding:10px;border-radius:8px;
+  font-family:var(--f);font-size:12px;font-weight:700;
+  cursor:pointer;border:none;transition:all .15s;letter-spacing:.2px;
+}
+.pvp-btn.main{background:var(--a);color:#fff;}
+.pvp-btn.main:hover{background:var(--a2);}
+.pvp-btn.main:disabled{background:var(--c3);color:var(--t2);cursor:not-allowed;}
+.pvp-btn.sec{background:var(--gb);color:var(--t1);border:1px solid var(--gb2);}
+.pvp-btn.sec:hover{border-color:var(--a);color:var(--a);}
+.pvp-warn{
+  margin:0 16px 8px;padding:7px 10px;
+  background:rgba(255,196,77,.08);border:1px solid rgba(255,196,77,.2);
+  border-radius:7px;font-size:10px;color:var(--y);line-height:1.5;
+  display:none;flex-shrink:0;
+}
+.pvp-warn.show{display:block;}
+
+/* ── Map button in ubicación field ──────────────────── */
+.pf-row.has-map .pf-body{display:flex;align-items:center;gap:6px;flex:1;}
+.pf-row.has-map .pf-input{flex:1;}
+.pf-map-btn{
+  width:28px;height:28px;border-radius:6px;flex-shrink:0;
+  background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);
+  color:var(--g);font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.pf-map-btn:hover{background:rgba(0,229,160,.2);border-color:var(--g);}
+
+.pvp-input{
+  width:100%;background:transparent;border:none;border-bottom:1px solid var(--gb2);
+  color:var(--t0);font-size:12px;font-family:var(--f);padding:3px 0;
+  outline:none;transition:border-color .15s;pointer-events:all;cursor:text;
+}
+.pvp-input:focus{border-bottom-color:var(--a);}
+.pvp-input.empty{color:var(--t2);}
+.pvp-input::placeholder{color:var(--t2);font-style:italic;}
+body.light .pvp-input{color:var(--t0);}
+
+/* ── All data/field emojis ───────────────────────────── */
+/* Dark mode: white */
+.pf-ico,
+.pvp-field-ico,
+.pd-det-i,
+.pcm-field .pd-det-i,
+.po-sug-i,
+.rec-ico,
+.svc-ico span,
+.flash-ico,
+.pd-card-tag span,
+.pvp-icon,
+.po-empty-ico,
+.as-av,
+.pcm-check
+{
+  filter: grayscale(1) brightness(10);
+  opacity: .85;
+  transition: filter .2s ease, opacity .2s ease;
+}
+
+
+.pcm-map-btn{background:var(--gb);border:1px solid var(--gb2);color:var(--t1);border-radius:6px;font-size:10px;padding:4px 10px;cursor:pointer;filter:grayscale(1);}
+
+/* Nota field in validation popup */
+.pvp-nota-wrap{
+  display:none;flex-direction:column;gap:4px;
+  padding:8px 16px;border-top:1px solid var(--gb);flex-shrink:0;
+}
+.pvp-nota-lbl{
+  font-family:var(--m);font-size:8px;color:var(--t2);
+  text-transform:uppercase;letter-spacing:.6px;
+}
+.pvp-nota-ta{
+  width:100%;background:var(--gb);border:1px solid var(--gb2);
+  color:var(--t0);font-size:11px;font-family:var(--f);
+  padding:7px 10px;border-radius:7px;resize:none;height:52px;
+  outline:none;transition:border-color .15s;line-height:1.5;
+  pointer-events:all;cursor:text;
+}
+.pvp-nota-ta:focus{border-color:var(--a);}
+.pvp-nota-ta::placeholder{color:var(--t2);font-style:italic;}
+
+body.dark .flash-pill{background:rgba(40,42,50,.96);border-color:rgba(255,255,255,.1);box-shadow:0 4px 16px rgba(0,0,0,.4);}
+body.dark .flash-lbl{color:var(--t2);}
+body.dark .flash-val{color:var(--t0);}
+
+body.light .pcm-nota-ico{filter:grayscale(1)!important;opacity:.55!important;}
+
+/* Emoji hover → full color */
+.pf-row:hover .pf-ico,
+.pvp-field:hover .pvp-field-ico,
+.pcm-field:hover .pd-det-i,
+.po-sug-i:hover,
+.rec-toast:hover .rec-ico,
+.pd-card:hover .pd-card-tag span,
+.pvp-icon:hover,
+.n-to:hover,
+.n-dash:hover
+{
+  filter: none;
+  opacity: 1;
+}
+
+body.light .pf-ico,
+body.light .pvp-field-ico,
+body.light .pd-det-i,
+body.light .pcm-field .pd-det-i,
+body.light .po-sug-i,
+body.light .rec-ico,
+body.light .svc-ico span,
+body.light .flash-ico,
+body.light .pd-card-tag span,
+body.light .pvp-icon,
+body.light .po-empty-ico,
+body.light .as-av,
+body.light .pcm-check
+{
+  filter: grayscale(1) brightness(0.6);
+  opacity: .9;
+}
 </style>
 </head>
 <body>
 <div class="app">
 
 <nav class="nav">
-  <div class="n-brand">HELIOS</div>
+  <div class="n-brand">
+    <span class="n-brand-word">CONNECT</span><span class="n-brand-reg">®</span>
+  </div>
   <div class="n-conn"><div class="cdot" id="cdot"></div><span id="clbl">conectando</span></div>
   <div class="n-timer" id="timer-row">
     <div class="n-div"></div>
@@ -816,11 +1009,11 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
       <span id="po-count-num">0</span><span class="po-counter-lbl"> POs</span>
     </div>
     <div class="n-th">
-      <button class="n-to on" id="th-dark" onclick="setTheme('dark')">🌙</button>
-      <button class="n-to" id="th-light" onclick="setTheme('light')">☀️</button>
+      <button class="n-to on" id="th-dark" onclick="setTheme('dark')" title="Modo oscuro">🌙</button>
+      <button class="n-to" id="th-light" onclick="setTheme('light')" title="Modo claro">☀️</button>
     </div>
     <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
-    <button class="n-demo" onclick="triggerDemo()">✦ Demo</button>
+    <button class="n-demo" onclick="triggerDemo()">Demo</button>
   </div>
 </nav>
 
@@ -828,28 +1021,6 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
   <!-- LEFT -->
   <aside class="col-l">
     <div class="l-inner">
-
-      <!-- Agent card -->
-      <div class="agent-card">
-        <div class="ac-av">👤</div>
-        <div class="ac-info">
-          <div class="ac-name">Agente Activo</div>
-          <div class="ac-shift">T. 08:00–16:00</div>
-        </div>
-        <div class="ac-goal">
-          <span class="ac-gn" id="ag-done">12</span>
-          <span class="ac-gd">/<span id="ag-goal">20</span> <span id="ag-star" style="filter:grayscale(1) opacity(.25)">⭐</span></span>
-          <div class="ac-bar"><div class="ac-fill" id="ag-bar" style="width:60%"></div></div>
-        </div>
-      </div>
-
-      <!-- KPIs -->
-      <div class="kpi-row">
-        <div class="kpi-cell"><div class="kpi-v g" id="ag-sat">4.8</div><div class="kpi-l">Satisfacción</div></div>
-        <div class="kpi-cell"><div class="kpi-v y" id="ag-aht">4:32</div><div class="kpi-l">T. Promedio</div></div>
-        <div class="kpi-cell"><div class="kpi-v" id="ag-fcr">87%</div><div class="kpi-l">Resolución</div></div>
-      </div>
-
       <div class="sec-lbl">Contexto</div>
       <div class="xmpty" id="ca-empty"><div class="ico">🎧</div><div class="lbl">Esperando llamada...</div></div>
       <div class="svc-card" id="svc-detected">
@@ -875,26 +1046,49 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
       <div class="live-b"><div class="ldot"></div>En vivo</div>
     </div>
     <div class="tp-body" id="t-body">
-      <span style="color:var(--t2);font-size:12px;font-family:var(--m);">Esperando transcripción...</span>
+      
     </div>
     <div id="t-inferred"></div><div id="sentiment-row"></div><div id="btn-analyze"></div>
+    <div class="agent-strip">
+      <div class="as-av">👤</div>
+      <div class="as-info">
+        <div class="as-name">Agente Activo</div>
+        <div class="as-shift">T. 08:00–16:00</div>
+      </div>
+      <div class="as-sep"></div>
+      <div class="as-goal">
+        <span class="as-gn" id="ag-done">12</span>
+        <span class="as-gd">/<span id="ag-goal">20</span></span>
+        <span id="ag-star" class="as-star">⭐</span>
+        <div class="as-bar-wrap">
+          <div class="as-bar-lbl">Meta del día</div>
+          <div class="as-bar-bg"><div class="as-bar-fill" id="ag-bar" style="width:60%"></div></div>
+        </div>
+      </div>
+      <div class="as-sep"></div>
+      <div class="as-kpi"><div class="as-kv g" id="ag-sat">4.8</div><div class="as-kl">Satisfac.</div></div>
+      <div class="as-sep"></div>
+      <div class="as-kpi"><div class="as-kv y" id="ag-aht">4:32</div><div class="as-kl">T. Prom.</div></div>
+      <div class="as-sep"></div>
+      <div class="as-kpi"><div class="as-kv" id="ag-fcr">87%</div><div class="as-kl">Resoluc.</div></div>
+    </div>
   </main>
 
   <!-- RIGHT — PO -->
   <aside class="col-r">
     <div class="po-hd">
       <span class="po-hd-lbl">Creación de PO</span>
-      <span class="po-badge" id="pb-status">En curso</span>
+      <span class="po-badge" id="pb-status" onclick="reopenPOValidation()" title="Ver resumen del PO" style="cursor:pointer">En curso</span>
     </div>
-    <div class="po-empty" id="pb-empty"><div class="po-empty-ico">📋</div><div class="po-empty-txt">Los datos se irán<br>completando aquí</div></div>
+    <div class="po-empty" id="pb-empty"><div class="po-empty-ico">📋</div></div>
     <div class="po-fields" id="pb-body"></div>
     <div class="po-spacer"></div>
     <div class="po-meta" id="pb-meta-row"><span class="po-meta-lbl">Espera est.</span><span class="po-meta-val" id="pb-wait">—</span></div>
     <div class="po-sugs" id="pb-sug-wrap"><div class="po-sugs-lbl">Preguntar al cliente</div><div id="pb-sug-list"></div></div>
     <div class="po-notes"><div class="po-notes-lbl">Nota</div><textarea class="po-notes-ta" id="pb-notes-ta" placeholder="Observación o instrucción especial..."></textarea></div>
     <div class="po-cta" id="pb-cta">
-      <button class="po-cta-btn main" onclick="confirmPO()">✦ Crear PO</button>
-      <button class="po-cta-btn sec" onclick="resetPOBuilder()">✕</button>
+      <button class="po-cta-btn main" onclick="reopenPOValidation()">Revisar PO</button>
+      <button class="po-cta-btn sec" onclick="resetPOBuilder()" title="Limpiar">✕</button>
     </div>
   </aside>
 </div>
@@ -910,7 +1104,7 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
   <div class="po-confirm-modal">
     <div class="pcm-head"><div class="pcm-head-glow"></div><div class="pcm-check">✓</div><div class="pcm-title">PO Creado</div><div class="pcm-po-num" id="pcm-num">—</div><div class="pcm-ts" id="pcm-ts">—</div></div>
     <div class="pcm-body" id="pcm-body"></div>
-    <div class="pcm-foot"><button class="pcm-btn sec" onclick="closePOConfirm()">Cerrar</button><button class="pcm-btn pri" onclick="openMapFromPO()">📍 Maps</button></div>
+    <div class="pcm-foot"><button class="pcm-btn sec" onclick="closePOConfirm()">Cerrar</button></div>
   </div>
 </div>
 <div class="po-drawer-ov" id="po-drawer-ov" onclick="if(event.target===this)closeDrawer()">
@@ -975,9 +1169,7 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
 <div id="bubbles-section" style="display:none"></div>
 <div id="insight" style="display:none"><div id="insighttxt"></div></div>
 
-<script>
-
-const CONFIG={
+<script>const CONFIG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
@@ -1028,10 +1220,13 @@ function handleMessage(p){
     try{
       const parsed=JSON.parse(p.data.replace(/```json|```/g,'').trim());
       lastAnalysis=parsed;
+      // Fill PO builder immediately with all detected fields
+      _autoFillPO(parsed);
       renderTags(parsed);
       renderSentiment(parsed.sentimiento_cliente);
       if(parsed.insight_atencion)showInsight(parsed.insight_atencion);
-      showToast('✦ Análisis listo — click en tags o Analizar');
+      if(typeof Recs!=='undefined') Recs.check(parsed, parsed.sentimiento_cliente);
+      showToast('✦ Análisis listo — datos inferidos automáticamente');
     }catch(e){console.warn('Analysis parse:',e);}
   }
 }
@@ -1051,11 +1246,13 @@ function appendTranscript(speaker,text){
   line.appendChild(spk);line.appendChild(txt);
   body.appendChild(line);
   body.scrollTop=body.scrollHeight;
+  // Trigger call timer on first transcript
+  if(typeof CallTimer!=='undefined') CallTimer.start();
+  // Trigger service detection from transcript text
+  if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
 }
 
 function renderTags(data){
-  // Auto-fill PO builder fields
-  applyAnalysis && setTimeout(()=>_autoFillPO(data),100);
   const c=document.getElementById('t-inferred');
   c.innerHTML='';
   const map=[
@@ -1089,9 +1286,12 @@ function renderTags(data){
 }
 
 function applyNombre(name){
+  // Also fill POBuilder
+  if(typeof POBuilder!=='undefined') POBuilder.addField('nombre_cliente',name,false);
+  // Legacy field support
   const p=name.trim().split(' ');
-  setField('f-fname',p[0]||'');
-  if(p.length>1)setField('f-lname',p.slice(1).join(' '));
+  const fn=document.getElementById('f-fname');if(fn)fn.value=p[0]||'';
+  const ln=document.getElementById('f-lname');if(ln&&p.length>1)ln.value=p.slice(1).join(' ');
 }
 
 function renderSentiment(sent){
@@ -1125,21 +1325,28 @@ function showInsight(text){
 
 function applyAnalysis(){
   if(!lastAnalysis){showToast('⚠ Sin análisis disponible');return;}
-  const a=lastAnalysis;let n=0;
-  if(a.nombre_cliente?.trim()){applyNombre(a.nombre_cliente);n++;}
-  if(a.placa?.trim()){setField('f-plate',a.placa);n++;}
-  if(a.color?.trim()){setField('f-color',a.color);n++;}
-  if(a.año?.trim()){setField('f-year',a.año);n++;}
-  if(a.marca?.trim()){setField('f-make',a.marca);n++;}
-  if(a.modelo?.trim()){setField('f-model',a.modelo);n++;}
-  if(a.ubicación?.trim()){setField('f-location',a.ubicación);n++;}
-  if(a.vin?.trim()){setField('f-vin',a.vin);n++;}
+  const a=lastAnalysis; let n=0;
+  // Map analysis fields to POBuilder (Helios uses POBuilder, not f-* IDs)
+  const fieldMap=[
+    ['tipo_asistencia',a.tipo_asistencia],
+    ['nombre_cliente', a.nombre_cliente],
+    ['ubicación',      a.ubicación],
+    ['placa',          a.placa],
+    ['marca',          a.marca],
+    ['modelo',         a.modelo],
+    ['año',            a.año],
+    ['color',          a.color],
+  ];
+  fieldMap.forEach(([key,val])=>{
+    if(val?.trim&&val.trim()&&val!=='N/A'){
+      POBuilder.addField(key,val,false);
+      n++;
+    }
+  });
   document.querySelectorAll('.tag').forEach(t=>t.classList.add('done'));
-  const btn=document.getElementById('btn-analyze');
-  btn.textContent=n>0?'✓ '+n+' campos aplicados':'⚠ Sin datos suficientes';
-  btn.classList.toggle('ok',n>0);
   showToast(n>0?'✓ SmartFill aplicó '+n+' campos':'⚠ Conversación sin datos aún');
-  setTimeout(()=>{btn.textContent='✦ ANALIZAR CON SMARTFILL AI';btn.classList.remove('ok');},3500);
+  if(a.sentimiento_cliente) renderSentiment(a.sentimiento_cliente);
+  if(a.insight_atencion) showInsight(a.insight_atencion);
 }
 
 function setField(id,val){
@@ -1153,16 +1360,17 @@ function triggerSmartFill(){
   appendTranscript(payload.speaker,payload.transcript);
   setTimeout(()=>{
     const demo={placa:'ARC123',marca:'Land Rover',modelo:'Range Rover',año:'1997',color:'Gris',nombre_cliente:'Mariam Fernandez',ubicación:'Parque Central, San José',tipo_asistencia:'Avería en vía',sentimiento_cliente:{valor:0,descripcion:'Tranquila pero urgente'},motivo_llamada:'Vehículo varado',protocolo_agente:{cumple:true,detalles:'Saludo correcto'},insight_atencion:'Zona céntrica con tráfico. Prioriza despacho rápido y confirma ETA al cliente.'};
-    lastAnalysis=demo;renderTags(demo);renderSentiment(demo.sentimiento_cliente);showInsight(demo.insight_atencion);
-    showToast('✦ Demo: análisis listo');
+    lastAnalysis=demo;
+    _autoFillPO(demo);
+    renderTags(demo);
+    renderSentiment(demo.sentimiento_cliente);
+    showInsight(demo.insight_atencion);
+    if(typeof Recs!=='undefined') Recs.check(demo, demo.sentimiento_cliente);
+    showToast('✦ Demo: análisis listo — datos cargados en PO');
   },1800);
   try{fetch(CONFIG.FUNCTION_URL,{method:'POST',headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
   }catch(e){console.warn("Demo fetch:",e);}
 }
-
-
-
-
 
 function setStatus(text,state){
   const dot=document.getElementById('cdot');
@@ -1177,145 +1385,12 @@ function showToast(msg){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-window.addEventListener('DOMContentLoaded',connectWebPubSub);
-function triggerDemo(){triggerSmartFill();}
+window.addEventListener('DOMContentLoaded', connectWebPubSub);
 
-/* ══════════════════════════════════════════
-   SMARTFILL BUBBLE ENGINE
-   ══════════════════════════════════════════ */
-const SF = (() => {
-  // field map: key → {id, label, icon}
-  const FIELDS = {
-    nombre_cliente: {id:'f-fname', label:'Nombre',    icon:'👤', split:true},
-    placa:          {id:'f-plate', label:'Placa',     icon:'🪪'},
-    marca:          {id:'f-make',  label:'Marca',     icon:'🚗'},
-    modelo:         {id:'f-model', label:'Modelo',    icon:'🔖'},
-    año:            {id:'f-year',  label:'Año',       icon:'📅'},
-    color:          {id:'f-color', label:'Color',     icon:'🎨'},
-    ubicación:      {id:'f-location', label:'Ubicación', icon:'📍'},
-  };
-
-  let _pending = {}; // key → {val, rendered}
-
-  function _applyField(key, val) {
-    // Wire into POBuilder
-    if(typeof POBuilder !== 'undefined') { POBuilder.addField(key, val, true); }
-  }
-
-  function _flashField(el) {
-    el.classList.remove('sfok'); void el.offsetWidth;
-    el.classList.add('sfok');
-    setTimeout(() => el.classList.remove('sfok'), 900);
-  }
-
-  function _removeBubble(key) {
-    const b = document.getElementById('sfb_' + key);
-    if (!b) return;
-    b.onclick = null;
-    b.style.transition = 'opacity .26s ease, transform .26s ease, max-height .28s ease .1s, margin .28s ease .1s';
-    b.style.opacity = '0';
-    b.style.transform = 'translateX(8px)';
-    b.style.maxHeight = b.offsetHeight + 'px';
-    requestAnimationFrame(() => {
-      b.style.maxHeight = '0';
-      b.style.marginBottom = '0';
-    });
-    setTimeout(() => b.remove(), 380);
-  }
-
-  function render(data) {
-    // data = lastAnalysis object
-    const wrap = document.getElementById('sfwrap');
-    if (!wrap) return;
-    // show analyzing briefly
-    const pill = document.getElementById('sfanalyzing');
-    if (pill) { pill.classList.add('show'); setTimeout(() => pill.classList.remove('show'), 1200); }
-
-    let delay = 200;
-    Object.keys(FIELDS).forEach(key => {
-      const val = data[key];
-      if (!val || !String(val).trim() || val === 'N/A') return;
-      if (_pending[key]) return; // already rendered
-
-      _pending[key] = val;
-      const f = FIELDS[key];
-
-      setTimeout(() => {
-        // Don't render if already applied
-        if (document.getElementById('sfb_' + key)) return;
-
-        const b = document.createElement('div');
-        b.className = 'sfb';
-        b.id = 'sfb_' + key;
-        b.innerHTML = '<div class="sfb-ico">' + f.icon + '</div><div class="sfb-body"><div class="sfb-lbl">' + f.label + '</div><div class="sfb-val">' + String(val) + '</div></div>';
-        b.onclick = () => {
-          _applyField(key, String(val));
-          _removeBubble(key);
-          showToast('✓ ' + f.label + ' aplicado');
-          AgentBar.checkComplete(data);
-        };
-        wrap.appendChild(b);
-      }, delay);
-      delay += 90;
-    });
-  }
-
-  function reset() {
-    _pending = {};
-    const wrap = document.getElementById('sfwrap');
-    if (wrap) wrap.innerHTML = '';
-  }
-
-  return { render, reset };
-})();
-
-/* ══════════════════════════════════════════
-   AGENT BAR METRICS
-   ══════════════════════════════════════════ */
-const AgentBar = (() => {
-  let done = 12, goal = 20;
-  let _appliedKeys = new Set();
-
-  function sync() {
-    const pct = Math.round(done / goal * 100);
-    const dEl = document.getElementById('ag-done');
-    const bEl = document.getElementById('ag-bar');
-    const sEl = document.getElementById('ag-star');
-    if (dEl) dEl.textContent = done;
-    if (bEl) {
-      bEl.style.width = Math.min(pct, 100) + '%';
-      if (pct >= 100) bEl.classList.add('done');
-    }
-    if (sEl && pct >= 80) { sEl.style.filter='none'; }
-    if (sEl && pct >= 80 && !sEl.classList.contains('earned')) {
-      sEl.classList.add('earned');
-      showToast('⭐ ¡Meta alcanzada! Excelente trabajo');
-    }
-  }
-
-  function checkComplete(data) {
-    // count how many FIELDS from data are applied
-    const keys = ['nombre_cliente','placa','marca','modelo','año','color','ubicación'];
-    const available = keys.filter(k => data[k]?.trim && data[k].trim() && data[k] !== 'N/A');
-    const remainBubbles = document.querySelectorAll('#sfwrap .sfb').length;
-    if (available.length > 0 && remainBubbles === 0) {
-      done = Math.min(done + 1, goal);
-      sync();
-      showToast('✦ Llamada completada — campo #' + done + '/' + goal);
-    }
-  }
-
-  function init() { sync(); }
-  return { init, checkComplete };
-})();
-
-/* patch renderTags to also show bubbles */
-const _origRenderTags = renderTags;
-renderTags = function(data) {
-  _origRenderTags(data);
-  SF.render(data);
-};
-
+function triggerDemo(){ triggerSmartFill(); }
+let _poList = [];
+let _activeDetail = -1;
+let _poCount = 0;
 
 function setTheme(t){
   isDark = (t === 'dark');
@@ -1324,36 +1399,6 @@ function setTheme(t){
   document.getElementById('th-light').classList.toggle('on', !isDark);
 }
 
-
-function _autoFillPO(data){
-  const map=[
-    ['tipo_asistencia',data.tipo_asistencia],
-    ['nombre_cliente', data.nombre_cliente],
-    ['ubicación',      data.ubicación],
-    ['placa',          data.placa],
-    ['marca',          data.marca],
-    ['modelo',         data.modelo],
-    ['año',            data.año],
-    ['color',          data.color],
-  ];
-  let d=0;
-  map.forEach(([key,val])=>{
-    if(!val||val==='N/A')return;
-    setTimeout(()=>POBuilder.addField(key,val,true),d);
-    d+=110;
-  });
-  if(data.tipo_asistencia) ServiceDetector.analyze&&ServiceDetector.analyze(data.tipo_asistencia);
-}
-AgentBar.init();
-
-
-/* ══ POBuilder ══════════════════════════════════
-   Auto-fills the right-panel PO fields from analysis
-   ════════════════════════════════════════════════ */
-
-/* ══════════════════════════════════════════════
-   PO BUILDER — editable live summary + confirm
-   ══════════════════════════════════════════════ */
 const CallTimer=(()=>{
   let _s=null,_t=null,_on=false;
   const W=4*60,A=6*60;
@@ -1551,15 +1596,16 @@ const POBuilder = (() => {
       const empty=document.getElementById('pb-empty');
       if(empty)empty.style.display='none';
       const body=document.getElementById('pb-body');
-      if(body)body.style.display='flex';
+      if(body){body.style.display='flex';body.style.flexDirection='column';}
       const meta=document.getElementById('pb-meta-row');
       if(meta)meta.style.display='flex';
       const notes=document.querySelector('.po-notes');
       if(notes)notes.classList.add('visible');
     }
   }
-  function addField(key,value){
-    const isNew=!_data[key]; _data[key]=value;
+  function addField(key,value,_forceNew){
+    const isNew=_forceNew!==undefined?_forceNew:!_data[key]; _data[key]=value;
+    if(isNew && typeof _pvpDismissed !== 'undefined') _pvpDismissed = false;
     _showPanel(); _upsertRow(key,value,isNew);
     _updateSugs(); _updateWait(); _updateStatus();
     // Flash pill ONLY on first detection, not on edits/updates
@@ -1623,9 +1669,11 @@ const POBuilder = (() => {
     }
 
     row=document.createElement('div');
-    row.className='pf-row'+(isNew?' new':'')+(isWide?' wide':'');
+    const isUbic = key==='ubicación';
+    row.className='pf-row'+(isNew?' new':'')+(isWide?' wide':'')+(isUbic?' has-map':'');
     row.id='pbr_'+key;
-    row.innerHTML=`${f.i}${f.l}`;
+    const mapBtn=isUbic?`<button class="pf-map-btn" onclick="openMapFromField()" title="Ver en mapa">🗺</button>`:'';
+    row.innerHTML=`<span class="pf-ico">${f.i}</span><div class="pf-body"><div class="pf-lbl">${f.l}</div><input class="pf-input" value="${String(value).substring(0,60)}" placeholder="—" onchange="POBuilder._edit('${key}',this.value)" oninput="POBuilder._edit('${key}',this.value)">${mapBtn}</div>`;
     container.appendChild(row);
     if(isNew) setTimeout(()=>row.classList.remove('new'),600);
   }
@@ -1639,7 +1687,7 @@ const POBuilder = (() => {
     list.innerHTML='';
     sugs.slice(0,2).forEach(s=>{
       const el=document.createElement('div'); el.className='pb-sug';
-      el.innerHTML=`${s.i}${s.t}›`;
+      el.innerHTML=`<span class="po-sug-i">${s.i}</span><span class="po-sug-t">${s.t}</span><span class="po-sug-arr">›</span>`;
       el.onclick=()=>{showToast('💬 '+s.q);el.style.opacity='.4';el.style.pointerEvents='none';};
       list.appendChild(el);
     });
@@ -1651,12 +1699,20 @@ const POBuilder = (() => {
     const hr=new Date().getHours(); const rush=(hr>=7&&hr<=17?'':hr>=8&&hr<=9||hr>=17&&hr<=19?' slow':'');
   }
   function _updateStatus(){
+    const REQUIRED = ['tipo_asistencia','nombre_cliente','ubicación'];
     const req=Object.entries(FIELDS).filter(([k,v])=>v.req.includes(_currentService||'grua')).map(([k])=>k);
     const filled=req.filter(k=>_data[k]&&String(_data[k]).trim());
     const complete=filled.length>=req.length;
-    const st=document.getElementById('pb-status'); const cta=document.getElementById('pb-cta');
+    const st=document.getElementById('pb-status');
     if(st){st.textContent=complete?'Listo':`${filled.length}/${req.length}`;st.className='po-badge'+(complete?' ready':'');}
-    if(cta)cta.style.display=complete?'flex':'none';
+    // Show/hide cta button based on completion
+    const ctaEl=document.getElementById('pb-cta');
+    if(ctaEl) ctaEl.style.display=filled.length>0?'flex':'none';
+    // Only close popup if required fields are now missing (e.g. after reset)
+    const reqFilled = REQUIRED.every(k=>_data[k]&&String(_data[k]).trim()&&_data[k]!=='N/A');
+    if(!reqFilled){
+      closePOValidation();
+    }
   }
   function loadFromAnalysis(data){
     let d=0;
@@ -1682,150 +1738,273 @@ const POBuilder = (() => {
   return{addField,setService,loadFromAnalysis,reset,getData,_edit,get _currentSvc(){return _currentService?{id:_currentService}:null}};
 })();
 
-function resetPOBuilder(){POBuilder.reset();}
 
-let _poCount=0, _poList=[], _activeDetailId=null;
-function _buildScores(data,sent,proto,callDuration){
-  // Satisfaction: based on sentiment valor
-  const sentVal=sent?Number(sent.valor):0;
-  const satisfaction=sentVal===1?92:sentVal===0?70:38;
+const SF = (() => {
+  // field map: key → {id, label, icon}
+  const FIELDS = {
+    nombre_cliente: {id:'f-fname', label:'Nombre',    icon:'👤', split:true},
+    placa:          {id:'f-plate', label:'Placa',     icon:'🪪'},
+    marca:          {id:'f-make',  label:'Marca',     icon:'🚗'},
+    modelo:         {id:'f-model', label:'Modelo',    icon:'🔖'},
+    año:            {id:'f-year',  label:'Año',       icon:'📅'},
+    color:          {id:'f-color', label:'Color',     icon:'🎨'},
+    ubicación:      {id:'f-location', label:'Ubicación', icon:'📍'},
+  };
 
-  // AHT score: based on call duration — ideal 2-5 min
-  let ahtScore=80;
-  if(callDuration&&callDuration!=='—'){
-    const parts=callDuration.split(':');
-    const mins=parseInt(parts[0]||0);
+  let _pending = {}; // key → {val, rendered}
 
-    if(mins<3||mins>8){ ahtScore=Math.max(20, ahtScore-(Math.abs(mins-5)*8)); }
+  function _applyField(key, val) {
+    // Wire into POBuilder
+    if(typeof POBuilder !== 'undefined') { POBuilder.addField(key, val, true); }
   }
-  const required=['nombre_cliente','ubicación','tipo_asistencia','placa','marca','modelo'];
-  const filled=required.filter(k=>data[k]&&String(data[k]).trim());
 
-  // Speech compliance: protocol + data
-  const proto_ok=proto?.cumple===true;
-  const speechItems=[
-    {label:'Saludo de bienvenida', ok: proto_ok },
-    {label:'Identificación del cliente', ok: !!data.nombre_cliente },
-    {label:'Validación de ubicación', ok: !!data.ubicación },
-    {label:'Confirmación de servicio', ok: !!data.tipo_asistencia },
-    {label:'ETA comunicado al cliente', ok: proto_ok && !!data.ubicación },
+  function _flashField(el) {
+    el.classList.remove('sfok'); void el.offsetWidth;
+    el.classList.add('sfok');
+    setTimeout(() => el.classList.remove('sfok'), 900);
+  }
+
+  function _removeBubble(key) {
+    const b = document.getElementById('sfb_' + key);
+    if (!b) return;
+    b.onclick = null;
+    b.style.transition = 'opacity .26s ease, transform .26s ease, max-height .28s ease .1s, margin .28s ease .1s';
+    b.style.opacity = '0';
+    b.style.transform = 'translateX(8px)';
+    b.style.maxHeight = b.offsetHeight + 'px';
+    requestAnimationFrame(() => {
+      b.style.maxHeight = '0';
+      b.style.marginBottom = '0';
+    });
+    setTimeout(() => b.remove(), 380);
+  }
+
+  function render(data) {
+    // data = lastAnalysis object
+    const wrap = document.getElementById('sfwrap');
+    if (!wrap) return;
+    // show analyzing briefly
+    const pill = document.getElementById('sfanalyzing');
+    if (pill) { pill.classList.add('show'); setTimeout(() => pill.classList.remove('show'), 1200); }
+
+    let delay = 200;
+    Object.keys(FIELDS).forEach(key => {
+      const val = data[key];
+      if (!val || !String(val).trim() || val === 'N/A') return;
+      if (_pending[key]) return; // already rendered
+
+      _pending[key] = val;
+      const f = FIELDS[key];
+
+      setTimeout(() => {
+        // Don't render if already applied
+        if (document.getElementById('sfb_' + key)) return;
+
+        const b = document.createElement('div');
+        b.className = 'sfb';
+        b.id = 'sfb_' + key;
+        b.innerHTML = '<div class="sfb-ico">' + f.icon + '</div><div class="sfb-body"><div class="sfb-lbl">' + f.label + '</div><div class="sfb-val">' + String(val) + '</div></div>';
+        b.onclick = () => {
+          _applyField(key, String(val));
+          _removeBubble(key);
+          showToast('✓ ' + f.label + ' aplicado');
+          AgentBar.checkComplete(data);
+        };
+        wrap.appendChild(b);
+      }, delay);
+      delay += 90;
+    });
+  }
+
+  function reset() {
+    _pending = {};
+    const wrap = document.getElementById('sfwrap');
+    if (wrap) wrap.innerHTML = '';
+  }
+
+  return { render, reset };
+})();
+
+
+const AgentBar = (() => {
+  let done = 12, goal = 20;
+  let _appliedKeys = new Set();
+
+  function sync() {
+    const pct = Math.round(done / goal * 100);
+    const dEl = document.getElementById('ag-done');
+    const bEl = document.getElementById('ag-bar');
+    const sEl = document.getElementById('ag-star');
+    if (dEl) dEl.textContent = done;
+    if (bEl) {
+      bEl.style.width = Math.min(pct, 100) + '%';
+      if (pct >= 100) bEl.classList.add('done');
+    }
+    if (sEl && pct >= 80) { sEl.style.filter='none'; }
+    if (sEl && pct >= 80 && !sEl.classList.contains('on')) {
+      sEl.classList.add('on');
+      showToast('⭐ ¡Meta alcanzada! Excelente trabajo');
+    }
+  }
+
+  function checkComplete(data) {
+    // count how many FIELDS from data are applied
+    const keys = ['nombre_cliente','placa','marca','modelo','año','color','ubicación'];
+    const available = keys.filter(k => data[k]?.trim && data[k].trim() && data[k] !== 'N/A');
+    const remainBubbles = document.querySelectorAll('#sfwrap .sfb').length;
+    if (available.length > 0 && remainBubbles === 0) {
+      done = Math.min(done + 1, goal);
+      sync();
+      showToast('✦ Llamada completada — campo #' + done + '/' + goal);
+    }
+  }
+
+  function init() { sync(); }
+  function increment() {
+    done = Math.min(done + 1, goal);
+    sync();
+  }
+  return { init, checkComplete, increment };
+})();
+
+
+function _autoFillPO(data){
+  const map=[
+    ['tipo_asistencia',data.tipo_asistencia],
+    ['nombre_cliente', data.nombre_cliente],
+    ['ubicación',      data.ubicación],
+    ['placa',          data.placa],
+    ['marca',          data.marca],
+    ['modelo',         data.modelo],
+    ['año',            data.año],
+    ['color',          data.color],
   ];
-  const speechScore=Math.round(speechItems.filter(i=>i.ok).length/speechItems.length*100);
+  const toAdd = map.filter(([k,v])=>v&&v!=='N/A');
+  if(!toAdd.length) return;
 
-  return{satisfaction,ahtScore,completeness,speechScore,speechItems};
+  // Block popup during fill
+  _pvpDismissed = true;
+
+  // Add all fields synchronously so _data is complete
+  toAdd.forEach(([key,val]) => POBuilder.addField(key, val, true));
+
+  if(data.tipo_asistencia) ServiceDetector.analyze(data.tipo_asistencia);
+
+  // After DOM settles, unblock and open popup once with complete data
+  setTimeout(()=>{
+    _pvpDismissed = false;
+    openPOValidation();
+  }, 400);
 }
 
 function confirmPO(){
-  const data=POBuilder.getData();
-  const noteEl=document.getElementById('pb-notes-ta');
-  if(noteEl&&noteEl.value.trim()) data.nota=noteEl.value.trim();
-  if(!lastAnalysis)lastAnalysis={};
-  Object.assign(lastAnalysis,data);
-  const num='PO-'+Math.floor(100000+Math.random()*900000);
-  const now=new Date();
-  const ts=now.toLocaleString('es-CR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-  const tsISO=now.toISOString();
+  try{
+    // Sync popup edits back to POBuilder
+    document.querySelectorAll('.pvp-input').forEach(inp=>{
+      if(inp.dataset.key && inp.value.trim())
+        POBuilder._edit(inp.dataset.key, inp.value.trim());
+    });
+    // Read nota from popup BEFORE closing it
+    const pvpNota = document.getElementById('pvp-nota');
+    const notaFromPopup = pvpNota ? pvpNota.value.trim() : '';
 
-  // Capture call duration from timer
-  const timerEl=document.getElementById('call-timer-val');
-  const callDuration=timerEl?timerEl.textContent:'—';
+    _pvpDismissed=false;
+    closePOValidation();
 
-  // Capture sentiment from lastAnalysis
-  const sent=lastAnalysis?.sentimiento_cliente||null;
-  const sentVal=sent?Number(sent.valor):0;
-  const sentDesc=sent?.descripcion||'';
+    const data = POBuilder.getData();
+    // Apply nota: popup takes priority over notes area
+    const noteEl = document.getElementById('pb-notes-ta');
+    if(noteEl && noteEl.value.trim()) data.nota = noteEl.value.trim();
+    if(notaFromPopup) data.nota = notaFromPopup;
 
-  // Protocol compliance from lastAnalysis
-  const proto=lastAnalysis?.protocolo_agente||null;
+    const num = 'PO-' + Math.floor(100000+Math.random()*900000);
+    const now = new Date();
+    const ts  = now.toLocaleString('es-CR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 
-  // Build scores
-  const scores=_buildScores(data,sent,proto,callDuration);
+    const timerEl = document.getElementById('call-timer-val');
+    const callDuration = timerEl ? timerEl.textContent : '—';
 
-  // Estimated dispatch time
-  const svcId=POBuilder._currentSvc?.id||null;
-  const WAIT={grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
-  const hr=now.getHours();
-  const rush=(hr>=7&&hr<=17?'rush ':hr>=8&&hr<=9||hr>=17&&hr<=19?' slow':'');
-  if(cnum)cnum.textContent=_poCount;
-  _renderDrawerCard({num,ts,data});
-  updateDrawerCount();
-  // fill modal
-  document.getElementById('pcm-num').textContent=num;
-  document.getElementById('pcm-ts').textContent=ts;
-  const body=document.getElementById('pcm-body'); body.innerHTML='';
-  const ICONS={nombre_cliente:'👤',placa:'🪪',marca:'🚗',modelo:'🔖',año:'📅',color:'🎨',tipo_asistencia:'🔧',ubicación:'📍',nota:'📝'};
-  const LBLS={nombre_cliente:'Cliente',placa:'Placa',marca:'Marca',modelo:'Modelo',año:'Año',color:'Color',tipo_asistencia:'Servicio',ubicación:'Ubicación',nota:'Nota'};
-  Object.entries(ICONS).forEach(([k,ico])=>{
-    const val=data[k]; if(!val||val==='N/A')return;
-    const isUbic=k==='ubicación';
-    const row=document.createElement('div'); row.className='pcm-field';
-    row.innerHTML=`${ico}${LBLS[k]}${val}`;
-    body.appendChild(row);
-    if(isUbic){
-      const enc=encodeURIComponent(val+', Costa Rica');
-      const mrow=document.createElement('div'); mrow.className='pcm-field';
-      mrow.innerHTML=`🗺`;
-      body.appendChild(mrow);
+    const sent  = lastAnalysis?.sentimiento_cliente || null;
+    const proto = lastAnalysis?.protocolo_agente    || null;
+    const scores = _buildScores(data, sent, proto, callDuration);
+
+    const svcId = POBuilder._currentSvc?.id || 'grua';
+    const WAIT  = {grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
+
+    // Save to list
+    const poEntry = {num, ts, data:{...data},
+      meta:{callDuration, sentVal:sent?Number(sent.valor):0,
+            waitTime:WAIT[svcId]||15, scores}};
+    _poList.push(poEntry);
+    _poCount = _poList.length;
+
+    // Update counter pill
+    const ctr  = document.getElementById('po-counter');
+    const cnum = document.getElementById('po-count-num');
+    if(cnum) cnum.textContent = _poCount;
+    if(ctr)  ctr.classList.add('show');
+
+    // Add to drawer
+    _renderDrawerCard(poEntry);
+    updateDrawerCount();
+
+    // Fill confirm modal
+    const pcmNum  = document.getElementById('pcm-num');
+    const pcmTs   = document.getElementById('pcm-ts');
+    const pcmBody = document.getElementById('pcm-body');
+    if(pcmNum) pcmNum.textContent = num;
+    if(pcmTs)  pcmTs.textContent  = ts;
+    if(pcmBody){
+      pcmBody.innerHTML = '';
+      const ICONS={tipo_asistencia:'🔧',nombre_cliente:'👤',ubicación:'📍',
+                   placa:'🪪',marca:'🚗',modelo:'🔖',año:'📅',color:'🎨'};
+      const LBLS ={tipo_asistencia:'Servicio',nombre_cliente:'Cliente',ubicación:'Ubicación',
+                   placa:'Placa',marca:'Marca',modelo:'Modelo',año:'Año',color:'Color'};
+      Object.entries(ICONS).forEach(([k,ico])=>{
+        const val=data[k]; if(!val||String(val).trim()===''||val==='N/A') return;
+        const row=document.createElement('div'); row.className='pcm-field';
+        row.innerHTML='<span class="pd-det-i">'+ico+'</span><div><div class="pd-det-lbl">'+LBLS[k]+'</div><div class="pd-det-v">'+String(val)+'</div></div>';
+        pcmBody.appendChild(row);
+      });
+
+      // Nota: read directly from both sources
+      const notaFinal = _pvpNotaValue ||
+        notaFromPopup ||
+        (document.getElementById('pb-notes-ta')||{}).value?.trim() || '';
+      if(notaFinal){
+        const nrow=document.createElement('div'); nrow.className='pcm-field';
+        nrow.innerHTML='<span class="pd-det-i" style="filter:grayscale(1) brightness(10);opacity:.85;transition:filter .2s,opacity .2s" class="pcm-nota-ico">📝</span><div><div class="pd-det-lbl">Nota</div><div class="pd-det-v" style="font-style:italic;color:var(--t1)">'+notaFinal+'</div></div>';
+        pcmBody.appendChild(nrow);
+        data.nota = notaFinal; // ensure saved in poEntry
+        _pvpNotaValue = ''; // reset after use
+      }
     }
-  });
-  document.getElementById('po-confirm-ov').classList.add('show');
-  POBuilder.reset();
-  AgentBar.increment();
+
+    const ov = document.getElementById('po-confirm-ov');
+    if(ov) ov.classList.add('show');
+
+    POBuilder.reset();
+    AgentBar.increment();
+    showToast('PO '+num+' creado');
+  }catch(err){
+    console.error('confirmPO error:', err);
+    showToast('Error al crear PO: '+err.message);
+  }
 }
+
 function closePOConfirm(){document.getElementById('po-confirm-ov').classList.remove('show');}
+
 function openMapFromPO(){if(_poData.data?.ubicación)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(_poData.data.ubicación+', Costa Rica'),'_blank');}
 
-
-
-/* ══════════════════════════════════════════════
-   PO HISTORY DRAWER
-   ══════════════════════════════════════════════ */
-const FIELD_ICONS={nombre_cliente:'👤',placa:'🪪',marca:'🚗',modelo:'🔖',año:'📅',color:'🎨',tipo_asistencia:'🔧',ubicación:'📍',nota:'📝'};
-const FIELD_LBLS={nombre_cliente:'Cliente',placa:'Placa',marca:'Marca',modelo:'Modelo',año:'Año',color:'Color',tipo_asistencia:'Servicio',ubicación:'Ubicación',nota:'Nota'};
+function resetPOBuilder(){POBuilder.reset();}
 
 function openDrawer(){
   document.getElementById('po-drawer-ov').classList.add('show');
 }
+
 function closeDrawer(){
   document.getElementById('po-drawer-ov').classList.remove('show');
   closeDetail();
-}
-
-function updateDrawerCount(){
-  const el=document.getElementById('pdh-count');
-  if(el) el.textContent=_poList.length+' PO'+(+_poList.length!==1?'s':'');
-}
-
-function _renderDrawerCard(po){
-  const empty=document.getElementById('pd-empty');
-  if(empty) empty.style.display='none';
-  const list=document.getElementById('pd-list');
-  if(!list) return;
-
-  const card=document.createElement('div');
-  card.className='pd-card';
-  card.id='pdc_'+po.num;
-
-  // build tags for key fields
-  const tagFields=['nombre_cliente','placa','tipo_asistencia','ubicación'];
-  const tags=tagFields.map(k=>{
-    const v=po.data[k]; if(!v||v==='N/A') return '';
-    return `${FIELD_ICONS[k]||''} ${FIELD_LBLS[k]} ${String(v).substring(0,20)}`;
-  }).join('');
-
-  card.innerHTML=`
-    
-      ${po.num}
-      ${FIELD_ICONS.tipo_asistencia} ${po.data.tipo_asistencia||'—'}
-      ${po.ts}
-    
-    ${tags}`;
-  card.onclick=()=>openDetail(po.num);
-
-  // insert after search area (before first card or empty)
-  const first=list.querySelector('.pd-card');
-  if(first) list.insertBefore(card, first);
-  else list.appendChild(card);
 }
 
 function filterPOs(query){
@@ -1922,14 +2101,10 @@ function openDetail(num){
   if(sc.speechItems?.length){
     const speechDiv=document.createElement('div');
     speechDiv.className='pd-speech';
-    speechDiv.innerHTML=`Cumplimiento de speech
-      ${sc.speechItems.map(i=>`
-        
-          
-          ${i.label}
-          ${i.ok?'✓':'✗'}
-        `).join('')}
-      `;
+    speechDiv.innerHTML=`<div class="pd-speech">
+        <div class="pd-speech-title">Cumplimiento de speech</div>
+        ${sc.speechItems.map(i=>'<div class="pd-speech-item"><div class="pd-speech-dot '+(i.ok?'ok':'fail')+'"></div>'+i.label+'</div>').join('')}
+      </div>`
     body.appendChild(speechDiv);
   }
 
@@ -1938,7 +2113,7 @@ function openDetail(num){
     const val=po.data[k]; if(!val||val==='N/A') return;
     const isUbic=k==='ubicación';
     const row=document.createElement('div'); row.className='pd-det-row';
-    row.innerHTML=`${ico}${FIELD_LBLS[k]}${val}`;
+    row.innerHTML=`<span class="pd-det-i">${ico}</span><div><div class="pd-det-lbl">${FIELD_LBLS[k]}</div><div class="pd-det-v">${val}</div></div>`;
     body.appendChild(row);
   });
 
@@ -1957,11 +2132,10 @@ function openMapFromDetail(){
     window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(po.data.ubicación+', Costa Rica'),'_blank');
 }
 
-
-
-
 function openDashboard(){_buildDashboard();document.getElementById('dash-ov').classList.add('show');document.getElementById('dash-date').textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});}
+
 function closeDashboard(){document.getElementById('dash-ov').classList.remove('show');}
+
 function _buildDashboard(){
   const pos=_poList, n=pos.length;
   const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
@@ -2109,6 +2283,166 @@ function _toggleDPO(idx){
   setTimeout(()=>detail.querySelectorAll('.dpo-bar-fill').forEach(f=>f.style.width=f.dataset.w),50);
 }
 
-AgentBar.init();</script>
+function _buildScores(data,sent,proto,callDuration){
+  // Satisfaction: based on sentiment valor
+  const sentVal=sent?Number(sent.valor):0;
+  const satisfaction=sentVal===1?92:sentVal===0?70:38;
+
+  // AHT score: based on call duration — ideal 2-5 min
+  let ahtScore=80;
+  if(callDuration&&callDuration!=='—'){
+    const parts=callDuration.split(':');
+    const mins=parseInt(parts[0]||0);
+
+    if(mins<3||mins>8){ ahtScore=Math.max(20, ahtScore-(Math.abs(mins-5)*8)); }
+  }
+  const required=['nombre_cliente','ubicación','tipo_asistencia','placa','marca','modelo'];
+  const filled=required.filter(k=>data[k]&&String(data[k]).trim());
+
+  // Speech compliance: protocol + data
+  const proto_ok=proto?.cumple===true;
+  const speechItems=[
+    {label:'Saludo de bienvenida', ok: proto_ok },
+    {label:'Identificación del cliente', ok: !!data.nombre_cliente },
+    {label:'Validación de ubicación', ok: !!data.ubicación },
+    {label:'Confirmación de servicio', ok: !!data.tipo_asistencia },
+    {label:'ETA comunicado al cliente', ok: proto_ok && !!data.ubicación },
+  ];
+  const speechScore=Math.round(speechItems.filter(i=>i.ok).length/speechItems.length*100);
+  const completeness=Math.round(filled.length/required.length*100);
+
+  return{satisfaction,ahtScore,completeness,speechScore,speechItems};
+}
+
+AgentBar.init()
+
+/* ── PO Validation Popup ─────────────────────────────── */
+let _pvpDismissed = false;
+let _pvpNotaValue = "";
+
+function openPOValidation(){
+  if(_pvpDismissed) return;
+  const popup = document.getElementById('po-validate-popup');
+  const fieldsEl = document.getElementById('pvp-fields');
+  const warnEl = document.getElementById('pvp-warn');
+  if(!popup||!fieldsEl) return;
+  // If already open, just update warn status — don't re-render inputs (would reset edits)
+  if(popup.classList.contains('show')){
+    _pvpRefreshStatus();
+    return;
+  }
+  const data = POBuilder.getData();
+  const DEF=[
+    {k:'tipo_asistencia',i:'🔧',l:'Servicio',req:true},
+    {k:'nombre_cliente', i:'👤',l:'Cliente', req:true},
+    {k:'ubicación',      i:'📍',l:'Ubicación',req:true},
+    {k:'placa',          i:'🪪',l:'Placa',   req:false},
+    {k:'marca',          i:'🚗',l:'Marca',   req:false},
+    {k:'modelo',         i:'🔖',l:'Modelo',  req:false},
+    {k:'año',            i:'📅',l:'Año',     req:false},
+    {k:'color',          i:'🎨',l:'Color',   req:false},
+  ];
+  // Always show nota field (optional)
+  const notaVal = (POBuilder.getData().nota||'');
+  fieldsEl.innerHTML=''; let miss=0;
+  DEF.forEach(f=>{
+    const val=data[f.k];
+    const ok=val&&String(val).trim()&&val!=='N/A';
+    if(!ok&&f.req) miss++;
+    const row=document.createElement('div');
+    row.className='pvp-field '+(ok?'ok':f.req?'miss':'');
+    row.innerHTML='<span class="pvp-field-ico">'+f.i+'</span><div class="pvp-field-info"><div class="pvp-field-lbl">'+f.l+(f.req?' *':'')+'</div><input class="pvp-input'+(ok?'':' empty')+'" data-key="'+f.k+'" value="'+(ok?String(val).replace(/"/g,'&quot;'):'')+'" placeholder="—" oninput="_pvpRefreshStatus()"></div>'+(f.req?'<div class="pvp-status '+(ok?'ok':'miss')+'" id="pvp-st-'+f.k+'">'+(ok?'✓':'✗')+'</div>':'');
+    fieldsEl.appendChild(row);
+  });
+  // Nota field
+  const notaWrap = document.getElementById('pvp-nota-wrap');
+  const notaInp  = document.getElementById('pvp-nota');
+  if(notaInp){ notaInp.value = notaVal; }
+  if(notaWrap){ notaWrap.style.display='flex'; }
+
+  warnEl.classList.toggle('show',miss>0);
+  popup.classList.add('show');
+}
+
+function closePOValidation(byUser){
+  if(byUser) _pvpDismissed=true;
+  const p=document.getElementById('po-validate-popup');
+  if(p) p.classList.remove('show');
+}
+
+function openMapFromField(){
+  const loc=(POBuilder.getData().ubicación)||'';
+  if(!loc){showToast('⚠ Sin ubicación registrada');return;}
+  window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(loc+', Costa Rica'),'_blank');
+}
+function _pvpRefreshStatus(){
+  const REQUIRED = ['tipo_asistencia','nombre_cliente','ubicación'];
+  let allOk = true;
+  document.querySelectorAll('.pvp-input').forEach(inp => {
+    const key = inp.dataset.key;
+    const val = inp.value.trim();
+    const filled = val.length > 0;
+    const st = document.getElementById('pvp-st-'+key);
+    if(st){ st.textContent=filled?'✓':'✗'; st.className='pvp-status '+(filled?'ok':'miss'); }
+    inp.classList.toggle('empty', !filled);
+    if(REQUIRED.includes(key) && !filled) allOk = false;
+  });
+  const warn = document.getElementById('pvp-warn');
+  if(warn) warn.classList.toggle('show', !allOk);
+}
+
+function reopenPOValidation(){
+  _pvpDismissed = false;
+  openPOValidation();
+}
+
+
+function _renderDrawerCard(po) {
+  const list = document.getElementById('pd-list');
+  const empty = document.getElementById('pd-empty');
+  if (!list) return;
+  if (empty) empty.style.display = 'none';
+  const idx = _poList.length - 1;
+  const card = document.createElement('div');
+  card.className = 'pd-card';
+  card.onclick = () => openDetail(idx);
+  card.innerHTML =
+    '<div class="pd-card-top">' +
+      '<span class="pd-card-num">'+po.num+'</span>' +
+      '<span class="pd-card-svc">'+(po.data.tipo_asistencia||'—')+'</span>' +
+      '<span class="pd-card-ts">'+po.ts+'</span>' +
+    '</div>' +
+    '<div class="pd-card-fields">' +
+      (po.data.nombre_cliente?'<span class="pd-card-tag">👤 '+po.data.nombre_cliente+'</span>':'') +
+      (po.data.placa?'<span class="pd-card-tag">🪪 '+po.data.placa+'</span>':'') +
+      (po.data.ubicación?'<span class="pd-card-tag">📍 '+po.data.ubicación+'</span>':'') +
+    '</div>';
+  list.insertBefore(card, list.firstChild);
+}
+
+function updateDrawerCount(){
+  const cnt = document.getElementById('pdh-count');
+  if(cnt) cnt.textContent = _poList.length + ' POs';
+}
+</script>
+
+<!-- PO Validation Popup — auto-appears when required fields complete -->
+<div class="po-validate-popup" id="po-validate-popup">
+  <div class="pvp-head">
+    <span class="pvp-icon">📋</span>
+    <span class="pvp-title">Confirmar creación de PO</span>
+    <button class="pvp-close" onclick="closePOValidation(true)">✕</button>
+  </div>
+  <div class="pvp-fields" id="pvp-fields"></div>
+  <div class="pvp-nota-wrap" id="pvp-nota-wrap">
+    <div class="pvp-nota-lbl">📝 Nota</div>
+    <textarea class="pvp-nota-ta" id="pvp-nota" placeholder="Observación o instrucción especial..." oninput="_pvpNotaValue=this.value.trim()"></textarea>
+  </div>
+  <div class="pvp-warn" id="pvp-warn">⚠ Campos requeridos incompletos.</div>
+  <div class="pvp-foot">
+    <button class="pvp-btn sec" onclick="closePOValidation(true)">Cancelar</button>
+    <button class="pvp-btn main" onclick="confirmPO()">✦ Crear PO</button>
+  </div>
+</div>
 </body>
 </html>
