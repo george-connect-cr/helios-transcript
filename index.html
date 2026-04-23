@@ -1931,7 +1931,6 @@ const POBuilder = (() => {
   }
   function addField(key,value,_forceNew){
     const isNew=_forceNew!==undefined?_forceNew:!_data[key]; _data[key]=value;
-    if(isNew && typeof _pvpDismissed !== 'undefined') _pvpDismissed = false;
     _showPanel(); _upsertRow(key,value,isNew);
     _updateSugs(); _updateWait(); _updateStatus();
     // Flash pill ONLY on first detection, not on edits/updates
@@ -2243,10 +2242,10 @@ function _autoFillPO(data){
 
   if(data.tipo_asistencia) ServiceDetector.analyze(data.tipo_asistencia);
 
-  // After DOM settles, unblock and open popup once with complete data
+  // After DOM settles, unblock and open popup once with complete data (unless user closed it)
   setTimeout(()=>{
     _pvpDismissed = false;
-    openPOValidation();
+    if(!_pvpClosedByUser) openPOValidation();
   }, 400);
 }
 
@@ -2764,10 +2763,11 @@ const KB = {
 
 /* ── PO Validation Popup ─────────────────────────────── */
 let _pvpDismissed = false;
+let _pvpClosedByUser = false; // permanent for this call
 let _pvpNotaValue = "";
 
 function openPOValidation(){
-  if(_pvpDismissed) return;
+  if(_pvpDismissed || _pvpClosedByUser) return;
   const popup = document.getElementById('po-validate-popup');
   const fieldsEl = document.getElementById('pvp-fields');
   const warnEl = document.getElementById('pvp-warn');
@@ -2812,7 +2812,7 @@ function openPOValidation(){
 }
 
 function closePOValidation(byUser){
-  if(byUser) _pvpDismissed=true;
+  if(byUser){ _pvpDismissed=true; _pvpClosedByUser=true; }
   const p=document.getElementById('po-validate-popup');
   if(p) p.classList.remove('show');
 }
@@ -2840,6 +2840,7 @@ function _pvpRefreshStatus(){
 
 function reopenPOValidation(){
   _pvpDismissed = false;
+  _pvpClosedByUser = false;
   openPOValidation();
 }
 
