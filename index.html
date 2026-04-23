@@ -1782,6 +1782,7 @@ const POBuilder = (() => {
     año:           {i:'📅',l:'Año',      req:['grua','mec']},
     color:         {i:'🎨',l:'Color',    req:['grua']},
     ubicación:     {i:'📍',l:'Ubicación',req:['grua','bat','llanta','gas','llaves','mec']},
+    ubicacion_destino:{i:'🏁',l:'Ubicación destino',req:['grua'],wide:true},
     tipo_asistencia:{i:'🔧',l:'Servicio',req:['grua','bat','llanta','gas','llaves','mec']},
   };
   const SUGS={
@@ -2034,6 +2035,8 @@ const SF = (() => {
 const AgentBar = (() => {
   let done = 0, goal = 20;  // done = POs creados en el día
 
+  function setDemo(){ done = 19; sync(); }
+
   function sync() {
     const pct = Math.round(done / goal * 100);
     const dEl = document.getElementById('ag-done');
@@ -2088,7 +2091,7 @@ const AgentBar = (() => {
     if(done < goal) showToast('PO #' + done + ' registrado — ' + Math.round(done/goal*100) + '% de meta');
   }
 
-  return { init, increment };
+  return { init, increment, setDemo };
 })();
 
 
@@ -2102,6 +2105,7 @@ function _autoFillPO(data){
     ['modelo',         data.modelo],
     ['año',            data.año],
     ['color',          data.color],
+    ['ubicacion_destino', data.ubicacion_destino],
   ];
   const toAdd = map.filter(([k,v])=>v&&v!=='N/A');
   if(!toAdd.length) return;
@@ -2658,6 +2662,7 @@ function openPOValidation(){
     {k:'modelo',         i:'🔖',l:'Modelo',  req:false},
     {k:'año',            i:'📅',l:'Año',     req:false},
     {k:'color',          i:'🎨',l:'Color',   req:false},
+    {k:'ubicacion_destino',i:'🏁',l:'Destino remolque',req:false},
   ];
   // Always show nota field (optional)
   const notaVal = (POBuilder.getData().nota||'');
@@ -2746,12 +2751,12 @@ function updateDrawerCount(){
 /* ══ KB CHECKLIST — dinámico por transcripción ══════════ */
 const KB_CHECKS = {
   grua: [
-    { id:'ubicacion',  txt:'Confirmar ubicación exacta',         keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','cañón','frente a','detrás de','costado','cien metros','doscientos'] },
-    { id:'marchamo',   txt:'Verificar marchamo vigente',          keywords:['marchamo','circulación','al día','vigente','tiene marchamo'] },
-    { id:'grua_viaje', txt:'¿Puede viajar en la grúa?',          keywords:['voy en la grúa','viajo en','sí puedo','puedo ir','acompañar','me quedo','alguien de confianza'] },
-    { id:'destino',    txt:'Confirmar destino del remolque',      keywords:['taller','llevar a','destino','dirección del taller','mecánico','donde lo llevo'] },
-    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','marca','modelo','color','año'] },
-    { id:'vacio',      txt:'Vehículo debe ir vacío',              keywords:['vacío','nadie adentro','solo yo','sin pasajeros'] },
+    { id:'ubicacion',    txt:'Confirmar ubicación exacta del vehículo', keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','cañón','frente a','detrás de','costado','cien metros','doscientos'] },
+    { id:'vehiculo',     txt:'Datos del vehículo (placa, marca, modelo)', keywords:['placa','marca','modelo','color','año'] },
+    { id:'marchamo',     txt:'Verificar marchamo vigente',               keywords:['marchamo','circulación','al día','vigente','tiene marchamo'] },
+    { id:'destino_orig', txt:'Confirmar ubicación destino (taller)',      keywords:['taller','llevar a','destino','dirección del taller','mecánico','donde lo llevo','me lo lleven a','lo lleven'] },
+    { id:'grua_viaje',   txt:'¿Puede viajar en la cabina de la grúa?',   keywords:['voy en la grúa','viajo en','sí puedo','puedo ir','acompañar','me quedo','alguien de confianza','cabina'] },
+    { id:'vacio',        txt:'Confirmar que el vehículo irá vacío',       keywords:['vacío','nadie adentro','solo yo','sin pasajeros','va vacío'] },
   ],
   bat: [
     { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','frente a'] },
