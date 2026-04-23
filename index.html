@@ -275,7 +275,8 @@ body.light .col-l{background:rgba(255,255,255,.5);}
   opacity:0;transform:translateY(-4px);transition:opacity .22s,transform .22s;
 }
 .rec-toast.show{opacity:1;transform:translateY(0);}
-.rec-toast.done{opacity:0;max-height:0;padding:0;margin:0;border:none;overflow:hidden;transition:all .2s;}
+.rec-toast.done{animation:rec-done-out .8s ease forwards;pointer-events:none;}
+@keyframes rec-done-out{0%{background:rgba(106,170,144,.18);border-color:#6aaa90;opacity:1;}40%{background:rgba(106,170,144,.12);opacity:.8;}100%{opacity:0;max-height:0;padding:0;margin:0;border:none;overflow:hidden;}}
 .rec-ico{width:22px;height:22px;border-radius:5px;flex-shrink:0;background:rgba(196,165,255,.1);border:1px solid rgba(196,165,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px;}
 .rec-body{flex:1;min-width:0;}
 .rec-lbl{font-family:var(--m);font-size:8px;color:var(--v);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
@@ -1874,7 +1875,10 @@ const Recs=(()=>{
   }
   function _dismiss(id){
     const t=document.getElementById('rec_'+id);
-    if(t){t.classList.add('done');setTimeout(()=>t.remove(),260);}
+    if(t){
+      t.classList.add('done');
+      setTimeout(()=>t.remove(), 850);
+    }
     _a.delete(id);
   }
   function dismiss(id){_dismiss(id);}
@@ -2989,7 +2993,7 @@ function _dismissKBPill(itemId){
   const el = document.getElementById('kbpill_'+itemId);
   if(!el) return;
   el.classList.add('done');
-  setTimeout(()=>el.remove(), 300);
+  setTimeout(()=>el.remove(), 850);
 }
 
 function renderKBSugs(sugs){
