@@ -116,10 +116,10 @@ body.light .nav{background:rgba(255,255,255,.8);}
 /* Timer */
 .n-timer{display:none;align-items:center;gap:7px;margin-right:18px;}
 .n-timer.on{display:flex;}
-.td-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:gp 1.5s infinite;}
+.td-dot{width:6px;height:6px;border-radius:50%;background:#6aaa90;animation:gp 1.5s infinite;}
 .td-dot.warn{background:var(--y);animation:none;}.td-dot.alert{background:var(--r);animation:rp 1s infinite;}
 @keyframes rp{0%,100%{opacity:1;}50%{opacity:.2;}}
-.td-num{font-family:var(--m);font-size:14px;font-weight:600;color:var(--t0);letter-spacing:.3px;}
+.td-num{font-family:var(--m);font-size:14px;font-weight:600;color:var(--t0);letter-spacing:.5px;}
 .td-num.warn{color:var(--y);}.td-num.alert{color:var(--r);}
 .td-alert{display:none;font-family:var(--m);font-size:8px;color:var(--r);padding:2px 8px;border-radius:4px;background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);}
 .td-alert.on{display:block;}
@@ -1280,7 +1280,7 @@ body.light .celebrate-card{
     <div class="n-div"></div>
     <div class="td-dot" id="t-dot"></div>
     <span class="td-num" id="call-timer-val">0:00</span>
-    <div class="td-alert" id="t-alert">⚠</div>
+    <div class="td-alert" id="t-alert" style="display:none">⚠</div>
   </div>
   <div class="n-r">
     <div class="po-counter" id="po-counter" onclick="openDrawer()">
@@ -1731,10 +1731,17 @@ const CallTimer=(()=>{
     if(v)v.textContent=fmt(s);
     if(v&&d){
       v.className='td-num';d.className='td-dot';
-      if(al)al.className='t-row-alert';
-      if(s>=A){v.classList.add('alert');d.classList.add('alert');if(l)l.textContent='';if(al)al.classList.add('on');}
-      else if(s>=W){v.classList.add('warn');d.classList.add('warn');if(l)l.textContent='Tiempo prolongado';}
-      else{if(l)l.textContent='En llamada';}
+      if(al) al.style.display='none'; // hide by default
+      if(s>=A){
+        v.classList.add('alert'); d.classList.add('alert');
+        if(al){ al.style.display='inline'; al.className='t-row-alert on'; }
+      } else if(s>=W){
+        v.classList.add('warn'); d.classList.add('warn');
+        if(al) al.style.display='none'; // no icon on warn, just color
+      } else {
+        // normal — dot stays green
+        d.style.background='#6aaa90';
+      }
     }
     _t=setTimeout(tick,1000);
   }
@@ -1749,7 +1756,7 @@ const CallTimer=(()=>{
     const v=document.getElementById('call-timer-val');if(v){v.textContent='0:00';v.className='td-num';}
     const d=document.getElementById('t-dot');if(d)d.className='td-dot';
     const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
-    const al=document.getElementById('t-alert');if(al)al.className='t-row-alert';
+    const al=document.getElementById('t-alert');if(al){al.className='t-row-alert';al.style.display='none';}
   }
   return{start,reset};
 })();
