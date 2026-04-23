@@ -1172,6 +1172,71 @@ body.light .kb-pill{
   flex-shrink:0;transition:all .15s;align-self:flex-start;
 }
 .rec-ck:hover{border-color:#6aaa90;color:#6aaa90;}
+
+/* ── Celebration overlay ─────────────────────────────── */
+.celebrate-ov{
+  position:fixed;inset:0;z-index:900;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+  opacity:0;transition:opacity .4s ease;
+}
+.celebrate-ov.show{opacity:1;pointer-events:all;}
+.celebrate-card{
+  background:var(--c1);
+  border:1px solid rgba(255,255,255,.12);
+  border-top:3px solid #bf9455;
+  border-radius:20px;
+  padding:36px 44px;
+  text-align:center;
+  box-shadow:0 32px 80px rgba(0,0,0,.4);
+  transform:scale(.88) translateY(20px);
+  transition:transform .45s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+  opacity:0;
+  max-width:340px;width:90%;
+}
+.celebrate-ov.show .celebrate-card{
+  transform:scale(1) translateY(0);
+  opacity:1;
+}
+.celebrate-star{font-size:52px;display:block;margin-bottom:12px;animation:spin-in .6s cubic-bezier(.34,1.56,.64,1);}
+@keyframes spin-in{0%{transform:scale(0) rotate(-40deg);}70%{transform:scale(1.15) rotate(5deg);}100%{transform:scale(1) rotate(0)}}
+.celebrate-title{
+  font-family:var(--f);font-size:20px;font-weight:800;
+  color:var(--t0);letter-spacing:-.3px;margin-bottom:6px;
+}
+.celebrate-sub{
+  font-family:var(--m);font-size:12px;color:var(--t1);
+  line-height:1.6;margin-bottom:20px;
+}
+.celebrate-count{
+  font-family:var(--m);font-size:28px;font-weight:700;
+  color:#bf9455;letter-spacing:-1px;margin-bottom:4px;
+}
+.celebrate-count-lbl{
+  font-family:var(--m);font-size:9px;color:var(--t2);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:22px;
+}
+.celebrate-close{
+  background:var(--gb);border:1px solid var(--gb2);
+  color:var(--t1);font-family:var(--f);font-size:12px;font-weight:600;
+  border-radius:10px;padding:10px 28px;cursor:pointer;
+  transition:all .15s;
+}
+.celebrate-close:hover{border-color:var(--a);color:var(--a);}
+/* Confetti particles */
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:899;overflow:hidden;}
+.confetti-p{
+  position:absolute;top:-10px;width:8px;height:8px;border-radius:2px;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1;}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
+}
+body.light .celebrate-card{
+  background:#ffffff;
+  border-color:rgba(0,0,0,.1);
+}
 </style>
 </head>
 <body>
@@ -2077,7 +2142,7 @@ const AgentBar = (() => {
         sEl.style.opacity = '1';
         if(!sEl.classList.contains('on')){
           sEl.classList.add('on');
-          showToast('⭐ ¡Meta del día alcanzada! ' + done + '/' + goal);
+          showCelebration(done, goal);
         }
       }
     }
@@ -2089,7 +2154,7 @@ const AgentBar = (() => {
     done = Math.min(done + 1, goal);
     sync();
     if(done >= goal){
-      setTimeout(()=>showToast('⭐ ¡Meta del día alcanzada! ' + done + '/' + goal + ' POs — ¡Excelente trabajo!', 5000), 200);
+      setTimeout(()=>showCelebration(done, goal), 200);
     } else {
       showToast('PO #' + done + ' registrado — ' + Math.round(done/goal*100) + '% de meta');
     }
@@ -2881,7 +2946,42 @@ function renderKBSugs(sugs){
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
   RECONNECT_MS:5000,
-};</script>
+};
+function showCelebration(done, goal){
+  const ov = document.getElementById('celebrate-ov');
+  const cnt = document.getElementById('cel-count');
+  if(cnt) cnt.textContent = done + '/' + goal;
+  if(ov) ov.classList.add('show');
+  _spawnConfetti();
+}
+
+function closeCelebration(){
+  const ov = document.getElementById('celebrate-ov');
+  if(ov) ov.classList.remove('show');
+  const wrap = document.getElementById('confetti-wrap');
+  if(wrap) wrap.innerHTML = '';
+}
+
+function _spawnConfetti(){
+  const wrap = document.getElementById('confetti-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const colors = ['#bf9455','#6aaa90','#cc7580','#ffffff','#ff5c00','#a0b8ff'];
+  for(let i=0;i<60;i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-p';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.width = (6+Math.random()*6) + 'px';
+    p.style.height = (6+Math.random()*6) + 'px';
+    p.style.borderRadius = Math.random()>.5 ? '50%' : '2px';
+    p.style.animationDuration = (2+Math.random()*3) + 's';
+    p.style.animationDelay = (Math.random()*1.5) + 's';
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
+}
+</script>
 
 <!-- PO Validation Popup — auto-appears when required fields complete -->
 <div class="po-validate-popup" id="po-validate-popup">
@@ -2899,6 +2999,19 @@ function renderKBSugs(sugs){
   <div class="pvp-foot">
     <button class="pvp-btn sec" onclick="closePOValidation(true)">Cancelar</button>
     <button class="pvp-btn main" onclick="confirmPO()">✦ Crear PO</button>
+  </div>
+</div>
+
+<!-- Celebration overlay -->
+<div class="confetti-wrap" id="confetti-wrap"></div>
+<div class="celebrate-ov" id="celebrate-ov" onclick="closeCelebration()">
+  <div class="celebrate-card" onclick="event.stopPropagation()">
+    <span class="celebrate-star">⭐</span>
+    <div class="celebrate-count" id="cel-count">20/20</div>
+    <div class="celebrate-count-lbl">POs del día</div>
+    <div class="celebrate-title">¡Meta alcanzada!</div>
+    <div class="celebrate-sub">Completaste tu objetivo del día.<br>¡Excelente trabajo, sigue así!</div>
+    <button class="celebrate-close" onclick="closeCelebration()">Continuar</button>
   </div>
 </div>
 </body>
