@@ -1548,6 +1548,10 @@ function appendTranscript(speaker,text){
   }
   if(typeof CallTimer!=='undefined') CallTimer.start();
   if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
+  // Re-check recs on every transcript line
+  if(typeof Recs!=='undefined' && typeof lastAnalysis!=='undefined' && lastAnalysis){
+    Recs.check(lastAnalysis, lastAnalysis.sentimiento_cliente, body.innerText);
+  }
 }
 
 function _showScrollArrow(){
@@ -1853,14 +1857,26 @@ const Recs=(()=>{
       trig:d=>!!d.ubicación&&d.ubicación.length<22, done:d=>d.ubicación&&d.ubicación.length>=22},
     {id:'eta',ico:'⏱',lbl:'ETA',
       txt:'Comunica el tiempo estimado de llegada antes de cerrar la llamada.',
-      trig:d=>!!d.tipo_asistencia&&!!d.ubicación, done:()=>false},
+      trig:d=>!!d.tipo_asistencia&&!!d.ubicación,
+      done:(d,s,t)=>{
+        const txt=(t||'').toLowerCase();
+        return txt.includes('minuto') || txt.includes('eta') || txt.includes('tiempo estimado') ||
+               txt.includes('llegará en') || txt.includes('llega en') || txt.includes('aproximadamente') ||
+               txt.includes('media hora') || txt.includes('veinte minutos') || txt.includes('treinta minutos');
+      }},
     {id:'sent_neg',ico:'⚠️',lbl:'Cliente molesto',
       txt:'El cliente parece molesto. Usa lenguaje empático y ofrece solución concreta.',
-      trig:(d,s)=>s&&Number(s.valor)===-1, done:()=>false},
+      trig:(d,s)=>s&&Number(s.valor)===-1,
+      done:(d,s,t)=>{
+        const txt=(t||'').toLowerCase();
+        return txt.includes('entiendo') || txt.includes('comprendo') || txt.includes('disculpe') ||
+               txt.includes('le ofrezco') || txt.includes('lo ayudo') || txt.includes('solución');
+      }},
   ];
-  function check(data,sent){
+  function check(data,sent,transcriptText){
+    const t = transcriptText || document.getElementById('t-body')?.innerText || '';
     C.forEach(c=>{
-      if(_a.has(c.id)){if(c.done(data,sent))_dismiss(c.id);}
+      if(_a.has(c.id)){if(c.done(data,sent,t))_dismiss(c.id);}
       else if(c.trig(data,sent)){_a.add(c.id);_show(c);}
     });
   }
