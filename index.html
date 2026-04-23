@@ -1237,6 +1237,35 @@ body.light .celebrate-card{
   background:#ffffff;
   border-color:rgba(0,0,0,.1);
 }
+
+/* ── Speech dot green flash ──────────────────────────── */
+.pd-speech-dot.ok{
+  background:#6aaa90;
+  animation:dot-appear .4s ease;
+}
+@keyframes dot-appear{
+  0%{transform:scale(0);opacity:0;}
+  60%{transform:scale(1.4);background:#6aaa90;}
+  100%{transform:scale(1);opacity:1;}
+}
+.dsd-dot.ok{
+  background:#6aaa90;
+  animation:dot-appear .4s ease;
+}
+
+/* ── Transcript scroll arrow ─────────────────────────── */
+.t-scroll-arrow{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--a);color:#fff;border:none;border-radius:20px;
+  padding:5px 14px 5px 10px;font-size:11px;font-family:var(--m);font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:5px;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s, transform .2s;
+  z-index:10;white-space:nowrap;
+  box-shadow:0 4px 14px rgba(255,92,0,.3);
+}
+.t-scroll-arrow.show{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
+.t-scroll-arrow:hover{background:var(--a2);}
 </style>
 </head>
 <body>
@@ -1299,7 +1328,8 @@ body.light .celebrate-card{
       <span class="tp-lbl">Transcripción en vivo</span>
       <div class="live-b"><div class="ldot"></div>En vivo</div>
     </div>
-    <div class="tp-body" id="t-body">
+    <div class="tp-wrap" style="position:relative;flex:1;display:flex;flex-direction:column;min-height:0;">
+    <div class="tp-body" id="t-body" onscroll="if(this.scrollHeight-this.scrollTop-this.clientHeight<80)_hideScrollArrow();">
       
     </div>
     <div id="t-inferred"></div><div id="sentiment-row"></div><div id="btn-analyze"></div>
@@ -1507,11 +1537,30 @@ function appendTranscript(speaker,text){
   txt.textContent=text;
   line.appendChild(spk);line.appendChild(txt);
   body.appendChild(line);
-  body.scrollTop=body.scrollHeight;
-  // Trigger call timer on first transcript
+  // Smart scroll: only auto-scroll if user is near the bottom
+  const isNearBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
+  if(isNearBottom){
+    body.scrollTop=body.scrollHeight;
+    _hideScrollArrow();
+  } else {
+    _showScrollArrow();
+  }
   if(typeof CallTimer!=='undefined') CallTimer.start();
-  // Trigger service detection from transcript text
   if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
+}
+
+function _showScrollArrow(){
+  const arr = document.getElementById('t-scroll-arrow');
+  if(arr) arr.classList.add('show');
+}
+function _hideScrollArrow(){
+  const arr = document.getElementById('t-scroll-arrow');
+  if(arr) arr.classList.remove('show');
+}
+function _scrollToLatest(){
+  const body = document.getElementById('t-body');
+  if(body){ body.scrollTo({top:body.scrollHeight, behavior:'smooth'}); }
+  _hideScrollArrow();
 }
 
 function renderTags(data){
@@ -2617,11 +2666,11 @@ function _buildScores(data,sent,proto,callDuration){
   // Speech compliance: protocol + data
   const proto_ok=proto?.cumple===true;
   const speechItems=[
-    {label:'Saludo de bienvenida', ok: proto_ok },
+    {label:'Saludo de bienvenida',       ok: proto_ok },
     {label:'Identificación del cliente', ok: !!data.nombre_cliente },
-    {label:'Validación de ubicación', ok: !!data.ubicación },
-    {label:'Confirmación de servicio', ok: !!data.tipo_asistencia },
-    {label:'ETA comunicado al cliente', ok: proto_ok && !!data.ubicación },
+    {label:'Validación de ubicación',    ok: !!data.ubicación },
+    {label:'Confirmación del servicio',  ok: !!data.tipo_asistencia },
+    {label:'ETA comunicado al cliente',  ok: proto_ok && !!data.ubicación && !!data.tipo_asistencia },
   ];
   const speechScore=Math.round(speechItems.filter(i=>i.ok).length/speechItems.length*100);
   const completeness=Math.round(filled.length/required.length*100);
