@@ -1591,7 +1591,7 @@ function showToast(msg){
 
 window.addEventListener('DOMContentLoaded', ()=>{ setTheme('light'); connectWebPubSub(); });
 
-function triggerDemo(){ triggerSmartFill(); }
+function triggerDemo(){ AgentBar.setDemo(); triggerSmartFill(); }
 let _poList = [];
 let _activeDetail = -1;
 let _poCount = 0;
