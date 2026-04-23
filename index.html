@@ -2088,7 +2088,11 @@ const AgentBar = (() => {
   function increment() {
     done = Math.min(done + 1, goal);
     sync();
-    if(done < goal) showToast('PO #' + done + ' registrado — ' + Math.round(done/goal*100) + '% de meta');
+    if(done >= goal){
+      setTimeout(()=>showToast('⭐ ¡Meta del día alcanzada! ' + done + '/' + goal + ' POs — ¡Excelente trabajo!', 5000), 200);
+    } else {
+      showToast('PO #' + done + ' registrado — ' + Math.round(done/goal*100) + '% de meta');
+    }
   }
 
   return { init, increment, setDemo };
