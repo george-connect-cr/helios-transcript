@@ -1316,11 +1316,6 @@ body.light .celebrate-card{
       </div>
       <div class="rec-stack" id="rec-stack"></div>
     </div>
-    <!-- KB Suggestions -->
-    <div class="kb-card" id="kb-card" style="display:none">
-      <div class="sec-lbl">💡 Checklist del servicio</div>
-      <div id="kb-sugs" class="kb-sugs"></div>
-    </div>
   </aside>
 
   <!-- CENTER -->
@@ -1455,6 +1450,8 @@ body.light .celebrate-card{
 <div id="insight" style="display:none"><div id="insighttxt"></div></div>
 
 <script>const CONFIG={
+  NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
+  FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/const CONFIG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
@@ -1851,7 +1848,8 @@ const Recs=(()=>{
   const C=[
     {id:'placa',ico:'🪪',lbl:'Placa',
       txt:'Confirma la placa del vehículo con el cliente para evitar errores.',
-      trig:d=>!d.placa, done:d=>!!d.placa},
+      trig:d=>!d.placa,
+      done:(d,s,t)=>!!d.placa||(t||'').toLowerCase().includes('tablilla')},
     {id:'ubic_ref',ico:'📍',lbl:'Referencia',
       txt:'Solicita un punto de referencia adicional para facilitar el despacho.',
       trig:d=>!!d.ubicación&&d.ubicación.length<22, done:d=>d.ubicación&&d.ubicación.length>=22},
@@ -2240,6 +2238,8 @@ const AgentBar = (() => {
 
 
 function _autoFillPO(data){
+  // Normalize: 'tablilla' → placa
+  if(!data.placa && data.tablilla) data.placa = data.tablilla;
   const map=[
     ['tipo_asistencia',data.tipo_asistencia],
     ['nombre_cliente', data.nombre_cliente],
@@ -2898,7 +2898,7 @@ function updateDrawerCount(){
 const KB_CHECKS = {
   grua: [
     { id:'ubicacion',    txt:'Confirmar ubicación exacta del vehículo', keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','cañón','frente a','detrás de','costado','cien metros','doscientos'] },
-    { id:'vehiculo',     txt:'Datos del vehículo (placa, marca, modelo)', keywords:['placa','marca','modelo','color','año'] },
+    { id:'vehiculo',     txt:'Datos del vehículo (placa, marca, modelo)', keywords:['placa','tablilla','marca','modelo','color','año'] },
     { id:'marchamo',     txt:'Verificar marchamo vigente',               keywords:['marchamo','circulación','al día','vigente','tiene marchamo'] },
     { id:'destino_orig', txt:'Confirmar ubicación destino (taller)',      keywords:['taller','llevar a','destino','dirección del taller','mecánico','donde lo llevo','me lo lleven a','lo lleven'] },
     { id:'grua_viaje',   txt:'¿Puede viajar en la cabina de la grúa?',   keywords:['voy en la grúa','viajo en','sí puedo','puedo ir','acompañar','me quedo','alguien de confianza','cabina'] },
@@ -2908,30 +2908,30 @@ const KB_CHECKS = {
     { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','frente a'] },
     { id:'intentos',   txt:'¿Cuántas veces intentó arrancar?',    keywords:['veces','intenté','arrancar','no arranca','probé'] },
     { id:'modelo',     txt:'Confirmar modelo del vehículo',       keywords:['marca','modelo','año','es un','tengo un'] },
-    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','marca','modelo','color','año'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
   ],
   llanta: [
     { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','frente a'] },
     { id:'repuesto',   txt:'¿Tiene llanta de repuesto?',          keywords:['repuesto','llanta de repuesto','sí tengo','tengo llanta','neumático de repuesto'] },
     { id:'herramientas',txt:'¿Tiene gato y llave?',              keywords:['gato','llave de rueda','herramientas','sí tengo herramientas'] },
-    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','marca','modelo','color','año'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
   ],
   gas: [
     { id:'ubicacion',  txt:'Confirmar ubicación exacta (vía pública)', keywords:['estoy en','calle','carretera','ruta','autopista','vía','encuentro en'] },
     { id:'combustible',txt:'Tipo de combustible',                 keywords:['gasolina','diesel','regular','súper','tipo de combustible'] },
     { id:'tarjeta',    txt:'Informar pago por tarjeta',           keywords:['tarjeta','débito','crédito','pago','informado','enterado'] },
-    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','marca','modelo','color','año'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
   ],
   llaves: [
     { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','estoy en','encuentro en','calle','avenida','frente a'] },
     { id:'llaves_adentro', txt:'¿Llaves están DENTRO del vehículo?', keywords:['adentro','dentro','sí están','las llaves están','inside','encerradas'] },
     { id:'cedula',     txt:'Cliente debe presentar cédula',       keywords:['cédula','identificación','documento','id'] },
-    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','marca','modelo','color','año'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
   ],
   mec: [
     { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','estoy en','encuentro en','calle','avenida','frente a'] },
     { id:'falla',      txt:'Describir la falla del vehículo',     keywords:['falla','problema','ruido','humo','no enciende','no arranca','averío','luz'] },
-    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','marca','modelo','color','año'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
   ],
   info: [
     { id:'nombre',     txt:'Identificar al cliente',              keywords:['nombre','me llamo','soy','cliente','afiliado'] },
@@ -3058,13 +3058,7 @@ function _spawnConfetti(){
   }
   setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
 }
-</script>
-
-<!-- PO Validation Popup — auto-appears when required fields complete -->
-<div class="po-validate-popup" id="po-validate-popup">
-  <div class="pvp-head">
-    <span class="pvp-icon">📋</span>
-    <span class="pvp-title">Confirmar creación de PO</span>
+ <span class="pvp-title">Confirmar creación de PO</span>
     <button class="pvp-close" onclick="closePOValidation(true)">✕</button>
   </div>
   <div class="pvp-fields" id="pvp-fields"></div>
