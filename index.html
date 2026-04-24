@@ -1848,8 +1848,7 @@ const Recs=(()=>{
   const C=[
     {id:'placa',ico:'🪪',lbl:'Placa',
       txt:'Confirma la placa del vehículo con el cliente para evitar errores.',
-      trig:d=>!d.placa,
-      done:(d,s,t)=>!!d.placa||(t||'').toLowerCase().includes('tablilla')},
+      trig:d=>!d.placa, done:(d,s,t)=>!!d.placa||(t||'').toLowerCase().includes('tablilla')},
     {id:'ubic_ref',ico:'📍',lbl:'Referencia',
       txt:'Solicita un punto de referencia adicional para facilitar el despacho.',
       trig:d=>!!d.ubicación&&d.ubicación.length<22, done:d=>d.ubicación&&d.ubicación.length>=22},
@@ -2238,7 +2237,6 @@ const AgentBar = (() => {
 
 
 function _autoFillPO(data){
-  // Normalize: 'tablilla' → placa
   if(!data.placa && data.tablilla) data.placa = data.tablilla;
   const map=[
     ['tipo_asistencia',data.tipo_asistencia],
