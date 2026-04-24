@@ -1451,8 +1451,6 @@ body.light .celebrate-card{
 
 <script>const CONFIG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
-  FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/const CONFIG={
-  NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
   RECONNECT_MS:5000,
@@ -3016,12 +3014,7 @@ function renderKBSugs(sugs){
   if(!el) return;
   el.innerHTML = sugs.map(s=>'<div class="kb-sug"><span class="kb-sug-dot"></span><span class="kb-sug-txt">'+s+'</span></div>').join('');
   document.getElementById('kb-card').style.display='block';
-}IG={
-  NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
-  FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
-  AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
-  RECONNECT_MS:5000,
-};
+}
 function showCelebration(done, goal){
   const ov = document.getElementById('celebrate-ov');
   const cnt = document.getElementById('cel-count');
@@ -3056,7 +3049,8 @@ function _spawnConfetti(){
   }
   setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
 }
- <span class="pvp-title">Confirmar creación de PO</span>
+</script>
+<span class="pvp-title">Confirmar creación de PO</span>
     <button class="pvp-close" onclick="closePOValidation(true)">✕</button>
   </div>
   <div class="pvp-fields" id="pvp-fields"></div>
