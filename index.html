@@ -9,78 +9,57 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
-body{
-  font-family:'Syne',sans-serif;
-  background:#f0ede8;
-  display:flex;align-items:center;justify-content:center;
-  -webkit-font-smoothing:antialiased;
-}
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 700px 500px at 80% 10%, rgba(255,92,0,.06) 0%, transparent 65%),
-    radial-gradient(ellipse 500px 400px at 5% 90%, rgba(191,148,85,.05) 0%, transparent 65%);
-}
-.wrap{
-  position:relative;z-index:1;
-  width:400px;
-  background:#fff;
-  border:1px solid rgba(0,0,0,.08);
-  border-top:2px solid #ff5c00;
-  border-radius:18px;
-  padding:40px 38px;
-  box-shadow:0 8px 40px rgba(0,0,0,.08);
-  animation:up .45s cubic-bezier(.34,1.56,.64,1);
-}
+body{font-family:'Syne',sans-serif;background:#f0ede8;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 700px 500px at 80% 10%,rgba(255,92,0,.06),transparent 65%),radial-gradient(ellipse 500px 400px at 5% 90%,rgba(191,148,85,.05),transparent 65%);}
+.wrap{position:relative;z-index:1;width:420px;background:#fff;border:1px solid rgba(0,0,0,.08);border-top:2px solid #ff5c00;border-radius:18px;padding:40px 38px;box-shadow:0 8px 40px rgba(0,0,0,.08);animation:up .45s cubic-bezier(.34,1.56,.64,1);}
 @keyframes up{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
 .logo{display:flex;align-items:baseline;gap:1px;margin-bottom:28px;}
-.logo-w{font-weight:900;font-size:18px;text-transform:uppercase;letter-spacing:-1px;
-  background:linear-gradient(135deg,#ff5c00,#ff8c44);-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;background-clip:text;}
-.logo-r{font-weight:900;font-size:9px;background:linear-gradient(135deg,#ff5c00,#ff8c44);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;vertical-align:super;}
+.logo-w{font-weight:900;font-size:18px;text-transform:uppercase;letter-spacing:-1px;background:linear-gradient(135deg,#ff5c00,#ff8c44);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-r{font-weight:900;font-size:9px;background:linear-gradient(135deg,#ff5c00,#ff8c44);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;vertical-align:super;}
 .title{font-size:20px;font-weight:700;color:#0d1018;margin-bottom:5px;letter-spacing:-.3px;}
-.sub{font-size:11px;color:#6b7280;line-height:1.6;margin-bottom:24px;font-family:'JetBrains Mono',monospace;}
+.sub{font-size:11px;color:#6b7280;line-height:1.6;margin-bottom:22px;font-family:'JetBrains Mono',monospace;}
 .sub span{color:#374151;font-weight:500;}
-.divider{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.divider{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
 .divider-line{flex:1;height:1px;background:rgba(0,0,0,.08);}
 .divider-txt{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;font-family:monospace;}
-.sim-badge{display:inline-flex;align-items:center;gap:5px;font-family:monospace;font-size:8px;
-  padding:3px 10px;border-radius:20px;background:rgba(191,148,85,.08);color:#bf9455;
-  border:1px solid rgba(191,148,85,.2);margin-bottom:16px;}
-.g-btn{display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:24px;
-  background:#fff;border:1px solid #dadce0;cursor:pointer;font-size:13px;font-weight:600;
-  color:#3c4043;width:100%;justify-content:center;transition:all .2s;
-  box-shadow:0 1px 6px rgba(0,0,0,.08);font-family:'Syne',sans-serif;}
+.sim-badge{display:inline-flex;align-items:center;gap:5px;font-family:monospace;font-size:8px;padding:3px 10px;border-radius:20px;background:rgba(191,148,85,.08);color:#bf9455;border:1px solid rgba(191,148,85,.2);margin-bottom:14px;}
+.g-btn{display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:24px;background:#fff;border:1px solid #dadce0;cursor:pointer;font-size:13px;font-weight:600;color:#3c4043;width:100%;justify-content:center;transition:all .2s;box-shadow:0 1px 6px rgba(0,0,0,.08);font-family:'Syne',sans-serif;}
 .g-btn:hover{box-shadow:0 3px 12px rgba(0,0,0,.14);transform:translateY(-1px);}
-.g-btn:active{transform:none;box-shadow:0 1px 4px rgba(0,0,0,.08);}
-.users{display:none;flex-direction:column;gap:7px;margin-top:16px;}
-.user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  border:1px solid rgba(0,0,0,.07);background:rgba(0,0,0,.01);cursor:pointer;transition:all .15s;}
+
+/* Role selector */
+.role-picker{display:none;margin-top:14px;}
+.role-lbl{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-family:monospace;}
+.roles-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.role-card{padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.07);background:#fafafa;cursor:pointer;transition:all .15s;text-align:left;}
+.role-card:hover{border-color:rgba(255,92,0,.25);background:rgba(255,92,0,.02);}
+.role-card.selected{border-color:#ff5c00;background:rgba(255,92,0,.04);}
+.rc-icon{font-size:18px;margin-bottom:5px;filter:grayscale(1);opacity:.6;transition:filter .15s;}
+.role-card.selected .rc-icon,.role-card:hover .rc-icon{filter:none;opacity:1;}
+.rc-name{font-size:12px;font-weight:700;color:#0d1018;margin-bottom:1px;}
+.rc-desc{font-size:9px;color:#9ca3af;font-family:monospace;line-height:1.4;}
+.rc-badge{display:inline-block;font-size:7px;padding:1px 6px;border-radius:20px;margin-top:3px;font-family:monospace;}
+
+/* Users list */
+.users-list{display:none;flex-direction:column;gap:7px;margin-top:14px;}
+.user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.07);background:rgba(0,0,0,.01);cursor:pointer;transition:all .15s;}
 .user:hover{border-color:rgba(255,92,0,.25);background:rgba(255,92,0,.02);}
-.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
-.info{flex:1;}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
 .uname{font-size:13px;font-weight:600;color:#0d1018;margin-bottom:1px;}
 .uemail{font-size:10px;color:#9ca3af;font-family:monospace;}
-.role{font-size:8px;padding:2px 8px;border-radius:20px;font-family:monospace;flex-shrink:0;}
-.role.a{background:rgba(106,170,144,.1);color:#4a8a72;border:1px solid rgba(106,170,144,.2);}
-.role.s{background:rgba(191,148,85,.1);color:#a67c45;border:1px solid rgba(191,148,85,.2);}
-.back-btn{margin-top:10px;width:100%;padding:7px;border-radius:8px;
-  border:1px solid rgba(0,0,0,.07);background:transparent;
-  color:#9ca3af;font-size:11px;cursor:pointer;transition:all .15s;}
+.urole{font-size:7px;padding:2px 7px;border-radius:20px;font-family:monospace;flex-shrink:0;}
+
+.back-btn{margin-top:10px;width:100%;padding:7px;border-radius:8px;border:1px solid rgba(0,0,0,.07);background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;transition:all .15s;}
 .back-btn:hover{color:#6b7280;}
+.next-btn{width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#ff5c00,#ff8c44);color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;box-shadow:0 4px 16px rgba(255,92,0,.2);}
+.next-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,92,0,.3);}
+.next-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
 .loading{display:none;flex-direction:column;align-items:center;gap:10px;padding:20px 0;}
-.spin{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.08);
-  border-top-color:#ff5c00;animation:spin .7s linear infinite;}
+.spin{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.08);border-top-color:#ff5c00;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .load-txt{font-size:11px;color:#9ca3af;font-family:monospace;}
-.timeout{display:none;padding:8px 12px;margin-bottom:16px;
-  background:rgba(191,148,85,.06);border:1px solid rgba(191,148,85,.15);
-  border-radius:8px;font-size:10px;color:#a67c45;text-align:center;font-family:monospace;}
-.footer{margin-top:22px;text-align:center;font-size:9px;color:#9ca3af;
-  line-height:1.7;font-family:monospace;}
+.timeout{display:none;padding:8px 12px;margin-bottom:14px;background:rgba(191,148,85,.06);border:1px solid rgba(191,148,85,.15);border-radius:8px;font-size:10px;color:#a67c45;text-align:center;font-family:monospace;}
+.footer{margin-top:20px;text-align:center;font-size:9px;color:#9ca3af;line-height:1.7;font-family:monospace;}
 .footer a{color:#6b7280;text-decoration:none;}
 .footer strong{color:#374151;}
 </style>
@@ -89,67 +68,142 @@ body::before{
 <div class="wrap">
   <div class="logo"><span class="logo-w">Connect</span><span class="logo-r">®</span></div>
   <div class="timeout" id="timeout">⏱ Sesión cerrada por inactividad. Vuelve a iniciar sesión.</div>
-  <div id="main">
+
+  <!-- Step 1: Google button -->
+  <div id="step1">
     <div class="title">Bienvenido al agente</div>
     <div class="sub">Inicia sesión con tu cuenta corporativa<br><span>@connect.inc</span> para continuar.</div>
-    <div class="divider">
-      <div class="divider-line"></div>
-      <div class="divider-txt">Acceso corporativo</div>
-      <div class="divider-line"></div>
-    </div>
+    <div class="divider"><div class="divider-line"></div><div class="divider-txt">Acceso corporativo</div><div class="divider-line"></div></div>
     <div class="sim-badge">⚙ Modo simulación</div>
-    <button class="g-btn" onclick="showUsers()">
+    <button class="g-btn" onclick="showRoles()">
       <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
       Continuar con Google
     </button>
-    <div class="users" id="users">
-      <div style="font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-family:monospace;">Selecciona un usuario</div>
-      <div class="user" onclick="loginAs('Dayana García','#ff5c00','D')">
-        <div class="av" style="background:linear-gradient(135deg,#ff5c00,#ff8c44)">D</div>
-        <div class="info"><div class="uname">Dayana García</div><div class="uemail">dayana.garcia@connect.inc</div></div>
-        <div class="role a">Agente</div>
-      </div>
-      <div class="user" onclick="loginAs('Carlos Mora','#6aaa90','C')">
-        <div class="av" style="background:linear-gradient(135deg,#6aaa90,#4a8a72)">C</div>
-        <div class="info"><div class="uname">Carlos Mora</div><div class="uemail">carlos.mora@connect.inc</div></div>
-        <div class="role a">Agente</div>
-      </div>
-      <div class="user" onclick="loginAs('Ana Vega','#bf9455','A')">
-        <div class="av" style="background:linear-gradient(135deg,#bf9455,#a67c45)">A</div>
-        <div class="info"><div class="uname">Ana Vega</div><div class="uemail">ana.vega@connect.inc</div></div>
-        <div class="role s">Supervisora</div>
-      </div>
-      <button class="back-btn" onclick="backToMain()">← Volver</button>
-    </div>
   </div>
+
+  <!-- Step 2: Role picker -->
+  <div id="step2" style="display:none">
+    <div class="title" style="margin-bottom:4px;">Selecciona tu rol</div>
+    <div class="sub" style="margin-bottom:14px;">¿Con qué perfil vas a ingresar hoy?</div>
+    <div class="roles-grid">
+      <div class="role-card" onclick="selectRole('admin')" id="rc-admin">
+        <div class="rc-icon">🔐</div>
+        <div class="rc-name">Admin</div>
+        <div class="rc-desc">Acceso completo al sistema</div>
+        <span class="rc-badge" style="background:rgba(99,102,241,.1);color:#6366f1;border:1px solid rgba(99,102,241,.2);">Admin</span>
+      </div>
+      <div class="role-card" onclick="selectRole('supervisor')" id="rc-supervisor">
+        <div class="rc-icon">📊</div>
+        <div class="rc-name">Supervisor</div>
+        <div class="rc-desc">Monitoreo y métricas del equipo</div>
+        <span class="rc-badge" style="background:rgba(191,148,85,.1);color:#a67c45;border:1px solid rgba(191,148,85,.2);">Supervisor</span>
+      </div>
+      <div class="role-card" onclick="selectRole('agente')" id="rc-agente">
+        <div class="rc-icon">🎧</div>
+        <div class="rc-name">Agente</div>
+        <div class="rc-desc">Atención de llamadas en vivo</div>
+        <span class="rc-badge" style="background:rgba(106,170,144,.1);color:#4a8a72;border:1px solid rgba(106,170,144,.2);">Agente</span>
+      </div>
+      <div class="role-card" onclick="selectRole('demo')" id="rc-demo">
+        <div class="rc-icon">🧪</div>
+        <div class="rc-name">Demo</div>
+        <div class="rc-desc">Vista de demostración</div>
+        <span class="rc-badge" style="background:rgba(156,163,175,.1);color:#6b7280;border:1px solid rgba(156,163,175,.2);">Demo</span>
+      </div>
+    </div>
+    <button class="next-btn" id="next-btn" onclick="showUsers()" disabled>Continuar →</button>
+    <button class="back-btn" onclick="backTo('step1','step2')">← Volver</button>
+  </div>
+
+  <!-- Step 3: User list -->
+  <div id="step3" style="display:none">
+    <div class="title" style="margin-bottom:4px;">Selecciona usuario</div>
+    <div class="sub" style="margin-bottom:10px;">Rol: <span id="role-lbl" style="font-weight:600;color:#374151;"></span></div>
+    <div class="users-list" id="users-list"></div>
+    <button class="back-btn" onclick="backTo('step2','step3')">← Volver</button>
+  </div>
+
+  <!-- Loading -->
   <div class="loading" id="loading">
     <div class="spin"></div>
     <div class="load-txt">Verificando credenciales...</div>
   </div>
+
   <div class="footer">Solo cuentas <strong>@connect.inc</strong> tienen acceso.<br><a href="mailto:soporte@connect.inc">¿Problemas? Contactar soporte</a></div>
 </div>
+
 <script>
+var USERS = {
+  admin:      [{name:'George Esna',     email:'george.esna@connect.inc',     color:'#6366f1', letter:'G'},
+               {name:'María Torres',    email:'maria.torres@connect.inc',     color:'#8b5cf6', letter:'M'}],
+  supervisor: [{name:'Ana Vega',        email:'ana.vega@connect.inc',         color:'#bf9455', letter:'A'},
+               {name:'Roberto Salas',   email:'roberto.salas@connect.inc',    color:'#a67c45', letter:'R'}],
+  agente:     [{name:'Dayana García',   email:'dayana.garcia@connect.inc',    color:'#ff5c00', letter:'D'},
+               {name:'Carlos Mora',     email:'carlos.mora@connect.inc',      color:'#6aaa90', letter:'C'},
+               {name:'Valeria Núñez',   email:'valeria.nunez@connect.inc',    color:'#cc7580', letter:'V'},
+               {name:'Luis Arias',      email:'luis.arias@connect.inc',       color:'#4a8a72', letter:'L'}],
+  demo:       [{name:'Usuario Demo',    email:'demo@connect.inc',             color:'#9ca3af', letter:'D'}]
+};
+var ROLE_LABELS = {admin:'Administrador',supervisor:'Supervisor',agente:'Agente',demo:'Demo'};
+var ROLE_COLORS = {
+  admin:      {bg:'rgba(99,102,241,.1)',color:'#6366f1',border:'rgba(99,102,241,.2)'},
+  supervisor: {bg:'rgba(191,148,85,.1)',color:'#a67c45',border:'rgba(191,148,85,.2)'},
+  agente:     {bg:'rgba(106,170,144,.1)',color:'#4a8a72',border:'rgba(106,170,144,.2)'},
+  demo:       {bg:'rgba(156,163,175,.1)',color:'#6b7280',border:'rgba(156,163,175,.2)'}
+};
+var selectedRole = null;
+
 window.addEventListener('DOMContentLoaded',function(){
   var s=localStorage.getItem('helios_session');
   if(s){try{var p=JSON.parse(s);if(p&&(Date.now()-p.ts<3600000)){window.location.href='app.html';return;}}catch{}}
   var params=new URLSearchParams(window.location.search);
   if(params.get('reason')==='timeout') document.getElementById('timeout').style.display='block';
 });
+
+function showRoles(){
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+}
+function selectRole(role){
+  selectedRole=role;
+  document.querySelectorAll('.role-card').forEach(function(c){c.classList.remove('selected');});
+  document.getElementById('rc-'+role).classList.add('selected');
+  document.getElementById('next-btn').disabled=false;
+}
 function showUsers(){
-  document.getElementById('users').style.display='flex';
+  if(!selectedRole)return;
+  document.getElementById('step2').style.display='none';
+  var s3=document.getElementById('step3');
+  s3.style.display='block';
+  document.getElementById('role-lbl').textContent=ROLE_LABELS[selectedRole];
+  var rc=ROLE_COLORS[selectedRole];
+  document.getElementById('role-lbl').style.cssText='font-weight:600;padding:1px 8px;border-radius:20px;background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+';font-size:10px;font-family:monospace;';
+  var list=document.getElementById('users-list');
+  list.style.display='flex';
+  list.innerHTML='';
+  (USERS[selectedRole]||[]).forEach(function(u){
+    var div=document.createElement('div');
+    div.className='user';
+    div.onclick=function(){loginAs(u,selectedRole);};
+    var rc=ROLE_COLORS[selectedRole];
+    div.innerHTML='<div class="av" style="background:'+u.color+'">'+u.letter+'</div>'+
+      '<div style="flex:1"><div class="uname">'+u.name+'</div><div class="uemail">'+u.email+'</div></div>'+
+      '<div class="urole" style="background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+'">'+ROLE_LABELS[selectedRole]+'</div>';
+    list.appendChild(div);
+  });
 }
-function backToMain(){
-  document.getElementById('users').style.display='none';
+function backTo(show,hide){
+  document.getElementById(show).style.display='block';
+  document.getElementById(hide).style.display='none';
 }
-function loginAs(name,color,letter){
-  document.getElementById('main').style.display='none';
-  var l=document.getElementById('loading');
-  l.style.display='flex';
+function loginAs(user,role){
+  document.getElementById('step3').style.display='none';
+  document.getElementById('loading').style.display='flex';
   setTimeout(function(){
-    var session={user:{name:name,email:name.toLowerCase().replace(' ','.')+'.connect.inc',color:color,letter:letter},ts:Date.now()};
+    var session={user:{name:user.name,email:user.email,color:user.color,letter:user.letter,role:role},ts:Date.now()};
     localStorage.setItem('helios_session',JSON.stringify(session));
     window.location.href='app.html';
-  },1200);
+  },1100);
 }
 </script>
 </body>

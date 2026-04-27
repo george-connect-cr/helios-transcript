@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="cache-control" content="no-cache, no-store"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Helios</title>
 <script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js"></script>
@@ -1267,6 +1268,20 @@ body.light .celebrate-card{
 }
 .t-scroll-arrow.show{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
 .t-scroll-arrow:hover{background:var(--a2);}
+
+.status-btn{position:relative;display:flex;align-items:center;gap:6px;padding:4px 12px 4px 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;transition:all .15s;font-family:var(--m);font-size:10px;color:var(--t1);}
+.status-btn:hover{background:var(--c2);}
+.status-dot-btn{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s;}
+.status-dot-btn.disponible{background:#6aaa90;}.status-dot-btn.ocupado{background:#cc7580;}.status-dot-btn.bano{background:#bf9455;}
+.status-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:6px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:700;display:none;animation:fi .15s ease;}
+.status-menu.show{display:block;}
+.status-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .12s;font-family:var(--m);font-size:11px;color:var(--t0);}
+.status-opt:hover{background:var(--c2);}
+.status-opt .sd{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+body.light .status-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1);color:#374151;}
+body.light .status-menu{background:#fff;border-color:rgba(0,0,0,.1);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+body.light .status-opt:hover{background:#f5f5f5;}
+body.light .status-opt{color:#0d1018;}
 </style>
 </head>
 <body>
@@ -1293,7 +1308,18 @@ body.light .celebrate-card{
     </div>
     <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
-      <button id="btn-logout" title="Cerrar sesión" style="width:32px;height:32px;border-radius:8px;background:var(--gb);border:1px solid var(--gb2);color:var(--t2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--r)';this.style.color='var(--r)'" onmouseleave="this.style.borderColor='var(--gb2)';this.style.color='var(--t2)'">⏻</button>
+      <div style="position:relative" id="status-wrap">
+      <button class="status-btn" onclick="toggleStatusMenu()">
+        <div class="status-dot-btn disponible" id="status-dot-btn"></div>
+        <span id="status-label">Disponible</span>
+      </button>
+      <div class="status-menu" id="status-menu">
+        <div class="status-opt" onclick="setStatus('disponible')"><div class="sd" style="background:#6aaa90"></div>Disponible</div>
+        <div class="status-opt" onclick="setStatus('ocupado')"><div class="sd" style="background:#cc7580"></div>Ocupado</div>
+        <div class="status-opt" onclick="setStatus('bano')"><div class="sd" style="background:#bf9455"></div>En baño</div>
+      </div>
+    </div>
+    <button id="btn-logout" title="Cerrar sesión" style="width:32px;height:32px;border-radius:8px;background:var(--gb);border:1px solid var(--gb2);color:var(--t2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--r)';this.style.color='var(--r)'" onmouseleave="this.style.borderColor='var(--gb2)';this.style.color='var(--t2)'">⏻</button>
   </div>
 </nav>
 
@@ -1705,16 +1731,32 @@ function showToast(msg){
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
-  try{
-    var _s=JSON.parse(localStorage.getItem('helios_session')||'null');
-    if(!_s||(Date.now()-_s.ts>3600000)){window.location.href='index.html?reason=noauth';return;}
-    var _u=_s.user||{};
-    var _ne=document.getElementById('ag-name');
-    if(_ne&&_u.name)_ne.textContent=_u.name.split(' ')[0];
-    document.getElementById('btn-logout')&&document.getElementById('btn-logout').addEventListener('click',function(){
-      localStorage.removeItem('helios_session');window.location.href='index.html';
+  // Simple session check
+  try {
+    const _sess = JSON.parse(localStorage.getItem('helios_session')||'null');
+    const _valid = _sess && (Date.now() - _sess.ts < 3600000);
+    if(!_valid){ window.location.href='index.html?reason=noauth'; return; }
+    // Set agent name
+    if(_sess.user){
+      const nameEl = document.getElementById('ag-name');
+      if(nameEl) nameEl.textContent = (_sess.user.name||'').split(' ')[0];
+    }
+    // Logout button
+    document.getElementById('btn-logout')?.addEventListener('click',()=>{
+      localStorage.removeItem('helios_session');
+      window.location.href='index.html';
     });
-  }catch(e){}
+    // Activity watcher - update session timestamp
+    ['click','keydown','touchstart'].forEach(ev=>{
+      document.addEventListener(ev,()=>{
+        try{
+          const s=JSON.parse(localStorage.getItem('helios_session')||'null');
+          if(s){s.ts=Date.now();localStorage.setItem('helios_session',JSON.stringify(s));}
+        }catch{}
+      },{passive:true});
+    });
+  } catch(e){ window.location.href='index.html'; return; }
+  // Start app
   setTheme('light');
   connectWebPubSub();
 });
@@ -3067,6 +3109,29 @@ function _spawnConfetti(){
     wrap.appendChild(p);
   }
   setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
+}
+
+var _currentStatus='disponible';
+function toggleStatusMenu(){
+  var m=document.getElementById('status-menu');
+  m.classList.toggle('show');
+  if(m.classList.contains('show')){
+    setTimeout(function(){
+      document.addEventListener('click',function cl(e){
+        if(!document.getElementById('status-wrap').contains(e.target)){m.classList.remove('show');document.removeEventListener('click',cl);}
+      });
+    },10);
+  }
+}
+function setStatus(s){
+  _currentStatus=s;
+  var lbls={disponible:'Disponible',ocupado:'Ocupado',bano:'En baño'};
+  var dot=document.getElementById('status-dot-btn');
+  var lbl=document.getElementById('status-label');
+  if(dot){dot.className='status-dot-btn '+s;}
+  if(lbl){lbl.textContent=lbls[s];}
+  document.getElementById('status-menu').classList.remove('show');
+  showToast(s==='disponible'?'🟢 Disponible':s==='ocupado'?'🔴 Ocupado':'🟡 En baño');
 }
 </script>
 
