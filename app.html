@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="cache-control" content="no-cache, no-store"/>
+<title>CONNECT · Agente</title>
+<script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js" onerror="console.warn('WebPubSub CDN failed')"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Styles -->
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/nav.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/overlays.css">
+<!-- Auth -->
+<script src="assets/js/auth.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+<nav class="nav">
+  <div class="n-brand">
+    <div class="n-brand-top"><span class="n-brand-word">CONNECT</span><span class="n-brand-reg">®</span></div>
+    <span class="n-brand-ver">v1.14.1</span>
+  </div>
+  <div class="n-conn"><div class="cdot" id="cdot"></div><span id="clbl">conectando</span></div>
+  <div class="n-timer" id="timer-row">
+    <div class="n-div"></div>
+    <div class="td-dot" id="t-dot"></div>
+    <span class="td-num" id="call-timer-val">0:00</span>
+    <div class="td-alert" id="t-alert" style="display:none">⚠</div>
+  </div>
+  <div class="n-r">
+    <div class="po-counter" id="po-counter" onclick="openDrawer()">
+      <span id="po-count-num">0</span><span class="po-counter-lbl"> POs</span>
+    </div>
+    <div class="n-th">
+      <button class="n-to" id="th-dark" onclick="setTheme('dark')" title="Modo oscuro">🌙</button>
+      <button class="n-to on" id="th-light" onclick="setTheme('light')" title="Modo claro">☀️</button>
+    </div>
+    <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
+    <button class="n-demo" onclick="triggerDemo()">Demo</button>
+      <button id="btn-logout" title="Cerrar sesión" style="
+        width:36px;height:36px;border-radius:8px;
+        background:var(--gb);border:1px solid var(--gb2);
+        color:var(--t2);cursor:pointer;font-size:14px;
+        display:flex;align-items:center;justify-content:center;
+        transition:all .15s;
+      " onmouseenter="this.style.borderColor='var(--r)';this.style.color='var(--r)'"
+         onmouseleave="this.style.borderColor='var(--gb2)';this.style.color='var(--t2)'">⏻</button>
+  </div>
+</nav>
+
+<div class="body">
+  <!-- LEFT -->
+  <aside class="col-l">
+    <div class="l-inner">
+      <div class="sec-lbl">Contexto</div>
+      <div class="xmpty" id="ca-empty"><div class="ico">🎧</div><div class="lbl">Esperando llamada...</div></div>
+      <div class="svc-card" id="svc-detected">
+        <div class="svc-in">
+          <div class="svc-ico"><span id="svc-ico">🔧</span></div>
+          <div><div class="svc-nm" id="svc-name">—</div><div class="svc-ht" id="svc-hint">—</div></div>
+          <div class="svc-chip hi" id="svc-conf">Alta</div>
+        </div>
+      </div>
+      <div class="sent-card" id="sentiment-card">
+        <div class="sent-row"><span class="sent-emo" id="sent-emoji">😐</span><span class="sent-lbl" id="sentiment-label" style="color:var(--y)">Neutro</span></div>
+        <div class="sent-desc" id="sentiment-val"></div>
+        <div class="sent-bar"><div class="sent-fill" id="sentiment-fill" style="width:50%"></div></div>
+      </div>
+      <div class="rec-stack" id="rec-stack"></div>
+    </div>
+  </aside>
+
+  <!-- CENTER -->
+  <main class="col-c">
+    <div class="tp-hd">
+      <span class="tp-lbl">Transcripción en vivo</span>
+      <div class="live-b"><div class="ldot"></div>En vivo</div>
+    </div>
+    <div class="tp-wrap" style="position:relative;flex:1;display:flex;flex-direction:column;min-height:0;">
+    <div class="tp-body" id="t-body" onscroll="if(this.scrollHeight-this.scrollTop-this.clientHeight<80)_hideScrollArrow();">
+      
+    </div>
+    <div id="t-inferred"></div><div id="sentiment-row"></div><div id="btn-analyze"></div>
+    <div class="agent-strip">
+      <div class="as-av">👤</div>
+      <div class="as-info">
+        <div class="as-name">Agente Activo</div>
+        <div class="as-shift">T. 08:00–16:00</div>
+      </div>
+      <div class="as-sep"></div>
+      <div class="as-goal">
+        <span class="as-gn" id="ag-done">12</span>
+        <span class="as-gd">/<span id="ag-goal">20</span></span>
+        <span id="ag-star" class="as-star">⭐</span>
+        <div class="as-bar-wrap">
+          <div class="as-bar-lbl">Meta del día</div>
+          <div class="as-bar-bg"><div class="as-bar-fill" id="ag-bar" style="width:60%"></div></div>
+        </div>
+      </div>
+      <div class="as-sep"></div>
+      <div class="as-kpi"><div class="as-kv g" id="ag-sat">4.8</div><div class="as-kl">Satisfac.</div></div>
+      <div class="as-sep"></div>
+      <div class="as-kpi"><div class="as-kv y" id="ag-aht">4:32</div><div class="as-kl">T. Prom.</div></div>
+      <div class="as-sep"></div>
+      <div class="as-kpi"><div class="as-kv" id="ag-fcr">87%</div><div class="as-kl">Resoluc.</div></div>
+    </div>
+  </main>
+
+  <!-- RIGHT — PO -->
+  <aside class="col-r">
+    <div class="po-hd">
+      <span class="po-hd-lbl">Creación de PO</span>
+      <span class="po-badge" id="pb-status" onclick="reopenPOValidation()" title="Ver resumen del PO" style="cursor:pointer">En curso</span>
+    </div>
+    <div class="po-empty" id="pb-empty"><div class="po-empty-ico">📋</div></div>
+    <div class="po-fields" id="pb-body"></div>
+    <div class="po-spacer"></div>
+    <div class="po-meta" id="pb-meta-row"><span class="po-meta-lbl">Espera est.</span><span class="po-meta-val" id="pb-wait">—</span></div>
+    <div class="po-sugs" id="pb-sug-wrap"><div class="po-sugs-lbl">Preguntar al cliente</div><div id="pb-sug-list"></div></div>
+    <div class="po-notes"><div class="po-notes-lbl">Nota</div><textarea class="po-notes-ta" id="pb-notes-ta" placeholder="Observación o instrucción especial..."></textarea></div>
+    <div class="po-cta" id="pb-cta">
+      <button class="po-cta-btn main" onclick="reopenPOValidation()">Revisar PO</button>
+      <button class="po-cta-btn sec" onclick="resetPOBuilder()" title="Limpiar">✕</button>
+    </div>
+  </aside>
+</div>
+</div>
+
+<div class="flash-stage" id="flash-stage"></div>
+<div class="svc-popup" id="svc-popup">
+  <div class="svc-pop-ico"><span id="svc-ico">🔧</span></div>
+  <div><div class="svc-pop-name" id="svc-name">—</div><div class="svc-pop-hint" id="svc-hint">Servicio</div></div>
+  <div class="svc-pop-badge hi" id="svc-conf">Alta</div>
+</div>
+<div class="po-confirm-ov" id="po-confirm-ov" onclick="if(event.target===this)closePOConfirm()">
+  <div class="po-confirm-modal">
+    <div class="pcm-head"><div class="pcm-head-glow"></div><div class="pcm-check">✓</div><div class="pcm-title">PO Creado</div><div class="pcm-po-num" id="pcm-num">—</div><div class="pcm-ts" id="pcm-ts">—</div></div>
+    <div class="pcm-body" id="pcm-body"></div>
+    <div class="pcm-foot"><button class="pcm-btn sec" onclick="closePOConfirm()">Cerrar</button></div>
+  </div>
+</div>
+<div class="po-drawer-ov" id="po-drawer-ov" onclick="if(event.target===this)closeDrawer()">
+  <div class="po-drawer">
+    <div class="pdh"><span style="font-size:15px">📋</span><span class="pdh-title">Historial de POs</span><span class="pdh-count" id="pdh-count">0 POs</span><button class="pdh-close" onclick="closeDrawer()">✕</button></div>
+    <div class="pd-search"><div class="pd-search-wrap"><span class="pd-search-ico">🔍</span><input class="pd-search-input" id="pd-search-input" placeholder="Buscar por PO, cliente, placa..." oninput="filterPOs(this.value)"><button class="pd-search-clear" id="pd-search-clear" onclick="clearSearch()">✕</button></div></div>
+    <div class="pd-list" id="pd-list"><div class="pd-empty" id="pd-empty"><div class="pd-empty-o">📋</div><div class="pd-empty-t">No hay POs aún</div></div></div>
+    <div class="pd-detail hidden" id="pd-detail">
+      <div class="pd-det-head"><span class="pd-det-num" id="pd-det-num">—</span><span class="pd-det-ts" id="pd-det-ts">—</span><button class="pd-det-close" onclick="closeDetail()">✕</button></div>
+      <div class="pd-det-body" id="pd-det-body"></div>
+      <div class="pd-det-foot"><button class="pd-det-btn sec" onclick="closeDetail()">Cerrar</button><button class="pd-det-btn pri" onclick="openMapFromDetail()">📍 Maps</button></div>
+    </div>
+  </div>
+</div>
+<div class="dash-ov" id="dash-ov">
+  <div class="dash-head">
+    <div class="dash-head-l"><div class="dash-brand2">HELIOS</div><div><div class="dash-head-title">Análisis del día</div><div class="dash-head-sub" id="dash-date">—</div></div></div>
+    <button class="dash-close" onclick="closeDashboard()">✕ Cerrar</button>
+  </div>
+  <div class="dash-body">
+    <div class="dash-score-card">
+      <div class="dash-score-ring-wrap">
+        <svg class="dash-ring" viewBox="0 0 152 152">
+          <circle cx="76" cy="76" r="64" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="7"/>
+          <circle cx="76" cy="76" r="64" fill="none" stroke="var(--a)" stroke-width="7" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402" id="dash-ring-fill" style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="dash-ring-inner"><div class="dash-ring-score" id="dash-total-score">—</div><div class="dash-ring-lbl">Score</div></div>
+      </div>
+      <div class="dash-score-info">
+        <div class="dash-agent-name">Agente Activo</div>
+        <div class="dash-agent-shift">T. 08:00–16:00 · <span id="dash-date2">—</span></div>
+        <div class="dash-score-grade" id="dash-grade">—</div>
+        <div class="dash-score-desc" id="dash-grade-desc">—</div>
+      </div>
+    </div>
+    <div class="dash-kpi-row">
+      <div class="dash-kpi"><div class="dash-kpi-val" id="dk-pos">0</div><div class="dash-kpi-lbl">POs creados</div></div>
+      <div class="dash-kpi"><div class="dash-kpi-val g" id="dk-sat">—</div><div class="dash-kpi-lbl">Satisfacción prom.</div></div>
+      <div class="dash-kpi"><div class="dash-kpi-val y" id="dk-aht">—</div><div class="dash-kpi-lbl">AHT promedio</div></div>
+      <div class="dash-kpi"><div class="dash-kpi-val" id="dk-fcr">—</div><div class="dash-kpi-lbl">Resolución 1ra</div></div>
+      <div class="dash-kpi"><div class="dash-kpi-val" id="dk-speech">—</div><div class="dash-kpi-lbl">Speech compliance</div></div>
+    </div>
+    <div class="dash-cols">
+      <div class="dash-col">
+        <div class="dash-sec-lbl">Desglose</div>
+        <div class="dash-score-bars" id="dash-score-bars"></div>
+        <div class="dash-sec-lbl">Llamadas del día</div>
+        <div class="dash-calls" id="dash-calls"><div class="dash-empty-calls">Sin POs registrados aún</div></div>
+      </div>
+      <div class="dash-col">
+        <div class="dash-sec-lbl">Recomendaciones</div>
+        <div class="dash-recs" id="dash-recs"></div>
+        <div class="dash-sec-lbl">Speech compliance</div>
+        <div class="dash-speech-detail" id="dash-speech-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="sfanalyzing" style="display:none"></div>
+<div id="sfwrap" style="display:none"></div>
+<div id="bubbles-section" style="display:none"></div>
+<div id="insight" style="display:none"><div id="insighttxt"></div></div>
+
+<script>const CONFIG={
+  NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
+  FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
+  AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
+  RECONNECT_MS:5000,
+};
+let wpsClient=null,lastAnalysis=null,isDark=false,_retries=0;
+
+async function connectWebPubSub(){
+  try{
+    setStatus('conectando','warn');
+    const res=await fetch(CONFIG.NEGOTIATE_URL+'?userId=viewer-'+Date.now(),{headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN}});
+    if(!res.ok)throw new Error('Negotiate '+res.status);
+    const{url}=await res.json();
+    if(window.WebPubSubClient){
+      wpsClient=new WebPubSubClient(url);
+      wpsClient.on('connected',()=>{setStatus('conectado','live');_retries=0;});
+      wpsClient.on('disconnected',()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);});
+      wpsClient.on('server-message',e=>handleMessage(e.message.data));
+      await wpsClient.start();
+    }else{
+      const ws=new WebSocket(url);
+      window._ws=ws;
+      ws.onopen=()=>{setStatus('conectado','live');showToast('✓ Conectado');_retries=0;};
+      ws.onclose=()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);};
+      ws.onerror=()=>setStatus('error','err');
+      ws.onmessage=e=>{
+        try{
+          const raw=JSON.parse(e.data);
+          let p;
+          if(raw.content!==undefined) p=typeof raw.content==='string'?JSON.parse(raw.content):raw.content;
+          else if(raw.data!==undefined) p=typeof raw.data==='string'?JSON.parse(raw.data):raw.data;
+          else p=raw;
+          handleMessage(p);
+        }catch(err){console.error('WS parse:',err);}
+      };
+    }
+  }catch(err){
+    console.error('WPS connect error:',err);
+    setStatus('error · '+err.message.substring(0,20),'err');
+    setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
+  }
+}
+
+function handleMessage(p){
+  if(!p)return;
+  if(p.transcript&&p.speaker){appendTranscript(p.speaker,p.transcript);return;}
+  if(p.type==='analysis'&&p.data){
+    try{
+      const parsed=JSON.parse(p.data.replace(/```json|```/g,'').trim());
+      lastAnalysis=parsed;
+      // Fill PO builder immediately with all detected fields
+      _autoFillPO(parsed);
+      renderTags(parsed);
+      renderSentiment(parsed.sentimiento_cliente);
+      if(parsed.insight_atencion)showInsight(parsed.insight_atencion);
+      if(typeof Recs!=='undefined') Recs.check(parsed, parsed.sentimiento_cliente);
+      // KB: validación en tiempo real
+      const kbTxt = [parsed.tipo_asistencia,parsed.motivo_llamada,parsed.ubicación].filter(Boolean).join(' ');
+      const kbAlertas = KB.buscar(kbTxt);
+      kbAlertas.forEach(a => setTimeout(()=>showToast(a, 6000), 300));
+      // KB: sugerencias por servicio
+      const svcKbId = POBuilder._currentSvc?.id;
+      if(svcKbId){ renderKBSugs(KB.sugerenciasParaServicio(svcKbId)); }
+      showToast('✦ Análisis listo — datos inferidos automáticamente');
+    }catch(e){console.warn('Analysis parse:',e);}
+  }
+}
+
+function appendTranscript(speaker,text){
+  checkKBTranscript(document.getElementById('t-body')?.innerText||'');
+  const body=document.getElementById('t-body');
+  if(body.querySelector('span[style]'))body.innerHTML='';
+  const line=document.createElement('div');
+  line.className='tline';
+  const isAg=(speaker||'').toLowerCase().includes('agent')||(speaker||'').toLowerCase()==='agente';
+  const spk=document.createElement('span');
+  spk.className='spk '+(isAg?'ag':'cl');
+  spk.textContent=isAg?'Agente':'Cliente';
+  const txt=document.createElement('span');
+  txt.className='stxt';
+  txt.textContent=text;
+  line.appendChild(spk);line.appendChild(txt);
+  body.appendChild(line);
+  // Smart scroll: only auto-scroll if user is near the bottom
+  const isNearBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
+  if(isNearBottom){
+    body.scrollTop=body.scrollHeight;
+    _hideScrollArrow();
+  } else {
+    _showScrollArrow();
+  }
+  if(typeof CallTimer!=='undefined') CallTimer.start();
+  if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
+  // Re-check recs on every transcript line
+  if(typeof Recs!=='undefined' && typeof lastAnalysis!=='undefined' && lastAnalysis){
+    Recs.check(lastAnalysis, lastAnalysis.sentimiento_cliente, body.innerText);
+  }
+}
+
+function _showScrollArrow(){
+  const arr = document.getElementById('t-scroll-arrow');
+  if(arr) arr.classList.add('show');
+}
+function _hideScrollArrow(){
+  const arr = document.getElementById('t-scroll-arrow');
+  if(arr) arr.classList.remove('show');
+}
+function _scrollToLatest(){
+  const body = document.getElementById('t-body');
+  if(body){ body.scrollTo({top:body.scrollHeight, behavior:'smooth'}); }
+  _hideScrollArrow();
+}
+
+function renderTags(data){
+  const c=document.getElementById('t-inferred');
+  c.innerHTML='';
+  const map=[
+    {key:'nombre_cliente',icon:'👤',hint:'Nombre',fn:applyNombre},
+    {key:'placa',icon:'🪪',hint:'Placa',fn:v=>setField('f-plate',v)},
+    {key:'marca',icon:'🚗',hint:'Marca',fn:v=>setField('f-make',v)},
+    {key:'modelo',icon:'🔖',hint:'Modelo',fn:v=>setField('f-model',v)},
+    {key:'año',icon:'📅',hint:'Año',fn:v=>setField('f-year',v)},
+    {key:'color',icon:'🎨',hint:'Color',fn:v=>setField('f-color',v)},
+    {key:'ubicación',icon:'📍',hint:'Ubicación',fn:v=>setField('f-location',v)},
+    {key:'tipo_asistencia',icon:'🔧',hint:'Asistencia',fn:()=>{}},
+    {key:'motivo_llamada',icon:'📞',hint:'Motivo',fn:()=>{}},
+  ];
+  let d=0;
+  map.forEach(f=>{
+    const v=data[f.key];
+    if(!v||!v.trim()||v==='N/A')return;
+    const tag=document.createElement('div');
+    tag.className='tag';
+    tag.title='Click → '+f.hint;
+    tag.textContent=f.icon+' '+v;
+    tag.style.transitionDelay=d+'ms';
+    tag.addEventListener('click',()=>{
+      f.fn(v);tag.classList.add('done');
+      showToast('✓ '+f.hint+' aplicado');
+    });
+    c.appendChild(tag);
+    requestAnimationFrame(()=>tag.classList.add('show'));
+    d+=70;
+  });
+}
+
+function applyNombre(name){
+  // Also fill POBuilder
+  if(typeof POBuilder!=='undefined') POBuilder.addField('nombre_cliente',name,false);
+  // Legacy field support
+  const p=name.trim().split(' ');
+  const fn=document.getElementById('f-fname');if(fn)fn.value=p[0]||'';
+  const ln=document.getElementById('f-lname');if(ln&&p.length>1)ln.value=p.slice(1).join(' ');
+}
+
+function renderSentiment(sent){
+  if(!sent)return;
+  const row=document.getElementById('sentiment-card');if(row){row.classList.add('show');}
+  const v=Number(sent.valor);
+  const cfg={
+    '-1':{ emoji:'😠', label:'Molesto',    color:'#ef4444', pct:10, gradient:'linear-gradient(90deg,#ef4444,#f87171)' },
+     '0':{ emoji:'😐', label:'Neutro',     color:'#f59e0b', pct:50, gradient:'linear-gradient(90deg,#f59e0b,#fcd34d)' },
+     '1':{ emoji:'😊', label:'Satisfecho', color:'#22c55e', pct:88, gradient:'linear-gradient(90deg,#22c55e,#4ade80)' },
+  };
+  const c = cfg[String(v)] || cfg['0'];
+  const emoji = document.getElementById('sent-emoji');
+  emoji.textContent = c.emoji;
+  emoji.style.animation = 'none';
+  requestAnimationFrame(()=>{ emoji.style.animation=''; });
+  const lbl = document.getElementById('sentiment-label');
+  lbl.textContent = c.label;
+  lbl.style.color = c.color;
+  document.getElementById('sentiment-val').textContent = sent.descripcion || '';
+  const fill = document.getElementById('sentiment-fill');
+  fill.style.width = c.pct + '%';
+  fill.style.background = c.gradient;
+}
+
+function showInsight(text){
+  const card=document.getElementById('insight');
+  document.getElementById('insighttxt').textContent=text;
+  card.style.display='block';
+}
+
+function applyAnalysis(){
+  if(!lastAnalysis){showToast('⚠ Sin análisis disponible');return;}
+  const a=lastAnalysis; let n=0;
+  // Map analysis fields to POBuilder (Helios uses POBuilder, not f-* IDs)
+  const fieldMap=[
+    ['tipo_asistencia',a.tipo_asistencia],
+    ['nombre_cliente', a.nombre_cliente],
+    ['ubicación',      a.ubicación],
+    ['placa',          a.placa],
+    ['marca',          a.marca],
+    ['modelo',         a.modelo],
+    ['año',            a.año],
+    ['color',          a.color],
+  ];
+  fieldMap.forEach(([key,val])=>{
+    if(val?.trim&&val.trim()&&val!=='N/A'){
+      POBuilder.addField(key,val,false);
+      n++;
+    }
+  });
+  document.querySelectorAll('.tag').forEach(t=>t.classList.add('done'));
+  showToast(n>0?'✓ SmartFill aplicó '+n+' campos':'⚠ Conversación sin datos aún');
+  if(a.sentimiento_cliente) renderSentiment(a.sentimiento_cliente);
+  if(a.insight_atencion) showInsight(a.insight_atencion);
+}
+
+function setField(id,val){
+  const el=document.getElementById(id);
+  if(!el||!val)return;
+  el.value=val;el.classList.remove('hl');el.classList.add('ok');
+}
+
+function triggerSmartFill(){
+  const payload={callUniqueId:'DEMO-'+Date.now(),transcript:'Hola buenos días, le llama Mariam Fernandez, cédula 101230456, teléfono 12345678, tengo un Land Rover Range Rover 97, gris, placa ARC123, me quedé varada cerca del Parque Central.',speaker:'cliente'};
+  appendTranscript(payload.speaker,payload.transcript);
+  setTimeout(()=>{
+    const demo={placa:'ARC123',marca:'Land Rover',modelo:'Range Rover',año:'1997',color:'Gris',nombre_cliente:'Mariam Fernandez',ubicación:'Parque Central, San José',tipo_asistencia:'Avería en vía',sentimiento_cliente:{valor:0,descripcion:'Tranquila pero urgente'},motivo_llamada:'Vehículo varado',protocolo_agente:{cumple:true,detalles:'Saludo correcto'},insight_atencion:'Zona céntrica con tráfico. Prioriza despacho rápido y confirma ETA al cliente.'};
+    lastAnalysis=demo;
+    _autoFillPO(demo);
+    // KB: mostrar checklist y validaciones
+    setTimeout(()=>{
+      const svcId = 'grua'; // demo es avería = grúa
+      initKBChecklist(svcId);
+      const kbAlertas = KB.buscar(demo.tipo_asistencia + ' ' + demo.motivo_llamada);
+      kbAlertas.forEach((a,i) => setTimeout(()=>showToast(a, 6000), i*800));
+    }, 500);
+    renderTags(demo);
+    renderSentiment(demo.sentimiento_cliente);
+    showInsight(demo.insight_atencion);
+    if(typeof Recs!=='undefined') Recs.check(demo, demo.sentimiento_cliente);
+    showToast('✦ Demo: análisis listo — datos cargados en PO');
+  },1800);
+  try{fetch(CONFIG.FUNCTION_URL,{method:'POST',headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
+  }catch(e){console.warn("Demo fetch:",e);}
+}
+
+function setStatus(text,state){
+  const dot=document.getElementById('cdot');
+  const lbl=document.getElementById('clbl');
+  dot.className='cdot '+state;
+  lbl.textContent=text;
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{ setTheme('light'); connectWebPubSub(); });
+
+function triggerDemo(){ AgentBar.setDemo(); triggerSmartFill(); }
+let _poList = [];
+let _activeDetail = -1;
+let _poCount = 0;
+
+function setTheme(t){
+  isDark = (t === 'dark');
+  document.body.classList.toggle('light', !isDark);
+  document.getElementById('th-dark').classList.toggle('on', isDark);
+  document.getElementById('th-light').classList.toggle('on', !isDark);
+}
+
+const CallTimer=(()=>{
+  let _s=null,_t=null,_on=false;
+  const W=4*60,A=6*60;
+  function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+  function tick(){
+    if(!_on)return;
+    const s=Math.floor((Date.now()-_s)/1000);
+    const v=document.getElementById('call-timer-val');
+    const d=document.getElementById('t-dot');
+    const l=null; // timer-lbl removed from compact bar
+    const al=document.getElementById('t-alert');
+    if(v)v.textContent=fmt(s);
+    if(v&&d){
+      v.className='td-num';d.className='td-dot';
+      if(al) al.style.display='none'; // hide by default
+      if(s>=A){
+        v.classList.add('alert'); d.classList.add('alert');
+        if(al){ al.style.display='inline'; al.className='t-row-alert on'; }
+      } else if(s>=W){
+        v.classList.add('warn'); d.classList.add('warn');
+        if(al) al.style.display='none'; // no icon on warn, just color
+      } else {
+        // normal — dot stays green
+        d.style.background='#6aaa90';
+      }
+    }
+    _t=setTimeout(tick,1000);
+  }
+  function start(){
+    if(_on)return;_on=true;_s=Date.now();
+    const row=document.getElementById('timer-row');if(row)row.classList.add('on');
+    tick();
+  }
+  function reset(){
+    _on=false;clearTimeout(_t);
+    const row=document.getElementById('timer-row');if(row)row.classList.remove('on');
+    const v=document.getElementById('call-timer-val');if(v){v.textContent='0:00';v.className='td-num';}
+    const d=document.getElementById('t-dot');if(d)d.className='td-dot';
+    const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
+    const al=document.getElementById('t-alert');if(al){al.className='t-row-alert';al.style.display='none';}
+  }
+  return{start,reset};
+})();
+
+
+const FlashPill = (() => {
+  let _queue = [], _running = false;
+
+  function show(icon, label, value) {
+    _queue.push({icon, label, value});
+    if (!_running) _next();
+  }
+
+  function _next() {
+    if (!_queue.length) { _running = false; return; }
+    _running = true;
+    const {icon, label, value} = _queue.shift();
+    const stage = document.getElementById('flash-stage');
+    if (!stage) { _running = false; return; }
+
+    const pill = document.createElement('div');
+    pill.className = 'flash-pill';
+    pill.innerHTML = `<span class="flash-ico">${icon}</span><span class="flash-lbl">${label}</span><span class="flash-val">${value}</span>`;
+    stage.appendChild(pill);
+
+    // auto-remove after 2s
+    setTimeout(() => {
+      pill.classList.add('out');
+      setTimeout(() => { pill.remove(); _next(); }, 300);
+    }, 1800);
+  }
+
+  return { show };
+})();
+
+
+const ServiceDetector=(()=>{
+  const S=[
+    {id:'grua',n:'Grúa / Remolque',i:'🚛',h:'Vehículo varado — necesita remolque',c:'hi',kw:[/\bgrú[a]?\b/i,/\bremolque\b/i,/\bvarad[oa]\b/i,/\bno arranca\b/i,/\bno enciende\b/i,/\baccidente\b/i,/\bchoc[oó]\b/i,/\batascad[oa]\b/i]},
+    {id:'bat',n:'Batería descargada',i:'🔋',h:'Arranque o cambio de batería',c:'hi',kw:[/\bbater[íi]a\b/i,/\bno prende\b/i,/\bdescargada\b/i,/\bjump\b/i,/\bcables\b/i]},
+    {id:'llanta',n:'Llanta ponchada',i:'🛞',h:'Cambio de neumático',c:'hi',kw:[/\bllanta\b/i,/\bponch[ae]\b/i,/\bneum[aá]tico\b/i,/\bdesinflad[oa]\b/i,/\breventó\b/i]},
+    {id:'gas',n:'Sin combustible',i:'⛽',h:'Suministro de gasolina o diesel',c:'hi',kw:[/\bgasolina\b/i,/\bcombustible\b/i,/\btanque vac[íi]o\b/i]},
+    {id:'llaves',n:'Apertura de vehículo',i:'🔑',h:'Llaves perdidas o encerradas',c:'hi',kw:[/\bllaves?\b/i,/\bencerr[aá]d[oa]\b/i,/\bno puedo abrir\b/i,/\bapertura\b/i]},
+    {id:'mec',n:'Asistencia mecánica',i:'🔧',h:'Falla mecánica en ruta',c:'md',kw:[/\bfalla\b/i,/\bhumo\b/i,/\brecalentad[oa]\b/i,/\bfrenos?\b/i,/\bgotea\b/i]},
+    {id:'info',n:'Consulta informativa',i:'ℹ️',h:'El cliente solicita información',c:'lo',kw:[/\bcuánto cuesta\b/i,/\bprecio\b/i,/\bcobertura\b/i,/\bpóliza\b/i]},
+  ];
+  let _det=null,_sc={};
+  function analyze(t){
+    const lo=t.toLowerCase();let best=null,bs=0;
+    S.forEach(s=>{
+      let sc=0;s.kw.forEach(r=>{if(r.test(lo))sc++;});
+      _sc[s.id]=(_sc[s.id]||0)+sc;
+      if(_sc[s.id]>bs){bs=_sc[s.id];best=s;}
+    });
+    if(best&&bs>0&&best.id!==_det){_det=best.id;_show(best);}
+  }
+  let _dismissTimer=null, _shownOnce=false;
+  function _show(s){
+    const pop=document.getElementById('svc-popup');
+    if(!pop)return;
+    // fill popup
+    document.getElementById('svc-ico').textContent=s.i;
+    document.getElementById('svc-name').textContent=s.n;
+    document.getElementById('svc-hint').textContent=s.h;
+    const conf=document.getElementById('svc-conf');
+    conf.textContent={hi:'Alta confianza',md:'Confianza media',lo:'Baja confianza'}[s.c];
+    conf.className='svc-pop-badge '+s.c;
+    // Only show popup if not already shown for this service
+    if(!_shownOnce){
+      _shownOnce=true;
+      clearTimeout(_dismissTimer);
+      pop.classList.add('show');
+      _dismissTimer=setTimeout(()=>{ pop.classList.remove('show'); }, 3000);
+    }
+    if(window.lastAnalysis)window.lastAnalysis.tipo_asistencia=s.n;
+    else window._detectedService=s.n;
+    document.getElementById('ca-empty').style.display='none';
+    POBuilder.setService(s.id, s.n);
+  }
+  function reset(){_det=null;_sc={};_shownOnce=false;clearTimeout(_dismissTimer);const p=document.getElementById('svc-popup');if(p)p.classList.remove('show');}
+  return{analyze,reset};
+})();
+
+
+const Recs=(()=>{
+  let _a=new Set();
+  const C=[
+    {id:'placa',ico:'🪪',lbl:'Placa',
+      txt:'Confirma la placa del vehículo con el cliente para evitar errores.',
+      trig:d=>!d.placa, done:(d,s,t)=>!!d.placa||(t||'').toLowerCase().includes('tablilla')},
+    {id:'ubic_ref',ico:'📍',lbl:'Referencia',
+      txt:'Solicita un punto de referencia adicional para facilitar el despacho.',
+      trig:d=>!!d.ubicación&&d.ubicación.length<22, done:d=>d.ubicación&&d.ubicación.length>=22},
+    {id:'eta',ico:'⏱',lbl:'ETA',
+      txt:'Comunica el tiempo estimado de llegada antes de cerrar la llamada.',
+      trig:d=>!!d.tipo_asistencia&&!!d.ubicación,
+      done:(d,s,t)=>{
+        const txt=(t||'').toLowerCase();
+        return txt.includes('minuto') || txt.includes('eta') || txt.includes('tiempo estimado') ||
+               txt.includes('llegará en') || txt.includes('llega en') || txt.includes('aproximadamente') ||
+               txt.includes('media hora') || txt.includes('veinte minutos') || txt.includes('treinta minutos');
+      }},
+    {id:'sent_neg',ico:'⚠️',lbl:'Cliente molesto',
+      txt:'El cliente parece molesto. Usa lenguaje empático y ofrece solución concreta.',
+      trig:(d,s)=>s&&Number(s.valor)===-1,
+      done:(d,s,t)=>{
+        const txt=(t||'').toLowerCase();
+        return txt.includes('entiendo') || txt.includes('comprendo') || txt.includes('disculpe') ||
+               txt.includes('le ofrezco') || txt.includes('lo ayudo') || txt.includes('solución');
+      }},
+  ];
+  function check(data,sent,transcriptText){
+    const t = transcriptText || document.getElementById('t-body')?.innerText || '';
+    C.forEach(c=>{
+      if(_a.has(c.id)){if(c.done(data,sent,t))_dismiss(c.id);}
+      else if(c.trig(data,sent)){_a.add(c.id);_show(c);}
+    });
+  }
+  function _show(c){
+    const s=document.getElementById('rec-stack');
+    if(!s||document.getElementById('rec_'+c.id))return;
+    const t=document.createElement('div');
+    t.className='rec-toast';t.id='rec_'+c.id;
+    t.innerHTML=`<div class="rec-ico">${c.ico}</div><div class="rec-body"><div class="rec-lbl">✦ ${c.lbl}</div><div class="rec-txt">${c.txt}</div></div><button class="rec-done-btn" onclick="Recs.dismiss('${c.id}')" title="Cumplido">✓</button>`;
+    s.appendChild(t);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+  }
+  function _dismiss(id){
+    const t=document.getElementById('rec_'+id);
+    if(t){
+      t.classList.add('done');
+      setTimeout(()=>t.remove(), 850);
+    }
+    _a.delete(id);
+  }
+  function dismiss(id){_dismiss(id);}
+  function showInsightText(text){
+    if(!text)return;
+    const id='ins_'+Date.now();
+    const s=document.getElementById('rec-stack');if(!s)return;
+    const t=document.createElement('div');t.className='rec-toast';t.id='rec_'+id;
+    t.innerHTML=`<div class="rec-ico">✦</div><div class="rec-body"><div class="rec-lbl">Recomendación IA</div><div class="rec-txt">${text}</div></div><button class="rec-done-btn" onclick="Recs.dismiss('${id}')" title="Entendido">✓</button>`;
+    s.appendChild(t);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+    setTimeout(()=>_dismiss(id),14000);
+  }
+  function reset(){_a.clear();const s=document.getElementById('rec-stack');if(s)s.innerHTML='';}
+  return{check,dismiss,showInsightText,reset};
+})();
+
+
+const POBuilder = (() => {
+  let _data={}, _visible=false, _currentService=null;
+  const FIELDS={
+    nombre_cliente:{i:'👤',l:'Cliente',  req:['grua','bat','llanta','gas','llaves','mec']},
+    placa:         {i:'🪪',l:'Placa',    req:['grua','bat','llanta','gas','llaves','mec']},
+    marca:         {i:'🚗',l:'Marca',    req:['grua','bat','llanta','mec']},
+    modelo:        {i:'🔖',l:'Modelo',   req:['grua','bat','llanta','mec']},
+    año:           {i:'📅',l:'Año',      req:['grua','mec']},
+    color:         {i:'🎨',l:'Color',    req:['grua']},
+    ubicación:     {i:'📍',l:'Ubicación',req:['grua','bat','llanta','gas','llaves','mec']},
+    ubicacion_destino:{i:'🏁',l:'Ubicación destino',req:['grua'],wide:true},
+    tipo_asistencia:{i:'🔧',l:'Servicio',req:['grua','bat','llanta','gas','llaves','mec']},
+  };
+  const SUGS={
+    grua:  [{i:'📍',t:'Punto de referencia',q:'¿Puede darme un punto de referencia cercano?'},{i:'🔢',t:'Cédula del cliente',q:'¿Me puede confirmar su número de cédula?'}],
+    bat:   [{i:'🔌',t:'¿Intentó arrancar?',q:'¿Ya intentó arrancar el vehículo?'},{i:'📍',t:'¿Vía pública?',q:'¿Está en vía pública o parqueo privado?'}],
+    llanta:[{i:'🛞',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'📍',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
+    gas:   [{i:'⛽',t:'Tipo combustible',q:'¿Su vehículo es gasolina o diesel?'},{i:'📐',t:'Cantidad necesaria',q:'¿Cuántos litros aproximadamente necesita?'}],
+    llaves:[{i:'🚪',t:'¿Tiene copia?',q:'¿Tiene una copia de la llave en casa?'},{i:'🔐',t:'¿Llave electrónica?',q:'¿Tiene seguro electrónico o llave convencional?'}],
+    mec:   [{i:'💨',t:'¿Sale humo?',q:'¿El vehículo emite humo o hay olores extraños?'},{i:'🌡️',t:'Luz advertencia',q:'¿Vio alguna luz de advertencia encendida?'}],
+    info:  [{i:'📄',t:'Número de póliza',q:'¿Me puede proporcionar su número de póliza?'}],
+  };
+  const WAIT={grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
+
+  function _showPanel(){
+    if(!_visible){_visible=true;
+      const empty=document.getElementById('pb-empty');
+      if(empty)empty.style.display='none';
+      const body=document.getElementById('pb-body');
+      if(body){body.style.display='flex';body.style.flexDirection='column';}
+      const meta=document.getElementById('pb-meta-row');
+      if(meta)meta.style.display='flex';
+      const notes=document.querySelector('.po-notes');
+      if(notes)notes.classList.add('visible');
+    }
+  }
+  function addField(key,value,_forceNew){
+    const isNew=_forceNew!==undefined?_forceNew:!_data[key]; _data[key]=value;
+    _showPanel(); _upsertRow(key,value,isNew);
+    _updateSugs(); _updateWait(); _updateStatus();
+    // Flash pill ONLY on first detection, not on edits/updates
+    if(isNew){ const f=FIELDS[key]; if(f) FlashPill.show(f.i,f.l,String(value).substring(0,26)); }
+  }
+  function setService(svcId,svcName){
+    if(typeof initKBChecklist !== 'undefined') initKBChecklist(svcId);
+    const isNew = _currentService !== svcId;
+    _currentService=svcId; _data.tipo_asistencia=svcName;
+    _showPanel(); _upsertRow('tipo_asistencia',svcName,isNew);
+    _updateSugs(); _updateWait(); _updateStatus();
+    // FlashPill for service only on first detection
+    if(isNew) FlashPill.show('🔧','Servicio',svcName);
+  }
+  function _upsertRow(key,value,isNew){
+    const body=document.getElementById('pb-body'); if(!body)return;
+    const f=FIELDS[key]; if(!f)return;
+    let row=document.getElementById('pbr_'+key);
+    if(row){
+      const inp=row.querySelector('.pf-input');
+      if(inp&&document.activeElement!==inp){
+        inp.value=value;
+        row.classList.add('new'); setTimeout(()=>row.classList.remove('new'),600);
+      }
+      return;
+    }
+
+    // Determine layout
+    const WIDE=['nombre_cliente','ubicación','tipo_asistencia'];
+    const SECTIONS={
+      tipo_asistencia:'Servicio',
+      nombre_cliente:'Cliente',
+      placa:'Vehículo',
+    };
+
+    // Insert section divider if first field of section
+    if(SECTIONS[key]){
+      const existingSec=document.getElementById('pfsec_'+key);
+      if(!existingSec){
+        const sec=document.createElement('div');
+        sec.className='pf-section';sec.id='pfsec_'+key;
+        sec.textContent=SECTIONS[key];
+        body.appendChild(sec);
+      }
+    }
+
+    // Create grid wrapper for pair fields if needed
+    const isWide=WIDE.includes(key);
+    let container=body;
+    if(!isWide){
+      // Find or create current grid
+      let grid=body.querySelector('.pf-grid:last-child');
+      const gridKeys=['placa','tablilla','marca','modelo','año','color'];
+      const gridIdx=gridKeys.indexOf(key);
+      // Create new grid if needed (first of grid group or grid is full)
+      if(!grid||grid.children.length>=4||gridIdx===0){
+        grid=document.createElement('div');
+        grid.className='pf-grid';
+        body.appendChild(grid);
+      }
+      container=grid;
+    }
+
+    row=document.createElement('div');
+    const isUbic = key==='ubicación';
+    row.className='pf-row'+(isNew?' new':'')+(isWide?' wide':'')+(isUbic?' has-map':'');
+    row.id='pbr_'+key;
+    const mapBtn=isUbic?`<button class="pf-map-btn" onclick="openMapFromField()" title="Ver en mapa">🗺</button>`:'';
+    row.innerHTML=`<span class="pf-ico">${f.i}</span><div class="pf-body"><div class="pf-lbl">${f.l}</div><input class="pf-input" value="${String(value).substring(0,60)}" placeholder="—" onchange="POBuilder._edit('${key}',this.value)" oninput="POBuilder._edit('${key}',this.value)">${mapBtn}</div>`;
+    container.appendChild(row);
+    if(isNew) setTimeout(()=>row.classList.remove('new'),600);
+  }
+  function _edit(key,value){_data[key]=value;_updateStatus();}
+  function _updateSugs(){
+    const wrap=document.getElementById('pb-sug-wrap');
+    const list=document.getElementById('pb-sug-list');
+    if(!wrap||!list)return;
+    const sugs=(SUGS[_currentService]||[]).filter(s=>!(s.t.includes('referencia')&&_data.ubicación)&&!(s.t.includes('cédula')&&_data.nombre_cliente));
+    if(!sugs.length){wrap.style.display='none';return;}
+    list.innerHTML='';
+    sugs.slice(0,2).forEach(s=>{
+      const el=document.createElement('div'); el.className='pb-sug';
+      el.innerHTML=`<span class="po-sug-i">${s.i}</span><span class="po-sug-t">${s.t}</span><span class="po-sug-arr">›</span>`;
+      el.onclick=()=>{showToast('💬 '+s.q);el.style.opacity='.4';el.style.pointerEvents='none';};
+      list.appendChild(el);
+    });
+    wrap.style.display='';
+  }
+  function _updateWait(){
+    const el=document.getElementById('pb-wait'); if(!el||!_currentService){if(el)el.textContent='—';return;}
+    const mins=WAIT[_currentService]||15;
+    const hr=new Date().getHours(); const rush=(hr>=7&&hr<=17?'':hr>=8&&hr<=9||hr>=17&&hr<=19?' slow':'');
+  }
+  function _updateStatus(){
+    const REQUIRED = ['tipo_asistencia','nombre_cliente','ubicación'];
+    const req=Object.entries(FIELDS).filter(([k,v])=>v.req.includes(_currentService||'grua')).map(([k])=>k);
+    const filled=req.filter(k=>_data[k]&&String(_data[k]).trim());
+    const complete=filled.length>=req.length;
+    const st=document.getElementById('pb-status');
+    if(st){st.textContent=complete?'Listo':`${filled.length}/${req.length}`;st.className='po-badge'+(complete?' ready':'');}
+    // Show/hide cta button based on completion
+    const ctaEl=document.getElementById('pb-cta');
+    if(ctaEl) ctaEl.style.display=filled.length>0?'flex':'none';
+    // Only close popup if required fields are now missing (e.g. after reset)
+    const reqFilled = REQUIRED.every(k=>_data[k]&&String(_data[k]).trim()&&_data[k]!=='N/A');
+    if(!reqFilled){
+      closePOValidation();
+    }
+  }
+  function loadFromAnalysis(data){
+    let d=0;
+    Object.keys(FIELDS).forEach(k=>{
+      const val=data[k]; if(val&&String(val).trim()&&val!=='N/A'){setTimeout(()=>addField(k,val),d);d+=130;}
+    });
+  }
+  function reset(){
+    _data={}; _visible=false; _currentService=null;
+    const empty=document.getElementById('pb-empty');if(empty)empty.style.display='flex';
+    const pbScroll=document.getElementById('pb-body');if(pbScroll){pbScroll.style.display='none';pbScroll.innerHTML='';}
+    const pbMeta=document.getElementById('pb-meta-row');if(pbMeta)pbMeta.style.display='none';
+    const poSugs=document.getElementById('pb-sug-wrap');if(poSugs)poSugs.style.display='none';
+    const b=document.getElementById('pb-body');if(b)b.innerHTML='';
+    const st=document.getElementById('pb-status');if(st){st.textContent='En curso';st.className='pb-status';}
+    const cta=document.getElementById('pb-cta');if(cta)cta.style.display='none';
+    const sw=document.getElementById('pb-sug-wrap');if(sw)sw.style.display='none';
+    const w=document.getElementById('pb-wait');if(w){w.textContent='—';w.className='pb-wait-val';}
+    const nt=document.getElementById('pb-notes-ta');if(nt)nt.value='';
+    const notes=document.querySelector('.po-notes');if(notes)notes.classList.remove('visible');
+  }
+  function getData(){return{..._data};}
+  return{addField,setService,loadFromAnalysis,reset,getData,_edit,get _currentSvc(){return _currentService?{id:_currentService}:null}};
+})();
+
+
+const SF = (() => {
+  // field map: key → {id, label, icon}
+  const FIELDS = {
+    nombre_cliente: {id:'f-fname', label:'Nombre',    icon:'👤', split:true},
+    placa:          {id:'f-plate', label:'Placa',     icon:'🪪'},
+    marca:          {id:'f-make',  label:'Marca',     icon:'🚗'},
+    modelo:         {id:'f-model', label:'Modelo',    icon:'🔖'},
+    año:            {id:'f-year',  label:'Año',       icon:'📅'},
+    color:          {id:'f-color', label:'Color',     icon:'🎨'},
+    ubicación:      {id:'f-location', label:'Ubicación', icon:'📍'},
+  };
+
+  let _pending = {}; // key → {val, rendered}
+
+  function _applyField(key, val) {
+    // Wire into POBuilder
+    if(typeof POBuilder !== 'undefined') { POBuilder.addField(key, val, true); }
+  }
+
+  function _flashField(el) {
+    el.classList.remove('sfok'); void el.offsetWidth;
+    el.classList.add('sfok');
+    setTimeout(() => el.classList.remove('sfok'), 900);
+  }
+
+  function _removeBubble(key) {
+    const b = document.getElementById('sfb_' + key);
+    if (!b) return;
+    b.onclick = null;
+    b.style.transition = 'opacity .26s ease, transform .26s ease, max-height .28s ease .1s, margin .28s ease .1s';
+    b.style.opacity = '0';
+    b.style.transform = 'translateX(8px)';
+    b.style.maxHeight = b.offsetHeight + 'px';
+    requestAnimationFrame(() => {
+      b.style.maxHeight = '0';
+      b.style.marginBottom = '0';
+    });
+    setTimeout(() => b.remove(), 380);
+  }
+
+  function render(data) {
+    // data = lastAnalysis object
+    const wrap = document.getElementById('sfwrap');
+    if (!wrap) return;
+    // show analyzing briefly
+    const pill = document.getElementById('sfanalyzing');
+    if (pill) { pill.classList.add('show'); setTimeout(() => pill.classList.remove('show'), 1200); }
+
+    let delay = 200;
+    Object.keys(FIELDS).forEach(key => {
+      const val = data[key];
+      if (!val || !String(val).trim() || val === 'N/A') return;
+      if (_pending[key]) return; // already rendered
+
+      _pending[key] = val;
+      const f = FIELDS[key];
+
+      setTimeout(() => {
+        // Don't render if already applied
+        if (document.getElementById('sfb_' + key)) return;
+
+        const b = document.createElement('div');
+        b.className = 'sfb';
+        b.id = 'sfb_' + key;
+        b.innerHTML = '<div class="sfb-ico">' + f.icon + '</div><div class="sfb-body"><div class="sfb-lbl">' + f.label + '</div><div class="sfb-val">' + String(val) + '</div></div>';
+        b.onclick = () => {
+          _applyField(key, String(val));
+          _removeBubble(key);
+          showToast('✓ ' + f.label + ' aplicado');
+          AgentBar.checkComplete(data);
+        };
+        wrap.appendChild(b);
+      }, delay);
+      delay += 90;
+    });
+  }
+
+  function reset() {
+    _pending = {};
+    const wrap = document.getElementById('sfwrap');
+    if (wrap) wrap.innerHTML = '';
+  }
+
+  return { render, reset };
+})();
+
+
+const AgentBar = (() => {
+  let done = 0, goal = 20;  // done = POs creados en el día
+
+  function setDemo(){ done = 19; sync(); }
+
+  function sync() {
+    const pct = Math.round(done / goal * 100);
+    const dEl = document.getElementById('ag-done');
+    const bEl = document.getElementById('ag-bar');
+    const sEl = document.getElementById('ag-star');
+
+    if(dEl) dEl.textContent = done;
+    if(bEl){
+      bEl.style.width = Math.min(pct, 100) + '%';
+      bEl.classList.toggle('done', pct >= 100);
+    }
+
+    // Star fills progressively based on % toward goal
+    if(sEl){
+      if(pct <= 0){
+        // Empty — grayscale
+        sEl.style.filter = 'grayscale(1) brightness(10)';
+        sEl.style.opacity = '.25';
+        sEl.classList.remove('on');
+      } else if(pct < 50){
+        // Quarter fill — slight color
+        sEl.style.filter = 'sepia(1) saturate(1.5) hue-rotate(5deg)';
+        sEl.style.opacity = '.5';
+        sEl.classList.remove('on');
+      } else if(pct < 80){
+        // Half fill — more color
+        sEl.style.filter = 'sepia(1) saturate(2) hue-rotate(5deg)';
+        sEl.style.opacity = '.75';
+        sEl.classList.remove('on');
+      } else if(pct < 100){
+        // Almost there — vivid
+        sEl.style.filter = 'none';
+        sEl.style.opacity = '.9';
+        sEl.classList.remove('on');
+      } else {
+        // 100% — full glow + animation
+        sEl.style.filter = 'none';
+        sEl.style.opacity = '1';
+        if(!sEl.classList.contains('on')){
+          sEl.classList.add('on');
+          showCelebration(done, goal);
+        }
+      }
+    }
+  }
+
+  function init() { sync(); }
+
+  function increment() {
+    done = Math.min(done + 1, goal);
+    sync();
+    if(done >= goal){
+      setTimeout(()=>showCelebration(done, goal), 200);
+    } else {
+      showToast('PO #' + done + ' registrado — ' + Math.round(done/goal*100) + '% de meta');
+    }
+  }
+
+  return { init, increment, setDemo };
+})();
+
+
+function _autoFillPO(data){
+  if(!data.placa&&data.tablilla)data.placa=data.tablilla;
+  const map=[
+    ['tipo_asistencia',data.tipo_asistencia],
+    ['nombre_cliente', data.nombre_cliente],
+    ['ubicación',      data.ubicación],
+    ['placa',          data.placa],
+    ['marca',          data.marca],
+    ['modelo',         data.modelo],
+    ['año',            data.año],
+    ['color',          data.color],
+    ['ubicacion_destino', data.ubicacion_destino],
+  ];
+  const toAdd = map.filter(([k,v])=>v&&v!=='N/A');
+  if(!toAdd.length) return;
+
+  // Block popup during fill
+  _pvpDismissed = true;
+
+  // Add all fields synchronously so _data is complete
+  toAdd.forEach(([key,val]) => POBuilder.addField(key, val, true));
+
+  if(data.tipo_asistencia) ServiceDetector.analyze(data.tipo_asistencia);
+
+  // After DOM settles, unblock and open popup once with complete data (unless user closed it)
+  setTimeout(()=>{
+    _pvpDismissed = false;
+    if(!_pvpClosedByUser) openPOValidation();
+  }, 400);
+}
+
+function confirmPO(){
+  try{
+    // Sync popup edits back to POBuilder
+    document.querySelectorAll('.pvp-input').forEach(inp=>{
+      if(inp.dataset.key && inp.value.trim())
+        POBuilder._edit(inp.dataset.key, inp.value.trim());
+    });
+    // Read nota from popup BEFORE closing it
+    const pvpNota = document.getElementById('pvp-nota');
+    const notaFromPopup = pvpNota ? pvpNota.value.trim() : '';
+
+    _pvpDismissed=false;
+    closePOValidation();
+
+    const data = POBuilder.getData();
+    // Apply nota: popup takes priority over notes area
+    const noteEl = document.getElementById('pb-notes-ta');
+    if(noteEl && noteEl.value.trim()) data.nota = noteEl.value.trim();
+    if(notaFromPopup) data.nota = notaFromPopup;
+
+    const num = 'PO-' + Math.floor(100000+Math.random()*900000);
+    const now = new Date();
+    const ts  = now.toLocaleString('es-CR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+
+    const timerEl = document.getElementById('call-timer-val');
+    const callDuration = timerEl ? timerEl.textContent : '—';
+
+    const sent  = lastAnalysis?.sentimiento_cliente || null;
+    const proto = lastAnalysis?.protocolo_agente    || null;
+    const scores = _buildScores(data, sent, proto, callDuration);
+
+    const svcId = POBuilder._currentSvc?.id || 'grua';
+    const WAIT  = {grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
+
+    // Save to list
+    const poEntry = {num, ts, data:{...data},
+      meta:{callDuration, sentVal:sent?Number(sent.valor):0,
+            waitTime:WAIT[svcId]||15, scores}};
+    _poList.push(poEntry);
+    _poCount = _poList.length;
+
+    // Update counter pill
+    const ctr  = document.getElementById('po-counter');
+    const cnum = document.getElementById('po-count-num');
+    if(cnum) cnum.textContent = _poCount;
+    if(ctr)  ctr.classList.add('show');
+
+    // Add to drawer
+    _renderDrawerCard(poEntry);
+    updateDrawerCount();
+
+    // Fill confirm modal
+    const pcmNum  = document.getElementById('pcm-num');
+    const pcmTs   = document.getElementById('pcm-ts');
+    const pcmBody = document.getElementById('pcm-body');
+    if(pcmNum) pcmNum.textContent = num;
+    if(pcmTs)  pcmTs.textContent  = ts;
+    if(pcmBody){
+      pcmBody.innerHTML = '';
+      const ICONS={tipo_asistencia:'🔧',nombre_cliente:'👤',ubicación:'📍',
+                   placa:'🪪',marca:'🚗',modelo:'🔖',año:'📅',color:'🎨'};
+      const LBLS ={tipo_asistencia:'Servicio',nombre_cliente:'Cliente',ubicación:'Ubicación',
+                   placa:'Placa',marca:'Marca',modelo:'Modelo',año:'Año',color:'Color'};
+      Object.entries(ICONS).forEach(([k,ico])=>{
+        const val=data[k]; if(!val||String(val).trim()===''||val==='N/A') return;
+        const row=document.createElement('div'); row.className='pcm-field';
+        row.innerHTML='<span class="pd-det-i">'+ico+'</span><div><div class="pd-det-lbl">'+LBLS[k]+'</div><div class="pd-det-v">'+String(val)+'</div></div>';
+        pcmBody.appendChild(row);
+      });
+
+      // Nota: read directly from both sources
+      const notaFinal = _pvpNotaValue ||
+        notaFromPopup ||
+        (document.getElementById('pb-notes-ta')||{}).value?.trim() || '';
+      if(notaFinal){
+        const nrow=document.createElement('div'); nrow.className='pcm-field';
+        nrow.innerHTML='<span class="pd-det-i" style="filter:grayscale(1) brightness(10);opacity:.85;transition:filter .2s,opacity .2s" class="pcm-nota-ico">📝</span><div><div class="pd-det-lbl">Nota</div><div class="pd-det-v" style="font-style:italic;color:var(--t1)">'+notaFinal+'</div></div>';
+        pcmBody.appendChild(nrow);
+        data.nota = notaFinal; // ensure saved in poEntry
+        _pvpNotaValue = ''; // reset after use
+      }
+    }
+
+    const ov = document.getElementById('po-confirm-ov');
+    if(ov) ov.classList.add('show');
+
+    POBuilder.reset();
+    AgentBar.increment();
+    showToast('PO '+num+' creado');
+  }catch(err){
+    console.error('confirmPO error:', err);
+    showToast('Error al crear PO: '+err.message);
+  }
+}
+
+function closePOConfirm(){document.getElementById('po-confirm-ov').classList.remove('show');}
+
+function openMapFromPO(){if(_poData.data?.ubicación)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(_poData.data.ubicación+', Costa Rica'),'_blank');}
+
+function resetPOBuilder(){POBuilder.reset();}
+
+function openDrawer(){
+  renderDrawer();
+  document.getElementById('po-drawer-ov').classList.add('show');
+}
+
+
+function renderDrawer(){
+  const list  = document.getElementById('pd-list');
+  const empty = document.getElementById('pd-empty');
+  const cnt   = document.getElementById('pdh-count');
+  if(cnt) cnt.textContent = _poList.length + ' POs';
+  if(!list) return;
+  if(!_poList.length){
+    if(empty) empty.style.display='flex';
+    list.innerHTML='';
+    return;
+  }
+  if(empty) empty.style.display='none';
+  list.innerHTML='';
+  [..._poList].reverse().forEach(po=>{
+    const card = document.createElement('div');
+    card.className = 'pd-card';
+    card.id = 'pdc_'+po.num;
+    card.onclick = ()=>openDetail(po.num);
+    card.innerHTML =
+      '<div class="pd-card-top">'+
+        '<span class="pd-card-num">'+po.num+'</span>'+
+        '<span class="pd-card-svc">'+(po.data.tipo_asistencia||'—')+'</span>'+
+        '<span class="pd-card-ts">'+po.ts+'</span>'+
+      '</div>'+
+      '<div class="pd-card-fields">'+
+        (po.data.nombre_cliente?'<span class="pd-card-tag">👤 '+po.data.nombre_cliente+'</span>':'')+
+        (po.data.placa?'<span class="pd-card-tag">🪪 '+po.data.placa+'</span>':'')+
+        (po.data.ubicación?'<span class="pd-card-tag">📍 '+po.data.ubicación+'</span>':'')+
+      '</div>';
+    list.appendChild(card);
+  });
+}
+
+function closeDrawer(){
+  document.getElementById('po-drawer-ov').classList.remove('show');
+  closeDetail();
+}
+
+function filterPOs(query){
+  const q=query.trim().toLowerCase();
+  const clear=document.getElementById('pd-search-clear');
+  if(clear) clear.classList.toggle('show', q.length>0);
+
+  const cards=document.querySelectorAll('.pd-card');
+  let visible=0;
+  cards.forEach(card=>{
+    const match = !q || card.textContent.toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+    if(match) visible++;
+  });
+  const empty=document.getElementById('pd-empty');
+  if(empty) empty.style.display = (visible===0 && _poList.length>0) ? 'flex' : 'none';
+  // update empty text
+  if(empty && q && visible===0) empty.querySelector('.pd-empty-t').textContent='Sin resultados para "'+query+'"';
+  else if(empty && _poList.length===0) { empty.style.display='flex'; empty.querySelector('.pd-empty-t').textContent='No hay POs creados aún'; }
+}
+
+function clearSearch(){
+  const inp=document.getElementById('pd-search-input');
+  if(inp){ inp.value=''; filterPOs(''); }
+}
+
+function openDetail(num){
+  const po = _poList.find(p=>p.num===num);
+  if(!po) return;
+  _activeDetailId = num;
+  const m  = po.meta || {};
+  const sc = m.scores || {satisfaction:70,ahtScore:80,completeness:75,speechScore:80,speechItems:[]};
+
+  // Highlight active card
+  document.querySelectorAll('.pd-card').forEach(c=>c.classList.remove('active'));
+  const activeCard = document.getElementById('pdc_'+num);
+  if(activeCard) activeCard.classList.add('active');
+
+  // Header
+  const detNum = document.getElementById('pd-det-num');
+  const detTs  = document.getElementById('pd-det-ts');
+  if(detNum) detNum.textContent = num;
+  if(detTs)  detTs.textContent  = po.ts;
+
+  const body = document.getElementById('pd-det-body');
+  if(!body) return;
+
+  const sentLbl = m.sentVal===1?'Satisfecho':m.sentVal===0?'Neutro':'Molesto';
+  const sentEmo = m.sentVal===1?'😊':m.sentVal===0?'😐':'😠';
+
+  // Build HTML
+  const ICONS = {tipo_asistencia:'🔧',nombre_cliente:'👤',ubicación:'📍',
+                 placa:'🪪',marca:'🚗',modelo:'🔖',año:'📅',color:'🎨',nota:'📝'};
+  const LBLS  = {tipo_asistencia:'Servicio',nombre_cliente:'Cliente',ubicación:'Ubicación',
+                 placa:'Placa',marca:'Marca',modelo:'Modelo',año:'Año',color:'Color',nota:'Nota'};
+
+  let html = '<div class="pd-det-fields">';
+  Object.entries(ICONS).forEach(([k,ico])=>{
+    const val = po.data[k];
+    if(!val||String(val).trim()===''||val==='N/A') return;
+    html += '<div class="pd-det-row"><span class="pd-det-i">'+ico+'</span><div><div class="pd-det-lbl">'+LBLS[k]+'</div><div class="pd-det-v">'+String(val)+'</div></div></div>';
+  });
+  html += '</div>';
+
+  // Metrics
+  html += '<div class="pd-metrics">';
+  html += '<div class="pd-metric"><div class="pd-metric-lbl">Sentimiento</div><div class="pd-metric-val" style="font-size:20px">'+sentEmo+'</div><div class="pd-metric-sub">'+sentLbl+'</div></div>';
+  html += '<div class="pd-metric"><div class="pd-metric-lbl">Duración</div><div class="pd-metric-val">'+(m.callDuration||'—')+'</div></div>';
+  html += '<div class="pd-metric"><div class="pd-metric-lbl">Espera est.</div><div class="pd-metric-val">'+(m.waitTime?m.waitTime+' min':'—')+'</div></div>';
+  html += '</div>';
+
+  // Score bars
+  const scoreRows = [
+    {l:'Satisfacción',v:sc.satisfaction},
+    {l:'AHT',         v:sc.ahtScore},
+    {l:'Completitud', v:sc.completeness},
+    {l:'Speech',      v:sc.speechScore},
+  ];
+  html += '<div class="pd-scores">';
+  scoreRows.forEach(s=>{
+    const c = s.v>=80?'good':s.v>=60?'warn':'bad';
+    html += '<div class="pd-score-row"><span class="pd-score-lbl">'+s.l+'</span><div class="pd-score-bar"><div class="pd-score-fill '+c+'" style="width:'+s.v+'%"></div></div><span class="pd-score-num '+c+'">'+s.v+'%</span></div>';
+  });
+  html += '</div>';
+
+  // Speech
+  if(sc.speechItems&&sc.speechItems.length){
+    html += '<div class="pd-speech"><div class="pd-speech-title">Speech</div>';
+    sc.speechItems.forEach(item=>{
+      html += '<div class="pd-speech-item"><div class="pd-speech-dot '+(item.ok?'ok':'fail')+'"></div>'+item.label+'</div>';
+    });
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+  document.getElementById('pd-detail').classList.remove('hidden');
+}
+
+function closeDetail(){
+  _activeDetailId=null;
+  document.querySelectorAll('.pd-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('pd-detail').classList.add('hidden');
+}
+
+function openMapFromDetail(){
+  const po=_poList.find(p=>p.num===_activeDetailId);
+  if(po?.data?.ubicación)
+    window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(po.data.ubicación+', Costa Rica'),'_blank');
+}
+
+function openDashboard(){_buildDashboard();document.getElementById('dash-ov').classList.add('show');document.getElementById('dash-date').textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});}
+
+function closeDashboard(){document.getElementById('dash-ov').classList.remove('show');}
+
+function _buildDashboard(){
+  const pos=_poList, n=pos.length;
+  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
+  const satAvg=avg(pos.map(p=>p.meta?.scores?.satisfaction||0))||72;
+  const ahtAvg=avg(pos.map(p=>p.meta?.scores?.ahtScore||0))||80;
+  const compAvg=avg(pos.map(p=>p.meta?.scores?.completeness||0))||75;
+  const speechAvg=avg(pos.map(p=>p.meta?.scores?.speechScore||0))||78;
+  const overall=Math.round(satAvg*.35+ahtAvg*.2+compAvg*.25+speechAvg*.2);
+
+  // Date
+  const dd=document.getElementById('dash-date');
+  if(dd) dd.textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});
+  const dd2=document.getElementById('dash-date2');
+  if(dd2) dd2.textContent=new Date().toLocaleDateString('es-CR',{day:'2-digit',month:'short'});
+
+  // Ring
+  const ring=document.getElementById('dash-ring-fill');
+  const scoreEl=document.getElementById('dash-total-score');
+  if(scoreEl) scoreEl.textContent=overall;
+  setTimeout(()=>{
+    if(ring){
+      const c=overall>=80?'var(--g)':overall>=60?'var(--y)':'var(--r)';
+      ring.style.strokeDashoffset=402-(402*overall/100);
+      ring.style.stroke=c;
+    }
+  },100);
+
+  // Grade
+  const R=[{min:88,lbl:'A+',sub:'Rendimiento excepcional. Superaste todos los estándares.'},{min:73,lbl:'A',sub:'Buen desempeño. Cumpliste la mayoría de estándares.'},{min:55,lbl:'B',sub:'Desempeño aceptable con oportunidades de mejora.'},{min:0,lbl:'C',sub:'Varios indicadores por debajo del estándar.'}];
+  const r=R.find(x=>overall>=x.min);
+  const gradeEl=document.getElementById('dash-grade');
+  const descEl=document.getElementById('dash-grade-desc');
+  if(gradeEl){ gradeEl.textContent=r.lbl; gradeEl.style.color=overall>=73?'var(--g)':overall>=55?'var(--y)':'var(--r)'; }
+  if(descEl) descEl.textContent=r.sub;
+
+  // KPIs
+  const fcr=n>0?Math.round(pos.filter(p=>(p.meta?.scores?.completeness||0)>=75).length/n*100):87;
+  const kpis={
+    'dk-pos': n,
+    'dk-sat': satAvg+'%',
+    'dk-aht': ahtAvg+'%',
+    'dk-fcr': fcr+'%',
+    'dk-speech': speechAvg+'%',
+  };
+  Object.entries(kpis).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=val;
+  });
+  const satEl=document.getElementById('dk-sat');
+  if(satEl) satEl.className='dash-kpi-val '+(satAvg>=80?'g':satAvg>=65?'y':'r');
+
+  // Score bars
+  const sb=document.getElementById('dash-score-bars');
+  if(sb){
+    sb.innerHTML=[
+      {l:'Satisfacción',v:satAvg},{l:'AHT',v:ahtAvg},
+      {l:'Completitud',v:compAvg},{l:'Speech',v:speechAvg},{l:'Total',v:overall}
+    ].map(s=>{
+      const c=s.v>=80?'g':s.v>=60?'y':'r';
+      const col=s.v>=80?'var(--g)':s.v>=60?'var(--y)':'var(--r)';
+      return`<div class="dsb-row"><span class="dsb-lbl">${s.l}</span><div class="dsb-bar"><div class="dsb-fill ${c}" style="width:0%" data-w="${s.v}%"></div></div><span class="dsb-num" style="color:${col}">${s.v}%</span></div>`;
+    }).join('');
+    setTimeout(()=>sb.querySelectorAll('.dsb-fill').forEach(f=>f.style.width=f.dataset.w),160);
+  }
+
+  // Calls list
+  const ce=document.getElementById('dash-calls');
+  if(ce){
+    if(n===0){
+      ce.innerHTML='<div class="dash-empty-calls">Sin POs registrados aún. Usa ✦ Demo para ver un ejemplo.</div>';
+    } else {
+      ce.innerHTML=pos.map((po,idx)=>{
+        const tot=po.meta?.scores?Math.round((po.meta.scores.satisfaction*.3+po.meta.scores.ahtScore*.2+po.meta.scores.completeness*.2+po.meta.scores.speechScore*.3)):72;
+        const c=tot>=80?'g':tot>=65?'y':'r';
+        return`<div class="dpo-row" id="dpo_${idx}" onclick="_toggleDPO(${idx})"><span class="dash-call-num">${po.num}</span><span class="dash-call-svc">${po.data.tipo_asistencia||'—'} · ${po.data.nombre_cliente||'—'}</span><span class="dash-call-score ${c}">${tot}%</span><span class="dash-call-ts">${po.ts}</span><span class="dpo-chevron">›</span></div><div class="dpo-detail" id="dpod_${idx}"></div>`;
+      }).join('');
+    }
+  }
+
+  // Speech compliance
+  const defP=['Saludo de bienvenida','Identificación del cliente','Validación de ubicación','Confirmación de servicio','ETA comunicado al cliente'];
+  const allI={};
+  pos.forEach(po=>(po.meta?.scores?.speechItems||[]).forEach(it=>{
+    if(!allI[it.label])allI[it.label]={ok:0,total:0};
+    allI[it.label].total++;if(it.ok)allI[it.label].ok++;
+  }));
+  const spEl=document.getElementById('dash-speech-detail');
+  if(spEl) spEl.innerHTML=defP.map(k=>{
+    const d=allI[k]||{ok:0,total:n||1};
+    const pct=n>0?Math.round(d.ok/d.total*100):0;
+    const ok=pct>=70||n===0;
+    return`<div class="dsd-row"><div class="dsd-dot ${ok?'ok':'fail'}"></div><span class="dsd-lbl">${k}</span><span class="dsd-rate" style="color:var(--${ok?'g':'r'})">${n>0?pct+'%':'—'}</span></div>`;
+  }).join('');
+
+  // Recommendations
+  const recsEl=document.getElementById('dash-recs');
+  if(recsEl) recsEl.innerHTML=_genRecs(overall,satAvg,ahtAvg,compAvg,speechAvg,n,0).map(r=>{
+    const cl=r.p==='alta'?'r':r.p==='media'?'y':'g';
+    return`<div class="dash-rec ${cl}"><div class="dash-rec-head"><span class="dash-rec-ico">${r.ico}</span><span class="dash-rec-title">${r.title}</span><span class="dash-rec-badge ${cl}">${r.p}</span></div><div class="dash-rec-txt">${r.body}</div></div>`;
+  }).join('');
+}
+
+function _genRecs(overall,sat,aht,comp,speech,n,wait){
+  const recs=[];
+  if(sat<70)recs.push({ico:'😊',title:'Mejorar empatía con el cliente',body:'El índice de satisfacción está por debajo del estándar. Practica frases de empatía y confirma comprensión durante la llamada.',p:'alta'});
+  if(aht<70)recs.push({ico:'⏱',title:'Reducir tiempo de atención',body:'El AHT supera el rango óptimo. Prepara las preguntas clave y evita silencios prolongados.',p:'alta'});
+  if(comp<75)recs.push({ico:'📋',title:'Capturar todos los datos del PO',body:'Nombre, placa, ubicación y tipo de servicio son obligatorios. Completa el formulario en cada llamada.',p:'alta'});
+  if(speech<70)recs.push({ico:'🎤',title:'Reforzar protocolo de atención',body:'El cumplimiento del speech está por debajo del 70%. Repasa: bienvenida, confirmación y ETA al cliente.',p:'media'});
+  if(wait>22)recs.push({ico:'🚀',title:'Optimizar despacho en hora pico',body:'Los tiempos de espera son altos. Coordina con el equipo para priorizar casos urgentes en franjas críticas.',p:'media'});
+  if(n===0)recs.push({ico:'📊',title:'Crea POs durante las llamadas',body:'Sin POs no hay métricas de desempeño. Completa el formulario en cada llamada de asistencia.',p:'media'});
+  if(overall>=85)recs.push({ico:'⭐',title:'Mantén el nivel de excelencia',body:'Tu rendimiento supera el estándar del equipo. Considera compartir tus mejores prácticas.',p:'baja'});
+  if(!recs.length)recs.push({ico:'👍',title:'Buen trabajo general',body:'Tu desempeño es sólido. Busca consistencia y mejora continua día a día.',p:'baja'});
+  return recs.slice(0,5);
+}
+
+function _toggleDPO(idx){
+  const row=document.getElementById('dpo_'+idx);
+  const detail=document.getElementById('dpod_'+idx);
+  if(!row||!detail)return;
+  const isOpen=detail.classList.contains('show');
+  document.querySelectorAll('.dpo-row').forEach(r=>r.classList.remove('open'));
+  document.querySelectorAll('.dpo-detail').forEach(d=>d.classList.remove('show'));
+  if(isOpen)return;
+  row.classList.add('open'); detail.classList.add('show');
+  if(detail.innerHTML.trim())return;
+  const po=_poList[idx]; if(!po)return;
+  const m=po.meta||{};
+  const sc=m.scores||{satisfaction:70,ahtScore:80,completeness:75,speechScore:80,speechItems:[]};
+  const tot=Math.round(sc.satisfaction*.3+sc.ahtScore*.2+sc.completeness*.2+sc.speechScore*.3);
+  const gc=v=>v>=80?'var(--g)':v>=65?'var(--y)':'var(--r)';
+  const sentLbl=m.sentVal===1?'😊 Satisfecho':m.sentVal===0?'😐 Neutro':'😠 Molesto';
+  let html=`<div class="dpo-grid">
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Score</div><div class="dpo-metric-val" style="color:${gc(tot)}">${tot}%</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Satisfacción</div><div class="dpo-metric-val" style="color:${gc(sc.satisfaction)}">${sc.satisfaction}%</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Duración</div><div class="dpo-metric-val">${m.callDuration||'—'}</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Sentimiento</div><div class="dpo-metric-val" style="font-size:18px">${m.sentVal===1?'😊':m.sentVal===0?'😐':'😠'}</div></div>
+  </div>
+  <div class="dpo-bars">
+    ${[{l:'Satisfacción',v:sc.satisfaction},{l:'AHT',v:sc.ahtScore},{l:'Completitud',v:sc.completeness},{l:'Speech',v:sc.speechScore}].map(b=>{const c=b.v>=80?'g':b.v>=65?'y':'r';return '<div class="dpo-bar-row"><span class="dpo-bar-lbl">'+b.l+'</span><div class="dpo-bar-bg"><div class="dpo-bar-fill '+c+'" style="width:0%" data-w="'+b.v+'%"></div></div><span class="dpo-bar-num">'+b.v+'%</span></div>';}).join('')}
+  </div>`;
+  if(sc.speechItems?.length){
+    html+=`<div class="dpo-speech">${sc.speechItems.map(i=>'<div class="dpo-speech-chip '+(i.ok?'ok':'fail')+'">'+(i.ok?'✓':'✗')+' '+i.label+'</div>').join('')}</div>`;
+  }
+  detail.innerHTML=html;
+  setTimeout(()=>detail.querySelectorAll('.dpo-bar-fill').forEach(f=>f.style.width=f.dataset.w),50);
+}
+
+function _buildScores(data,sent,proto,callDuration){
+  // Satisfaction: based on sentiment valor
+  const sentVal=sent?Number(sent.valor):0;
+  const satisfaction=sentVal===1?92:sentVal===0?70:38;
+
+  // AHT score: based on call duration — ideal 2-5 min
+  let ahtScore=80;
+  if(callDuration&&callDuration!=='—'){
+    const parts=callDuration.split(':');
+    const mins=parseInt(parts[0]||0);
+
+    if(mins<3||mins>8){ ahtScore=Math.max(20, ahtScore-(Math.abs(mins-5)*8)); }
+  }
+  const required=['nombre_cliente','ubicación','tipo_asistencia','placa','tablilla','marca','modelo'];
+  const filled=required.filter(k=>data[k]&&String(data[k]).trim());
+
+  // Speech compliance: protocol + data
+  const proto_ok=proto?.cumple===true;
+  const speechItems=[
+    {label:'Saludo de bienvenida',       ok: proto_ok },
+    {label:'Identificación del cliente', ok: !!data.nombre_cliente },
+    {label:'Validación de ubicación',    ok: !!data.ubicación },
+    {label:'Confirmación del servicio',  ok: !!data.tipo_asistencia },
+    {label:'ETA comunicado al cliente',  ok: proto_ok && !!data.ubicación && !!data.tipo_asistencia },
+  ];
+  const speechScore=Math.round(speechItems.filter(i=>i.ok).length/speechItems.length*100);
+  const completeness=Math.round(filled.length/required.length*100);
+
+  return{satisfaction,ahtScore,completeness,speechScore,speechItems};
+}
+
+AgentBar.init()
+
+
+/* ══ BASE DE CONOCIMIENTO — Contrato Asistencia Vial CONNECT ══ */
+const KB = {
+
+  servicios: {
+    grua:    { nombre:'Remolque por avería/accidente', planes:{basico:{eventos:1,monto:150},premium:{eventos:2,monto:200},plus:{eventos:3,monto:300}} },
+    rescate: { nombre:'Maniobras de rescate',          planes:{basico:null,premium:{eventos:1,monto:150},plus:{eventos:2,monto:150}} },
+    llanta:  { nombre:'Cambio de llanta',              planes:{basico:{eventos:1,monto:90},premium:{eventos:3,monto:120},plus:{eventos:5,monto:150}} },
+    bateria: { nombre:'Paso de corriente',             planes:{basico:{eventos:1,monto:90},premium:{eventos:3,monto:120},plus:{eventos:5,monto:150}} },
+    gasolina:{ nombre:'Envío de combustible',          planes:{basico:{eventos:1,monto:90},premium:{eventos:3,monto:120},plus:{eventos:5,monto:150}} },
+    llaves:  { nombre:'Apertura vehicular',            planes:{basico:{eventos:1,monto:120},premium:{eventos:3,monto:190},plus:{eventos:3,monto:250}} },
+    traslado:{ nombre:'Transporte continuación viaje', planes:{basico:null,premium:{eventos:2,monto:100},plus:{eventos:3,monto:150}} },
+  },
+
+  restricciones: [
+    { keywords:['uber','didi','pedidos ya','taxi','público','plataforma'],        alerta:'⚠ Vehículos de transporte público o plataformas digitales NO están cubiertos.' },
+    { keywords:['carga','camión','plataforma','tonelada'],                        alerta:'⚠ Vehículos de carga o más de 3.5 toneladas NO están cubiertos.' },
+    { keywords:['herido','ambulancia','accidentado'],                             alerta:'⚠ Vehículos con heridos: coordina emergencias primero (911). Luego gestiona grúa.' },
+    { keywords:['moto','motocicleta','bicicleta','cuadraciclo','can am'],         alerta:'⚠ Motos < 325cc, bicimotos y cuadraciclos NO están cubiertos.' },
+    { keywords:['fuera de costa rica','panamá','nicaragua','extranjero'],         alerta:'⚠ El servicio aplica ÚNICAMENTE dentro de Costa Rica.' },
+    { keywords:['sin marchamo','marchamo vencido','no circula'],                  alerta:'⚠ Vehículos sin marchamo vigente NO tienen cobertura.' },
+    { keywords:['ebrio','borracho','alcohol','drogas'],                           alerta:'⚠ Servicio NO aplica si el conductor está bajo efectos de alcohol o drogas.' },
+    { keywords:['llanta','moto'],                                                 alerta:'⚠ Cambio de llanta NO aplica para motocicletas.' },
+    { keywords:['cochera','garaje','parqueo','casa'],                             alerta:'⚠ Grúa NO se gestiona en garajes o cocheras privadas sin condiciones adecuadas.' },
+    { keywords:['combustible','gasolina','sin gasolina'],                         alerta:'ℹ Combustible: CONNECT cubre 1 galón solo en el primer servicio del año. En vía pública únicamente.' },
+    { keywords:['copia','duplicado de llave','llave perdida'],                    alerta:'⚠ Apertura vehicular NO incluye copia de llaves ni reparación de cerraduras.' },
+    { keywords:['baúl','cajuela','maletero'],                                     alerta:'⚠ Apertura vehicular NO aplica para baúl si no abre desde el interior.' },
+    { keywords:['nuevo cliente','afiliación','primera vez'],                      alerta:'ℹ Los beneficios inician 72 horas después de la afiliación.' },
+    { keywords:['daño','reclamo','queja','golpe'],                                alerta:'ℹ Reclamos por daños deben reportarse en máximo 24 horas al 2504-6000.' },
+  ],
+
+  reglas: {
+    vigencia:        'Beneficios inician 72h después de afiliación. Sin vigencia: NO hay servicio.',
+    pago:            'Cliente debe estar al día en pagos. Verificar antes de gestionar.',
+    acompanamiento:  'Cliente debe acompañar la grúa en todo el trayecto (cabina). Máx 2 personas.',
+    identificacion:  'Cliente debe presentar cédula para apertura vehicular y al solicitar servicios.',
+    autorizacion:    'Servicios NO preprogramados — solo en el momento de la emergencia.',
+    vehiculos_max:   'Máximo 3 vehículos por cliente. Antigüedad máxima 20 años.',
+    cancelacion:     'Cancelación comunica por escrito. Cobro suspende el mes siguiente.',
+    telefono:        '2504-6000',
+  },
+
+  // Sugerencias contextuales por tipo de servicio
+  sugerencias: {
+    grua:    ['Confirmar ubicación exacta (calle, referencia)', 'Preguntar si puede viajar en la grúa', 'Verificar que el vehículo vaya vacío', 'Confirmar destino del remolque', 'Verificar marchamo vigente'],
+    llanta:  ['Confirmar que tiene llanta de repuesto en buen estado', 'Verificar que NO es motocicleta', 'Preguntar si tiene las herramientas (gato, llave)'],
+    bateria: ['Confirmar modelo del vehículo (algunos no permiten paso de corriente)', 'Preguntar si ha intentado arrancar varias veces'],
+    gasolina:['Confirmar que está en vía pública', 'Confirmar tipo de combustible (gasolina/diesel)', 'Informar que pago de gasolina es por tarjeta'],
+    llaves:  ['Confirmar que las llaves están DENTRO del vehículo', 'Pedir cédula del cliente en sitio', 'Verificar que NO es motocicleta'],
+    rescate: ['Solo aplica Plan Premium o Plus', 'Debe ir vinculado a servicio de remolque'],
+    traslado:['Solo si viajan MÁS de 2 personas o autorización especial', 'Máximo 4 personas', 'Solo Plan Premium o Plus'],
+  },
+
+  buscar(texto) {
+    const t = texto.toLowerCase();
+    const alertas = [];
+    this.restricciones.forEach(r => {
+      if(r.keywords.some(k => t.includes(k))) alertas.push(r.alerta);
+    });
+    return alertas;
+  },
+
+  sugerenciasParaServicio(svcId) {
+    return this.sugerencias[svcId] || [];
+  },
+
+  infoServicio(svcId, plan) {
+    const svc = this.servicios[svcId];
+    if(!svc) return null;
+    const p = svc.planes[plan||'basico'];
+    if(!p) return { nombre: svc.nombre, cubierto: false };
+    return { nombre: svc.nombre, cubierto: true, eventos: p.eventos, monto: p.monto };
+  }
+};
+
+/* ── PO Validation Popup ─────────────────────────────── */
+let _pvpDismissed = false;
+let _pvpClosedByUser = false; // permanent for this call
+let _pvpNotaValue = "";
+
+function openPOValidation(){
+  if(_pvpDismissed || _pvpClosedByUser) return;
+  const popup = document.getElementById('po-validate-popup');
+  const fieldsEl = document.getElementById('pvp-fields');
+  const warnEl = document.getElementById('pvp-warn');
+  if(!popup||!fieldsEl) return;
+  // If already open, just update warn status — don't re-render inputs (would reset edits)
+  if(popup.classList.contains('show')){
+    _pvpRefreshStatus();
+    return;
+  }
+  const data = POBuilder.getData();
+  const DEF=[
+    {k:'tipo_asistencia',i:'🔧',l:'Servicio',req:true},
+    {k:'nombre_cliente', i:'👤',l:'Cliente', req:true},
+    {k:'ubicación',      i:'📍',l:'Ubicación',req:true},
+    {k:'placa',          i:'🪪',l:'Placa',   req:false},
+    {k:'marca',          i:'🚗',l:'Marca',   req:false},
+    {k:'modelo',         i:'🔖',l:'Modelo',  req:false},
+    {k:'año',            i:'📅',l:'Año',     req:false},
+    {k:'color',          i:'🎨',l:'Color',   req:false},
+    {k:'ubicacion_destino',i:'🏁',l:'Destino remolque',req:false},
+  ];
+  // Always show nota field (optional)
+  const notaVal = (POBuilder.getData().nota||'');
+  fieldsEl.innerHTML=''; let miss=0;
+  DEF.forEach(f=>{
+    const val=data[f.k];
+    const ok=val&&String(val).trim()&&val!=='N/A';
+    if(!ok&&f.req) miss++;
+    const row=document.createElement('div');
+    row.className='pvp-field '+(ok?'ok':f.req?'miss':'');
+    row.innerHTML='<span class="pvp-field-ico">'+f.i+'</span><div class="pvp-field-info"><div class="pvp-field-lbl">'+f.l+(f.req?' *':'')+'</div><input class="pvp-input'+(ok?'':' empty')+'" data-key="'+f.k+'" value="'+(ok?String(val).replace(/"/g,'&quot;'):'')+'" placeholder="—" oninput="_pvpRefreshStatus()"></div>'+(f.req?'<div class="pvp-status '+(ok?'ok':'miss')+'" id="pvp-st-'+f.k+'">'+(ok?'✓':'✗')+'</div>':'');
+    fieldsEl.appendChild(row);
+  });
+  // Nota field
+  const notaWrap = document.getElementById('pvp-nota-wrap');
+  const notaInp  = document.getElementById('pvp-nota');
+  if(notaInp){ notaInp.value = notaVal; }
+  if(notaWrap){ notaWrap.style.display='flex'; }
+
+  warnEl.classList.toggle('show',miss>0);
+  popup.classList.add('show');
+}
+
+function closePOValidation(byUser){
+  if(byUser){ _pvpDismissed=true; _pvpClosedByUser=true; }
+  const p=document.getElementById('po-validate-popup');
+  if(p) p.classList.remove('show');
+}
+
+function openMapFromField(){
+  const loc=(POBuilder.getData().ubicación)||'';
+  if(!loc){showToast('⚠ Sin ubicación registrada');return;}
+  window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(loc+', Costa Rica'),'_blank');
+}
+function _pvpRefreshStatus(){
+  const REQUIRED = ['tipo_asistencia','nombre_cliente','ubicación'];
+  let allOk = true;
+  document.querySelectorAll('.pvp-input').forEach(inp => {
+    const key = inp.dataset.key;
+    const val = inp.value.trim();
+    const filled = val.length > 0;
+    const st = document.getElementById('pvp-st-'+key);
+    if(st){ st.textContent=filled?'✓':'✗'; st.className='pvp-status '+(filled?'ok':'miss'); }
+    inp.classList.toggle('empty', !filled);
+    if(REQUIRED.includes(key) && !filled) allOk = false;
+  });
+  const warn = document.getElementById('pvp-warn');
+  if(warn) warn.classList.toggle('show', !allOk);
+}
+
+function reopenPOValidation(){
+  _pvpDismissed = false;
+  _pvpClosedByUser = false;
+  openPOValidation();
+}
+
+
+function _renderDrawerCard(po) {
+  const list = document.getElementById('pd-list');
+  const empty = document.getElementById('pd-empty');
+  if (!list) return;
+  if (empty) empty.style.display = 'none';
+  const idx = _poList.length - 1;
+  const card = document.createElement('div');
+  card.className = 'pd-card';
+  card.id = 'pdc_'+po.num;
+  card.onclick = () => openDetail(po.num);
+  card.innerHTML =
+    '<div class="pd-card-top">' +
+      '<span class="pd-card-num">'+po.num+'</span>' +
+      '<span class="pd-card-svc">'+(po.data.tipo_asistencia||'—')+'</span>' +
+      '<span class="pd-card-ts">'+po.ts+'</span>' +
+    '</div>' +
+    '<div class="pd-card-fields">' +
+      (po.data.nombre_cliente?'<span class="pd-card-tag">👤 '+po.data.nombre_cliente+'</span>':'') +
+      (po.data.placa?'<span class="pd-card-tag">🪪 '+po.data.placa+'</span>':'') +
+      (po.data.ubicación?'<span class="pd-card-tag">📍 '+po.data.ubicación+'</span>':'') +
+    '</div>';
+  list.insertBefore(card, list.firstChild);
+}
+
+function updateDrawerCount(){
+  const cnt = document.getElementById('pdh-count');
+  if(cnt) cnt.textContent = _poList.length + ' POs';
+}
+
+/* ══ KB CHECKLIST — dinámico por transcripción ══════════ */
+const KB_CHECKS = {
+  grua: [
+    { id:'ubicacion',    txt:'Confirmar ubicación exacta del vehículo', keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','cañón','frente a','detrás de','costado','cien metros','doscientos'] },
+    { id:'vehiculo',     txt:'Datos del vehículo (placa, marca, modelo)', keywords:['placa','tablilla','marca','modelo','color','año'] },
+    { id:'marchamo',     txt:'Verificar marchamo vigente',               keywords:['marchamo','circulación','al día','vigente','tiene marchamo'] },
+    { id:'destino_orig', txt:'Confirmar ubicación destino (taller)',      keywords:['taller','llevar a','destino','dirección del taller','mecánico','donde lo llevo','me lo lleven a','lo lleven'] },
+    { id:'grua_viaje',   txt:'¿Puede viajar en la cabina de la grúa?',   keywords:['voy en la grúa','viajo en','sí puedo','puedo ir','acompañar','me quedo','alguien de confianza','cabina'] },
+    { id:'vacio',        txt:'Confirmar que el vehículo irá vacío',       keywords:['vacío','nadie adentro','solo yo','sin pasajeros','va vacío'] },
+  ],
+  bat: [
+    { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','frente a'] },
+    { id:'intentos',   txt:'¿Cuántas veces intentó arrancar?',    keywords:['veces','intenté','arrancar','no arranca','probé'] },
+    { id:'modelo',     txt:'Confirmar modelo del vehículo',       keywords:['marca','modelo','año','es un','tengo un'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
+  ],
+  llanta: [
+    { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','ubicación','estoy en','encuentro en','calle','avenida','frente a'] },
+    { id:'repuesto',   txt:'¿Tiene llanta de repuesto?',          keywords:['repuesto','llanta de repuesto','sí tengo','tengo llanta','neumático de repuesto'] },
+    { id:'herramientas',txt:'¿Tiene gato y llave?',              keywords:['gato','llave de rueda','herramientas','sí tengo herramientas'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
+  ],
+  gas: [
+    { id:'ubicacion',  txt:'Confirmar ubicación exacta (vía pública)', keywords:['estoy en','calle','carretera','ruta','autopista','vía','encuentro en'] },
+    { id:'combustible',txt:'Tipo de combustible',                 keywords:['gasolina','diesel','regular','súper','tipo de combustible'] },
+    { id:'tarjeta',    txt:'Informar pago por tarjeta',           keywords:['tarjeta','débito','crédito','pago','informado','enterado'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
+  ],
+  llaves: [
+    { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','estoy en','encuentro en','calle','avenida','frente a'] },
+    { id:'llaves_adentro', txt:'¿Llaves están DENTRO del vehículo?', keywords:['adentro','dentro','sí están','las llaves están','inside','encerradas'] },
+    { id:'cedula',     txt:'Cliente debe presentar cédula',       keywords:['cédula','identificación','documento','id'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
+  ],
+  mec: [
+    { id:'ubicacion',  txt:'Confirmar ubicación exacta',          keywords:['ubicado','estoy en','encuentro en','calle','avenida','frente a'] },
+    { id:'falla',      txt:'Describir la falla del vehículo',     keywords:['falla','problema','ruido','humo','no enciende','no arranca','averío','luz'] },
+    { id:'vehiculo',   txt:'Datos completos del vehículo',        keywords:['placa','tablilla','marca','modelo','color','año'] },
+  ],
+  info: [
+    { id:'nombre',     txt:'Identificar al cliente',              keywords:['nombre','me llamo','soy','cliente','afiliado'] },
+    { id:'consulta',   txt:'Registrar consulta del cliente',      keywords:['pregunta','consulta','quiero saber','me gustaría','información sobre'] },
+  ],
+};
+
+let _kbState = {};   // { itemId: 'pending' | 'done' }
+let _kbSvcId = null;
+
+function initKBChecklist(svcId){
+  if(!KB_CHECKS[svcId]) return;
+  // Clear previous KB pills
+  document.querySelectorAll('.kb-rec').forEach(p=>p.remove());
+  _kbSvcId = svcId;
+  _kbState = {};
+  (KB_CHECKS[svcId]||[]).forEach(c => { _kbState[c.id] = 'pending'; });
+  // Stagger pill appearance
+  const checks = KB_CHECKS[svcId];
+  checks.forEach((c, i) => {
+    setTimeout(() => {
+      if(_kbState[c.id] === 'pending') _showKBPill(c);
+    }, i * 300);
+  });
+}
+
+function checkKBTranscript(transcriptText){
+  if(!_kbSvcId) return;
+  const checks = KB_CHECKS[_kbSvcId] || [];
+  const t = transcriptText.toLowerCase();
+  let changed = false;
+  checks.forEach(c => {
+    if(_kbState[c.id] === 'pending'){
+      if(c.keywords.some(k => t.includes(k))){
+        _kbState[c.id] = 'done';
+        changed = true;
+        _dismissKBPill(c.id);
+      }
+    }
+  });
+  if(changed) _renderKBChecklist();
+}
+
+function _renderKBChecklist(){
+  const checks = KB_CHECKS[_kbSvcId] || [];
+  checks.forEach(c => {
+    if(_kbState[c.id] === 'pending' && !document.getElementById('kbpill_'+c.id)){
+      _showKBPill(c);
+    }
+  });
+}
+
+function _showKBPill(c){
+  const stack = document.getElementById('rec-stack');
+  if(!stack) return;
+  const el = document.createElement('div');
+  el.className = 'rec-toast kb-rec';
+  el.id = 'kbpill_' + c.id;
+  const btn = document.createElement('button');
+  btn.className = 'rec-ck';
+  btn.textContent = '✓';
+  btn.onclick = function(){ _dismissKBPill(c.id); };
+  el.innerHTML =
+    '<span class="rec-ico">📋</span>' +
+    '<div class="rec-body">' +
+      '<div class="rec-lbl">Checklist</div>' +
+      '<div class="rec-txt">' + c.txt + '</div>' +
+    '</div>';
+  el.appendChild(btn);
+  stack.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+}
+
+function _dismissKBPill(itemId){
+  const el = document.getElementById('kbpill_'+itemId);
+  if(!el) return;
+  el.classList.add('done');
+  setTimeout(()=>el.remove(), 850);
+}
+
+function renderKBSugs(sugs){
+  // Legacy — kept for compatibility
+  const el = document.getElementById('kb-sugs');
+  if(!el) return;
+  el.innerHTML = sugs.map(s=>'<div class="kb-sug"><span class="kb-sug-dot"></span><span class="kb-sug-txt">'+s+'</span></div>').join('');
+  document.getElementById('kb-card').style.display='block';
+}
+function showCelebration(done, goal){
+  const ov = document.getElementById('celebrate-ov');
+  const cnt = document.getElementById('cel-count');
+  if(cnt) cnt.textContent = done + '/' + goal;
+  if(ov) ov.classList.add('show');
+  _spawnConfetti();
+}
+
+function closeCelebration(){
+  const ov = document.getElementById('celebrate-ov');
+  if(ov) ov.classList.remove('show');
+  const wrap = document.getElementById('confetti-wrap');
+  if(wrap) wrap.innerHTML = '';
+}
+
+function _spawnConfetti(){
+  const wrap = document.getElementById('confetti-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const colors = ['#bf9455','#6aaa90','#cc7580','#ffffff','#ff5c00','#a0b8ff'];
+  for(let i=0;i<60;i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-p';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.width = (6+Math.random()*6) + 'px';
+    p.style.height = (6+Math.random()*6) + 'px';
+    p.style.borderRadius = Math.random()>.5 ? '50%' : '2px';
+    p.style.animationDuration = (2+Math.random()*3) + 's';
+    p.style.animationDelay = (Math.random()*1.5) + 's';
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
+}
+</script>
+<span class="pvp-title">Confirmar creación de PO</span>
+    <button class="pvp-close" onclick="closePOValidation(true)">✕</button>
+  </div>
+  <div class="pvp-fields" id="pvp-fields"></div>
+  <div class="pvp-nota-wrap" id="pvp-nota-wrap">
+    <div class="pvp-nota-lbl">📝 Nota</div>
+    <textarea class="pvp-nota-ta" id="pvp-nota" placeholder="Observación o instrucción especial..." oninput="_pvpNotaValue=this.value.trim()"></textarea>
+  </div>
+  <div class="pvp-warn" id="pvp-warn">⚠ Campos requeridos incompletos.</div>
+  <div class="pvp-foot">
+    <button class="pvp-btn sec" onclick="closePOValidation(true)">Cancelar</button>
+    <button class="pvp-btn main" onclick="confirmPO()">✦ Crear PO</button>
+  </div>
+</div>
+
+<!-- Celebration overlay -->
+<div class="confetti-wrap" id="confetti-wrap"></div>
+<div class="celebrate-ov" id="celebrate-ov" onclick="closeCelebration()">
+  <div class="celebrate-card" onclick="event.stopPropagation()">
+    <span class="celebrate-star">⭐</span>
+    <div class="celebrate-count" id="cel-count">20/20</div>
+    <div class="celebrate-count-lbl">POs del día</div>
+    <div class="celebrate-title">¡Meta alcanzada!</div>
+    <div class="celebrate-sub">Completaste tu objetivo del día.<br>¡Excelente trabajo, sigue así!</div>
+    <button class="celebrate-close" onclick="closeCelebration()">Continuar</button>
+  </div>
+</div>
+
+<!-- Scripts — order matters -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/po-builder.js"></script>
+<script src="assets/js/agent.js"></script>
+<script src="assets/js/kb.js"></script>
+<script src="assets/js/realtime.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+  // Auth guard — redirect to login if no session
+  const _currentUser = AUTH.guard();
+  if (_currentUser) {
+    // Populate agent name in UI
+    const nameEl = document.getElementById('ag-name');
+    if (nameEl) nameEl.textContent = _currentUser.name.split(' ')[0];
+
+    // Logout button
+    document.getElementById('btn-logout')?.addEventListener('click', () => AUTH.logout());
+
+    // Start app
+    window.addEventListener('DOMContentLoaded', () => {
+      setTheme('light');
+      connectWebPubSub();
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* ═══════════════════════════════════════════════
+   BASE — tokens, reset, layout
+   ═══════════════════════════════════════════════ */
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+
+/* ═══ TOKENS ═══════════════════════════════════════ */
+:root{
+  --a:#ff5c00;   /* orange */
+  --a2:#ff8c44;  /* orange light */
+  --g:#6aaa90;   /* green */
+  --y:#bf9455;   /* yellow */
+  --r:#cc7580;   /* red */
+  --v:#c4a5ff;   /* violet */
+
+  --bg:#080a0f;
+  --c1:#0d1018;
+  --c2:#131620;
+  --c3:#1a1e2c;
+  --c4:#222738;
+
+  --gb:rgba(255,255,255,.055);
+  --gb2:rgba(255,255,255,.1);
+
+  --t0:#ffffff;
+  --t1:#a0a8b8;
+  --t2:#7a8399;
+  --t3:#3a4155;
+
+  --f:'Syne',sans-serif;
+  --m:'JetBrains Mono',monospace;
+}
+body.light{
+  --bg:#eef0f7; --c1:#fff; --c2:#f4f6fb; --c3:#e8eaf4; --c4:#dde0ee;
+  --gb:rgba(0,0,0,.06); --gb2:rgba(0,0,0,.1);
+  --t0:#0d1018; --t1:#3a4266; --t2:#8892b8; --t3:#c8cde8;
+  --a:#e04500; --a2:#ff7733;
+}
+
+body{
+  font-family:var(--f);background:var(--bg);color:var(--t0);
+  -webkit-font-smoothing:antialiased;font-size:14px;
+}
+
+/* mesh glow */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 900px 700px at 10% 15%, rgba(255,92,0,.05) 0%, transparent 65%),
+    radial-gradient(ellipse 700px 900px at 90% 90%, rgba(0,229,160,.03) 0%, transparent 65%),
+    radial-gradient(ellipse 500px 500px at 60% 40%, rgba(196,165,255,.025) 0%, transparent 65%);
+}
+body.light::before{
+  background:radial-gradient(ellipse 900px 700px at 10% 15%, rgba(224,69,0,.04) 0%, transparent 65%);
+}
+
+.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
+
