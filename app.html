@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="cache-control" content="no-cache, no-store"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Helios</title>
 <script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js"></script>
@@ -1706,32 +1705,16 @@ function showToast(msg){
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
-  // Simple session check
-  try {
-    const _sess = JSON.parse(localStorage.getItem('helios_session')||'null');
-    const _valid = _sess && (Date.now() - _sess.ts < 3600000);
-    if(!_valid){ window.location.href='index.html?reason=noauth'; return; }
-    // Set agent name
-    if(_sess.user){
-      const nameEl = document.getElementById('ag-name');
-      if(nameEl) nameEl.textContent = (_sess.user.name||'').split(' ')[0];
-    }
-    // Logout button
-    document.getElementById('btn-logout')?.addEventListener('click',()=>{
-      localStorage.removeItem('helios_session');
-      window.location.href='index.html';
+  try{
+    var _s=JSON.parse(localStorage.getItem('helios_session')||'null');
+    if(!_s||(Date.now()-_s.ts>3600000)){window.location.href='index.html?reason=noauth';return;}
+    var _u=_s.user||{};
+    var _ne=document.getElementById('ag-name');
+    if(_ne&&_u.name)_ne.textContent=_u.name.split(' ')[0];
+    document.getElementById('btn-logout')&&document.getElementById('btn-logout').addEventListener('click',function(){
+      localStorage.removeItem('helios_session');window.location.href='index.html';
     });
-    // Activity watcher - update session timestamp
-    ['click','keydown','touchstart'].forEach(ev=>{
-      document.addEventListener(ev,()=>{
-        try{
-          const s=JSON.parse(localStorage.getItem('helios_session')||'null');
-          if(s){s.ts=Date.now();localStorage.setItem('helios_session',JSON.stringify(s));}
-        }catch{}
-      },{passive:true});
-    });
-  } catch(e){ window.location.href='index.html'; return; }
-  // Start app
+  }catch(e){}
   setTheme('light');
   connectWebPubSub();
 });
