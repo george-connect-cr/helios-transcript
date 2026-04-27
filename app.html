@@ -1294,25 +1294,6 @@ body.light .celebrate-card{
     </div>
     <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
-      <div id="status-wrap" style="position:relative">
-        <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;padding:4px 12px 4px 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);">
-          <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6aaa90;"></div>
-          <span id="status-label">Disponible</span>
-        </button>
-        <div id="status-menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:6px;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:700;max-height:320px;overflow-y:auto;">
-          <div style="font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px 2px;font-family:var(--m);">Estado</div>
-          <div onclick="setStatus('#6aaa90','Disponible')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#6aaa90;flex-shrink:0"></div>🟢 Disponible</div>
-          <div onclick="setStatus('#cc7580','En llamada')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#cc7580;flex-shrink:0"></div>🔴 En llamada</div>
-          <div style="font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:6px 10px 2px;font-family:var(--m);">Pausas</div>
-          <div onclick="setStatus('#bf9455','Baño · 8m')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#bf9455;flex-shrink:0"></div>🚻 Baño<span style="margin-left:auto;font-size:8px;color:var(--t2)">8m</span></div>
-          <div onclick="setStatus('#bf9455','Break · 15m')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#bf9455;flex-shrink:0"></div>☕ Break<span style="margin-left:auto;font-size:8px;color:var(--t2)">15m</span></div>
-          <div onclick="setStatus('#bf9455','Almuerzo · 60m')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#bf9455;flex-shrink:0"></div>🍽 Almuerzo<span style="margin-left:auto;font-size:8px;color:var(--t2)">60m</span></div>
-          <div onclick="setStatus('#a0a8b8','Reunión · 60m')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#a0a8b8;flex-shrink:0"></div>👥 Reunión<span style="margin-left:auto;font-size:8px;color:var(--t2)">60m</span></div>
-          <div onclick="setStatus('#a0a8b8','Capacitación · 30m')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#a0a8b8;flex-shrink:0"></div>📚 Capacitación<span style="margin-left:auto;font-size:8px;color:var(--t2)">30m</span></div>
-          <div onclick="setStatus('#a0a8b8','Back Office')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#a0a8b8;flex-shrink:0"></div>💼 Back Office</div>
-          <div onclick="setStatus('#cc7580','Falla técnica')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--t0);font-family:var(--m);" onmouseover="this.style.background='var(--gb2)'" onmouseout="this.style.background=''"><div style="width:8px;height:8px;border-radius:50%;background:#cc7580;flex-shrink:0"></div>⚠️ Falla técnica</div>
-        </div>
-      </div>
       <button id="btn-logout" title="Cerrar sesión" style="width:32px;height:32px;border-radius:8px;background:var(--gb);border:1px solid var(--gb2);color:var(--t2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--r)';this.style.color='var(--r)'" onmouseleave="this.style.borderColor='var(--gb2)';this.style.color='var(--t2)'">⏻</button>
   </div>
 </nav>
@@ -3105,26 +3086,62 @@ function _spawnConfetti(){
   setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
 }
 
-var _currentStatus='disponible';
+// States — key ones from pause list
+var PAUSAS = [
+  {id:'disponible', label:'Disponible',    color:'#6aaa90', dot:'#6aaa90', icon:'🟢', key:true},
+  {id:'almuerzo',   label:'Almuerzo',       color:'#bf9455', dot:'#bf9455', icon:'🍽️', key:true},
+  {id:'bano',       label:'Baño',           color:'#bf9455', dot:'#bf9455', icon:'🚻', key:true},
+  {id:'break',      label:'Break',          color:'#bf9455', dot:'#bf9455', icon:'☕', key:true},
+  {id:'ocupado',    label:'Ocupado',        color:'#cc7580', dot:'#cc7580', icon:'🔴', key:true},
+  {id:'capacitacion',label:'Capacitación',  color:'#6366f1', dot:'#6366f1', icon:'📚', key:false},
+  {id:'coaching',   label:'Coaching',       color:'#6366f1', dot:'#6366f1', icon:'🎯', key:false},
+  {id:'reunion',    label:'Reunión',        color:'#6366f1', dot:'#6366f1', icon:'👥', key:false},
+  {id:'backoffice', label:'Back Office',    color:'#9ca3af', dot:'#9ca3af', icon:'💼', key:false},
+  {id:'falla',      label:'Falla técnica',  color:'#cc7580', dot:'#cc7580', icon:'⚠️', key:false},
+  {id:'training',   label:'Training',       color:'#6366f1', dot:'#6366f1', icon:'🎓', key:false},
+];
+var _currentStatus = 'disponible';
+
+function _buildStatusMenu(){
+  var menu = document.getElementById('status-menu');
+  if(!menu) return;
+  var key = PAUSAS.filter(function(p){return p.key;});
+  var rest = PAUSAS.filter(function(p){return !p.key;});
+  var html = '<div style="font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px 6px;font-family:var(--m);">Estado</div>';
+  key.forEach(function(p){
+    html += '<div class="status-opt" onclick="setStatus(\''+p.id+'\')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+'</div>';
+  });
+  html += '<div style="height:1px;background:var(--gb2);margin:6px 4px;"></div>';
+  html += '<div style="font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:2px 10px 6px;font-family:var(--m);">Pausas</div>';
+  rest.forEach(function(p){
+    html += '<div class="status-opt" onclick="setStatus(\''+p.id+'\')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+'</div>';
+  });
+  menu.innerHTML = html;
+}
+
 function toggleStatusMenu(){
   var m=document.getElementById('status-menu');
-  var show=m.style.display==='none';
-  m.style.display=show?'block':'none';
-  if(show){
+  _buildStatusMenu();
+  m.classList.toggle('show');
+  if(m.classList.contains('show')){
     setTimeout(function(){
       document.addEventListener('click',function cl(e){
-        if(!document.getElementById('status-wrap').contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}
+        if(!document.getElementById('status-wrap').contains(e.target)){m.classList.remove('show');document.removeEventListener('click',cl);}
       });
     },10);
   }
 }
-function setStatus(color,label){
-  var dot=document.getElementById('status-dot-btn');
-  var lbl=document.getElementById('status-label');
-  if(dot) dot.style.background=color;
-  if(lbl) lbl.textContent=label.split(' ·')[0];
-  document.getElementById('status-menu').style.display='none';
-  showToast(label==='Disponible'?'🟢 Disponible':'⏸ '+label);
+
+function setStatus(id){
+  var p = PAUSAS.find(function(x){return x.id===id;});
+  if(!p) return;
+  _currentStatus = id;
+  var dot = document.getElementById('status-dot-btn');
+  var lbl = document.getElementById('status-label');
+  if(dot){ dot.style.background = p.dot; }
+  if(lbl){ lbl.textContent = p.label; }
+  document.getElementById('status-menu').classList.remove('show');
+  showToast(p.icon+' '+p.label);
 }
 </script>
 
