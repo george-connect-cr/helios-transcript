@@ -7,22 +7,70 @@
 <title>CONNECT · Acceso</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/login.css">
-<!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="assets/js/auth.js"></script>
-<script>
-  // Check if already authenticated — redirect to app
-  window.addEventListener('DOMContentLoaded', () => {
-    const s = AUTH.getSession();
-    if (s) { window.location.href = 'app.html'; return; }
+<style>
+/* Simulated Google button */
+.sim-google-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 24px;border-radius:24px;
+  background:#fff;border:1px solid #dadce0;
+  cursor:pointer;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;
+  color:#3c4043;transition:all .2s;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+  width:100%;justify-content:center;
+  animation:btn-in .4s .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes btn-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sim-google-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,.18);transform:translateY(-1px);}
+.sim-google-btn:active{transform:translateY(0);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.sim-google-btn svg{flex-shrink:0;}
+.sim-google-btn span{flex:1;text-align:left;}
 
-    // Show timeout notice if redirected due to inactivity
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('reason') === 'timeout') {
-      document.getElementById('timeout-notice').style.display = 'block';
-    }
-  });
-</script>
+/* Demo users */
+.demo-users{margin-top:20px;display:flex;flex-direction:column;gap:8px;}
+.demo-user{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:10px;border:1px solid var(--gb2);
+  background:rgba(255,255,255,.03);cursor:pointer;
+  transition:all .15s;
+  animation:btn-in .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.demo-user:nth-child(1){animation-delay:.4s}
+.demo-user:nth-child(2){animation-delay:.5s}
+.demo-user:nth-child(3){animation-delay:.6s}
+.demo-user:hover{border-color:rgba(255,92,0,.3);background:rgba(255,92,0,.04);}
+.demo-avatar{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
+}
+.demo-info{flex:1;min-width:0;}
+.demo-name{font-size:13px;font-weight:600;color:var(--t0);margin-bottom:1px;}
+.demo-email{font-family:var(--m);font-size:10px;color:var(--t2);}
+.demo-role{font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;flex-shrink:0;}
+.demo-role.agent{background:rgba(106,170,144,.1);color:#6aaa90;border:1px solid rgba(106,170,144,.2);}
+.demo-role.super{background:rgba(191,148,85,.1);color:#bf9455;border:1px solid rgba(191,148,85,.2);}
+
+/* Loading state */
+.login-loading{
+  display:none;flex-direction:column;align-items:center;gap:12px;padding:24px;
+}
+.login-loading.show{display:flex;}
+.spin{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid var(--gb2);border-top-color:var(--a);
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-family:var(--m);font-size:11px;color:var(--t2);}
+
+.sim-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--m);font-size:8px;padding:3px 10px;border-radius:20px;
+  background:rgba(191,148,85,.08);color:#bf9455;border:1px solid rgba(191,148,85,.2);
+  margin-bottom:20px;
+}
+</style>
 </head>
 <body>
 
@@ -38,52 +86,100 @@
     ⏱ Tu sesión se cerró por inactividad. Vuelve a iniciar sesión.
   </div>
 
-  <!-- Title -->
-  <div class="login-title">Bienvenido al agente</div>
-  <div class="login-sub">
-    Inicia sesión con tu cuenta corporativa<br>
-    <span>@connect.inc</span> para continuar.
-  </div>
-
-  <div class="login-divider">
-    <div class="login-divider-line"></div>
-    <div class="login-divider-txt">Acceso corporativo</div>
-    <div class="login-divider-line"></div>
-  </div>
-
-  <!-- Google Sign-In button -->
-  <div class="g-signin-wrap">
-    <div id="g_id_onload"
-      data-client_id="YOUR_GOOGLE_CLIENT_ID"
-      data-callback="onGoogleSignIn"
-      data-auto_select="false"
-      data-itp_support="true"
-      data-hd="connect.inc">
+  <div id="login-main">
+    <!-- Title -->
+    <div class="login-title">Bienvenido al agente</div>
+    <div class="login-sub" style="margin-bottom:20px;">
+      Inicia sesión con tu cuenta corporativa<br>
+      <span>@connect.inc</span> para continuar.
     </div>
-    <div class="g_id_signin"
-      data-type="standard"
-      data-size="large"
-      data-theme="outline"
-      data-text="signin_with"
-      data-shape="pill"
-      data-logo_alignment="left"
-      data-width="280">
+
+    <div class="sim-badge">🔧 Modo simulación</div>
+
+    <!-- Simulated Google button -->
+    <button class="sim-google-btn" onclick="showDemoUsers()">
+      <svg width="18" height="18" viewBox="0 0 18 18">
+        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/>
+        <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
+        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/>
+      </svg>
+      <span>Continuar con Google</span>
+    </button>
+
+    <!-- Demo users -->
+    <div class="demo-users" id="demo-users" style="display:none">
+      <div style="font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Selecciona un usuario de demo</div>
+      <div class="demo-user" onclick="loginAs('dayana.garcia@connect.inc','Dayana García','agent')">
+        <div class="demo-avatar" style="background:linear-gradient(135deg,#ff5c00,#ff8c44)">D</div>
+        <div class="demo-info">
+          <div class="demo-name">Dayana García</div>
+          <div class="demo-email">dayana.garcia@connect.inc</div>
+        </div>
+        <div class="demo-role agent">Agente</div>
+      </div>
+      <div class="demo-user" onclick="loginAs('carlos.mora@connect.inc','Carlos Mora','agent')">
+        <div class="demo-avatar" style="background:linear-gradient(135deg,#6aaa90,#4a8a72)">C</div>
+        <div class="demo-info">
+          <div class="demo-name">Carlos Mora</div>
+          <div class="demo-email">carlos.mora@connect.inc</div>
+        </div>
+        <div class="demo-role agent">Agente</div>
+      </div>
+      <div class="demo-user" onclick="loginAs('ana.vega@connect.inc','Ana Vega','super')">
+        <div class="demo-avatar" style="background:linear-gradient(135deg,#bf9455,#a67c45)">A</div>
+        <div class="demo-info">
+          <div class="demo-name">Ana Vega</div>
+          <div class="demo-email">ana.vega@connect.inc</div>
+        </div>
+        <div class="demo-role super">Supervisora</div>
+      </div>
     </div>
   </div>
 
-  <!-- Error message -->
+  <!-- Loading state -->
+  <div class="login-loading" id="login-loading">
+    <div class="spin"></div>
+    <div class="loading-txt">Verificando credenciales...</div>
+  </div>
+
+  <!-- Error -->
   <div class="login-error" id="auth-error"></div>
 
-  <div class="login-footer">
+  <div class="login-footer" style="margin-top:24px;">
     Solo cuentas <strong>@connect.inc</strong> tienen acceso.<br>
     <a href="mailto:soporte@connect.inc">¿Problemas? Contactar soporte</a>
   </div>
 </div>
 
 <script>
-  function onGoogleSignIn(response) {
-    AUTH.handleCredential(response);
+window.addEventListener('DOMContentLoaded', () => {
+  const s = AUTH.getSession();
+  if (s) { window.location.href = 'app.html'; return; }
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('reason') === 'timeout') {
+    document.getElementById('timeout-notice').style.display = 'block';
   }
+});
+
+function showDemoUsers() {
+  document.getElementById('demo-users').style.display = 'flex';
+  document.getElementById('demo-users').style.flexDirection = 'column';
+}
+
+function loginAs(email, name, role) {
+  // Show loading
+  document.getElementById('login-main').style.display = 'none';
+  document.getElementById('login-loading').classList.add('show');
+
+  // Simulate auth delay
+  setTimeout(() => {
+    const user = { email, name, role, picture: '' };
+    const session = { user, ts: Date.now() };
+    localStorage.setItem('helios_session', JSON.stringify(session));
+    window.location.href = 'app.html';
+  }, 1200);
+}
 </script>
 </body>
 </html>

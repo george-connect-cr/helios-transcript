@@ -1847,14 +1847,21 @@ function _spawnConfetti(){
   const _currentUser = AUTH.guard();
   if (_currentUser) {
     // Populate agent name in UI
-    const nameEl = document.getElementById('ag-name');
-    if (nameEl) nameEl.textContent = _currentUser.name.split(' ')[0];
+    document.addEventListener('DOMContentLoaded', () => {
+      const nameEl = document.getElementById('ag-name');
+      if (nameEl) nameEl.textContent = _currentUser.name.split(' ')[0];
 
-    // Logout button
-    document.getElementById('btn-logout')?.addEventListener('click', () => AUTH.logout());
+      const emailEl = document.getElementById('ag-email');
+      if (emailEl) emailEl.textContent = _currentUser.email;
 
-    // Start app
-    window.addEventListener('DOMContentLoaded', () => {
+      const avEl = document.getElementById('ag-avatar-letter');
+      if (avEl) avEl.textContent = _currentUser.name.charAt(0).toUpperCase();
+
+      // Logout button
+      const logoutBtn = document.getElementById('btn-logout');
+      if (logoutBtn) logoutBtn.addEventListener('click', () => AUTH.logout());
+
+      // Start app
       setTheme('light');
       connectWebPubSub();
     });
