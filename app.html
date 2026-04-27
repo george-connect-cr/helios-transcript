@@ -812,23 +812,24 @@ body.light .agent-strip{
 /* ── PO Validation Popup ─────────────────────────────── */
 .po-validate-popup{
   position:fixed;
-  bottom:80px;right:20px;
+  top:52px;right:0;
+  bottom:0;
   width:340px;
-  max-height:calc(100vh - 100px);
+  max-height:none;
   display:flex;flex-direction:column;
   background:rgba(30,35,50,.98);
   border:1px solid rgba(255,255,255,.12);
   border-top:2px solid var(--a);
-  border-radius:14px;
+  border-radius:0;
   backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);
-  box-shadow:0 16px 48px rgba(0,0,0,.5);
-  z-index:18;
-  transform:translateY(20px);opacity:0;pointer-events:none;
+  box-shadow:-4px 0 24px rgba(0,0,0,.3);
+  z-index:19;
+  transform:translateX(20px);opacity:0;pointer-events:none;
   transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
 }
 .po-validate-popup.show{
-  transform:translateY(0);opacity:1;pointer-events:all;
+  transform:translateX(0);opacity:1;pointer-events:all;
 }
 body.light .po-validate-popup{
   background:rgba(255,255,255,.97);
