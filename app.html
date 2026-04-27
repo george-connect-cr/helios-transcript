@@ -812,9 +812,9 @@ body.light .agent-strip{
 /* ── PO Validation Popup ─────────────────────────────── */
 .po-validate-popup{
   position:fixed;
-  bottom:80px;right:20px;
+  bottom:20px;right:355px;
   width:340px;
-  max-height:calc(100vh - 100px);
+  max-height:calc(100vh - 80px);
   display:flex;flex-direction:column;
   background:rgba(30,35,50,.98);
   border:1px solid rgba(255,255,255,.12);
@@ -3084,72 +3084,6 @@ function _spawnConfetti(){
     wrap.appendChild(p);
   }
   setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
-}
-
-// ── Status / Pausas ──────────────────────────────────
-var PAUSAS = [
-  {id:'disponible',  label:'Disponible',    color:'#6aaa90', key:true,  icon:'🟢'},
-  {id:'almuerzo',    label:'Almuerzo',       color:'#bf9455', key:true,  icon:'🍽️'},
-  {id:'bano',        label:'Baño',           color:'#bf9455', key:true,  icon:'🚻'},
-  {id:'break',       label:'Break',          color:'#bf9455', key:true,  icon:'☕'},
-  {id:'ocupado',     label:'Ocupado',        color:'#cc7580', key:true,  icon:'🔴'},
-  {id:'capacitacion',label:'Capacitación',   color:'#6366f1', key:false, icon:'📚'},
-  {id:'coaching',    label:'Coaching',       color:'#6366f1', key:false, icon:'🎯'},
-  {id:'reunion',     label:'Reunión',        color:'#6366f1', key:false, icon:'👥'},
-  {id:'backoffice',  label:'Back Office',    color:'#9ca3af', key:false, icon:'💼'},
-  {id:'falla',       label:'Falla técnica',  color:'#cc7580', key:false, icon:'⚠️'},
-  {id:'training',    label:'Training',       color:'#6366f1', key:false, icon:'🎓'},
-  {id:'maternidad',  label:'Maternidad',     color:'#c084fc', key:false, icon:'🤱'},
-  {id:'meeting',     label:'Meeting',        color:'#6366f1', key:false, icon:'📅'},
-  {id:'outbound',    label:'Outbound',       color:'#9ca3af', key:false, icon:'📞'},
-];
-var _currentStatus = 'disponible';
-
-function _buildStatusMenu(){
-  var menu = document.getElementById('status-menu');
-  if(!menu) return;
-  var key = PAUSAS.filter(function(p){return p.key;});
-  var rest = PAUSAS.filter(function(p){return !p.key;});
-  var html = '<div class="status-sec">Estado</div>';
-  key.forEach(function(p){
-    var active = _currentStatus === p.id ? 'background:var(--c2);' : '';
-    html += '<div class="status-opt" onclick="setStatus(\''+p.id+'\',\''+p.color+'\',\''+p.label+'\',\''+p.icon+'\')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(p.id===_currentStatus?' ✓':'')+'</div>';
-  });
-  html += '<div class="status-sep"></div><div class="status-sec">Pausas</div>';
-  rest.forEach(function(p){
-    html += '<div class="status-opt" onclick="setStatus(\''+p.id+'\',\''+p.color+'\',\''+p.label+'\',\''+p.icon+'\')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(p.id===_currentStatus?' ✓':'')+'</div>';
-  });
-  menu.innerHTML = html;
-}
-
-function toggleStatusMenu(){
-  var m = document.getElementById('status-menu');
-  if(!m) return;
-  _buildStatusMenu();
-  var isOpen = m.style.display !== 'none' && m.style.display !== '';
-  m.style.display = isOpen ? 'none' : 'block';
-  if(!isOpen){
-    setTimeout(function(){
-      document.addEventListener('click', function closeM(e){
-        var wrap = document.getElementById('status-wrap');
-        if(wrap && !wrap.contains(e.target)){
-          m.style.display = 'none';
-          document.removeEventListener('click', closeM);
-        }
-      });
-    }, 10);
-  }
-}
-
-function setStatus(id, color, label, icon){
-  _currentStatus = id;
-  var dot = document.getElementById('status-dot-btn');
-  var lbl = document.getElementById('status-label');
-  var menu = document.getElementById('status-menu');
-  if(dot) dot.style.background = color;
-  if(lbl) lbl.textContent = label;
-  if(menu) menu.style.display = 'none';
-  if(typeof showToast === 'function') showToast(icon + ' ' + label);
 }
 </script>
 
