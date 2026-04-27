@@ -1441,7 +1441,18 @@ body.light .celebrate-card{
         <div class="dash-sec-lbl">Recomendaciones</div>
         <div class="dash-recs" id="dash-recs"></div>
         <div class="dash-sec-lbl">Speech compliance</div>
-        <div class="dash-speech-detail"const CONFIG={
+        <div class="dash-speech-detail" id="dash-speech-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="sfanalyzing" style="display:none"></div>
+<div id="sfwrap" style="display:none"></div>
+<div id="bubbles-section" style="display:none"></div>
+<div id="insight" style="display:none"><div id="insighttxt"></div></div>
+
+<script>const CONFIG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
@@ -1695,18 +1706,16 @@ function showToast(msg){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// Auth guard
-const _currentUser = AUTH.guard();
-if (_currentUser) {
+// Auth guard — redirect to login if no valid session
+const _currentUser = (typeof AUTH !== 'undefined') ? AUTH.guard() : null;
+if(_currentUser || typeof AUTH === 'undefined'){
   window.addEventListener('DOMContentLoaded', ()=>{
     setTheme('light');
     connectWebPubSub();
-    // Set agent name from session
     const nameEl = document.getElementById('ag-name');
-    if(nameEl) nameEl.textContent = _currentUser.name.split(' ')[0];
-    // Logout button
+    if(nameEl && _currentUser) nameEl.textContent = _currentUser.name.split(' ')[0];
     const logoutBtn = document.getElementById('btn-logout');
-    if(logoutBtn) logoutBtn.addEventListener('click', ()=> AUTH.logout());
+    if(logoutBtn) logoutBtn.addEventListener('click', ()=> AUTH && AUTH.logout());
   });
 }
 
@@ -3051,15 +3060,6 @@ function _spawnConfetti(){
     p.style.left = Math.random()*100 + 'vw';
     p.style.background = colors[Math.floor(Math.random()*colors.length)];
     p.style.width = (6+Math.random()*6) + 'px';
-    p.style.height = (6+Math.random()*6) + 'px';
-    p.style.borderRadius = Math.random()>.5 ? '50%' : '2px';
-    p.style.animationDuration = (2+Math.random()*3) + 's';
-    p.style.animationDelay = (Math.random()*1.5) + 's';
-    wrap.appendChild(p);
-  }
-  setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
-}
-6+Math.random()*6) + 'px';
     p.style.height = (6+Math.random()*6) + 'px';
     p.style.borderRadius = Math.random()>.5 ? '50%' : '2px';
     p.style.animationDuration = (2+Math.random()*3) + 's';
