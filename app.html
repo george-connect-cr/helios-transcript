@@ -5,7 +5,6 @@
 <meta http-equiv="cache-control" content="no-cache, no-store"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Helios</title>
-<script src="assets/js/auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -1706,18 +1705,36 @@ function showToast(msg){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// Auth guard — redirect to login if no valid session
-const _currentUser = (typeof AUTH !== 'undefined') ? AUTH.guard() : null;
-if(_currentUser || typeof AUTH === 'undefined'){
-  window.addEventListener('DOMContentLoaded', ()=>{
-    setTheme('light');
-    connectWebPubSub();
-    const nameEl = document.getElementById('ag-name');
-    if(nameEl && _currentUser) nameEl.textContent = _currentUser.name.split(' ')[0];
-    const logoutBtn = document.getElementById('btn-logout');
-    if(logoutBtn) logoutBtn.addEventListener('click', ()=> AUTH && AUTH.logout());
-  });
-}
+window.addEventListener('DOMContentLoaded', ()=>{
+  // Simple session check
+  try {
+    const _sess = JSON.parse(localStorage.getItem('helios_session')||'null');
+    const _valid = _sess && (Date.now() - _sess.ts < 3600000);
+    if(!_valid){ window.location.href='index.html?reason=noauth'; return; }
+    // Set agent name
+    if(_sess.user){
+      const nameEl = document.getElementById('ag-name');
+      if(nameEl) nameEl.textContent = (_sess.user.name||'').split(' ')[0];
+    }
+    // Logout button
+    document.getElementById('btn-logout')?.addEventListener('click',()=>{
+      localStorage.removeItem('helios_session');
+      window.location.href='index.html';
+    });
+    // Activity watcher - update session timestamp
+    ['click','keydown','touchstart'].forEach(ev=>{
+      document.addEventListener(ev,()=>{
+        try{
+          const s=JSON.parse(localStorage.getItem('helios_session')||'null');
+          if(s){s.ts=Date.now();localStorage.setItem('helios_session',JSON.stringify(s));}
+        }catch{}
+      },{passive:true});
+    });
+  } catch(e){ window.location.href='index.html'; return; }
+  // Start app
+  setTheme('light');
+  connectWebPubSub();
+});
 
 function triggerDemo(){ AgentBar.setDemo(); triggerSmartFill(); }
 let _poList = [];
