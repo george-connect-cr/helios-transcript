@@ -1268,6 +1268,13 @@ body.light .celebrate-card{
 }
 .t-scroll-arrow.show{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
 .t-scroll-arrow:hover{background:var(--a2);}
+.status-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--m);font-size:11px;color:var(--t0);transition:background .12s;}
+.status-opt:hover{background:var(--c2);}
+.status-opt .sd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.status-sep{height:1px;background:var(--gb2);margin:4px;}
+.status-sec{font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;font-family:var(--m);}
+body.light .status-opt{color:var(--t0);}
+body.light .status-opt:hover{background:var(--c2);}
 </style>
 </head>
 <body>
@@ -1294,6 +1301,13 @@ body.light .celebrate-card{
     </div>
     <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
+      <div style="position:relative" id="status-wrap">
+        <button id="status-btn" onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;padding:5px 12px 5px 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);transition:all .15s;white-space:nowrap;">
+          <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6aaa90;flex-shrink:0;"></div>
+          <span id="status-label">Disponible</span>
+        </button>
+        <div id="status-menu" style="position:absolute;top:calc(100% + 8px);right:0;background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:6px;min-width:185px;max-height:380px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:700;display:none;"></div>
+      </div>
       <button id="btn-logout" title="Cerrar sesión" style="width:32px;height:32px;border-radius:8px;background:var(--gb);border:1px solid var(--gb2);color:var(--t2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--r)';this.style.color='var(--r)'" onmouseleave="this.style.borderColor='var(--gb2)';this.style.color='var(--t2)'">⏻</button>
   </div>
 </nav>
@@ -3084,64 +3098,6 @@ function _spawnConfetti(){
     wrap.appendChild(p);
   }
   setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
-}
-
-// States — key ones from pause list
-var PAUSAS = [
-  {id:'disponible', label:'Disponible',    color:'#6aaa90', dot:'#6aaa90', icon:'🟢', key:true},
-  {id:'almuerzo',   label:'Almuerzo',       color:'#bf9455', dot:'#bf9455', icon:'🍽️', key:true},
-  {id:'bano',       label:'Baño',           color:'#bf9455', dot:'#bf9455', icon:'🚻', key:true},
-  {id:'break',      label:'Break',          color:'#bf9455', dot:'#bf9455', icon:'☕', key:true},
-  {id:'ocupado',    label:'Ocupado',        color:'#cc7580', dot:'#cc7580', icon:'🔴', key:true},
-  {id:'capacitacion',label:'Capacitación',  color:'#6366f1', dot:'#6366f1', icon:'📚', key:false},
-  {id:'coaching',   label:'Coaching',       color:'#6366f1', dot:'#6366f1', icon:'🎯', key:false},
-  {id:'reunion',    label:'Reunión',        color:'#6366f1', dot:'#6366f1', icon:'👥', key:false},
-  {id:'backoffice', label:'Back Office',    color:'#9ca3af', dot:'#9ca3af', icon:'💼', key:false},
-  {id:'falla',      label:'Falla técnica',  color:'#cc7580', dot:'#cc7580', icon:'⚠️', key:false},
-  {id:'training',   label:'Training',       color:'#6366f1', dot:'#6366f1', icon:'🎓', key:false},
-];
-var _currentStatus = 'disponible';
-
-function _buildStatusMenu(){
-  var menu = document.getElementById('status-menu');
-  if(!menu) return;
-  var key = PAUSAS.filter(function(p){return p.key;});
-  var rest = PAUSAS.filter(function(p){return !p.key;});
-  var html = '<div style="font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px 6px;font-family:var(--m);">Estado</div>';
-  key.forEach(function(p){
-    html += '<div class="status-opt" onclick="setStatus(\''+p.id+'\')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+'</div>';
-  });
-  html += '<div style="height:1px;background:var(--gb2);margin:6px 4px;"></div>';
-  html += '<div style="font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:2px 10px 6px;font-family:var(--m);">Pausas</div>';
-  rest.forEach(function(p){
-    html += '<div class="status-opt" onclick="setStatus(\''+p.id+'\')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+'</div>';
-  });
-  menu.innerHTML = html;
-}
-
-function toggleStatusMenu(){
-  var m=document.getElementById('status-menu');
-  _buildStatusMenu();
-  m.classList.toggle('show');
-  if(m.classList.contains('show')){
-    setTimeout(function(){
-      document.addEventListener('click',function cl(e){
-        if(!document.getElementById('status-wrap').contains(e.target)){m.classList.remove('show');document.removeEventListener('click',cl);}
-      });
-    },10);
-  }
-}
-
-function setStatus(id){
-  var p = PAUSAS.find(function(x){return x.id===id;});
-  if(!p) return;
-  _currentStatus = id;
-  var dot = document.getElementById('status-dot-btn');
-  var lbl = document.getElementById('status-label');
-  if(dot){ dot.style.background = p.dot; }
-  if(lbl){ lbl.textContent = p.label; }
-  document.getElementById('status-menu').classList.remove('show');
-  showToast(p.icon+' '+p.label);
 }
 </script>
 
