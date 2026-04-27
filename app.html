@@ -812,10 +812,9 @@ body.light .agent-strip{
 /* ── PO Validation Popup ─────────────────────────────── */
 .po-validate-popup{
   position:fixed;
-  top:62px;right:0;
-  bottom:60px;
+  bottom:80px;right:20px;
   width:340px;
-  max-height:none;
+  max-height:calc(100vh - 100px);
   display:flex;flex-direction:column;
   background:rgba(30,35,50,.98);
   border:1px solid rgba(255,255,255,.12);
@@ -824,7 +823,7 @@ body.light .agent-strip{
   backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);
   box-shadow:0 16px 48px rgba(0,0,0,.5);
-  z-index:600;
+  z-index:18;
   transform:translateY(20px);opacity:0;pointer-events:none;
   transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
 }
