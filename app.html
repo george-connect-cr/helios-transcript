@@ -812,24 +812,23 @@ body.light .agent-strip{
 /* ── PO Validation Popup ─────────────────────────────── */
 .po-validate-popup{
   position:fixed;
-  top:52px;right:0;
-  bottom:0;
+  bottom:80px;right:20px;
   width:340px;
-  max-height:none;
+  max-height:calc(100vh - 100px);
   display:flex;flex-direction:column;
   background:rgba(30,35,50,.98);
   border:1px solid rgba(255,255,255,.12);
   border-top:2px solid var(--a);
-  border-radius:0;
+  border-radius:14px;
   backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);
-  box-shadow:-4px 0 24px rgba(0,0,0,.3);
-  z-index:19;
-  transform:translateX(20px);opacity:0;pointer-events:none;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+  z-index:600;
+  transform:translateY(20px);opacity:0;pointer-events:none;
   transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
 }
 .po-validate-popup.show{
-  transform:translateX(0);opacity:1;pointer-events:all;
+  transform:translateY(0);opacity:1;pointer-events:all;
 }
 body.light .po-validate-popup{
   background:rgba(255,255,255,.97);
@@ -1269,6 +1268,7 @@ body.light .celebrate-card{
 }
 .t-scroll-arrow.show{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
 .t-scroll-arrow:hover{background:var(--a2);}
+.status-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--m);font-size:11px;color:var(--t0);transition:background .12s;}.status-opt:hover{background:var(--c2);}.status-opt .sd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}.status-sep{height:1px;background:var(--gb2);margin:4px;}.status-sec{font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;font-family:var(--m);}body.light .status-opt{color:var(--t0);}body.light .status-opt:hover{background:#f0ede8;}
 </style>
 </head>
 <body>
@@ -1295,6 +1295,7 @@ body.light .celebrate-card{
     </div>
     <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
+      <div style="position:relative" id="status-wrap"><button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);white-space:nowrap;"><div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6aaa90;flex-shrink:0;transition:background .3s;"></div><span id="status-label">Disponible</span></button><div id="status-menu" style="position:absolute;top:calc(100% + 8px);right:0;background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:6px;min-width:185px;max-height:360px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:21;display:none;"></div></div>
       <button id="btn-logout" title="Cerrar sesión" style="width:32px;height:32px;border-radius:8px;background:var(--gb);border:1px solid var(--gb2);color:var(--t2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--r)';this.style.color='var(--r)'" onmouseleave="this.style.borderColor='var(--gb2)';this.style.color='var(--t2)'">⏻</button>
   </div>
 </nav>
@@ -3086,6 +3087,12 @@ function _spawnConfetti(){
   }
   setTimeout(()=>{ if(wrap) wrap.innerHTML=''; }, 6000);
 }
+
+var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'coaching',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'},{id:'training',label:'Training',color:'#6366f1',key:false,icon:'🎓'},{id:'meeting',label:'Meeting',color:'#6366f1',key:false,icon:'📅'},{id:'outbound',label:'Outbound',color:'#9ca3af',key:false,icon:'📞'}];
+var _currentStatus='disponible';
+function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;var h='<div class="status-sec">Estado</div>';PAUSAS.filter(function(p){return p.key;}).forEach(function(p){h+='<div class="status-opt" onclick="setStatus(''+p.id+'',''+p.color+'',''+p.label+'',''+p.icon+'')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(p.id===_currentStatus?' ✓':'')+'</div>';});h+='<div class="status-sep"></div><div class="status-sec">Pausas</div>';PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){h+='<div class="status-opt" onclick="setStatus(''+p.id+'',''+p.color+'',''+p.label+'',''+p.icon+'')"><div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(p.id===_currentStatus?' ✓':'')+'</div>';});m.innerHTML=h;}
+function toggleStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;_buildStatusMenu();var open=m.style.display==='block';m.style.display=open?'none':'block';if(!open){setTimeout(function(){document.addEventListener('click',function cl(e){var w=document.getElementById('status-wrap');if(w&&!w.contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}});},10);}}
+function setStatus(id,color,label,icon){_currentStatus=id;var dot=document.getElementById('status-dot-btn');var lbl=document.getElementById('status-label');var menu=document.getElementById('status-menu');if(dot)dot.style.background=color;if(lbl)lbl.textContent=label;if(menu)menu.style.display='none';if(typeof showToast==='function')showToast(icon+' '+label);}
 </script>
 
 <!-- PO Validation Popup — auto-appears when required fields complete -->
