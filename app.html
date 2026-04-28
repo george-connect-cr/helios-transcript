@@ -608,10 +608,10 @@ body.light .toast{background:rgba(255,255,255,.96);color:var(--t0);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
 /* ═══ DASHBOARD ════════════════════════════════════ */
-.dash-ov{position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;overflow:hidden;}
+.dash-ov{position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;overflow:hidden;height:100vh;}
 .dash-ov.show{display:flex;animation:fi .22s ease;}
 .dash-head{
-  height:56px;padding:0 36px;display:flex;align-items:center;justify-content:space-between;
+  height:56px;flex-shrink:0;padding:0 36px;display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--gb);
   background:rgba(13,16,24,.7);backdrop-filter:blur(20px);flex-shrink:0;position:relative;
 }
@@ -623,7 +623,7 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
 .dash-head-sub{font-family:var(--m);font-size:10px;color:var(--t2);margin-top:2px;}
 .dash-close{height:34px;padding:0 16px;background:var(--gb);border:1px solid var(--gb2);border-radius:8px;color:var(--t1);font-size:12px;font-family:var(--f);cursor:pointer;transition:all .2s;}
 .dash-close:hover{border-color:var(--gb2);color:var(--t0);}
-.dash-body{flex:1;overflow-y:auto;padding:36px 44px;display:flex;flex-direction:column;gap:28px;max-width:1360px;width:100%;margin:0 auto;}
+.dash-body{flex:1;min-height:0;overflow-y:auto;padding:36px 44px;display:flex;flex-direction:column;gap:28px;max-width:1360px;width:100%;margin:0 auto;}
 .dash-body::-webkit-scrollbar{width:4px;}.dash-body::-webkit-scrollbar-thumb{background:var(--gb2);border-radius:4px;}
 /* Score hero */
 .dash-score-card{
@@ -1463,8 +1463,8 @@ body.light .status-opt:hover{background:#f5f5f5;}
   </div>
 </div></div><!-- /dtab-dia-content -->
 
-  <div id="dtab-rep-content" style="display:none;flex:1;min-height:0;overflow:hidden;">
-    <div style="display:flex;height:100%;overflow:hidden;">
+  <div id="dtab-rep-content" style="display:none;flex:1;min-height:0;overflow:hidden;flex-direction:row;">
+    <div style="display:flex;width:100%;height:100%;overflow:hidden;">
       <div id="rep-sb" style="width:180px;min-width:180px;border-right:1px solid rgba(255,255,255,.08);padding:10px 0;overflow-y:auto;flex-shrink:0;"></div>
       <div style="flex:1;overflow-y:auto;padding:16px;min-width:0;">
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(255,255,255,.06);">
@@ -3145,11 +3145,12 @@ function switchDashTab(tab){
     if(ttl)ttl.textContent='Análisis del día';
   }else{
     if(dia)dia.style.display='none';
-    if(rep){rep.style.display='flex';rep.style.flex='1';rep.style.overflow='hidden';rep.style.minHeight='0';}
+    if(rep){rep.style.cssText='display:flex;flex:1;overflow:hidden;min-height:0;flex-direction:column;';}
     if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.4)';bDia.style.borderColor='rgba(255,255,255,.06)';}
     if(bRep){bRep.style.background='rgba(255,255,255,.1)';bRep.style.color='#fff';bRep.style.borderColor='rgba(255,255,255,.15)';}
     if(ttl)ttl.textContent='Reportes & Analytics';
-    renderRepSb();renderRepView(_repView);
+    renderRepSb();
+    renderRepView(_repView);
   }
 }
 function renderRepSb(){
