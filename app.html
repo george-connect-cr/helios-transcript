@@ -3237,7 +3237,11 @@ function switchDashTab(tab){
     if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.4)';bDia.style.borderColor='rgba(255,255,255,.06)';}
     if(bRep){bRep.style.background='rgba(255,255,255,.1)';bRep.style.color='var(--t0)';bRep.style.borderColor='rgba(255,255,255,.15)';bRep.style.boxShadow='none';}
     if(ttl)ttl.textContent='Reportes & Analytics';
-    renderRepSb();renderRepView(_repView);
+    renderRepSb();
+    renderRepView(_repView);
+    // Always show content even with empty data
+    var rc=document.getElementById('rep-content');
+    if(rc&&!rc.innerHTML.trim())renderRepView('resumen');
   }
 }
 
@@ -3358,7 +3362,25 @@ function repAgSel(){
   var sel=document.createElement('select');sel.id='rep-ag-sel';sel.style.cssText='margin-bottom:12px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:11px;width:220px;';
   sel.innerHTML='<option value="">Seleccionar agente...</option>'+RA.map(function(a){return'<option value="'+a.name+'">'+a.name+'</option>';}).join('');
   sel.onchange=function(){repShowAg(this.value);};
-  var det=document.createElement('div');det.id='rep-ag-det';det.innerHTML='<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-family:var(--m);font-size:12px;">Selecciona un agente</div>';
+  var det=document.createElement('div');det.id='rep-ag-det';
+  det.innerHTML='<div style="padding:24px 0;">'+
+    '<div style="display:grid;grid-template-columns:190px 1fr;gap:12px;">'+
+      '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;text-align:center;">'+
+        '<div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);margin:0 auto 10px;"></div>'+
+        '<div style="width:80px;height:10px;background:rgba(255,255,255,.06);border-radius:3px;margin:0 auto 6px;"></div>'+
+        '<div style="width:40px;height:24px;background:rgba(255,255,255,.04);border-radius:3px;margin:10px auto 4px;"></div>'+
+        '<div style="width:50px;height:8px;background:rgba(255,255,255,.04);border-radius:3px;margin:0 auto;"></div>'+
+      '</div>'+
+      '<div>'+
+        '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:10px;">'+
+          [1,2,3].map(function(){return '<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="width:60px;height:8px;background:rgba(255,255,255,.04);border-radius:3px;flex:1;"></div><div style="width:40px;height:8px;background:rgba(255,255,255,.06);border-radius:3px;"></div></div>';}).join('')+
+        '</div>'+
+        '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;">'+
+          '<div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);text-align:center;padding:8px;">Selecciona un agente para ver su perfil</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
   var wrap=document.createElement('div');wrap.appendChild(sel);wrap.appendChild(det);return wrap.innerHTML;
 }
 
