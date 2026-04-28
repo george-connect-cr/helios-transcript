@@ -3163,7 +3163,260 @@ function renderRepSb(){
     d.onclick=function(){renderRepView(this.getAttribute('data-view'));};
     sb.appendChild(d);
   });
-}</script>
+}
+function renderRepView(v){
+  _repView=v; renderRepSb();
+  var c=document.getElementById('rep-content'); if(!c)return;
+  var ag=getRepF();
+  if(v==='resumen')         c.innerHTML=repResumen(ag);
+  else if(v==='agentes')    c.innerHTML=repTable(ag);
+  else if(v==='supervisor') c.innerHTML=repSup(ag);
+  else if(v==='formador')   c.innerHTML=repForm();
+  else if(v==='agente_v')   c.innerHTML=repAgSel();
+  else if(v==='feedback')   c.innerHTML=repFb();
+  else if(v==='coaching')   c.innerHTML=repCoach();
+}
+
+function getRepF(){
+  var fa=(document.getElementById('rf-agente')||{}).value||'';
+  var fc=(document.getElementById('rf-carril')||{}).value||'';
+  var fp=(document.getElementById('rf-pais')||{}).value||'';
+  var fcu=(document.getElementById('rf-cuenta')||{}).value||'';
+  var f=RA.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});
+  return f.length?f:RA;
+}
+function applyRepFilters(){renderRepView(_repView);}
+
+function _rc(v){return v>=85?'var(--g)':v>=70?'var(--y)':'var(--r)';}
+function _rScore(a){
+  var bg=a.grade==='A'?'rgba(106,170,144,.15)':a.grade==='B'?'rgba(191,148,85,.15)':'rgba(204,117,128,.15)';
+  var c=a.grade==='A'?'var(--g)':a.grade==='B'?'var(--y)':'var(--r)';
+  return '<span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:20px;border-radius:5px;font-family:var(--m);font-size:10px;font-weight:700;background:'+bg+';color:'+c+';">'+a.score+'</span>';
+}
+function _rBar(v){
+  var c=_rc(v);
+  return '<div style="width:60px;height:3px;background:var(--gb2);border-radius:2px;overflow:hidden;margin-top:2px;"><div style="height:100%;width:'+v+'%;background:'+c+'"></div></div>';
+}
+var _cC={Home:'#6366f1',Road:'var(--g)',Concierge:'var(--y)'};
+var _pC={'Costa Rica':'var(--r)','Panamá':'var(--y)','Guatemala':'var(--g)','Honduras':'var(--t2)'};
+
+function repResumen(ag){
+  var tot={calls:0,pos:0,sat:0,sp:0,sc:0};
+  ag.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;});
+  var n=ag.length||1;
+  var kpis=[['Llamadas',tot.calls,'▲12%'],['POs',tot.pos,'▲8%'],['Satisfacción',Math.round(tot.sat/n)+'%','▲2%'],['Speech',Math.round(tot.sp/n)+'%','▲5%'],['Score',Math.round(tot.sc/n),'▲3%']];
+  var out='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';
+  kpis.forEach(function(k){
+    out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;">'+
+      '<div style="font-family:var(--m);font-size:22px;font-weight:600;color:var(--t0);letter-spacing:-.02em;line-height:1;">'+k[1]+'</div>'+
+      '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">'+k[0]+'</div>'+
+      '<div style="font-family:var(--m);font-size:9px;color:var(--g);margin-top:4px;">'+k[2]+'</div>'+
+    '</div>';
+  });
+  out+='</div>';
+  out+='<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Resumen por agente</div>';
+  out+=repTable(ag);
+  return out;
+}
+
+function repTable(ag){
+  var ths=['Agente','Carril','País','Llamadas','AHT','Satisf.','Speech','Score'].map(function(x){
+    return '<th style="padding:8px 12px;text-align:left;font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;">'+x+'</th>';
+  }).join('');
+  var trs=ag.map(function(a){
+    var sc=_rc(a.sat); var sp=_rc(a.speech);
+    return '<tr style="border-bottom:1px solid var(--gb);">'+
+      '<td style="padding:9px 12px;"><div style="display:flex;align-items:center;gap:9px;">'+
+        '<div style="width:28px;height:28px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">'+a.letter+'</div>'+
+        '<div><div style="font-size:12px;font-weight:600;color:var(--t0);">'+a.name+'</div>'+
+        '<div style="font-family:var(--m);font-size:9px;color:var(--t2);">'+a.carril+' · '+a.pais+'</div></div>'+
+      '</div></td>'+
+      '<td style="padding:9px 12px;"><span style="font-family:var(--m);font-size:9px;padding:2px 8px;border-radius:20px;background:var(--gb);color:var(--t1);border:1px solid var(--gb2);">'+a.carril+'</span></td>'+
+      '<td style="padding:9px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">'+a.calls+'</td>'+
+      '<td style="padding:9px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">'+a.aht+'</td>'+
+      '<td style="padding:9px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:'+sc+';">'+a.sat+'%</div>'+_rBar(a.sat)+'</td>'+
+      '<td style="padding:9px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:'+sp+';">'+a.speech+'%</div></td>'+
+      '<td style="padding:9px 12px;">'+_rScore(a)+'</td>'+
+    '</tr>';
+  }).join('');
+  return '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;overflow:hidden;">'+
+    '<table style="width:100%;border-collapse:collapse;">'+
+    '<thead><tr style="background:var(--c2);">'+ths+'</tr></thead>'+
+    '<tbody>'+trs+'</tbody></table></div>';
+}
+
+function repSup(ag){
+  var tc={pos:'var(--g)',neg:'var(--r)',neu:'var(--y)'};
+  var out=RP.map(function(p){
+    var c=tc[p.type];
+    var label=p.type==='pos'?'Positivo':p.type==='neg'?'Atención':'Neutro';
+    return '<div style="background:var(--c1);border:1px solid var(--gb2);border-left:3px solid '+c+';border-radius:10px;padding:14px;margin-bottom:10px;">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
+        '<span style="font-size:16px;">'+p.icon+'</span>'+
+        '<span style="font-size:13px;font-weight:600;color:var(--t0);flex:1;">'+p.title+'</span>'+
+        '<span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:'+c+';border:1px solid var(--gb2);">'+label+'</span>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:4px;">'+p.desc+'</div>'+
+      '<div style="font-family:var(--m);font-size:9px;color:var(--t2);">👥 '+p.agents+'</div>'+
+    '</div>';
+  }).join('');
+  var sorted=ag.slice().sort(function(a,b){return b.score-a.score;});
+  out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;">'+
+    '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Ranking del equipo</div>';
+  sorted.forEach(function(a,i){
+    var mc=i===0?'#bf9455':i===1?'#9ca3af':i===2?'#a67c45':'var(--t3)';
+    out+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gb);">'+
+      '<span style="font-family:var(--m);font-size:11px;font-weight:700;width:18px;color:'+mc+';">'+(i+1)+'</span>'+
+      '<div style="width:24px;height:24px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">'+a.letter+'</div>'+
+      '<span style="flex:1;font-size:12px;color:var(--t0);">'+a.name+'</span>'+
+      _rScore(a)+_rBar(a.score)+
+    '</div>';
+  });
+  out+='</div>';
+  return out;
+}
+
+function repForm(){
+  var opps=[
+    {a:'Protocolo de apertura',imp:'alto',ag:'Luis Arias, María Solano, Andrés Fallas',d:'Estandarizar saludo y preguntas clave en primeros 45 segundos.'},
+    {a:'Comunicación de ETA',imp:'alto',ag:'Carlos Mora, Luis Arias, Andrés Fallas',d:'Confirmar ETA antes de cerrar TODAS las llamadas.'},
+    {a:'Clientes molestos',imp:'medio',ag:'Luis Arias, María Solano',d:'Técnicas de desescalada y lenguaje empático.'}
+  ];
+  var iC={alto:'var(--r)',medio:'var(--y)',bajo:'var(--g)'};
+  var out='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">';
+  out+='<div><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Oportunidades</div>';
+  opps.forEach(function(o){
+    out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:12px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">'+
+        '<span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+o.a+'</span>'+
+        '<span style="font-family:var(--m);font-size:8px;color:'+iC[o.imp]+';">'+o.imp+'</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--t1);margin-bottom:3px;">'+o.d+'</div>'+
+      '<div style="font-family:var(--m);font-size:9px;color:var(--t2);">'+o.ag+'</div>'+
+    '</div>';
+  });
+  out+='</div><div>';
+  out+='<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Planes activos</div>';
+  RC.forEach(function(p){
+    var col=p.pct>=70?'var(--g)':p.pct>=40?'var(--y)':'var(--r)';
+    out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:12px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;margin-bottom:4px;">'+
+        '<span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+p.agent+'</span>'+
+        '<span style="font-family:var(--m);font-size:12px;font-weight:700;color:'+col+';">'+p.pct+'%</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--t1);margin-bottom:6px;">'+p.obj+'</div>'+
+      '<div style="height:4px;background:var(--gb2);border-radius:2px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+p.pct+'%;background:'+col+'"></div>'+
+      '</div>'+
+      '<div style="font-family:var(--m);font-size:9px;color:var(--t2);margin-top:4px;">Coach: '+p.coach+' · '+p.dl+'</div>'+
+    '</div>';
+  });
+  out+='</div></div>';
+  return out;
+}
+
+function repAgSel(){
+  var opts=RA.map(function(a){return'<option value="'+a.name+'">'+a.name+'</option>';}).join('');
+  return '<select id="rep-ag-sel" onchange="repShowAg(this.value)" style="margin-bottom:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--gb2);background:var(--c1);color:var(--t0);font-family:var(--m);font-size:12px;width:240px;cursor:pointer;">'+
+    '<option value="">Seleccionar agente...</option>'+opts+
+    '</select>'+
+    '<div id="rep-ag-det" style="padding:32px;text-align:center;font-family:var(--m);font-size:11px;color:var(--t2);">Selecciona un agente para ver su perfil</div>';
+}
+
+function repShowAg(name){
+  var a=RA.find(function(x){return x.name===name;});
+  var d=document.getElementById('rep-ag-det');
+  if(!d||!a)return;
+  var af=RF.filter(function(f){return f.agent===a.name;});
+  var ap=RC.find(function(p){return p.agent===a.name;});
+  d.innerHTML='<div style="display:grid;grid-template-columns:200px 1fr;gap:14px;">'+
+    '<div>'+
+      '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:16px;text-align:center;margin-bottom:10px;">'+
+        '<div style="width:48px;height:48px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;margin:0 auto 10px;">'+a.letter+'</div>'+
+        '<div style="font-size:14px;font-weight:700;color:var(--t0);margin-bottom:2px;">'+a.name+'</div>'+
+        '<div style="font-size:30px;font-weight:700;font-family:var(--m);color:var(--t0);letter-spacing:-.02em;margin:8px 0 2px;">'+a.score+'</div>'+
+        '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;">Score total</div>'+
+      '</div>'+
+      '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:12px;">'+
+        [['Llamadas',a.calls,''],['POs',a.pos,''],['AHT',a.aht,''],['Satisfacción',a.sat,'%'],['Speech',a.speech,'%']].map(function(m){
+          return '<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid var(--gb);">'+
+            '<span style="flex:1;font-size:11px;color:var(--t1);">'+m[0]+'</span>'+
+            '<span style="font-family:var(--m);font-size:12px;font-weight:600;color:var(--t0);">'+m[1]+m[2]+'</span>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+    '<div>'+
+      '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;margin-bottom:10px;">'+
+        '<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:10px;">Observaciones recibidas</div>'+
+        (af.length?af.map(function(f){
+          var pc=f.priority==='alta'?'var(--r)':f.priority==='media'?'var(--y)':'var(--g)';
+          return '<div style="padding:8px 0;border-bottom:1px solid var(--gb);">'+
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">'+
+              '<div style="width:7px;height:7px;border-radius:50%;background:'+pc+';flex-shrink:0;"></div>'+
+              '<span style="font-family:var(--m);font-size:9px;color:var(--t2);">'+f.by+' · '+f.role+' · '+f.date+'</span>'+
+              '<span style="margin-left:auto;font-family:var(--m);font-size:8px;padding:1px 7px;border-radius:20px;background:var(--gb);color:'+pc+';border:1px solid var(--gb2);">'+f.priority+'</span>'+
+            '</div>'+
+            '<div style="font-size:12px;color:var(--t1);line-height:1.6;">'+f.text+'</div>'+
+            '<div style="margin-top:5px;">'+f.tags.map(function(t){return'<span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:var(--t2);border:1px solid var(--gb2);margin-right:4px;">'+t+'</span>';}).join('')+'</div>'+
+          '</div>';
+        }).join(''):'<div style="font-size:11px;color:var(--t2);padding:8px 0;">Sin observaciones</div>')+
+      '</div>'+
+      (ap?
+        '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;">'+
+          '<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:6px;">Plan de coaching activo</div>'+
+          '<div style="font-size:12px;color:var(--t1);margin-bottom:8px;">🎯 '+ap.obj+'</div>'+
+          '<div style="height:5px;background:var(--gb2);border-radius:3px;overflow:hidden;margin-bottom:4px;">'+
+            '<div style="height:100%;width:'+ap.pct+'%;background:var(--g)"></div>'+
+          '</div>'+
+          '<div style="font-family:var(--m);font-size:9px;color:var(--t2);">'+ap.pct+'% completado · '+ap.coach+' · Plazo: '+ap.dl+'</div>'+
+        '</div>'
+      :'<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;text-align:center;font-size:11px;color:var(--t2);">Sin plan activo ✓</div>')+
+    '</div>'+
+  '</div>';
+}
+
+function repFb(){
+  return RF.map(function(f){
+    var pc=f.priority==='alta'?'var(--r)':f.priority==='media'?'var(--y)':'var(--g)';
+    var a=RA.find(function(x){return x.name===f.agent;})||{color:'#9ca3af',letter:'?'};
+    return '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;margin-bottom:10px;">'+
+      '<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">'+
+        '<div style="width:30px;height:30px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">'+a.letter+'</div>'+
+        '<div>'+
+          '<div style="font-size:13px;font-weight:600;color:var(--t0);">'+f.agent+'</div>'+
+          '<div style="font-family:var(--m);font-size:9px;color:var(--t2);">'+f.by+' · '+f.role+' · '+f.date+'</div>'+
+        '</div>'+
+        '<span style="margin-left:auto;font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:'+pc+';border:1px solid var(--gb2);">'+f.priority.toUpperCase()+'</span>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:7px;">'+f.text+'</div>'+
+      '<div>'+f.tags.map(function(t){return'<span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:var(--t2);border:1px solid var(--gb2);margin-right:4px;">'+t+'</span>';}).join('')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function repCoach(){
+  return RC.map(function(p){
+    var col=p.pct>=70?'var(--g)':p.pct>=40?'var(--y)':'var(--r)';
+    var a=RA.find(function(x){return x.name===p.agent;})||{color:'#9ca3af',letter:'?'};
+    return '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;margin-bottom:10px;">'+
+      '<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">'+
+        '<div style="width:30px;height:30px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">'+a.letter+'</div>'+
+        '<div>'+
+          '<div style="font-size:13px;font-weight:600;color:var(--t0);">'+p.agent+'</div>'+
+          '<div style="font-family:var(--m);font-size:9px;color:var(--t2);">Coach: '+p.coach+' · Plazo: '+p.dl+'</div>'+
+        '</div>'+
+        '<div style="margin-left:auto;font-family:var(--m);font-size:18px;font-weight:700;color:'+col+';">'+p.pct+'%</div>'+
+      '</div>'+
+      '<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:6px;">🎯 '+p.obj+'</div>'+
+      '<div style="height:5px;background:var(--gb2);border-radius:3px;overflow:hidden;margin-bottom:8px;">'+
+        '<div style="height:100%;width:'+p.pct+'%;background:'+col+'"></div>'+
+      '</div>'+
+      p.acts.map(function(ac){return'<div style="font-size:11px;color:var(--t1);padding:2px 0;">→ '+ac+'</div>';}).join('')+
+    '</div>';
+  }).join('');
+}
+</script>
 
 <!-- PO Validation Popup — auto-appears when required fields complete -->
 <div class="po-validate-popup" id="po-validate-popup">
