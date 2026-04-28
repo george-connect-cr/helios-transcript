@@ -1269,6 +1269,17 @@ body.light .celebrate-card{
 .t-scroll-arrow:hover{background:var(--a2);}
 .status-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--m);font-size:11px;color:var(--t0);transition:background .1s;}.status-opt:hover{background:var(--c2);}.status-opt .sd{width:6px;height:6px;border-radius:50%;flex-shrink:0;}.status-sep{height:1px;background:var(--gb);margin:3px 0;}.status-sec{font-family:var(--m);font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:var(--t2);padding:4px 10px;}
 body.light .status-opt:hover{background:#f5f5f5;}
+
+/* Call popup when in reportes mode */
+.dash-ov.rep-mode .dash-call-overlay{
+  position:fixed;bottom:20px;right:20px;
+  width:320px;background:var(--c1);
+  border:1px solid var(--gb2);border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.15);
+  z-index:210;padding:16px;
+  animation:slideUpIn .2s ease;
+}
+@keyframes slideUpIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -1293,7 +1304,7 @@ body.light .status-opt:hover{background:#f5f5f5;}
       <button class="n-to" id="th-dark" onclick="setTheme('dark')" title="Modo oscuro">🌙</button>
       <button class="n-to on" id="th-light" onclick="setTheme('light')" title="Modo claro">☀️</button>
     </div>
-    <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
+    <button class="n-dash" onclick="openDashboard('rep')" title="Reportes & Analytics">📊</button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
     <div style="position:relative" id="status-wrap">
       <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);">
@@ -3124,9 +3135,18 @@ function toggleStatusMenu(){var m=document.getElementById("status-menu");if(!m)r
 function setStatus(id,color,label,icon){_curStatus=id;var d=document.getElementById("status-dot-btn");var l=document.getElementById("status-label");if(d)d.style.background=color;if(l)l.textContent=label;var m=document.getElementById("status-menu");if(m)m.style.display="none";showToast(icon+" "+label);}
 
 var _dashTab='dia',_repView='resumen';
-var RA=[{id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',pais:'Costa Rica',cuenta:'CallCenter',calls:187,pos:142,aht:'3:52',sat:92,speech:96,score:91,grade:'A'},{id:2,name:'Carlos Mora',letter:'C',color:'#6aaa90',carril:'Road',pais:'Costa Rica',cuenta:'SODAC',calls:164,pos:118,aht:'4:31',sat:84,speech:88,score:83,grade:'B'},{id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',cuenta:'CallCenter',calls:201,pos:167,aht:'3:44',sat:95,speech:98,score:94,grade:'A'},{id:4,name:'Luis Arias',letter:'L',color:'#4a8a72',carril:'Home',pais:'Costa Rica',cuenta:'PausasCC',calls:143,pos:98,aht:'5:12',sat:71,speech:79,score:72,grade:'C'},{id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',cuenta:'SODAC',calls:178,pos:134,aht:'4:05',sat:88,speech:91,score:87,grade:'B'},{id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:156,pos:121,aht:'4:22',sat:82,speech:86,score:81,grade:'B'},{id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',cuenta:'PausasCC',calls:132,pos:89,aht:'5:44',sat:68,speech:74,score:68,grade:'C'},{id:8,name:'José Quesada',letter:'J',color:'#0ea5e9',carril:'Road',pais:'Panamá',cuenta:'SODAC',calls:169,pos:128,aht:'4:18',sat:86,speech:90,score:85,grade:'B'}];
-var RF=[{agent:'Dayana García',by:'Ana Vega',role:'Supervisora',date:'23 abr',text:'Excelente manejo del cliente molesto. Lenguaje empático y resolución rápida.',tags:['Empatía','Resolución'],priority:'baja'},{agent:'Luis Arias',by:'Roberto Salas',role:'Supervisor',date:'22 abr',text:'AHT elevado. Demora en confirmar ubicación. Requiere refuerzo en protocolo.',tags:['AHT','Protocolo'],priority:'alta'},{agent:'Carlos Mora',by:'Ana Vega',role:'Supervisora',date:'21 abr',text:'Buen desempeño. No siempre comunica ETA antes de despedirse.',tags:['ETA','Cierre'],priority:'media'},{agent:'María Solano',by:'Roberto Salas',role:'Supervisor',date:'21 abr',text:'Speech bajo 74%. Omite saludo en 4 de 10 llamadas.',tags:['Speech','Saludo'],priority:'alta'}];
-var RC=[{agent:'Luis Arias',obj:'Reducir AHT a menos de 4:30',acts:['Preguntas clave en primeros 60s','Role-play apertura'],dl:'30 abr',pct:35,coach:'Roberto Salas'},{agent:'María Solano',obj:'Speech compliance al 90%',acts:['5 grabaciones/semana','Sesión con formador'],dl:'5 may',pct:20,coach:'Ana Vega'},{agent:'Carlos Mora',obj:'Comunicar ETA en 100% llamadas',acts:['Checklist visual','Feedback diario'],dl:'28 abr',pct:60,coach:'Roberto Salas'}];
+var RA=[
+  {id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',    pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},
+  {id:2,name:'Carlos Mora',  letter:'C',color:'#6aaa90',carril:'Road',    pais:'Costa Rica',cuenta:'SODAC',     calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},
+  {id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',   cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},
+  {id:4,name:'Luis Arias',   letter:'L',color:'#4a8a72',carril:'Home',    pais:'Costa Rica',cuenta:'PausasCC', calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},
+  {id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',    pais:'Guatemala', cuenta:'SODAC',     calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},
+  {id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},
+  {id:7,name:'María Solano', letter:'M',color:'#8b5cf6',carril:'Home',    pais:'Honduras',  cuenta:'PausasCC', calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},
+  {id:8,name:'José Quesada', letter:'J',color:'#0ea5e9',carril:'Road',    pais:'Panamá',    cuenta:'SODAC',     calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'}
+];
+var RF=[];
+var RC=[];
 var RP=[{icon:'📉',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},{icon:'⭐',title:'Alto rendimiento Concierge',type:'pos',desc:'Satisfacción +90% y speech +94% consistentes.',agents:'Valeria Núñez, Andrés Fallas'},{icon:'⚠️',title:'Omisión de ETA',type:'neg',desc:'40% de agentes no comunican ETA al cerrar.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},{icon:'📈',title:'Mejora en speech',type:'pos',desc:'Speech compliance +8% en 2 semanas.',agents:'Dayana García, Sofía Ramírez'}];
 var RM=[{id:'resumen',i:'📊',l:'Resumen'},{id:'agentes',i:'🎧',l:'Agentes'},{id:'supervisor',i:'📈',l:'Supervisor'},{id:'formador',i:'🎓',l:'Formador'},{id:'agente_v',i:'👤',l:'Por Agente'},{id:'feedback',i:'💬',l:'Feedback'},{id:'coaching',i:'🎯',l:'Coaching'}];
 
