@@ -1300,8 +1300,7 @@ body.light .status-opt:hover{background:#f0ede8;}
       <button class="n-to on" id="th-light" onclick="setTheme('light')" title="Modo claro">☀️</button>
     </div>
     <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
-    <button class="n-demo" onclick="window.location.href='reportes.html'" title="Reportes & Analytics" style="background:var(--gb);border-color:var(--gb2);color:var(--t1);">📊 Reportes</button>
-      <button class="n-demo" onclick="triggerDemo()">Demo</button>
+    <button class="n-demo" onclick="triggerDemo()">Demo</button>
       <div style="position:relative" id="status-wrap">
         <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);white-space:nowrap;">
           <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6aaa90;flex-shrink:0;transition:background .3s;"></div>
@@ -3138,6 +3137,209 @@ function setStatus(id,color,label,icon){
   if(lbl)lbl.textContent=label;
   document.getElementById("status-menu").style.display="none";
   if(typeof showToast==="function")showToast(icon+" "+label);
+}
+
+var _dashTab='dia';
+var _repView='resumen';
+var REP_AGENTS=[
+  {id:1,name:"Dayana García",letter:"D",color:"#ff5c00",carril:"Home",    pais:"Costa Rica",cuenta:"CallCenter",calls:187,pos:142,aht:"3:52",sat:92,speech:96,score:91,grade:"A"},
+  {id:2,name:"Carlos Mora",  letter:"C",color:"#6aaa90",carril:"Road",    pais:"Costa Rica",cuenta:"SODAC",     calls:164,pos:118,aht:"4:31",sat:84,speech:88,score:83,grade:"B"},
+  {id:3,name:"Valeria Núñez",letter:"V",color:"#cc7580",carril:"Concierge",pais:"Panamá",   cuenta:"CallCenter",calls:201,pos:167,aht:"3:44",sat:95,speech:98,score:94,grade:"A"},
+  {id:4,name:"Luis Arias",   letter:"L",color:"#4a8a72",carril:"Home",    pais:"Costa Rica",cuenta:"PausasCC", calls:143,pos:98, aht:"5:12",sat:71,speech:79,score:72,grade:"C"},
+  {id:5,name:"Sofía Ramírez",letter:"S",color:"#bf9455",carril:"Road",    pais:"Guatemala", cuenta:"SODAC",     calls:178,pos:134,aht:"4:05",sat:88,speech:91,score:87,grade:"B"},
+  {id:6,name:"Andrés Fallas",letter:"A",color:"#6366f1",carril:"Concierge",pais:"Costa Rica",cuenta:"CallCenter",calls:156,pos:121,aht:"4:22",sat:82,speech:86,score:81,grade:"B"},
+  {id:7,name:"María Solano", letter:"M",color:"#8b5cf6",carril:"Home",    pais:"Honduras",  cuenta:"PausasCC", calls:132,pos:89, aht:"5:44",sat:68,speech:74,score:68,grade:"C"},
+  {id:8,name:"José Quesada", letter:"J",color:"#0ea5e9",carril:"Road",    pais:"Panamá",    cuenta:"SODAC",     calls:169,pos:128,aht:"4:18",sat:86,speech:90,score:85,grade:"B"}
+];
+var REP_FEEDBACK=[
+  {agent:"Dayana García",by:"Ana Vega",role:"Supervisora",date:"23 abr",text:"Excelente manejo del cliente molesto. Lenguaje empático y resolución rápida.",tags:["Empatía","Resolución"],priority:"baja"},
+  {agent:"Luis Arias",by:"Roberto Salas",role:"Supervisor",date:"22 abr",text:"AHT elevado. Demora en confirmar ubicación. Requiere refuerzo en protocolo.",tags:["AHT","Protocolo"],priority:"alta"},
+  {agent:"Carlos Mora",by:"Ana Vega",role:"Supervisora",date:"21 abr",text:"Buen desempeño. No siempre comunica ETA antes de despedirse.",tags:["ETA","Cierre"],priority:"media"},
+  {agent:"María Solano",by:"Roberto Salas",role:"Supervisor",date:"21 abr",text:"Speech compliance bajo (74%). Omite saludo en 4 de 10 llamadas.",tags:["Speech","Saludo"],priority:"alta"}
+];
+var REP_PATTERNS=[
+  {icon:"📉",title:"AHT elevado en carril Road",type:"neg",desc:"3 agentes muestran AHT 18% por encima del objetivo.",agents:"Carlos Mora, Luis Arias, José Quesada"},
+  {icon:"⭐",title:"Alto rendimiento en Concierge",type:"pos",desc:"Satisfacción +90% y speech +94% consistentemente.",agents:"Valeria Núñez, Andrés Fallas"},
+  {icon:"⚠️",title:"Omisión de ETA",type:"neg",desc:"40% de agentes no comunican ETA. Patrón en turno tarde.",agents:"Carlos Mora, Luis Arias, Andrés Fallas"},
+  {icon:"📈",title:"Mejora en speech",type:"pos",desc:"Speech compliance +8% en últimas 2 semanas.",agents:"Dayana García, Sofía Ramírez"}
+];
+var REP_COACHING=[
+  {agent:"Luis Arias",  objective:"Reducir AHT a menos de 4:30", actions:["Preguntas clave en primeros 60s","Role-play de apertura"],deadline:"30 abr",progress:35,coach:"Roberto Salas"},
+  {agent:"María Solano",objective:"Speech compliance al 90%",      actions:["5 grabaciones propias/semana","Sesión con formador"],   deadline:"5 may", progress:20,coach:"Ana Vega"},
+  {agent:"Carlos Mora", objective:"Comunicar ETA en 100% llamadas",actions:["Checklist visual","Feedback diario"],                    deadline:"28 abr",progress:60,coach:"Roberto Salas"}
+];
+
+function switchDashTab(tab){
+  _dashTab=tab;
+  var dia=document.querySelector(".dash-body");
+  var rep=document.getElementById("dtab-content-reportes");
+  var btnDia=document.getElementById("dtab-dia");
+  var btnRep=document.getElementById("dtab-reportes");
+  var title=document.getElementById("dash-view-title");
+  if(tab==="dia"){
+    if(dia)dia.style.display="";
+    if(rep){rep.style.display="none";}
+    if(btnDia){btnDia.style.background="rgba(255,255,255,.12)";btnDia.style.color="#fff";}
+    if(btnRep){btnRep.style.background="transparent";btnRep.style.color="rgba(255,255,255,.5)";}
+    if(title)title.textContent="Análisis del día";
+  }else{
+    if(dia)dia.style.display="none";
+    if(rep){rep.style.display="flex";rep.style.flex="1";rep.style.overflow="hidden";}
+    if(btnDia){btnDia.style.background="transparent";btnDia.style.color="rgba(255,255,255,.5)";}
+    if(btnRep){btnRep.style.background="rgba(255,255,255,.12)";btnRep.style.color="#fff";}
+    if(title)title.textContent="Reportes & Analytics";
+    renderRepSidebar();
+    renderRepView(_repView);
+  }
+}
+
+var REP_MENU=[{id:"resumen",icon:"📊",label:"Resumen"},{id:"agentes",icon:"🎧",label:"Agentes"},{id:"supervisor",icon:"📈",label:"Supervisor"},{id:"formador",icon:"🎓",label:"Formador"},{id:"agente_v",icon:"👤",label:"Por Agente"},{id:"feedback",icon:"💬",label:"Feedback"},{id:"coaching",icon:"🎯",label:"Coaching"}];
+
+function renderRepSidebar(){
+  var sb=document.getElementById("rep-sidebar");
+  if(!sb)return;
+  sb.innerHTML=REP_MENU.map(function(it){
+    var a=_repView===it.id;
+    return "<div onclick="renderRepView('"+it.id+"')" style="display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:11px;font-weight:"+(a?"600":"400")+";color:"+(a?"var(--a)":"rgba(255,255,255,.6)")+";border-left:2px solid "+(a?"var(--a)":"transparent")+";background:"+(a?"rgba(255,92,0,.06)":"transparent")+";transition:all .12s;"><span style="font-size:13px;">"+it.icon+"</span>"+it.label+"</div>";
+  }).join("");
+}
+
+function renderRepView(v){
+  _repView=v;renderRepSidebar();
+  var c=document.getElementById("rep-content");if(!c)return;
+  var agents=getRepFiltered();
+  if(v==="resumen")   c.innerHTML=repResumen(agents);
+  else if(v==="agentes")   c.innerHTML=repAgentesTable(agents);
+  else if(v==="supervisor")c.innerHTML=repSupervisor(agents);
+  else if(v==="formador")  c.innerHTML=repFormador();
+  else if(v==="agente_v")  c.innerHTML=repAgenteSelector();
+  else if(v==="feedback")  c.innerHTML=repFeedback();
+  else if(v==="coaching")  c.innerHTML=repCoaching();
+}
+
+function getRepFiltered(){
+  var fa=document.getElementById("rf-agente")?.value||"";
+  var fc=document.getElementById("rf-carril")?.value||"";
+  var fp=document.getElementById("rf-pais")?.value||"";
+  var fcu=document.getElementById("rf-cuenta")?.value||"";
+  return REP_AGENTS.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});
+}
+function applyRepFilters(){renderRepView(_repView);}
+
+function _rTag(a,t){
+  var C={Home:"#6366f1",Road:"#6aaa90",Concierge:"#bf9455","Costa Rica":"#cc7580","Panamá":"#bf9455","Guatemala":"#6aaa90","Honduras":"#9ca3af"};
+  var v=t==="carril"?a.carril:a.pais;
+  return "<span style="font-family:var(--m);font-size:8px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:"+(C[v]||"#fff")+";border:1px solid currentColor;">"+v+"</span>";
+}
+function _rScore(a){
+  var C={A:"rgba(106,170,144,.2)",B:"rgba(191,148,85,.2)",C:"rgba(204,117,128,.2)"};
+  var T={A:"#6aaa90",B:"#bf9455",C:"#cc7580"};
+  return "<span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:20px;border-radius:5px;font-family:var(--m);font-size:10px;font-weight:700;background:"+C[a.grade]+";color:"+T[a.grade]+";">"+a.score+"</span>";
+}
+function _rBar(v,c){
+  var col=c||(v>=85?"#6aaa90":v>=70?"#bf9455":"#cc7580");
+  return "<div style="width:80px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;"><div style="height:100%;width:"+v+"%;background:"+col+";border-radius:4px;"></div></div>";
+}
+
+function repResumen(agents){
+  var total={calls:0,pos:0,sat:0,speech:0,score:0};
+  agents.forEach(function(a){total.calls+=a.calls;total.pos+=a.pos;total.sat+=a.sat;total.speech+=a.speech;total.score+=a.score;});
+  var n=agents.length||1;
+  var kpis=[["Llamadas",total.calls,"▲ 12%"],["POs",total.pos,"▲ 8%"],["Satisfacción",Math.round(total.sat/n)+"%","▲ 2%"],["Speech",Math.round(total.speech/n)+"%","▲ 5%"],["Score prom.",Math.round(total.score/n),"▲ 3%"]];
+  var html="<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;">";
+  kpis.forEach(function(k){html+="<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;"><div style="font-family:var(--m);font-size:20px;font-weight:700;color:var(--t0);">"+k[1]+"</div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;">"+k[0]+"</div><div style="font-family:var(--m);font-size:9px;color:#6aaa90;margin-top:4px;">"+k[2]+"</div></div>";});
+  return html+"</div>"+repAgentesTable(agents);
+}
+
+function repAgentesTable(agents){
+  if(!agents.length)return"<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-family:var(--m);font-size:12px;">Sin agentes para los filtros seleccionados</div>";
+  var rows=agents.map(function(a){
+    var sC=a.sat>=90?"#6aaa90":a.sat>=80?"#bf9455":"#cc7580";
+    var spC=a.speech>=90?"#6aaa90":a.speech>=80?"#bf9455":"#cc7580";
+    return "<tr style="border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;" onclick="renderRepView('agente_v');setTimeout(function(){var s=document.getElementById('rep-agent-sel');if(s){s.value='"+a.name+"';repShowAgent('"+a.name+"');}},100);">"+
+      "<td style="padding:8px 12px;"><div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">"+a.letter+"</div><div style="font-size:12px;font-weight:600;color:var(--t0);">"+a.name+"</div></div></td>"+
+      "<td style="padding:8px 12px;">"+_rTag(a,"carril")+"</td>"+
+      "<td style="padding:8px 12px;">"+_rTag(a,"pais")+"</td>"+
+      "<td style="padding:8px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">"+a.calls+"</td>"+
+      "<td style="padding:8px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">"+a.aht+"</td>"+
+      "<td style="padding:8px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:"+sC+";">"+a.sat+"%</div>"+_rBar(a.sat,sC)+"</td>"+
+      "<td style="padding:8px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:"+spC+";">"+a.speech+"%</div></td>"+
+      "<td style="padding:8px 12px;">"+_rScore(a)+"</td>"+
+    "</tr>";
+  }).join("");
+  var heads=["Agente","Carril","País","Llamadas","AHT","Satisf.","Speech","Score"].map(function(h){return "<th style="padding:8px 12px;text-align:left;font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;">"+h+"</th>";}).join("");
+  return "<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:rgba(255,255,255,.04);">"+heads+"</tr></thead><tbody>"+rows+"</tbody></table></div>";
+}
+
+function repSupervisor(agents){
+  var tc={pos:"#6aaa90",neg:"#cc7580",neu:"#bf9455"};
+  var html=REP_PATTERNS.map(function(p){return"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span>"+p.icon+"</span><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">"+p.title+"</span><span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.06);color:"+tc[p.type]+";">"+(p.type==="pos"?"Positivo":p.type==="neg"?"Atención":"Neutro")+"</span></div><div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.6;margin-bottom:4px;">"+p.desc+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">👥 "+p.agents+"</div></div>";}).join("");
+  var sorted=agents.slice().sort(function(a,b){return b.score-a.score;});
+  html+="<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:10px;">Ranking del equipo</div>";
+  sorted.forEach(function(a,i){
+    var col=i===0?"#bf9455":i===1?"#9ca3af":i===2?"#a67c45":"rgba(255,255,255,.3)";
+    html+="<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="font-family:var(--m);font-size:11px;font-weight:700;width:18px;color:"+col+"">"+(i+1)+"</div><div style="width:22px;height:22px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">"+a.letter+"</div><div style="flex:1;font-size:11px;color:var(--t0);">"+a.name+"</div>"+_rScore(a)+_rBar(a.score)+"</div>";
+  });
+  return html+"</div>";
+}
+
+function repFormador(){
+  var opps=[{area:"Protocolo de apertura",impact:"alto",agents:"Luis Arias, María Solano, Andrés Fallas",desc:"Estandarizar saludo y preguntas clave en primeros 45 segundos."},{area:"Comunicación de ETA",impact:"alto",agents:"Carlos Mora, Luis Arias, Andrés Fallas",desc:"Confirmar tiempo estimado antes de cerrar TODAS las llamadas."},{area:"Manejo de clientes molestos",impact:"medio",agents:"Luis Arias, María Solano",desc:"Técnicas de desescalada y lenguaje empático."}];
+  var iC={alto:"#cc7580",medio:"#bf9455",bajo:"#6aaa90"};
+  var html="<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:10px;">Oportunidades de mejora</div>";
+  opps.forEach(function(o){html+="<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">"+o.area+"</div><span style="font-family:var(--m);font-size:8px;color:"+iC[o.impact]+";">"+o.impact+"</span></div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:2px;">"+o.desc+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">"+o.agents+"</div></div>";});
+  html+="</div><div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:10px;">Planes activos</div>";
+  REP_COACHING.forEach(function(p){var col=p.progress>=70?"#6aaa90":p.progress>=40?"#bf9455":"#cc7580";html+="<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;align-items:center;margin-bottom:4px;"><div style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">"+p.agent+"</div><span style="font-family:var(--m);font-size:11px;font-weight:700;color:"+col+";">"+p.progress+"%</span></div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">"+p.objective+"</div><div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;"><div style="height:100%;width:"+p.progress+"%;background:"+col+";border-radius:4px;"></div></div></div>";});
+  return html+"</div>";
+}
+
+function repAgenteSelector(){
+  var opts=REP_AGENTS.map(function(a){return"<option value=""+a.name+"">"+a.name+"</option>";}).join("");
+  return"<div style="margin-bottom:14px;"><select id="rep-agent-sel" onchange="repShowAgent(this.value)" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:11px;width:240px;"><option value="">Seleccionar agente...</option>"+opts+"</select></div><div id="rep-agent-detail"><div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-family:var(--m);font-size:12px;">Selecciona un agente</div></div>";
+}
+
+function repShowAgent(name){
+  var a=REP_AGENTS.find(function(x){return x.name===name;});
+  var d=document.getElementById("rep-agent-detail");
+  if(!d||!a)return;
+  var af=REP_FEEDBACK.filter(function(f){return f.agent===a.name;});
+  var ap=REP_COACHING.find(function(p){return p.agent===a.name;});
+  var sC=a.sat>=90?"#6aaa90":a.sat>=80?"#bf9455":"#cc7580";
+  d.innerHTML="<div style="display:grid;grid-template-columns:200px 1fr;gap:12px;">"+
+    "<div><div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px;">"+
+      "<div style="width:44px;height:44px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;margin:0 auto 8px;">"+a.letter+"</div>"+
+      "<div style="font-size:14px;font-weight:700;color:var(--t0);">"+a.name+"</div>"+
+      "<div style="font-size:28px;font-weight:800;font-family:var(--m);color:var(--t0);margin:8px 0 2px;">"+a.score+"</div>"+
+      "<div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;">Score total</div>"+
+    "</div>"+
+    "<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;">"+
+      [["Llamadas",a.calls,""],["POs",a.pos,""],["AHT",a.aht,""],["Satisfacción",a.sat,"%"],["Speech",a.speech,"%"]].map(function(m){
+        return"<div style="display:flex;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="flex:1;font-size:11px;color:rgba(255,255,255,.5);">"+m[0]+"</div><div style="font-family:var(--m);font-size:11px;font-weight:600;color:var(--t0);">"+m[1]+m[2]+"</div></div>";
+      }).join("")+
+    "</div></div>"+
+    "<div>"+
+      "<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:10px;">"+
+        "<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px;">Observaciones recibidas</div>"+
+        (af.length?af.map(function(f){var pc=f.priority==="alta"?"#cc7580":f.priority==="media"?"#bf9455":"#6aaa90";return"<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;gap:6px;margin-bottom:4px;"><div style="width:6px;height:6px;border-radius:50%;background:"+pc+";flex-shrink:0;margin-top:3px;"></div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">"+f.by+" · "+f.date+"</div></div><div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.5;">"+f.text+"</div></div>";}).join(""):"<div style="padding:12px 0;font-size:11px;color:rgba(255,255,255,.3);">Sin observaciones recientes</div>")+
+      "</div>"+
+      (ap?"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:6px;">Plan de coaching</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:6px;">🎯 "+ap.objective+"</div><div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:"+ap.progress+"%;background:#6aaa90;border-radius:4px;"></div></div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">"+ap.progress+"% · "+ap.coach+" · "+ap.deadline+"</div></div>":"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;text-align:center;font-size:11px;color:rgba(255,255,255,.3);">Sin plan activo ✓</div>")+
+    "</div></div>";
+}
+
+function repFeedback(){
+  return REP_FEEDBACK.map(function(f){
+    var pc=f.priority==="alta"?"#cc7580":f.priority==="media"?"#bf9455":"#6aaa90";
+    var a=REP_AGENTS.find(function(x){return x.name===f.agent;})||{color:"#6b7280",letter:"?"};
+    return"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:28px;height:28px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">"+a.letter+"</div><div><div style="font-size:12px;font-weight:600;color:var(--t0);">"+f.agent+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">"+f.by+" · "+f.role+" · "+f.date+"</div></div><div style="margin-left:auto;font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.06);color:"+pc+";">"+f.priority.toUpperCase()+"</div></div><div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:6px;">"+f.text+"</div><div>"+f.tags.map(function(t){return"<span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.08);margin-right:4px;">"+t+"</span>";}).join("")+"</div></div>";
+  }).join("");
+}
+
+function repCoaching(){
+  return REP_COACHING.map(function(p){
+    var col=p.progress>=70?"#6aaa90":p.progress>=40?"#bf9455":"#cc7580";
+    var a=REP_AGENTS.find(function(x){return x.name===p.agent;})||{color:"#6b7280",letter:"?"};
+    return"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:28px;height:28px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">"+a.letter+"</div><div><div style="font-size:12px;font-weight:600;color:var(--t0);">"+p.agent+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">Coach: "+p.coach+" · "+p.deadline+"</div></div><div style="margin-left:auto;font-family:var(--m);font-size:16px;font-weight:700;color:"+col+";">"+p.progress+"%</div></div><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:6px;">🎯 "+p.objective+"</div><div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-bottom:8px;"><div style="height:100%;width:"+p.progress+"%;background:"+col+";border-radius:4px;"></div></div>"+p.actions.map(function(ac){return"<div style="font-size:11px;color:rgba(255,255,255,.5);padding:2px 0;">→ "+ac+"</div>";}).join("")+"</div>";
+  }).join("");
 }
 </script>
 
