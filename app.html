@@ -1300,7 +1300,8 @@ body.light .status-opt:hover{background:#f0ede8;}
       <button class="n-to on" id="th-light" onclick="setTheme('light')" title="Modo claro">☀️</button>
     </div>
     <button class="n-dash" onclick="openDashboard()" title="Análisis del día">📊</button>
-    <button class="n-demo" onclick="triggerDemo()">Demo</button>
+    <button class="n-demo" onclick="window.location.href='reportes.html'" title="Reportes & Analytics" style="background:var(--gb);border-color:var(--gb2);color:var(--t1);">📊 Reportes</button>
+      <button class="n-demo" onclick="triggerDemo()">Demo</button>
       <div style="position:relative" id="status-wrap">
         <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);white-space:nowrap;">
           <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6aaa90;flex-shrink:0;transition:background .3s;"></div>
