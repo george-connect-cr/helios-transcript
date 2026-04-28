@@ -1813,6 +1813,11 @@ const CallTimer=(()=>{
     const d=document.getElementById('t-dot');if(d)d.className='td-dot';
     const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
     const al=document.getElementById('t-alert');if(al){al.className='t-row-alert';al.style.display='none';}
+    // Post-call: set coaching + show rating
+    setTimeout(function(){
+      if(typeof setStatus==='function') setStatus('coaching_p','#6366f1','Coaching','🎯');
+      if(typeof showCallRating==='function') showCallRating();
+    }, 600);
   }
   return{start,reset};
 })();

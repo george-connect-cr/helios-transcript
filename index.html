@@ -195,10 +195,72 @@ function backTo(show,hide){
   document.getElementById(hide).style.display='none';
 }
 function loginAs(user,role){
+  if(role==='agente'){
+    showExtensionPopup(user,role);
+    return;
+  }
+  _doLogin(user,role,null);
+}
+
+function showExtensionPopup(user,role){
+  var overlay=document.createElement('div');
+  overlay.id='ext-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML=
+    '<div style="background:#fff;border-radius:16px;padding:32px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.15);">'+
+      '<div style="text-align:center;margin-bottom:24px;">'+
+        '<div style="font-size:32px;margin-bottom:8px;">📞</div>'+
+        '<div style="font-size:18px;font-weight:700;color:#111318;margin-bottom:6px;">Conectar a Audara</div>'+
+        '<div style="font-size:13px;color:#6b7280;line-height:1.5;">Ingresa tu número de extensión<br>para conectarte al sistema de llamadas</div>'+
+      '</div>'+
+      '<div style="margin-bottom:16px;">'+
+        '<div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Extensión</div>'+
+        '<input id="ext-input" type="tel" placeholder="Ej: 1023" maxlength="6"'+
+          'style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:18px;font-family:monospace;text-align:center;letter-spacing:.1em;color:#111318;outline:none;transition:border-color .15s;"'+
+          'oninput="this.value=this.value.replace(/[^0-9]/g,'')"'+
+          'onfocus="this.style.borderColor='#E8440A'"'+
+          'onblur="this.style.borderColor='#e5e7eb'"'+
+        '>'+
+        '<div id="ext-error" style="font-size:11px;color:#C0566A;margin-top:5px;display:none;">Ingresa una extensión válida (mínimo 3 dígitos)</div>'+
+      '</div>'+
+      '<button onclick="_connectAudara(''+user.name.replace(/'/g,'').replace(/"/g,'')+'',''+role+'')" style="width:100%;padding:13px;border-radius:10px;border:none;background:#E8440A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.02em;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">Conectar</button>'+
+      '<button onclick="document.getElementById('ext-overlay').remove()" style="width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #e5e7eb;background:transparent;color:#6b7280;font-size:13px;cursor:pointer;">Cancelar</button>'+
+    '</div>';
+  document.body.appendChild(overlay);
+  setTimeout(function(){document.getElementById('ext-input').focus();},100);
+  // Enter key
+  overlay.addEventListener('keydown',function(e){
+    if(e.key==='Enter') _connectAudara(user.name,role);
+  });
+}
+
+function _connectAudara(userName,role){
+  var ext=document.getElementById('ext-input');
+  var err=document.getElementById('ext-error');
+  if(!ext||ext.value.length<3){if(err)err.style.display='block';return;}
+  if(err)err.style.display='none';
+  var extNum=ext.value;
+  // Find user object
+  var allUsers=[];
+  USERS.forEach(function(u){allUsers=allUsers.concat(u.users);});
+  var user=allUsers.find(function(u){return u.name===userName;})||{name:userName,email:'',color:'#ff5c00',letter:userName[0]};
+  // Store extension
+  var overlay=document.getElementById('ext-overlay');
+  if(overlay){
+    var btn=overlay.querySelector('button');
+    if(btn){btn.textContent='Conectando...';btn.disabled=true;}
+  }
+  setTimeout(function(){
+    if(overlay)overlay.remove();
+    _doLogin(user,role,extNum);
+  },900);
+}
+
+function _doLogin(user,role,extension){
   document.getElementById('step3').style.display='none';
   document.getElementById('loading').style.display='flex';
   setTimeout(function(){
-    var session={user:{name:user.name,email:user.email,color:user.color,letter:user.letter,role:role},ts:Date.now()};
+    var session={user:{name:user.name,email:user.email,color:user.color,letter:user.letter,role:role,extension:extension},ts:Date.now()};
     localStorage.setItem('helios_session',JSON.stringify(session));
     window.location.href='app.html';
   },1100);
