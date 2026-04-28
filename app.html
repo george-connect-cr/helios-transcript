@@ -1417,10 +1417,16 @@ body.light .status-opt:hover{background:#f0ede8;}
 </div>
 <div class="dash-ov" id="dash-ov">
   <div class="dash-head">
-    <div class="dash-head-l"><div class="dash-brand2">HELIOS</div><div><div class="dash-head-title">Análisis del día</div><div class="dash-head-sub" id="dash-date">—</div></div></div>
-    <button class="dash-close" onclick="closeDashboard()">✕ Cerrar</button>
+    <div class="dash-head-l"><div class="dash-brand2">CONNECT</div><div><div class="dash-head-title" id="dash-view-title">Análisis del día</div><div class="dash-head-sub" id="dash-date">—</div></div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+      <div style="display:flex;gap:3px;background:rgba(255,255,255,.07);padding:3px;border-radius:10px;">
+        <button id="dtab-dia" onclick="switchDashTab('dia')" style="padding:5px 14px;border-radius:7px;border:none;cursor:pointer;font-family:var(--m);font-size:10px;font-weight:600;background:rgba(255,255,255,.12);color:#fff;transition:all .15s;">📞 Mi día</button>
+        <button id="dtab-rep" onclick="switchDashTab('rep')" style="padding:5px 14px;border-radius:7px;border:none;cursor:pointer;font-family:var(--m);font-size:10px;font-weight:600;background:transparent;color:rgba(255,255,255,.5);transition:all .15s;">📊 Reportes</button>
+      </div>
+      <button class="dash-close" onclick="closeDashboard()" style="padding:6px 12px;">✕</button>
+    </div>
   </div>
-  <div class="dash-body">
+  <div id="dtab-dia-content"><div class="dash-body">
     <div class="dash-score-card">
       <div class="dash-score-ring-wrap">
         <svg class="dash-ring" viewBox="0 0 152 152">
@@ -1458,6 +1464,25 @@ body.light .status-opt:hover{background:#f0ede8;}
       </div>
     </div>
   </div>
+</div></div><!-- end dtab-dia-content -->
+
+  <!-- REPORTES TAB -->
+  <div id="dtab-rep-content" style="display:none;flex:1;overflow:hidden;">
+    <div style="display:flex;height:100%;overflow:hidden;">
+      <div id="rep-sb" style="width:180px;min-width:180px;border-right:1px solid rgba(255,255,255,.08);padding:10px 0;overflow-y:auto;flex-shrink:0;"></div>
+      <div style="flex:1;overflow-y:auto;padding:16px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(255,255,255,.06);">
+          <div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Agente</div><select id="rf-agente" onchange="applyRepFilters()" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:10px;"><option value="">Todos</option><option>Dayana García</option><option>Carlos Mora</option><option>Valeria Núñez</option><option>Luis Arias</option><option>Sofía Ramírez</option><option>Andrés Fallas</option><option>María Solano</option><option>José Quesada</option></select></div>
+          <div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Carril</div><select id="rf-carril" onchange="applyRepFilters()" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:10px;"><option value="">Todos</option><option>Home</option><option>Road</option><option>Concierge</option></select></div>
+          <div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">País</div><select id="rf-pais" onchange="applyRepFilters()" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:10px;"><option value="">Todos</option><option>Costa Rica</option><option>Panamá</option><option>Guatemala</option><option>Honduras</option></select></div>
+          <div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Cuenta</div><select id="rf-cuenta" onchange="applyRepFilters()" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:10px;"><option value="">Todas</option><option>SODAC</option><option>CallCenter</option><option>PausasCC</option></select></div>
+          <div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Período</div><select id="rf-fecha" onchange="applyRepFilters()" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:10px;"><option>Hoy</option><option selected>Esta semana</option><option>Este mes</option><option>Último trimestre</option></select></div>
+        </div>
+        <div id="rep-content"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 <div class="toast" id="toast"></div>
 <div id="sfanalyzing" style="display:none"></div>
@@ -3139,207 +3164,277 @@ function setStatus(id,color,label,icon){
   if(typeof showToast==="function")showToast(icon+" "+label);
 }
 
+// ── DASHBOARD TABS + REPORTS ─────────────────────────
 var _dashTab='dia';
 var _repView='resumen';
-var REP_AGENTS=[
-  {id:1,name:"Dayana García",letter:"D",color:"#ff5c00",carril:"Home",    pais:"Costa Rica",cuenta:"CallCenter",calls:187,pos:142,aht:"3:52",sat:92,speech:96,score:91,grade:"A"},
-  {id:2,name:"Carlos Mora",  letter:"C",color:"#6aaa90",carril:"Road",    pais:"Costa Rica",cuenta:"SODAC",     calls:164,pos:118,aht:"4:31",sat:84,speech:88,score:83,grade:"B"},
-  {id:3,name:"Valeria Núñez",letter:"V",color:"#cc7580",carril:"Concierge",pais:"Panamá",   cuenta:"CallCenter",calls:201,pos:167,aht:"3:44",sat:95,speech:98,score:94,grade:"A"},
-  {id:4,name:"Luis Arias",   letter:"L",color:"#4a8a72",carril:"Home",    pais:"Costa Rica",cuenta:"PausasCC", calls:143,pos:98, aht:"5:12",sat:71,speech:79,score:72,grade:"C"},
-  {id:5,name:"Sofía Ramírez",letter:"S",color:"#bf9455",carril:"Road",    pais:"Guatemala", cuenta:"SODAC",     calls:178,pos:134,aht:"4:05",sat:88,speech:91,score:87,grade:"B"},
-  {id:6,name:"Andrés Fallas",letter:"A",color:"#6366f1",carril:"Concierge",pais:"Costa Rica",cuenta:"CallCenter",calls:156,pos:121,aht:"4:22",sat:82,speech:86,score:81,grade:"B"},
-  {id:7,name:"María Solano", letter:"M",color:"#8b5cf6",carril:"Home",    pais:"Honduras",  cuenta:"PausasCC", calls:132,pos:89, aht:"5:44",sat:68,speech:74,score:68,grade:"C"},
-  {id:8,name:"José Quesada", letter:"J",color:"#0ea5e9",carril:"Road",    pais:"Panamá",    cuenta:"SODAC",     calls:169,pos:128,aht:"4:18",sat:86,speech:90,score:85,grade:"B"}
+
+var RA=[
+  {id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',    pais:'Costa Rica',cuenta:'CallCenter',calls:187,pos:142,aht:'3:52',sat:92,speech:96,score:91,grade:'A'},
+  {id:2,name:'Carlos Mora',  letter:'C',color:'#6aaa90',carril:'Road',    pais:'Costa Rica',cuenta:'SODAC',     calls:164,pos:118,aht:'4:31',sat:84,speech:88,score:83,grade:'B'},
+  {id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',   cuenta:'CallCenter',calls:201,pos:167,aht:'3:44',sat:95,speech:98,score:94,grade:'A'},
+  {id:4,name:'Luis Arias',   letter:'L',color:'#4a8a72',carril:'Home',    pais:'Costa Rica',cuenta:'PausasCC', calls:143,pos:98, aht:'5:12',sat:71,speech:79,score:72,grade:'C'},
+  {id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',    pais:'Guatemala', cuenta:'SODAC',     calls:178,pos:134,aht:'4:05',sat:88,speech:91,score:87,grade:'B'},
+  {id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:156,pos:121,aht:'4:22',sat:82,speech:86,score:81,grade:'B'},
+  {id:7,name:'María Solano', letter:'M',color:'#8b5cf6',carril:'Home',    pais:'Honduras',  cuenta:'PausasCC', calls:132,pos:89, aht:'5:44',sat:68,speech:74,score:68,grade:'C'},
+  {id:8,name:'José Quesada', letter:'J',color:'#0ea5e9',carril:'Road',    pais:'Panamá',    cuenta:'SODAC',     calls:169,pos:128,aht:'4:18',sat:86,speech:90,score:85,grade:'B'}
 ];
-var REP_FEEDBACK=[
-  {agent:"Dayana García",by:"Ana Vega",role:"Supervisora",date:"23 abr",text:"Excelente manejo del cliente molesto. Lenguaje empático y resolución rápida.",tags:["Empatía","Resolución"],priority:"baja"},
-  {agent:"Luis Arias",by:"Roberto Salas",role:"Supervisor",date:"22 abr",text:"AHT elevado. Demora en confirmar ubicación. Requiere refuerzo en protocolo.",tags:["AHT","Protocolo"],priority:"alta"},
-  {agent:"Carlos Mora",by:"Ana Vega",role:"Supervisora",date:"21 abr",text:"Buen desempeño. No siempre comunica ETA antes de despedirse.",tags:["ETA","Cierre"],priority:"media"},
-  {agent:"María Solano",by:"Roberto Salas",role:"Supervisor",date:"21 abr",text:"Speech compliance bajo (74%). Omite saludo en 4 de 10 llamadas.",tags:["Speech","Saludo"],priority:"alta"}
+var RF=[
+  {agent:'Dayana García',by:'Ana Vega',role:'Supervisora',date:'23 abr',text:'Excelente manejo del cliente molesto. Lenguaje empático y resolución rápida.',tags:['Empatía','Resolución'],priority:'baja'},
+  {agent:'Luis Arias',by:'Roberto Salas',role:'Supervisor',date:'22 abr',text:'AHT elevado. Demora en confirmar ubicación. Requiere refuerzo en protocolo.',tags:['AHT','Protocolo'],priority:'alta'},
+  {agent:'Carlos Mora',by:'Ana Vega',role:'Supervisora',date:'21 abr',text:'Buen desempeño. No siempre comunica ETA antes de despedirse.',tags:['ETA','Cierre'],priority:'media'},
+  {agent:'María Solano',by:'Roberto Salas',role:'Supervisor',date:'21 abr',text:'Speech compliance bajo (74%). Omite saludo en 4 de 10 llamadas.',tags:['Speech','Saludo'],priority:'alta'}
 ];
-var REP_PATTERNS=[
-  {icon:"📉",title:"AHT elevado en carril Road",type:"neg",desc:"3 agentes muestran AHT 18% por encima del objetivo.",agents:"Carlos Mora, Luis Arias, José Quesada"},
-  {icon:"⭐",title:"Alto rendimiento en Concierge",type:"pos",desc:"Satisfacción +90% y speech +94% consistentemente.",agents:"Valeria Núñez, Andrés Fallas"},
-  {icon:"⚠️",title:"Omisión de ETA",type:"neg",desc:"40% de agentes no comunican ETA. Patrón en turno tarde.",agents:"Carlos Mora, Luis Arias, Andrés Fallas"},
-  {icon:"📈",title:"Mejora en speech",type:"pos",desc:"Speech compliance +8% en últimas 2 semanas.",agents:"Dayana García, Sofía Ramírez"}
+var RC=[
+  {agent:'Luis Arias',  obj:'Reducir AHT a menos de 4:30', acts:['Preguntas clave en primeros 60s','Role-play de apertura'],dl:'30 abr',pct:35,coach:'Roberto Salas'},
+  {agent:'María Solano',obj:'Speech compliance al 90%',     acts:['5 grabaciones propias/semana','Sesión con formador'],    dl:'5 may', pct:20,coach:'Ana Vega'},
+  {agent:'Carlos Mora', obj:'Comunicar ETA en 100% llamadas',acts:['Checklist visual','Feedback diario'],                   dl:'28 abr',pct:60,coach:'Roberto Salas'}
 ];
-var REP_COACHING=[
-  {agent:"Luis Arias",  objective:"Reducir AHT a menos de 4:30", actions:["Preguntas clave en primeros 60s","Role-play de apertura"],deadline:"30 abr",progress:35,coach:"Roberto Salas"},
-  {agent:"María Solano",objective:"Speech compliance al 90%",      actions:["5 grabaciones propias/semana","Sesión con formador"],   deadline:"5 may", progress:20,coach:"Ana Vega"},
-  {agent:"Carlos Mora", objective:"Comunicar ETA en 100% llamadas",actions:["Checklist visual","Feedback diario"],                    deadline:"28 abr",progress:60,coach:"Roberto Salas"}
+var RP=[
+  {icon:'📉',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},
+  {icon:'⭐',title:'Alto rendimiento Concierge',type:'pos',desc:'Satisfacción +90% y speech +94% consistentes.',agents:'Valeria Núñez, Andrés Fallas'},
+  {icon:'⚠️',title:'Omisión de ETA',type:'neg',desc:'40% de agentes no comunican ETA al cerrar.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},
+  {icon:'📈',title:'Mejora en speech',type:'pos',desc:'Speech compliance +8% en 2 semanas.',agents:'Dayana García, Sofía Ramírez'}
 ];
+var RM=[{id:'resumen',i:'📊',l:'Resumen'},{id:'agentes',i:'🎧',l:'Agentes'},{id:'supervisor',i:'📈',l:'Supervisor'},{id:'formador',i:'🎓',l:'Formador'},{id:'agente_v',i:'👤',l:'Por Agente'},{id:'feedback',i:'💬',l:'Feedback'},{id:'coaching',i:'🎯',l:'Coaching'}];
 
 function switchDashTab(tab){
   _dashTab=tab;
-  var dia=document.querySelector(".dash-body");
-  var rep=document.getElementById("dtab-content-reportes");
-  var btnDia=document.getElementById("dtab-dia");
-  var btnRep=document.getElementById("dtab-reportes");
-  var title=document.getElementById("dash-view-title");
-  if(tab==="dia"){
-    if(dia)dia.style.display="";
-    if(rep){rep.style.display="none";}
-    if(btnDia){btnDia.style.background="rgba(255,255,255,.12)";btnDia.style.color="#fff";}
-    if(btnRep){btnRep.style.background="transparent";btnRep.style.color="rgba(255,255,255,.5)";}
-    if(title)title.textContent="Análisis del día";
+  var dia=document.getElementById('dtab-dia-content');
+  var rep=document.getElementById('dtab-rep-content');
+  var bDia=document.getElementById('dtab-dia');
+  var bRep=document.getElementById('dtab-rep');
+  var ttl=document.getElementById('dash-view-title');
+  if(tab==='dia'){
+    if(dia)dia.style.display='';
+    if(rep)rep.style.display='none';
+    if(bDia){bDia.style.background='rgba(255,255,255,.12)';bDia.style.color='#fff';}
+    if(bRep){bRep.style.background='transparent';bRep.style.color='rgba(255,255,255,.5)';}
+    if(ttl)ttl.textContent='Análisis del día';
   }else{
-    if(dia)dia.style.display="none";
-    if(rep){rep.style.display="flex";rep.style.flex="1";rep.style.overflow="hidden";}
-    if(btnDia){btnDia.style.background="transparent";btnDia.style.color="rgba(255,255,255,.5)";}
-    if(btnRep){btnRep.style.background="rgba(255,255,255,.12)";btnRep.style.color="#fff";}
-    if(title)title.textContent="Reportes & Analytics";
-    renderRepSidebar();
-    renderRepView(_repView);
+    if(dia)dia.style.display='none';
+    if(rep){rep.style.display='flex';rep.style.flex='1';rep.style.overflow='hidden';}
+    if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.5)';}
+    if(bRep){bRep.style.background='rgba(255,255,255,.12)';bRep.style.color='#fff';}
+    if(ttl)ttl.textContent='Reportes & Analytics';
+    renderRepSb();renderRepView(_repView);
   }
 }
 
-var REP_MENU=[{id:"resumen",icon:"📊",label:"Resumen"},{id:"agentes",icon:"🎧",label:"Agentes"},{id:"supervisor",icon:"📈",label:"Supervisor"},{id:"formador",icon:"🎓",label:"Formador"},{id:"agente_v",icon:"👤",label:"Por Agente"},{id:"feedback",icon:"💬",label:"Feedback"},{id:"coaching",icon:"🎯",label:"Coaching"}];
-
-function renderRepSidebar(){
-  var sb=document.getElementById("rep-sidebar");
-  if(!sb)return;
-  sb.innerHTML=REP_MENU.map(function(it){
+function renderRepSb(){
+  var sb=document.getElementById('rep-sb');if(!sb)return;
+  sb.innerHTML='';
+  RM.forEach(function(it){
     var a=_repView===it.id;
-    return "<div onclick="renderRepView('"+it.id+"')" style="display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:11px;font-weight:"+(a?"600":"400")+";color:"+(a?"var(--a)":"rgba(255,255,255,.6)")+";border-left:2px solid "+(a?"var(--a)":"transparent")+";background:"+(a?"rgba(255,92,0,.06)":"transparent")+";transition:all .12s;"><span style="font-size:13px;">"+it.icon+"</span>"+it.label+"</div>";
-  }).join("");
+    var d=document.createElement('div');
+    d.setAttribute('data-view',it.id);
+    d.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:11px;font-weight:'+(a?'600':'400')+';color:'+(a?'var(--a)':'rgba(255,255,255,.6)')+';border-left:2px solid '+(a?'var(--a)':'transparent')+';background:'+(a?'rgba(255,92,0,.06)':'transparent')+';transition:all .12s;';
+    d.innerHTML='<span style="font-size:13px;">'+it.i+'</span>'+it.l;
+    d.onclick=function(){renderRepView(this.getAttribute('data-view'));};
+    sb.appendChild(d);
+  });
 }
 
 function renderRepView(v){
-  _repView=v;renderRepSidebar();
-  var c=document.getElementById("rep-content");if(!c)return;
-  var agents=getRepFiltered();
-  if(v==="resumen")   c.innerHTML=repResumen(agents);
-  else if(v==="agentes")   c.innerHTML=repAgentesTable(agents);
-  else if(v==="supervisor")c.innerHTML=repSupervisor(agents);
-  else if(v==="formador")  c.innerHTML=repFormador();
-  else if(v==="agente_v")  c.innerHTML=repAgenteSelector();
-  else if(v==="feedback")  c.innerHTML=repFeedback();
-  else if(v==="coaching")  c.innerHTML=repCoaching();
+  _repView=v;renderRepSb();
+  var c=document.getElementById('rep-content');if(!c)return;
+  var ag=getRepF();
+  if(v==='resumen')    c.innerHTML=repResumen(ag);
+  else if(v==='agentes')    c.innerHTML=repTable(ag);
+  else if(v==='supervisor') c.innerHTML=repSup(ag);
+  else if(v==='formador')   c.innerHTML=repForm();
+  else if(v==='agente_v')   c.innerHTML=repAgSel();
+  else if(v==='feedback')   c.innerHTML=repFb();
+  else if(v==='coaching')   c.innerHTML=repCoach();
 }
 
-function getRepFiltered(){
-  var fa=document.getElementById("rf-agente")?.value||"";
-  var fc=document.getElementById("rf-carril")?.value||"";
-  var fp=document.getElementById("rf-pais")?.value||"";
-  var fcu=document.getElementById("rf-cuenta")?.value||"";
-  return REP_AGENTS.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});
+function getRepF(){
+  var fa=(document.getElementById('rf-agente')||{}).value||'';
+  var fc=(document.getElementById('rf-carril')||{}).value||'';
+  var fp=(document.getElementById('rf-pais')||{}).value||'';
+  var fcu=(document.getElementById('rf-cuenta')||{}).value||'';
+  return RA.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});
 }
 function applyRepFilters(){renderRepView(_repView);}
 
-function _rTag(a,t){
-  var C={Home:"#6366f1",Road:"#6aaa90",Concierge:"#bf9455","Costa Rica":"#cc7580","Panamá":"#bf9455","Guatemala":"#6aaa90","Honduras":"#9ca3af"};
-  var v=t==="carril"?a.carril:a.pais;
-  return "<span style="font-family:var(--m);font-size:8px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:"+(C[v]||"#fff")+";border:1px solid currentColor;">"+v+"</span>";
-}
+function _rc(v){return v>=85?'#6aaa90':v>=70?'#bf9455':'#cc7580';}
 function _rScore(a){
-  var C={A:"rgba(106,170,144,.2)",B:"rgba(191,148,85,.2)",C:"rgba(204,117,128,.2)"};
-  var T={A:"#6aaa90",B:"#bf9455",C:"#cc7580"};
-  return "<span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:20px;border-radius:5px;font-family:var(--m);font-size:10px;font-weight:700;background:"+C[a.grade]+";color:"+T[a.grade]+";">"+a.score+"</span>";
+  var bg=a.grade==='A'?'rgba(106,170,144,.2)':a.grade==='B'?'rgba(191,148,85,.2)':'rgba(204,117,128,.2)';
+  var c=a.grade==='A'?'#6aaa90':a.grade==='B'?'#bf9455':'#cc7580';
+  return '<span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:20px;border-radius:5px;font-family:var(--m);font-size:10px;font-weight:700;background:'+bg+';color:'+c+';">'+a.score+'</span>';
 }
-function _rBar(v,c){
-  var col=c||(v>=85?"#6aaa90":v>=70?"#bf9455":"#cc7580");
-  return "<div style="width:80px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;"><div style="height:100%;width:"+v+"%;background:"+col+";border-radius:4px;"></div></div>";
+function _rBar(v){
+  var c=_rc(v);
+  return '<div style="width:70px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+v+'%;background:'+c+';border-radius:4px;"></div></div>';
 }
+var carrilC={Home:'#6366f1',Road:'#6aaa90',Concierge:'#bf9455'};
+var paisC={'Costa Rica':'#cc7580','Panamá':'#bf9455','Guatemala':'#6aaa90','Honduras':'#9ca3af'};
+function _rTag(v,col){return '<span style="font-family:var(--m);font-size:8px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:'+col+';border:1px solid currentColor;">'+v+'</span>';}
 
-function repResumen(agents){
-  var total={calls:0,pos:0,sat:0,speech:0,score:0};
-  agents.forEach(function(a){total.calls+=a.calls;total.pos+=a.pos;total.sat+=a.sat;total.speech+=a.speech;total.score+=a.score;});
-  var n=agents.length||1;
-  var kpis=[["Llamadas",total.calls,"▲ 12%"],["POs",total.pos,"▲ 8%"],["Satisfacción",Math.round(total.sat/n)+"%","▲ 2%"],["Speech",Math.round(total.speech/n)+"%","▲ 5%"],["Score prom.",Math.round(total.score/n),"▲ 3%"]];
-  var html="<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;">";
-  kpis.forEach(function(k){html+="<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;"><div style="font-family:var(--m);font-size:20px;font-weight:700;color:var(--t0);">"+k[1]+"</div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;">"+k[0]+"</div><div style="font-family:var(--m);font-size:9px;color:#6aaa90;margin-top:4px;">"+k[2]+"</div></div>";});
-  return html+"</div>"+repAgentesTable(agents);
-}
-
-function repAgentesTable(agents){
-  if(!agents.length)return"<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-family:var(--m);font-size:12px;">Sin agentes para los filtros seleccionados</div>";
-  var rows=agents.map(function(a){
-    var sC=a.sat>=90?"#6aaa90":a.sat>=80?"#bf9455":"#cc7580";
-    var spC=a.speech>=90?"#6aaa90":a.speech>=80?"#bf9455":"#cc7580";
-    return "<tr style="border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;" onclick="renderRepView('agente_v');setTimeout(function(){var s=document.getElementById('rep-agent-sel');if(s){s.value='"+a.name+"';repShowAgent('"+a.name+"');}},100);">"+
-      "<td style="padding:8px 12px;"><div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">"+a.letter+"</div><div style="font-size:12px;font-weight:600;color:var(--t0);">"+a.name+"</div></div></td>"+
-      "<td style="padding:8px 12px;">"+_rTag(a,"carril")+"</td>"+
-      "<td style="padding:8px 12px;">"+_rTag(a,"pais")+"</td>"+
-      "<td style="padding:8px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">"+a.calls+"</td>"+
-      "<td style="padding:8px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">"+a.aht+"</td>"+
-      "<td style="padding:8px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:"+sC+";">"+a.sat+"%</div>"+_rBar(a.sat,sC)+"</td>"+
-      "<td style="padding:8px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:"+spC+";">"+a.speech+"%</div></td>"+
-      "<td style="padding:8px 12px;">"+_rScore(a)+"</td>"+
-    "</tr>";
-  }).join("");
-  var heads=["Agente","Carril","País","Llamadas","AHT","Satisf.","Speech","Score"].map(function(h){return "<th style="padding:8px 12px;text-align:left;font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;">"+h+"</th>";}).join("");
-  return "<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:rgba(255,255,255,.04);">"+heads+"</tr></thead><tbody>"+rows+"</tbody></table></div>";
-}
-
-function repSupervisor(agents){
-  var tc={pos:"#6aaa90",neg:"#cc7580",neu:"#bf9455"};
-  var html=REP_PATTERNS.map(function(p){return"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span>"+p.icon+"</span><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">"+p.title+"</span><span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.06);color:"+tc[p.type]+";">"+(p.type==="pos"?"Positivo":p.type==="neg"?"Atención":"Neutro")+"</span></div><div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.6;margin-bottom:4px;">"+p.desc+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">👥 "+p.agents+"</div></div>";}).join("");
-  var sorted=agents.slice().sort(function(a,b){return b.score-a.score;});
-  html+="<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:10px;">Ranking del equipo</div>";
-  sorted.forEach(function(a,i){
-    var col=i===0?"#bf9455":i===1?"#9ca3af":i===2?"#a67c45":"rgba(255,255,255,.3)";
-    html+="<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="font-family:var(--m);font-size:11px;font-weight:700;width:18px;color:"+col+"">"+(i+1)+"</div><div style="width:22px;height:22px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">"+a.letter+"</div><div style="flex:1;font-size:11px;color:var(--t0);">"+a.name+"</div>"+_rScore(a)+_rBar(a.score)+"</div>";
+function repResumen(ag){
+  var tot={calls:0,pos:0,sat:0,sp:0,sc:0};
+  ag.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;});
+  var n=ag.length||1;
+  var kpis=[['Llamadas',tot.calls,'▲12%'],['POs',tot.pos,'▲8%'],['Satisfacción',Math.round(tot.sat/n)+'%','▲2%'],['Speech',Math.round(tot.sp/n)+'%','▲5%'],['Score',Math.round(tot.sc/n),'▲3%']];
+  var html='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;">';
+  kpis.forEach(function(k){
+    html+='<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;"><div style="font-family:var(--m);font-size:20px;font-weight:700;color:var(--t0);">'+k[1]+'</div><div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;">'+k[0]+'</div><div style="font-family:var(--m);font-size:9px;color:#6aaa90;margin-top:3px;">'+k[2]+'</div></div>';
   });
-  return html+"</div>";
+  return html+'</div>'+repTable(ag);
 }
 
-function repFormador(){
-  var opps=[{area:"Protocolo de apertura",impact:"alto",agents:"Luis Arias, María Solano, Andrés Fallas",desc:"Estandarizar saludo y preguntas clave en primeros 45 segundos."},{area:"Comunicación de ETA",impact:"alto",agents:"Carlos Mora, Luis Arias, Andrés Fallas",desc:"Confirmar tiempo estimado antes de cerrar TODAS las llamadas."},{area:"Manejo de clientes molestos",impact:"medio",agents:"Luis Arias, María Solano",desc:"Técnicas de desescalada y lenguaje empático."}];
-  var iC={alto:"#cc7580",medio:"#bf9455",bajo:"#6aaa90"};
-  var html="<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:10px;">Oportunidades de mejora</div>";
-  opps.forEach(function(o){html+="<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">"+o.area+"</div><span style="font-family:var(--m);font-size:8px;color:"+iC[o.impact]+";">"+o.impact+"</span></div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:2px;">"+o.desc+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">"+o.agents+"</div></div>";});
-  html+="</div><div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:10px;">Planes activos</div>";
-  REP_COACHING.forEach(function(p){var col=p.progress>=70?"#6aaa90":p.progress>=40?"#bf9455":"#cc7580";html+="<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;align-items:center;margin-bottom:4px;"><div style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">"+p.agent+"</div><span style="font-family:var(--m);font-size:11px;font-weight:700;color:"+col+";">"+p.progress+"%</span></div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">"+p.objective+"</div><div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;"><div style="height:100%;width:"+p.progress+"%;background:"+col+";border-radius:4px;"></div></div></div>";});
-  return html+"</div>";
+function repTable(ag){
+  if(!ag.length)return'<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-family:var(--m);font-size:12px;">Sin agentes para los filtros seleccionados</div>';
+  var wrap=document.createElement('div');
+  wrap.style.cssText='background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;';
+  var tbl=document.createElement('table');
+  tbl.style.cssText='width:100%;border-collapse:collapse;';
+  var thead=document.createElement('thead');
+  var hRow=document.createElement('tr');
+  hRow.style.background='rgba(255,255,255,.04)';
+  ['Agente','Carril','País','Llamadas','AHT','Satisf.','Speech','Score'].forEach(function(h){
+    var th=document.createElement('th');
+    th.style.cssText='padding:8px 10px;text-align:left;font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;';
+    th.textContent=h;hRow.appendChild(th);
+  });
+  thead.appendChild(hRow);tbl.appendChild(thead);
+  var tbody=document.createElement('tbody');
+  ag.forEach(function(a){
+    var tr=document.createElement('tr');
+    tr.style.cssText='border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;';
+    tr.onclick=function(){renderRepView('agente_v');setTimeout(function(){var s=document.getElementById('rep-ag-sel');if(s){s.value=a.name;repShowAg(a.name);}},80);};
+    tr.innerHTML=
+      '<td style="padding:8px 10px;"><div style="display:flex;align-items:center;gap:7px;"><div style="width:24px;height:24px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">'+a.letter+'</div><span style="font-size:11px;font-weight:600;color:var(--t0);">'+a.name+'</span></div></td>'+
+      '<td style="padding:8px 10px;">'+_rTag(a.carril,carrilC[a.carril]||'#fff')+'</td>'+
+      '<td style="padding:8px 10px;">'+_rTag(a.pais,paisC[a.pais]||'#fff')+'</td>'+
+      '<td style="padding:8px 10px;font-family:var(--m);font-size:11px;color:var(--t0);">'+a.calls+'</td>'+
+      '<td style="padding:8px 10px;font-family:var(--m);font-size:11px;color:var(--t0);">'+a.aht+'</td>'+
+      '<td style="padding:8px 10px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:'+_rc(a.sat)+';">'+a.sat+'%</div>'+_rBar(a.sat)+'</td>'+
+      '<td style="padding:8px 10px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:'+_rc(a.speech)+';">'+a.speech+'%</div></td>'+
+      '<td style="padding:8px 10px;">'+_rScore(a)+'</td>';
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);wrap.appendChild(tbl);
+  var tmp=document.createElement('div');tmp.appendChild(wrap);return tmp.innerHTML;
 }
 
-function repAgenteSelector(){
-  var opts=REP_AGENTS.map(function(a){return"<option value=""+a.name+"">"+a.name+"</option>";}).join("");
-  return"<div style="margin-bottom:14px;"><select id="rep-agent-sel" onchange="repShowAgent(this.value)" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:11px;width:240px;"><option value="">Seleccionar agente...</option>"+opts+"</select></div><div id="rep-agent-detail"><div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-family:var(--m);font-size:12px;">Selecciona un agente</div></div>";
+function repSup(ag){
+  var tc={pos:'#6aaa90',neg:'#cc7580',neu:'#bf9455'};
+  var html=RP.map(function(p){
+    var c=tc[p.type];
+    return'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span>'+p.icon+'</span><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+p.title+'</span><span style="font-family:var(--m);font-size:8px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.06);color:'+c+';border:1px solid currentColor;">'+(p.type==='pos'?'Positivo':p.type==='neg'?'Atención':'Neutro')+'</span></div><div style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:3px;">'+p.desc+'</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">👥 '+p.agents+'</div></div>';
+  }).join('');
+  var sorted=ag.slice().sort(function(a,b){return b.score-a.score;});
+  html+='<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px;">Ranking</div>';
+  sorted.forEach(function(a,i){
+    var mc=i===0?'#bf9455':i===1?'#9ca3af':i===2?'#a67c45':'rgba(255,255,255,.3)';
+    html+='<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="font-family:var(--m);font-size:11px;font-weight:700;width:16px;color:'+mc+';">'+(i+1)+'</span><div style="width:22px;height:22px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">'+a.letter+'</div><span style="flex:1;font-size:11px;color:var(--t0);">'+a.name+'</span>'+_rScore(a)+_rBar(a.score)+'</div>';
+  });
+  return html+'</div>';
 }
 
-function repShowAgent(name){
-  var a=REP_AGENTS.find(function(x){return x.name===name;});
-  var d=document.getElementById("rep-agent-detail");
-  if(!d||!a)return;
-  var af=REP_FEEDBACK.filter(function(f){return f.agent===a.name;});
-  var ap=REP_COACHING.find(function(p){return p.agent===a.name;});
-  var sC=a.sat>=90?"#6aaa90":a.sat>=80?"#bf9455":"#cc7580";
-  d.innerHTML="<div style="display:grid;grid-template-columns:200px 1fr;gap:12px;">"+
-    "<div><div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px;">"+
-      "<div style="width:44px;height:44px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;margin:0 auto 8px;">"+a.letter+"</div>"+
-      "<div style="font-size:14px;font-weight:700;color:var(--t0);">"+a.name+"</div>"+
-      "<div style="font-size:28px;font-weight:800;font-family:var(--m);color:var(--t0);margin:8px 0 2px;">"+a.score+"</div>"+
-      "<div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;">Score total</div>"+
-    "</div>"+
-    "<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;">"+
-      [["Llamadas",a.calls,""],["POs",a.pos,""],["AHT",a.aht,""],["Satisfacción",a.sat,"%"],["Speech",a.speech,"%"]].map(function(m){
-        return"<div style="display:flex;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="flex:1;font-size:11px;color:rgba(255,255,255,.5);">"+m[0]+"</div><div style="font-family:var(--m);font-size:11px;font-weight:600;color:var(--t0);">"+m[1]+m[2]+"</div></div>";
-      }).join("")+
-    "</div></div>"+
-    "<div>"+
-      "<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:10px;">"+
-        "<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px;">Observaciones recibidas</div>"+
-        (af.length?af.map(function(f){var pc=f.priority==="alta"?"#cc7580":f.priority==="media"?"#bf9455":"#6aaa90";return"<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;gap:6px;margin-bottom:4px;"><div style="width:6px;height:6px;border-radius:50%;background:"+pc+";flex-shrink:0;margin-top:3px;"></div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">"+f.by+" · "+f.date+"</div></div><div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.5;">"+f.text+"</div></div>";}).join(""):"<div style="padding:12px 0;font-size:11px;color:rgba(255,255,255,.3);">Sin observaciones recientes</div>")+
-      "</div>"+
-      (ap?"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:6px;">Plan de coaching</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:6px;">🎯 "+ap.objective+"</div><div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:"+ap.progress+"%;background:#6aaa90;border-radius:4px;"></div></div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">"+ap.progress+"% · "+ap.coach+" · "+ap.deadline+"</div></div>":"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;text-align:center;font-size:11px;color:rgba(255,255,255,.3);">Sin plan activo ✓</div>")+
-    "</div></div>";
+function repForm(){
+  var opps=[
+    {a:'Protocolo de apertura',imp:'alto',ag:'Luis Arias, María Solano, Andrés Fallas',d:'Estandarizar saludo y preguntas clave en primeros 45 segundos.'},
+    {a:'Comunicación de ETA',imp:'alto',ag:'Carlos Mora, Luis Arias, Andrés Fallas',d:'Confirmar ETA antes de cerrar TODAS las llamadas.'},
+    {a:'Clientes molestos',imp:'medio',ag:'Luis Arias, María Solano',d:'Técnicas de desescalada y lenguaje empático.'}
+  ];
+  var iC={alto:'#cc7580',medio:'#bf9455',bajo:'#6aaa90'};
+  var html='<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px;">Oportunidades</div>';
+  opps.forEach(function(o){
+    html+='<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+o.a+'</span><span style="font-family:var(--m);font-size:8px;color:'+iC[o.imp]+';">'+o.imp+'</span></div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:2px;">'+o.d+'</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">'+o.ag+'</div></div>';
+  });
+  html+='</div><div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px;">Planes activos</div>';
+  RC.forEach(function(p){
+    var col=p.pct>=70?'#6aaa90':p.pct>=40?'#bf9455':'#cc7580';
+    html+='<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;margin-bottom:3px;"><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+p.agent+'</span><span style="font-family:var(--m);font-size:11px;font-weight:700;color:'+col+';">'+p.pct+'%</span></div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">'+p.obj+'</div><div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+p.pct+'%;background:'+col+';border-radius:4px;"></div></div></div>';
+  });
+  return html+'</div>';
 }
 
-function repFeedback(){
-  return REP_FEEDBACK.map(function(f){
-    var pc=f.priority==="alta"?"#cc7580":f.priority==="media"?"#bf9455":"#6aaa90";
-    var a=REP_AGENTS.find(function(x){return x.name===f.agent;})||{color:"#6b7280",letter:"?"};
-    return"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:28px;height:28px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">"+a.letter+"</div><div><div style="font-size:12px;font-weight:600;color:var(--t0);">"+f.agent+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">"+f.by+" · "+f.role+" · "+f.date+"</div></div><div style="margin-left:auto;font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.06);color:"+pc+";">"+f.priority.toUpperCase()+"</div></div><div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:6px;">"+f.text+"</div><div>"+f.tags.map(function(t){return"<span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.08);margin-right:4px;">"+t+"</span>";}).join("")+"</div></div>";
-  }).join("");
+function repAgSel(){
+  var sel=document.createElement('select');
+  sel.id='rep-ag-sel';sel.style.cssText='margin-bottom:12px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--t0);font-family:var(--m);font-size:11px;width:220px;';
+  sel.innerHTML='<option value="">Seleccionar agente...</option>'+RA.map(function(a){return'<option value="'+a.name+'">'+a.name+'</option>';}).join('');
+  sel.onchange=function(){repShowAg(this.value);};
+  var det=document.createElement('div');det.id='rep-ag-det';
+  det.innerHTML='<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-family:var(--m);font-size:12px;">Selecciona un agente</div>';
+  var wrap=document.createElement('div');wrap.appendChild(sel);wrap.appendChild(det);
+  return wrap.innerHTML;
 }
 
-function repCoaching(){
-  return REP_COACHING.map(function(p){
-    var col=p.progress>=70?"#6aaa90":p.progress>=40?"#bf9455":"#cc7580";
-    var a=REP_AGENTS.find(function(x){return x.name===p.agent;})||{color:"#6b7280",letter:"?"};
-    return"<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:28px;height:28px;border-radius:50%;background:"+a.color+";display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">"+a.letter+"</div><div><div style="font-size:12px;font-weight:600;color:var(--t0);">"+p.agent+"</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">Coach: "+p.coach+" · "+p.deadline+"</div></div><div style="margin-left:auto;font-family:var(--m);font-size:16px;font-weight:700;color:"+col+";">"+p.progress+"%</div></div><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:6px;">🎯 "+p.objective+"</div><div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-bottom:8px;"><div style="height:100%;width:"+p.progress+"%;background:"+col+";border-radius:4px;"></div></div>"+p.actions.map(function(ac){return"<div style="font-size:11px;color:rgba(255,255,255,.5);padding:2px 0;">→ "+ac+"</div>";}).join("")+"</div>";
-  }).join("");
+function repShowAg(name){
+  var a=RA.find(function(x){return x.name===name;});
+  var d=document.getElementById('rep-ag-det');if(!d||!a)return;
+  var af=RF.filter(function(f){return f.agent===a.name;});
+  var ap=RC.find(function(p){return p.agent===a.name;});
+  var sC=a.sat>=90?'#6aaa90':a.sat>=80?'#bf9455':'#cc7580';
+  d.innerHTML=
+    '<div style="display:grid;grid-template-columns:190px 1fr;gap:12px;">'+
+    '<div>'+
+      '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px;">'+
+        '<div style="width:44px;height:44px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;margin:0 auto 8px;">'+a.letter+'</div>'+
+        '<div style="font-size:14px;font-weight:700;color:var(--t0);">'+a.name+'</div>'+
+        '<div style="font-size:28px;font-weight:800;font-family:var(--m);color:var(--t0);margin:8px 0 2px;">'+a.score+'</div>'+
+        '<div style="font-family:var(--m);font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;">Score total</div>'+
+      '</div>'+
+      '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;">'+
+        [['Llamadas',a.calls,''],['POs',a.pos,''],['AHT',a.aht,''],['Satisfacción',a.sat,'%'],['Speech',a.speech,'%']].map(function(m){
+          return'<div style="display:flex;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="flex:1;font-size:11px;color:rgba(255,255,255,.5);">'+m[0]+'</span><span style="font-family:var(--m);font-size:11px;font-weight:600;color:var(--t0);">'+m[1]+m[2]+'</span></div>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+    '<div>'+
+      '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:10px;">'+
+        '<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px;">Observaciones</div>'+
+        (af.length?af.map(function(f){
+          var pc=f.priority==='alta'?'#cc7580':f.priority==='media'?'#bf9455':'#6aaa90';
+          return'<div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);"><div style="display:flex;gap:5px;margin-bottom:3px;"><div style="width:6px;height:6px;border-radius:50%;background:'+pc+';flex-shrink:0;margin-top:2px;"></div><span style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">'+f.by+' · '+f.date+'</span></div><div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.5;">'+f.text+'</div></div>';
+        }).join(''):'<div style="padding:10px 0;font-size:11px;color:rgba(255,255,255,.3);">Sin observaciones recientes</div>')+
+      '</div>'+
+      (ap?
+        '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;">'+
+          '<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:5px;">Plan de coaching</div>'+
+          '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:5px;">🎯 '+ap.obj+'</div>'+
+          '<div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-bottom:3px;"><div style="height:100%;width:'+ap.pct+'%;background:#6aaa90;border-radius:4px;"></div></div>'+
+          '<div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">'+ap.pct+'% · '+ap.coach+' · '+ap.dl+'</div>'+
+        '</div>'
+      :'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;text-align:center;font-size:11px;color:rgba(255,255,255,.3);">Sin plan activo ✓</div>')+
+    '</div></div>';
+}
+
+function repFb(){
+  return RF.map(function(f){
+    var pc=f.priority==='alta'?'#cc7580':f.priority==='media'?'#bf9455':'#6aaa90';
+    var a=RA.find(function(x){return x.name===f.agent;})||{color:'#6b7280',letter:'?'};
+    return'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">'+
+        '<div style="width:28px;height:28px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">'+a.letter+'</div>'+
+        '<div><div style="font-size:12px;font-weight:600;color:var(--t0);">'+f.agent+'</div>'+
+          '<div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">'+f.by+' · '+f.role+' · '+f.date+'</div></div>'+
+        '<div style="margin-left:auto;font-family:var(--m);font-size:8px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.06);color:'+pc+';border:1px solid currentColor;">'+f.priority.toUpperCase()+'</div>'+
+      '</div>'+
+      '<div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:5px;">'+f.text+'</div>'+
+      '<div>'+f.tags.map(function(t){return'<span style="font-family:var(--m);font-size:8px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.08);margin-right:3px;">'+t+'</span>';}).join('')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function repCoach(){
+  return RC.map(function(p){
+    var col=p.pct>=70?'#6aaa90':p.pct>=40?'#bf9455':'#cc7580';
+    var a=RA.find(function(x){return x.name===p.agent;})||{color:'#6b7280',letter:'?'};
+    return'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">'+
+        '<div style="width:28px;height:28px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">'+a.letter+'</div>'+
+        '<div><div style="font-size:12px;font-weight:600;color:var(--t0);">'+p.agent+'</div>'+
+          '<div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.4);">Coach: '+p.coach+' · '+p.dl+'</div></div>'+
+        '<div style="margin-left:auto;font-family:var(--m);font-size:16px;font-weight:700;color:'+col+';">'+p.pct+'%</div>'+
+      '</div>'+
+      '<div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:5px;">🎯 '+p.obj+'</div>'+
+      '<div style="height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-bottom:7px;"><div style="height:100%;width:'+p.pct+'%;background:'+col+';border-radius:4px;"></div></div>'+
+      p.acts.map(function(ac){return'<div style="font-size:11px;color:rgba(255,255,255,.5);padding:2px 0;">→ '+ac+'</div>';}).join('')+
+    '</div>';
+  }).join('');
 }
 </script>
 
