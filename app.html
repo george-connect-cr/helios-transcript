@@ -1420,8 +1420,8 @@ body.light .status-opt:hover{background:#f0ede8;}
     <div class="dash-head-l"><div class="dash-brand2">CONNECT</div><div><div class="dash-head-title" id="dash-view-title">Análisis del día</div><div class="dash-head-sub" id="dash-date">—</div></div></div>
     <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
       <div style="display:flex;gap:3px;background:rgba(255,255,255,.07);padding:3px;border-radius:10px;">
-        <button id="dtab-dia" onclick="switchDashTab('dia')" style="padding:5px 14px;border-radius:7px;border:none;cursor:pointer;font-family:var(--m);font-size:10px;font-weight:600;background:rgba(255,255,255,.12);color:#fff;transition:all .15s;">📞 Mi día</button>
-        <button id="dtab-rep" onclick="switchDashTab('rep')" style="padding:5px 14px;border-radius:7px;border:none;cursor:pointer;font-family:var(--m);font-size:10px;font-weight:600;background:transparent;color:rgba(255,255,255,.5);transition:all .15s;">📊 Reportes</button>
+        <button id="dtab-dia" onclick="switchDashTab('dia')" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 18px;border-radius:8px;border:none;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;transition:all .15s;"><span style="font-size:16px;">📞</span><span style="font-family:var(--m);font-size:9px;font-weight:600;letter-spacing:.3px;white-space:nowrap;">Mi día</span></button>
+        <button id="dtab-rep" onclick="switchDashTab('rep')" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 18px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,.5);transition:all .15s;"><span style="font-size:16px;">📊</span><span style="font-family:var(--m);font-size:9px;font-weight:600;letter-spacing:.3px;white-space:nowrap;">Reportes</span></button>
       </div>
       <button class="dash-close" onclick="closeDashboard()" style="padding:6px 12px;">✕</button>
     </div>
