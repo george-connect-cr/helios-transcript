@@ -175,7 +175,7 @@ function showUsers(){
   s3.style.display='block';
   document.getElementById('role-lbl').textContent=ROLE_LABELS[selectedRole];
   var rc=ROLE_COLORS[selectedRole];
-  document.getElementById('role-lbl').style.cssText='font-weight:600;padding:1px 8px;border-radius:20px;background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+';font-size:10px;font-family:'SF Mono','Fira Code','Consolas',monospace;';
+  document.getElementById('role-lbl').style.cssText='font-weight:600;padding:1px 8px;border-radius:20px;background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+';font-size:10px;font-family:monospace;';
   var list=document.getElementById('users-list');
   list.style.display='flex';
   list.innerHTML='';
@@ -203,35 +203,39 @@ function loginAs(user,role){
 }
 
 function showExtensionPopup(user,role){
-  var overlay=document.createElement('div');
-  overlay.id='ext-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:flex;align-items:center;justify-content:center;';
-  overlay.innerHTML=
-    '<div style="background:#fff;border-radius:16px;padding:32px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.15);">'+
-      '<div style="text-align:center;margin-bottom:24px;">'+
-        '<div style="font-size:32px;margin-bottom:8px;">📞</div>'+
-        '<div style="font-size:18px;font-weight:700;color:#111318;margin-bottom:6px;">Conectar a Audara</div>'+
-        '<div style="font-size:13px;color:#6b7280;line-height:1.5;">Ingresa tu número de extensión<br>para conectarte al sistema de llamadas</div>'+
-      '</div>'+
-      '<div style="margin-bottom:16px;">'+
-        '<div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Extensión</div>'+
-        '<input id="ext-input" type="tel" placeholder="Ej: 1023" maxlength="6"'+
-          'style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:18px;font-family:monospace;text-align:center;letter-spacing:.1em;color:#111318;outline:none;transition:border-color .15s;"'+
-          'oninput="this.value=this.value.replace(/[^0-9]/g,'')"'+
-          'onfocus="this.style.borderColor='#E8440A'"'+
-          'onblur="this.style.borderColor='#e5e7eb'"'+
-        '>'+
-        '<div id="ext-error" style="font-size:11px;color:#C0566A;margin-top:5px;display:none;">Ingresa una extensión válida (mínimo 3 dígitos)</div>'+
-      '</div>'+
-      '<button onclick="_connectAudara(''+user.name.replace(/'/g,'').replace(/"/g,'')+'',''+role+'')" style="width:100%;padding:13px;border-radius:10px;border:none;background:#E8440A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.02em;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">Conectar</button>'+
-      '<button onclick="document.getElementById('ext-overlay').remove()" style="width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #e5e7eb;background:transparent;color:#6b7280;font-size:13px;cursor:pointer;">Cancelar</button>'+
-    '</div>';
-  document.body.appendChild(overlay);
-  setTimeout(function(){document.getElementById('ext-input').focus();},100);
-  // Enter key
-  overlay.addEventListener('keydown',function(e){
-    if(e.key==='Enter') _connectAudara(user.name,role);
-  });
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;';
+  var card=document.createElement('div');
+  card.style.cssText='background:#fff;border-radius:16px;padding:32px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center;';
+  var ico=document.createElement('div');ico.style.cssText='font-size:36px;margin-bottom:12px;';ico.textContent='📞';
+  var ttl=document.createElement('div');ttl.style.cssText='font-size:18px;font-weight:700;color:#111318;margin-bottom:6px;';ttl.textContent='Conectar a Audara';
+  var sub=document.createElement('div');sub.style.cssText='font-size:13px;color:#6b7280;line-height:1.5;margin-bottom:20px;';sub.textContent='Ingresa tu extensión para conectarte al sistema de llamadas';
+  var lbl=document.createElement('div');lbl.style.cssText='font-size:11px;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;text-align:left;';lbl.textContent='Extensión';
+  var inp=document.createElement('input');
+  inp.type='tel';inp.placeholder='Ej: 1023';inp.maxLength=6;
+  inp.style.cssText='width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:22px;text-align:center;letter-spacing:.15em;color:#111318;outline:none;box-sizing:border-box;';
+  inp.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'');});
+  inp.addEventListener('focus',function(){this.style.borderColor='#E8440A';});
+  inp.addEventListener('blur',function(){this.style.borderColor='#e5e7eb';});
+  var err=document.createElement('div');err.style.cssText='font-size:11px;color:#C0566A;margin:5px 0 0;min-height:16px;text-align:left;';
+  var btnOk=document.createElement('button');
+  btnOk.style.cssText='width:100%;padding:13px;border-radius:10px;border:none;background:#E8440A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px;';
+  btnOk.textContent='Conectar';
+  var btnNo=document.createElement('button');
+  btnNo.style.cssText='width:100%;padding:10px;border-radius:10px;border:1px solid #e5e7eb;background:transparent;color:#6b7280;font-size:13px;cursor:pointer;margin-top:8px;';
+  btnNo.textContent='Cancelar';
+  btnNo.onclick=function(){ov.remove();};
+  function doConn(){
+    var val=inp.value.trim();
+    if(val.length<3){err.textContent='Ingresa mínimo 3 dígitos';inp.focus();return;}
+    err.textContent='';btnOk.textContent='Conectando...';btnOk.disabled=true;btnOk.style.opacity='0.7';
+    setTimeout(function(){ov.remove();_doLogin(user,role,val);},900);
+  }
+  btnOk.onclick=doConn;
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')doConn();});
+  [ico,ttl,sub,lbl,inp,err,btnOk,btnNo].forEach(function(el){card.appendChild(el);});
+  ov.appendChild(card);document.body.appendChild(ov);
+  setTimeout(function(){inp.focus();},100);
 }
 
 function _connectAudara(userName,role){
