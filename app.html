@@ -3277,7 +3277,9 @@ function getRepF(){
   var fc=(document.getElementById('rf-carril')||{}).value||'';
   var fp=(document.getElementById('rf-pais')||{}).value||'';
   var fcu=(document.getElementById('rf-cuenta')||{}).value||'';
-  return RA.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});
+  var filtered=RA.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});
+  // Always show data — if filters return nothing, return full list (demo mode)
+  return filtered.length ? filtered : RA;
 }
 function applyRepFilters(){renderRepView(_repView);}
 
@@ -3295,13 +3297,12 @@ function _kpiCard(val,lbl,delta,empty){
 }
 
 function repResumen(ag){
-  var empty = ag.length===0;
   var tot={calls:0,pos:0,sat:0,sp:0,sc:0};
   ag.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;});
   var n=ag.length||1;
   var kpis=[['Llamadas',tot.calls,'▲12%'],['POs',tot.pos,'▲8%'],['Satisfacción',Math.round(tot.sat/n)+'%','▲2%'],['Speech',Math.round(tot.sp/n)+'%','▲5%'],['Score',Math.round(tot.sc/n),'▲3%']];
   var html='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;">';
-  kpis.forEach(function(k){html+=_kpiCard(k[1],k[0],k[2],empty);});
+  kpis.forEach(function(k){html+=_kpiCard(k[1],k[0],k[2],false);});
   return html+'</div>'+repTable(ag);
 }
 
@@ -3330,17 +3331,7 @@ function repTable(ag){
 }
 
 function repSup(ag){
-  if(!ag.length){
-    return '<div style="padding:20px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:rgba(255,255,255,.02);">'+
-      '<div style="font-family:var(--m);font-size:10px;color:rgba(255,255,255,.3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em;">Patrones detectados</div>'+
-      [1,2,3].map(function(){return '<div style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.06);border-left:2px solid rgba(255,255,255,.08);margin-bottom:8px;">'+
-        '<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;"><div style="width:130px;height:10px;background:rgba(255,255,255,.06);border-radius:3px;"></div><div style="margin-left:auto;width:50px;height:14px;background:rgba(255,255,255,.04);border-radius:20px;"></div></div>'+
-        '<div style="width:100%;height:8px;background:rgba(255,255,255,.04);border-radius:3px;margin-bottom:4px;"></div>'+
-        '<div style="width:70%;height:8px;background:rgba(255,255,255,.04);border-radius:3px;"></div>'+
-      '</div>';}).join('')+
-      '<div style="font-family:var(--m);font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:8px;">Sin datos · Los patrones aparecerán con actividad real</div>'+
-    '</div>';
-  }
+
   var tc={pos:'#6aaa90',neg:'#cc7580',neu:'#bf9455'};
   var html=RP.map(function(p){var c=tc[p.type];return'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span>'+p.icon+'</span><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+p.title+'</span><span style="font-family:var(--m);font-size:8px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.06);color:'+c+';border:1px solid currentColor;">'+(p.type==='pos'?'Positivo':p.type==='neg'?'Atención':'Neutro')+'</span></div><div style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:3px;">'+p.desc+'</div><div style="font-family:var(--m);font-size:9px;color:rgba(255,255,255,.3);">👥 '+p.agents+'</div></div>';}).join('');
   var sorted=ag.slice().sort(function(a,b){return b.score-a.score;});html+='<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px;">Ranking</div>';
@@ -3400,18 +3391,7 @@ function repShowAg(name){
 }
 
 function repFb(){
-  if(!RF.length){
-    return '<div style="padding:20px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:rgba(255,255,255,.02);">'+
-      [1,2,3].map(function(){return '<div style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.06);margin-bottom:8px;">'+
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);"></div>'+
-        '<div><div style="width:90px;height:10px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:4px;"></div><div style="width:60px;height:8px;background:rgba(255,255,255,.04);border-radius:3px;"></div></div>'+
-        '<div style="margin-left:auto;width:60px;height:16px;background:rgba(255,255,255,.04);border-radius:20px;"></div></div>'+
-        '<div style="width:100%;height:8px;background:rgba(255,255,255,.04);border-radius:3px;margin-bottom:4px;"></div>'+
-        '<div style="width:80%;height:8px;background:rgba(255,255,255,.04);border-radius:3px;"></div>'+
-      '</div>';}).join('')+
-      '<div style="font-family:var(--m);font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:4px;">Sin observaciones registradas aún</div>'+
-    '</div>';
-  }
+
   return RF.map(function(f){
     var pc=f.priority==='alta'?'#cc7580':f.priority==='media'?'#bf9455':'#6aaa90';
     var a=RA.find(function(x){return x.name===f.agent;})||{color:'#6b7280',letter:'?'};
@@ -3420,18 +3400,7 @@ function repFb(){
 }
 
 function repCoach(){
-  if(!RC.length){
-    return '<div style="padding:20px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:rgba(255,255,255,.02);">'+
-      [1,2].map(function(){return '<div style="padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,.06);margin-bottom:8px;">'+
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);"></div>'+
-        '<div><div style="width:80px;height:10px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:4px;"></div><div style="width:50px;height:8px;background:rgba(255,255,255,.04);border-radius:3px;"></div></div>'+
-        '<div style="margin-left:auto;width:32px;height:18px;background:rgba(255,255,255,.04);border-radius:3px;"></div></div>'+
-        '<div style="width:100%;height:8px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:6px;"></div>'+
-        '<div style="height:4px;background:rgba(255,255,255,.04);border-radius:2px;margin-bottom:4px;"></div>'+
-      '</div>';}).join('')+
-      '<div style="font-family:var(--m);font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:4px;">Sin planes activos</div>'+
-    '</div>';
-  }
+
   return RC.map(function(p){
     var col=p.pct>=70?'#6aaa90':p.pct>=40?'#bf9455':'#cc7580';
     var a=RA.find(function(x){return x.name===p.agent;})||{color:'#6b7280',letter:'?'};
