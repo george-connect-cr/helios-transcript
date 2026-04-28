@@ -3272,6 +3272,16 @@ function renderRepView(v){
   else if(v==='coaching')   c.innerHTML=repCoach();
 }
 
+
+function _repRowClick(tr){
+  var name=tr.getAttribute('data-agent');
+  if(!name)return;
+  renderRepView('agente_v');
+  setTimeout(function(){
+    var s=document.getElementById('rep-ag-sel');
+    if(s){s.value=name;repShowAg(name);}
+  },80);
+}
 function getRepF(){
   var fa=(document.getElementById('rf-agente')||{}).value||'';
   var fc=(document.getElementById('rf-carril')||{}).value||'';
