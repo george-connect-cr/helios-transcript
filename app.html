@@ -1418,16 +1418,10 @@ body.light .status-opt:hover{background:#f0ede8;}
 <div class="dash-ov" id="dash-ov">
   <div class="dash-head">
     <div class="dash-head-l"><div class="dash-brand2">CONNECT</div><div><div class="dash-head-title" id="dash-view-title">Análisis del día</div><div class="dash-head-sub" id="dash-date">—</div></div></div>
-    <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
-      <div style="display:inline-flex;gap:3px;background:rgba(0,0,0,.25);padding:3px;border-radius:10px;">
-        <button id="dtab-dia" onclick="switchDashTab('dia')" style="display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:8px;border:none;cursor:pointer;background:rgba(255,255,255,.95);color:#0d1018;font-family:var(--m);font-size:12px;font-weight:700;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.15);">
-          <span style="font-size:15px;">📞</span> Mi día
-        </button>
-        <button id="dtab-rep" onclick="switchDashTab('rep')" style="display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,.5);font-family:var(--m);font-size:12px;font-weight:600;transition:all .15s;">
-          <span style="font-size:15px;">📊</span> Reportes
-        </button>
-      </div>
-      <button class="dash-close" onclick="closeDashboard()" style="padding:6px 12px;">✕</button>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+      <button id="dtab-dia" onclick="switchDashTab('dia')" style="height:28px;padding:0 14px;display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.15);border-radius:6px;cursor:pointer;background:rgba(255,255,255,.1);color:var(--t0);font-family:var(--m);font-size:10px;font-weight:600;letter-spacing:.04em;transition:all .15s;">📞 Mi día</button>
+      <button id="dtab-rep" onclick="switchDashTab('rep')" style="height:28px;padding:0 14px;display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.06);border-radius:6px;cursor:pointer;background:transparent;color:rgba(255,255,255,.4);font-family:var(--m);font-size:10px;font-weight:600;letter-spacing:.04em;transition:all .15s;">📊 Reportes</button>
+      <button class="dash-close" onclick="closeDashboard()" style="padding:6px 12px;margin-left:4px;">✕</button>
     </div>
   </div>
   <div id="dtab-dia-content"><div class="dash-body">
@@ -3208,14 +3202,14 @@ function switchDashTab(tab){
   if(tab==='dia'){
     if(dia)dia.style.display='';
     if(rep)rep.style.display='none';
-    if(bDia){bDia.style.background='rgba(255,255,255,.95)';bDia.style.color='#0d1018';bDia.style.boxShadow='0 1px 4px rgba(0,0,0,.15)';}
-    if(bRep){bRep.style.background='transparent';bRep.style.color='rgba(255,255,255,.5)';bRep.style.boxShadow='none';}
+    if(bDia){bDia.style.background='rgba(255,255,255,.1)';bDia.style.color='var(--t0)';bDia.style.borderColor='rgba(255,255,255,.15)';bDia.style.boxShadow='none';}
+    if(bRep){bRep.style.background='transparent';bRep.style.color='rgba(255,255,255,.4)';bRep.style.borderColor='rgba(255,255,255,.06)';}
     if(ttl)ttl.textContent='Análisis del día';
   }else{
     if(dia)dia.style.display='none';
     if(rep){rep.style.display='flex';rep.style.flex='1';rep.style.overflow='hidden';}
-    if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.5)';bDia.style.boxShadow='none';}
-    if(bRep){bRep.style.background='rgba(255,255,255,.95)';bRep.style.color='#0d1018';bRep.style.boxShadow='0 1px 4px rgba(0,0,0,.15)';}
+    if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.4)';bDia.style.borderColor='rgba(255,255,255,.06)';}
+    if(bRep){bRep.style.background='rgba(255,255,255,.1)';bRep.style.color='var(--t0)';bRep.style.borderColor='rgba(255,255,255,.15)';bRep.style.boxShadow='none';}
     if(ttl)ttl.textContent='Reportes & Analytics';
     renderRepSb();renderRepView(_repView);
   }
