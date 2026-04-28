@@ -1759,6 +1759,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
     if(lb)lb.addEventListener('click',function(){localStorage.removeItem('helios_session');window.location.href='index.html';});
   }catch(e){}
   setTheme('light'); connectWebPubSub();
+  // Init status UI to coaching
+  (function(){
+    var dot=document.getElementById('status-dot-btn');
+    var lbl=document.getElementById('status-label');
+    if(dot)dot.style.background='#6366f1';
+    if(lbl)lbl.textContent='Coaching';
+  })();
 });
 
 function triggerDemo(){ AgentBar.setDemo(); triggerSmartFill(); }
@@ -3116,7 +3123,7 @@ function _spawnConfetti(){
 }
 
 var PAUSAS=[{id:"disponible",label:"Disponible",color:"#6aaa90",key:true,icon:"🟢"},{id:"almuerzo",label:"Almuerzo",color:"#bf9455",key:true,icon:"🍽️"},{id:"bano",label:"Baño",color:"#bf9455",key:true,icon:"🚻"},{id:"break",label:"Break",color:"#bf9455",key:true,icon:"☕"},{id:"ocupado",label:"Ocupado",color:"#cc7580",key:true,icon:"🔴"},{id:"capacitacion",label:"Capacitación",color:"#6366f1",key:false,icon:"📚"},{id:"coaching_p",label:"Coaching",color:"#6366f1",key:false,icon:"🎯"},{id:"reunion",label:"Reunión",color:"#6366f1",key:false,icon:"👥"},{id:"backoffice",label:"Back Office",color:"#9ca3af",key:false,icon:"💼"},{id:"falla",label:"Falla técnica",color:"#cc7580",key:false,icon:"⚠️"}];
-var _curStatus="disponible";
+var _curStatus="coaching_p";
 function _buildStatusMenu(){
   var m=document.getElementById("status-menu");if(!m)return;
   m.innerHTML='';
@@ -3439,6 +3446,114 @@ function repCoach(){
       p.acts.map(function(ac){return'<div style="font-size:11px;color:var(--t1);padding:2px 0;">→ '+ac+'</div>';}).join('')+
     '</div>';
   }).join('');
+}
+
+var _lastTranscriptText = '';
+
+function showCallRating(){
+  // Remove any existing popup
+  var ex=document.getElementById('call-rating-popup');
+  if(ex)ex.remove();
+
+  var ov=document.createElement('div');
+  ov.id='call-rating-popup';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;animation:fi .2s ease;';
+
+  var card=document.createElement('div');
+  card.style.cssText='background:var(--c1);border:1px solid var(--gb2);border-radius:16px;padding:28px 32px;width:460px;max-width:94vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);';
+
+  // Header
+  var hd=document.createElement('div');
+  hd.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;';
+  hd.innerHTML='<div><div style="font-size:15px;font-weight:700;color:var(--t0);">Calificación de llamada</div>'+
+    '<div style="font-family:var(--m);font-size:10px;color:var(--t2);margin-top:2px;" id="cr-call-id">ID: #'+String(Date.now()).slice(-6)+'</div></div>'+
+    '<span style="font-size:28px;">📋</span>';
+
+  // Get timer value for AHT
+  var timerEl=document.getElementById('call-timer-val');
+  var aht=timerEl?timerEl.textContent:'—';
+
+  // Speech compliance check
+  var speechItems=['Saludo de bienvenida','Identificación del cliente','Validación de ubicación','Confirmación del servicio','ETA comunicado'];
+  var spOk=0;
+  var txt=(_lastTranscriptText||'').toLowerCase();
+  var spRows=speechItems.map(function(k){
+    var done=txt.includes(k.split(' ')[0].toLowerCase());
+    if(done)spOk++;
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gb);';
+    var dot=document.createElement('div');
+    dot.style.cssText='width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;background:'+(done?'var(--g)':'var(--gb2)')+';';
+    dot.textContent=done?'✓':'';
+    var lbl=document.createElement('span');lbl.style.cssText='font-size:11px;color:var(--t1);';lbl.textContent=k;
+    row.appendChild(dot);row.appendChild(lbl);
+    return row;
+  });
+  var spPct=Math.round(spOk/speechItems.length*100);
+
+  // Estimate scores
+  var nPOs=window.POs?window.POs.length:0;
+  var satPct=nPOs>0?Math.min(95,70+nPOs*5):50;
+  var compPct=nPOs>0?Math.min(100,nPOs*30):0;
+
+  // KPI grid
+  var kpiGrid=document.createElement('div');
+  kpiGrid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;';
+  [['Satisfacción',satPct+'%','⭐'],['Speech',spPct+'%','🎙'],['AHT',aht,'⏱'],['Completitud',compPct+'%','✅']].forEach(function(m){
+    var kpi=document.createElement('div');
+    kpi.style.cssText='background:var(--c2);border:1px solid var(--gb2);border-radius:10px;padding:12px;text-align:center;';
+    kpi.innerHTML='<div style="font-size:16px;margin-bottom:4px;">'+m[2]+'</div>'+
+      '<div style="font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);">'+m[1]+'</div>'+
+      '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">'+m[0]+'</div>';
+    kpiGrid.appendChild(kpi);
+  });
+
+  // Speech section
+  var spSection=document.createElement('div');
+  spSection.style.cssText='margin-bottom:16px;';
+  var spLabel=document.createElement('div');
+  spLabel.style.cssText='font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;';
+  spLabel.textContent='Speech compliance';
+  spSection.appendChild(spLabel);
+  spRows.forEach(function(r){spSection.appendChild(r);});
+
+  // Observations
+  var obsSection=document.createElement('div');
+  obsSection.style.cssText='margin-bottom:16px;';
+  var obsLabel=document.createElement('div');
+  obsLabel.style.cssText='font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;';
+  obsLabel.textContent='Observaciones';
+  var obsInput=document.createElement('textarea');
+  obsInput.placeholder='Agrega una observación opcional...';
+  obsInput.style.cssText='width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--gb2);background:var(--c2);color:var(--t0);font-family:var(--f);font-size:12px;resize:none;height:60px;outline:none;box-sizing:border-box;';
+  obsSection.appendChild(obsLabel);obsSection.appendChild(obsInput);
+
+  // Buttons
+  var btnRow=document.createElement('div');
+  btnRow.style.cssText='display:flex;gap:8px;';
+  var btnDiscard=document.createElement('button');
+  btnDiscard.style.cssText='flex:1;padding:10px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:12px;font-weight:500;cursor:pointer;';
+  btnDiscard.textContent='Descartar';
+  btnDiscard.onclick=function(){ov.remove();_lastTranscriptText='';};
+  var btnSave=document.createElement('button');
+  btnSave.style.cssText='flex:2;padding:10px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;';
+  btnSave.textContent='Guardar calificación';
+  btnSave.onclick=function(){
+    ov.remove();
+    _lastTranscriptText='';
+    showToast('✓ Calificación guardada');
+  };
+  btnRow.appendChild(btnDiscard);btnRow.appendChild(btnSave);
+
+  // Assemble
+  card.appendChild(hd);
+  card.appendChild(kpiGrid);
+  card.appendChild(spSection);
+  card.appendChild(obsSection);
+  card.appendChild(btnRow);
+  ov.appendChild(card);
+  document.body.appendChild(ov);
+  ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
 }
 </script>
 
