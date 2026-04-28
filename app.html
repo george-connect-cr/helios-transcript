@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Helios</title>
 <script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
@@ -34,8 +34,8 @@ html,body{height:100%;overflow:hidden;}
   --t2:#7a8399;
   --t3:#3a4155;
 
-  --f:'Syne',sans-serif;
-  --m:'JetBrains Mono',monospace;
+  --f:'Plus Jakarta Sans',system-ui,sans-serif;
+  --m:'DM Mono',monospace;
 }
 body.light{
   --bg:#eef0f7; --c1:#fff; --c2:#f4f6fb; --c3:#e8eaf4; --c4:#dde0ee;
@@ -658,7 +658,7 @@ body.light .dash-head{background:rgba(255,255,255,.7);}
 .dash-kpi:hover{border-color:rgba(255,92,0,.2);}
 .dash-kpi-val{font-family:var(--f);font-size:20px;font-weight:800;color:var(--t0);margin-bottom:6px;line-height:1;letter-spacing:-.5px;}
 .dash-kpi-val.g{color:var(--g);}.dash-kpi-val.y{color:var(--y);}.dash-kpi-val.r{color:var(--r);}
-.dash-kpi-lbl{font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;}
+.dash-kpi-lbl{font-family:var(--m);font-size:8px;letter-spacing:.06em;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;}
 /* Cols */
 .dash-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
 .dash-col{display:flex;flex-direction:column;gap:20px;}
