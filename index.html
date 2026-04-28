@@ -20,14 +20,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:ra
 .sub span{color:#374151;font-weight:500;}
 .divider{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
 .divider-line{flex:1;height:1px;background:rgba(0,0,0,.08);}
-.divider-txt{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;font-family:monospace;}
-.sim-badge{display:inline-flex;align-items:center;gap:5px;font-family:monospace;font-size:8px;padding:3px 10px;border-radius:20px;background:rgba(191,148,85,.08);color:#bf9455;border:1px solid rgba(191,148,85,.2);margin-bottom:14px;}
+.divider-txt{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;font-family:'SF Mono','Fira Code','Consolas',monospace;}
+.sim-badge{display:inline-flex;align-items:center;gap:5px;font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:8px;padding:3px 10px;border-radius:20px;background:rgba(191,148,85,.08);color:#bf9455;border:1px solid rgba(191,148,85,.2);margin-bottom:14px;}
 .g-btn{display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:24px;background:#fff;border:1px solid #dadce0;cursor:pointer;font-size:13px;font-weight:600;color:#3c4043;width:100%;justify-content:center;transition:all .2s;box-shadow:0 1px 6px rgba(0,0,0,.08);font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
 .g-btn:hover{box-shadow:0 3px 12px rgba(0,0,0,.14);transform:translateY(-1px);}
 
 /* Role selector */
 .role-picker{display:none;margin-top:14px;}
-.role-lbl{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-family:monospace;}
+.role-lbl{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-family:'SF Mono','Fira Code','Consolas',monospace;}
 .roles-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
 .role-card{padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.07);background:#fafafa;cursor:pointer;transition:all .15s;text-align:left;}
 .role-card:hover{border-color:rgba(255,92,0,.25);background:rgba(255,92,0,.02);}
@@ -35,8 +35,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:ra
 .rc-icon{font-size:18px;margin-bottom:5px;filter:grayscale(1);opacity:.6;transition:filter .15s;}
 .role-card.selected .rc-icon,.role-card:hover .rc-icon{filter:none;opacity:1;}
 .rc-name{font-size:12px;font-weight:600;color:#111318;margin-bottom:1px;letter-spacing:-.01em;}
-.rc-desc{font-size:9px;color:#9ca3af;font-family:monospace;line-height:1.4;}
-.rc-badge{display:inline-block;font-size:7px;padding:1px 6px;border-radius:20px;margin-top:3px;font-family:monospace;}
+.rc-desc{font-size:9px;color:#9ca3af;font-family:'SF Mono','Fira Code','Consolas',monospace;line-height:1.4;}
+.rc-badge{display:inline-block;font-size:7px;padding:1px 6px;border-radius:20px;margin-top:3px;font-family:'SF Mono','Fira Code','Consolas',monospace;}
 
 /* Users list */
 .users-list{display:none;flex-direction:column;gap:7px;margin-top:14px;}
@@ -44,8 +44,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:ra
 .user:hover{border-color:rgba(255,92,0,.25);background:rgba(255,92,0,.02);}
 .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
 .uname{font-size:13px;font-weight:600;color:#111318;margin-bottom:2px;letter-spacing:-.01em;}
-.uemail{font-size:10px;color:#9ca3af;font-family:monospace;}
-.urole{font-size:7px;padding:2px 7px;border-radius:20px;font-family:monospace;flex-shrink:0;}
+.uemail{font-size:10px;color:#9ca3af;font-family:'SF Mono','Fira Code','Consolas',monospace;}
+.urole{font-size:7px;padding:2px 7px;border-radius:20px;font-family:'SF Mono','Fira Code','Consolas',monospace;flex-shrink:0;}
 
 .back-btn{margin-top:10px;width:100%;padding:7px;border-radius:8px;border:1px solid rgba(0,0,0,.07);background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;transition:all .15s;}
 .back-btn:hover{color:#6b7280;}
@@ -56,9 +56,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:ra
 .loading{display:none;flex-direction:column;align-items:center;gap:10px;padding:20px 0;}
 .spin{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.08);border-top-color:#ff5c00;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-txt{font-size:11px;color:#9ca3af;font-family:monospace;}
-.timeout{display:none;padding:8px 12px;margin-bottom:14px;background:rgba(191,148,85,.06);border:1px solid rgba(191,148,85,.15);border-radius:8px;font-size:10px;color:#a67c45;text-align:center;font-family:monospace;}
-.footer{margin-top:20px;text-align:center;font-size:9px;color:#9ca3af;line-height:1.7;font-family:monospace;}
+.load-txt{font-size:11px;color:#9ca3af;font-family:'SF Mono','Fira Code','Consolas',monospace;}
+.timeout{display:none;padding:8px 12px;margin-bottom:14px;background:rgba(191,148,85,.06);border:1px solid rgba(191,148,85,.15);border-radius:8px;font-size:10px;color:#a67c45;text-align:center;font-family:'SF Mono','Fira Code','Consolas',monospace;}
+.footer{margin-top:20px;text-align:center;font-size:9px;color:#9ca3af;line-height:1.7;font-family:'SF Mono','Fira Code','Consolas',monospace;}
 .footer a{color:#6b7280;text-decoration:none;}
 .footer strong{color:#374151;}
 </style>
@@ -175,7 +175,7 @@ function showUsers(){
   s3.style.display='block';
   document.getElementById('role-lbl').textContent=ROLE_LABELS[selectedRole];
   var rc=ROLE_COLORS[selectedRole];
-  document.getElementById('role-lbl').style.cssText='font-weight:600;padding:1px 8px;border-radius:20px;background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+';font-size:10px;font-family:monospace;';
+  document.getElementById('role-lbl').style.cssText='font-weight:600;padding:1px 8px;border-radius:20px;background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+';font-size:10px;font-family:'SF Mono','Fira Code','Consolas',monospace;';
   var list=document.getElementById('users-list');
   list.style.display='flex';
   list.innerHTML='';
