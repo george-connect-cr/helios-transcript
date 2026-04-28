@@ -1275,6 +1275,12 @@ body.light .celebrate-card{
 .status-sec{font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;font-family:var(--m);}
 body.light .status-opt{color:var(--t0);}
 body.light .status-opt:hover{background:#f0ede8;}
+
+/* ── Location field confirmation ─────────────────── */
+.pvp-field-hint{font-family:var(--m);font-size:9px;color:var(--t2);margin-top:3px;line-height:1.4;}
+.pvp-loc-btn{font-family:var(--m);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid var(--gb2);background:transparent;color:var(--t1);cursor:pointer;transition:all .15s;}
+.pvp-loc-btn:hover{border-color:var(--a);color:var(--a);}
+.pvp-loc-btn.confirmed{border-color:var(--g)!important;color:var(--g)!important;background:rgba(106,170,144,.06);}
 </style>
 </head>
 <body>
@@ -1904,9 +1910,10 @@ const Recs=(()=>{
     {id:'placa',ico:'🪪',lbl:'Placa',
       txt:'Confirma la placa del vehículo con el cliente para evitar errores.',
       trig:d=>!d.placa, done:(d,s,t)=>!!d.placa||(t||'').toLowerCase().includes('tablilla')},
-    {id:'ubic_ref',ico:'📍',lbl:'Referencia',
-      txt:'Solicita un punto de referencia adicional para facilitar el despacho.',
-      trig:d=>!!d.ubicación&&d.ubicación.length<22, done:d=>d.ubicación&&d.ubicación.length>=22},
+    {id:'ubic_ref',ico:'📍',lbl:'Confirmar ubicación + referencia',
+      txt:'Confirma que la dirección funcione en Google Maps/Waze Y solicita referencia local visible (semáforo, farmacia, etc.).',
+      trig:d=>!!d.ubicación&&!d.referencia_origen,
+      done:(d,s,t)=>{var tx=(t||'').toLowerCase();return !!d.referencia_origen||(tx.includes('frente')||tx.includes('costado')||tx.includes('semáforo')||tx.includes('esquina')||tx.includes('entrada')||tx.includes('cerca')||tx.includes('referencia'));}},
     {id:'eta',ico:'⏱',lbl:'ETA',
       txt:'Comunica el tiempo estimado de llegada antes de cerrar la llamada.',
       trig:d=>!!d.tipo_asistencia&&!!d.ubicación,
@@ -2293,6 +2300,8 @@ const AgentBar = (() => {
 
 function _autoFillPO(data){
   if(!data.placa&&data.tablilla)data.placa=data.tablilla;
+  if(!data.referencia_origen&&data.referencia)data.referencia_origen=data.referencia;
+  if(!data.referencia_destino&&data.referencia_dest)data.referencia_destino=data.referencia_dest;
   const map=[
     ['tipo_asistencia',data.tipo_asistencia],
     ['nombre_cliente', data.nombre_cliente],
@@ -2852,15 +2861,17 @@ function openPOValidation(){
   }
   const data = POBuilder.getData();
   const DEF=[
-    {k:'tipo_asistencia',i:'🔧',l:'Servicio',req:true},
-    {k:'nombre_cliente', i:'👤',l:'Cliente', req:true},
-    {k:'ubicación',      i:'📍',l:'Ubicación',req:true},
-    {k:'placa',          i:'🪪',l:'Placa',   req:false},
-    {k:'marca',          i:'🚗',l:'Marca',   req:false},
-    {k:'modelo',         i:'🔖',l:'Modelo',  req:false},
-    {k:'año',            i:'📅',l:'Año',     req:false},
-    {k:'color',          i:'🎨',l:'Color',   req:false},
-    {k:'ubicacion_destino',i:'🏁',l:'Destino remolque',req:false},
+    {k:'tipo_asistencia',   i:'🔧',l:'Servicio',             req:true, hint:''},
+    {k:'nombre_cliente',    i:'👤',l:'Cliente',               req:true, hint:''},
+    {k:'ubicación',         i:'📍',l:'Ubicación actual (GPS)',req:true, hint:'Dirección que aparezca en Google Maps / Waze'},
+    {k:'referencia_origen', i:'🗺',l:'Referencia origen',     req:true, hint:'Ej: frente al semáforo del ICE, 100m del Walmart'},
+    {k:'ubicacion_destino', i:'🏁',l:'Destino remolque (GPS)',req:false,hint:'Dirección GPS del taller o destino'},
+    {k:'referencia_destino',i:'📌',l:'Referencia destino',    req:false,hint:'Punto visible del destino'},
+    {k:'placa',             i:'🪪',l:'Placa / Tablilla',       req:false,hint:''},
+    {k:'marca',             i:'🚗',l:'Marca',                  req:false,hint:''},
+    {k:'modelo',            i:'🔖',l:'Modelo',                 req:false,hint:''},
+    {k:'año',               i:'📅',l:'Año',                    req:false,hint:''},
+    {k:'color',             i:'🎨',l:'Color',                  req:false,hint:''},
   ];
   // Always show nota field (optional)
   const notaVal = (POBuilder.getData().nota||'');
@@ -2871,7 +2882,10 @@ function openPOValidation(){
     if(!ok&&f.req) miss++;
     const row=document.createElement('div');
     row.className='pvp-field '+(ok?'ok':f.req?'miss':'');
-    row.innerHTML='<span class="pvp-field-ico">'+f.i+'</span><div class="pvp-field-info"><div class="pvp-field-lbl">'+f.l+(f.req?' *':'')+'</div><input class="pvp-input'+(ok?'':' empty')+'" data-key="'+f.k+'" value="'+(ok?String(val).replace(/"/g,'&quot;'):'')+'" placeholder="—" oninput="_pvpRefreshStatus()"></div>'+(f.req?'<div class="pvp-status '+(ok?'ok':'miss')+'" id="pvp-st-'+f.k+'">'+(ok?'✓':'✗')+'</div>':'');
+    var ph = f.hint||'—';
+    var hintHtml = f.hint ? '<div class="pvp-field-hint">'+f.hint+'</div>' : '';
+    var mapBtn = (f.k==='ubicación'||f.k==='ubicacion_destino') ? '<button class="pvp-loc-btn" onclick="_confirmLocation(\'' + f.k + '\')">🗺 Confirmar en mapa</button>' : '';
+    row.innerHTML = '<span class="pvp-field-ico">'+f.i+'</span><div class="pvp-field-info"><div class="pvp-field-lbl">'+f.l+(f.req?' <span style="color:var(--a)">*</span>':'')+'</div><input class="pvp-input'+(ok?'':' empty')+'" data-key="'+f.k+'" value="'+(ok?String(val).replace(/"/g,'&quot;'):'')+'" placeholder="'+ph+'" oninput="_pvpRefreshStatus()">'+hintHtml+mapBtn+'</div>'+(f.req?'<div class="pvp-status '+(ok?'ok':'miss')+'" id="pvp-st-'+f.k+'">'+(ok?'✓':'✗')+'</div>':'');
     fieldsEl.appendChild(row);
   });
   // Nota field
@@ -2888,6 +2902,18 @@ function closePOValidation(byUser){
   if(byUser){ _pvpDismissed=true; _pvpClosedByUser=true; }
   const p=document.getElementById('po-validate-popup');
   if(p) p.classList.remove('show');
+}
+
+
+function _confirmLocation(fieldKey){
+  var inp = document.querySelector('.pvp-input[data-key="'+fieldKey+'"]');
+  if(!inp||!inp.value.trim()){showToast('⚠ Ingresa la dirección primero');return;}
+  var addr = inp.value.trim()+', Costa Rica';
+  window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr),'_blank');
+  // Mark button as confirmed after opening
+  var btn = inp.parentNode.querySelector('.pvp-loc-btn');
+  if(btn){btn.textContent='✓ Confirmado';btn.classList.add('confirmed');}
+  showToast('✓ Verificando ubicación en Maps');
 }
 
 function openMapFromField(){
