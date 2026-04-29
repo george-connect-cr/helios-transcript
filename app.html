@@ -1305,7 +1305,7 @@ body.light .status-opt:hover{background:#f0ede8;}
       <div style="position:relative" id="status-wrap">
         <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);white-space:nowrap;">
           <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6aaa90;flex-shrink:0;transition:background .3s;"></div>
-          <span id="status-label">Disponible</span>
+          <span id="status-label">Coaching</span>
         </button>
         <div id="status-menu" style="position:absolute;top:calc(100% + 8px);right:0;background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:6px;min-width:185px;max-height:360px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:21;display:none;"></div>
       </div>
@@ -1487,7 +1487,7 @@ body.light .status-opt:hover{background:#f0ede8;}
 <div id="bubbles-section" style="display:none"></div>
 <div id="insight" style="display:none"><div id="insighttxt"></div></div>
 
-<script>const CONFIG={
+<script>coconst CONFIG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
@@ -1749,6 +1749,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     var _u=_s.user||{};
     var _ne=document.getElementById('ag-name');
     if(_ne&&_u.name)_ne.textContent=_u.name.split(' ')[0];
+    if(_u.role==='agente'){var _sub=document.getElementById('n-brand-sub');if(_sub)_sub.style.display='inline';}
     document.getElementById('btn-logout')&&document.getElementById('btn-logout').addEventListener('click',function(){
       localStorage.removeItem('helios_session');window.location.href='index.html';
     });
@@ -3356,7 +3357,7 @@ function showCallRating(){
   ov.appendChild(card);document.body.appendChild(ov);
   ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
 }
-</script>
+script>
 
 <!-- PO Validation Popup — auto-appears when required fields complete -->
 <div class="po-validate-popup" id="po-validate-popup">
