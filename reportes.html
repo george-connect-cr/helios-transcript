@@ -127,6 +127,15 @@ tr:hover td{background:#fafaf8;}
 
 /* ── Scroll area ── */
 .scroll-x{overflow-x:auto;}
+
+/* ── Filters dropdown ── */
+.filter-drop{position:relative;}
+.fdrop{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--gb2);border-radius:10px;padding:5px;min-width:160px;box-shadow:0 6px 20px rgba(0,0,0,.1);z-index:100;display:none;}
+.fdrop div{padding:7px 12px;font-size:12px;color:var(--t1);cursor:pointer;border-radius:6px;transition:background .1s;}
+.fdrop div:hover{background:#f5f3f0;}
+.filter-drop.open .fdrop{display:block;}
+.filter-tag{display:flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:rgba(232,68,10,.1);color:var(--a);font-size:11px;font-weight:600;border:1px solid rgba(232,68,10,.2);}
+.filter-tag button{background:none;border:none;cursor:pointer;color:var(--a);font-size:12px;padding:0;line-height:1;}
 </style>
 </head>
 <body>
@@ -159,12 +168,39 @@ tr:hover td{background:#fafaf8;}
 
   <!-- Right panel -->
   <div style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;">
-    <div class="filters">
-      <div class="fpill active">Esta semana</div>
-      <div class="fpill">Agente <span class="arr">▾</span></div>
-      <div class="fpill">Carril <span class="arr">▾</span></div>
-      <div class="fpill">País <span class="arr">▾</span></div>
-      <div class="fpill">Cuenta <span class="arr">▾</span></div>
+    <div class="filters" id="filters-bar">
+      <div class="fpill active" onclick="setWeek(this)">Esta semana</div>
+      <div class="fpill" onclick="setWeek(this)">Semana anterior</div>
+      <div class="fpill" onclick="setWeek(this)">Este mes</div>
+      <div class="fpill filter-drop" id="f-carril">
+        Carril <span class="arr">▾</span>
+        <div class="fdrop" id="fdrop-carril">
+          <div onclick="setFilter('carril','')">Todos</div>
+          <div onclick="setFilter('carril','Home')">🏠 Home</div>
+          <div onclick="setFilter('carril','Road')">🚗 Road</div>
+          <div onclick="setFilter('carril','Concierge')">💎 Concierge</div>
+        </div>
+      </div>
+      <div class="fpill filter-drop" id="f-pais">
+        País <span class="arr">▾</span>
+        <div class="fdrop" id="fdrop-pais">
+          <div onclick="setFilter('pais','')">Todos</div>
+          <div onclick="setFilter('pais','Costa Rica')">🇨🇷 Costa Rica</div>
+          <div onclick="setFilter('pais','Panamá')">🇵🇦 Panamá</div>
+          <div onclick="setFilter('pais','Guatemala')">🇬🇹 Guatemala</div>
+          <div onclick="setFilter('pais','Honduras')">🇭🇳 Honduras</div>
+        </div>
+      </div>
+      <div class="fpill filter-drop" id="f-grade">
+        Rendimiento <span class="arr">▾</span>
+        <div class="fdrop" id="fdrop-grade">
+          <div onclick="setFilter('grade','')">Todos</div>
+          <div onclick="setFilter('grade','A')">⭐ Excelente (A)</div>
+          <div onclick="setFilter('grade','B')">👍 Bueno (B)</div>
+          <div onclick="setFilter('grade','C')">⚠️ Requiere atención (C)</div>
+        </div>
+      </div>
+      <div id="filter-tags" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
     </div>
     <div class="content" id="main-content">Cargando...</div>
   </div>
@@ -177,7 +213,13 @@ var RA=[
    sentiment:{pos:78,neu:14,neg:8},
    durations:[210,185,265,190,245,178,220,195,240,200,185,230,195,210,188],
    poScores:[88,92,85,94,90,87,93,89,91,86],
-   mejoras:['Comunicar ETA consistentemente','Reducir pausas en silencio > 5s']},
+   mejoras:['Comunicar ETA consistentemente','Reducir pausas en silencio > 5s'],
+   pos:[
+     {id:'PO-2045',fecha:'28 abr',servicio:'Grúa',duracion:195,score:94,sat:5,speech:98,sent:'pos',items:{saludo:true,identificacion:true,ubicacion:true,eta:false,cierre:true},obs:''},
+     {id:'PO-2043',fecha:'28 abr',servicio:'Batería',duracion:210,score:91,sat:4,speech:96,sent:'pos',items:{saludo:true,identificacion:true,ubicacion:true,eta:true,cierre:true},obs:''},
+     {id:'PO-2037',fecha:'27 abr',servicio:'Llanta',duracion:185,score:88,sat:4,speech:94,sent:'pos',items:{saludo:true,identificacion:true,ubicacion:true,eta:false,cierre:true},obs:'ETA no comunicado'},
+     {id:'PO-2030',fecha:'27 abr',servicio:'Grúa',duracion:240,score:92,sat:5,speech:97,sent:'pos',items:{saludo:true,identificacion:true,ubicacion:true,eta:true,cierre:true},obs:''}
+   ]},
   {id:2,name:'Carlos Mora',letter:'C',color:'#4a8a72',carril:'Road',pais:'Costa Rica',calls:164,pos:118,aht:271,ahtStr:'4:31',sat:84,speech:88,score:83,grade:'B',
    sentiment:{pos:62,neu:22,neg:16},
    durations:[280,310,265,290,320,285,260,295,305,270,285,310,275,290,265],
@@ -192,7 +234,13 @@ var RA=[
    sentiment:{pos:48,neu:28,neg:24},
    durations:[320,290,340,315,360,280,325,295,345,310,330,285,315,300,340],
    poScores:[68,72,65,70,74,67,71,69,72,66],
-   mejoras:['Reducir AHT: preguntas abiertas → cerradas','Saludo de bienvenida completo','Speech compliance: protocolo de apertura','Manejo de clientes molestos','Confirmar datos antes de registrar']},
+   mejoras:['Reducir AHT: preguntas abiertas → cerradas','Saludo de bienvenida completo','Speech compliance: protocolo de apertura','Manejo de clientes molestos','Confirmar datos antes de registrar'],
+   pos:[
+     {id:'PO-2044',fecha:'28 abr',servicio:'Grúa',duracion:345,score:68,sat:3,speech:74,sent:'neg',items:{saludo:false,identificacion:true,ubicacion:false,eta:false,cierre:true},obs:'Sin saludo. No validó ubicación. AHT elevado.'},
+     {id:'PO-2040',fecha:'28 abr',servicio:'Llanta',duracion:310,score:72,sat:3,speech:79,sent:'neu',items:{saludo:true,identificacion:true,ubicacion:true,eta:false,cierre:false},obs:'Faltó ETA y cierre formal'},
+     {id:'PO-2034',fecha:'27 abr',servicio:'Batería',duracion:295,score:74,sat:4,speech:80,sent:'neu',items:{saludo:true,identificacion:true,ubicacion:true,eta:false,cierre:true},obs:'ETA no comunicado'},
+     {id:'PO-2028',fecha:'26 abr',servicio:'Grúa',duracion:360,score:65,sat:2,speech:70,sent:'neg',items:{saludo:false,identificacion:false,ubicacion:true,eta:false,cierre:false},obs:'Cliente molesto. Múltiples omisiones del protocolo.'}
+   ]},
   {id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',calls:178,pos:134,aht:245,ahtStr:'4:05',sat:88,speech:91,score:87,grade:'B',
    sentiment:{pos:70,neu:22,neg:8},
    durations:[240,255,235,260,245,250,240,265,248,255,242,258,245,252,240],
@@ -207,12 +255,22 @@ var RA=[
    sentiment:{pos:42,neu:30,neg:28},
    durations:[350,320,370,340,380,330,355,345,365,335,350,325,360,340,375],
    poScores:[65,68,63,67,70,64,68,66,69,63],
-   mejoras:['Speech compliance: saludo en 100% de llamadas','Reducir AHT significativamente','Manejo de clientes molestos','Validación de datos del cliente','Cierre de llamada con ETA']},
+   mejoras:['Speech compliance: saludo en 100% de llamadas','Reducir AHT significativamente','Manejo de clientes molestos','Validación de datos del cliente','Cierre de llamada con ETA'],
+   pos:[
+     {id:'PO-2042',fecha:'28 abr',servicio:'Grúa',duracion:355,score:66,sat:3,speech:72,sent:'neg',items:{saludo:false,identificacion:true,ubicacion:true,eta:false,cierre:false},obs:'Sin saludo ni cierre. Cliente reportó mala atención.'},
+     {id:'PO-2036',fecha:'27 abr',servicio:'Batería',duracion:340,score:70,sat:3,speech:76,sent:'neu',items:{saludo:true,identificacion:true,ubicacion:false,eta:false,cierre:true},obs:'No validó ubicación'},
+     {id:'PO-2029',fecha:'26 abr',servicio:'Llanta',duracion:375,score:63,sat:2,speech:68,sent:'neg',items:{saludo:false,identificacion:false,ubicacion:true,eta:false,cierre:false},obs:'Múltiples omisiones. Requiere coaching urgente.'}
+   ]},
   {id:8,name:'José Quesada',letter:'J',color:'#f59e0b',carril:'Road',pais:'Panamá',calls:169,pos:128,aht:258,ahtStr:'4:18',sat:86,speech:90,score:85,grade:'B',
    sentiment:{pos:68,neu:24,neg:8},
    durations:[255,270,248,262,275,258,265,260,272,255,260,268,255,265,258],
    poScores:[84,87,82,86,88,83,86,84,87,82],
-   mejoras:['ETA consistente al cierre','Reducción de silencios']}
+   mejoras:['ETA consistente al cierre','Reducción de silencios'],
+   pos:[
+     {id:'PO-2041',fecha:'28 abr',servicio:'Grúa',duracion:262,score:86,sat:4,speech:88,sent:'pos',items:{saludo:true,identificacion:true,ubicacion:true,eta:false,cierre:true},obs:''},
+     {id:'PO-2038',fecha:'28 abr',servicio:'Batería',duracion:248,score:89,sat:5,speech:92,sent:'pos',items:{saludo:true,identificacion:true,ubicacion:true,eta:true,cierre:true},obs:''},
+     {id:'PO-2031',fecha:'27 abr',servicio:'Llanta',duracion:275,score:82,sat:4,speech:86,sent:'neu',items:{saludo:true,identificacion:false,ubicacion:true,eta:true,cierre:true},obs:'Omitió identificación del cliente'}
+   ]}
 ];
 
 var RC=[
@@ -271,9 +329,10 @@ function initRole(){
 
 // ── RESUMEN ──────────────────────────────────────────
 function viewResumen(){
+  var ag=_RAFiltered.length?_RAFiltered:RA;
   var tot={calls:0,pos:0,sat:0,sp:0,sc:0,aht:0};
-  RA.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;tot.aht+=a.aht;});
-  var n=RA.length;
+  ag.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;tot.aht+=a.aht;});
+  var n=ag.length||1;
   var avgAht=fmtSec(Math.round(tot.aht/n));
   var kpis=[
     ['Llamadas',tot.calls,'▲12%',false],
@@ -291,7 +350,7 @@ function viewResumen(){
 
   // Grade distribution
   var grades={A:0,B:0,C:0};
-  RA.forEach(function(a){grades[a.grade]++;});
+  ag.forEach(function(a){grades[a.grade]++;});
   html+='<div class="grid-2" style="margin-bottom:16px;">';
   html+='<div><div class="sec-title">Distribución de rendimiento</div><div class="card">';
   [['A','Excelente','#4a8a72',grades.A],['B','Bueno','#a67c45',grades.B],['C','Requiere atención','#b85c6b',grades.C]].forEach(function(g){
@@ -307,7 +366,7 @@ function viewResumen(){
 
   // Sentiment overview
   var totSent={pos:0,neu:0,neg:0};
-  RA.forEach(function(a){totSent.pos+=a.sentiment.pos;totSent.neu+=a.sentiment.neu;totSent.neg+=a.sentiment.neg;});
+  ag.forEach(function(a){totSent.pos+=a.sentiment.pos;totSent.neu+=a.sentiment.neu;totSent.neg+=a.sentiment.neg;});
   var st=totSent.pos+totSent.neu+totSent.neg;
   html+='<div><div class="sec-title">Análisis de sentimiento del equipo</div><div class="card">';
   [['Positivo',Math.round(totSent.pos/n),'#4a8a72','😊'],['Neutro',Math.round(totSent.neu/n),'#a67c45','😐'],['Negativo',Math.round(totSent.neg/n),'#b85c6b','😞']].forEach(function(s){
@@ -319,15 +378,16 @@ function viewResumen(){
   });
   html+='</div></div></div>';
 
-  html+='<div class="sec-title">Todos los agentes</div>'+tableAgentes();
+  html+='<div class="sec-title">Todos los agentes</div>'+tableAgentes(ag);
   return html;
 }
 
 // ── TABLA AGENTES ────────────────────────────────────
-function tableAgentes(){
+function tableAgentes(ag){
+  ag=ag||(_RAFiltered.length?_RAFiltered:RA);
   var ths=['Agente','Carril','País','Llamadas','AHT','Satisf.','Speech','Sentimiento','Score'].map(function(x){return'<th>'+x+'</th>';}).join('');
   var cC={Home:'#6366f1',Road:'#4a8a72',Concierge:'#a67c45'};
-  var trs=RA.map(function(a){
+  var trs=ag.map(function(a){
     var sentV=a.sentiment.pos;
     return'<tr onclick="nav(\'agente_v\');setTimeout(function(){showAgente('+a.id+');},50);" style="cursor:pointer;">'+
       '<td><div style="display:flex;align-items:center;gap:10px;"><div class="av av-sm" style="background:'+a.color+'">'+a.letter+'</div>'+
@@ -346,18 +406,20 @@ function tableAgentes(){
 }
 
 function viewAgentes(){
-  return'<div class="page-title">Todos los agentes</div><div class="page-sub">Haz clic en un agente para ver su perfil detallado</div>'+tableAgentes();
+  var ag=_RAFiltered.length?_RAFiltered:RA;
+  return'<div class="page-title">Todos los agentes</div><div class="page-sub">Haz clic en un agente para ver su perfil detallado · '+ag.length+' agentes</div>'+tableAgentes(ag);
 }
 
 // ── POR AGENTE (DETALLE COMPLETO) ───────────────────
 var _selAgent = null;
 
 function viewPorAgente(){
-  var opts=RA.map(function(a){return'<option value="'+a.id+'"'+(a===_selAgent?' selected':'')+'>'+a.name+'</option>';}).join('');
+  var agList=_RAFiltered.length?_RAFiltered:RA;
+  var opts=agList.map(function(a){return'<option value="'+a.id+'"'+((_selAgent&&a.id===_selAgent.id)?' selected':'')+'>'+a.name+'</option>';}).join('');
   var sel='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'+
     '<select id="ag-sel" onchange="showAgente(parseInt(this.value))" style="padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);background:#fff;font-size:13px;width:260px;cursor:pointer;color:var(--t0);">'+
     '<option value="">Seleccionar agente...</option>'+opts+'</select>'+
-    '<div style="font-size:12px;color:var(--t2);">'+RA.length+' agentes disponibles</div>'+
+    '<div style="font-size:12px;color:var(--t2);">'+agList.length+' agentes disponibles</div>'+
   '</div>';
   return sel+'<div id="ag-detail">'+(
     _selAgent ? agentDetail(_selAgent) :
@@ -558,6 +620,38 @@ function agentDetail(a){
       '</div>'
     :'<div class="card" style="text-align:center;padding:20px;"><div style="font-size:28px;margin-bottom:6px;">✓</div><div style="font-size:12px;color:var(--t2);">Sin plan de coaching activo</div></div>');
 
+
+  // ── PO detail table ──
+  var poDetailCard='';
+  if(a.pos && a.pos.length){
+    var spLabels={saludo:'Saludo',identificacion:'Identificación',ubicacion:'Ubicación',eta:'ETA',cierre:'Cierre'};
+    var poRows=a.pos.map(function(p){
+      var sc=p.score>=85?'#4a8a72':p.score>=70?'#a67c45':'#b85c6b';
+      var sentIco=p.sent==='pos'?'😊':p.sent==='neg'?'😞':'😐';
+      var items=Object.keys(p.items).map(function(k){
+        return'<span title="'+spLabels[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:700;background:'+(p.items[k]?'rgba(74,138,114,.15)':'rgba(184,92,107,.12)')+';color:'+(p.items[k]?'#4a8a72':'#b85c6b')+';">'+(p.items[k]?'✓':'✗')+'</span>';
+      }).join('');
+      var stars='';for(var i=0;i<5;i++)stars+='<span style="color:'+(i<p.sat?'#f59e0b':'#d1d5db');stars+=';font-size:11px;">★</span>';
+      return'<tr>'+
+        '<td style="font-family:var(--m);font-size:10px;color:var(--t2);">'+p.id+'</td>'+
+        '<td style="font-size:11px;color:var(--t2);">'+p.fecha+'</td>'+
+        '<td><span class="tag" style="font-size:9px;color:#6366f1;border-color:#6366f1;background:rgba(99,102,241,.06);">'+p.servicio+'</span></td>'+
+        '<td style="font-family:var(--m);font-size:11px;color:'+(p.duracion>280?'var(--r)':'var(--t1)')+';">'+Math.floor(p.duracion/60)+':'+(p.duracion%60<10?'0':'')+p.duracion%60+'</td>'+
+        '<td><span class="score-badge" style="font-size:11px;background:'+(p.score>=85?'rgba(74,138,114,.12)':p.score>=70?'rgba(166,124,69,.12)':'rgba(184,92,107,.12)')+';color:'+sc+';">'+p.score+'</span></td>'+
+        '<td style="white-space:nowrap;">'+stars+'</td>'+
+        '<td style="font-size:14px;">'+sentIco+'</td>'+
+        '<td><div style="display:flex;gap:3px;align-items:center;">'+items+'</div></td>'+
+        '<td style="font-size:11px;color:var(--t2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(p.obs||'—')+'</td>'+
+      '</tr>';
+    }).join('');
+    poDetailCard='<div class="sec-title" style="margin-top:4px;">Análisis por PO</div>'+
+      '<div class="tbl-wrap scroll-x">'+
+        '<table><thead><tr>'+
+          ['ID','Fecha','Servicio','Duración','Score','Satisfacción','Sentimiento','Speech items','Observación'].map(function(x){return'<th>'+x+'</th>';}).join('')+
+        '</tr></thead><tbody>'+poRows+'</tbody></table>'+
+      '</div>';
+  }
+
   return header+kpiRow+
     '<div class="grid-2">'+
       '<div>'+poCard+mejoras(a)+'</div>'+
@@ -566,7 +660,8 @@ function agentDetail(a){
     '<div class="grid-2">'+
       '<div>'+spCard+'</div>'+
       '<div>'+obsCard+planCard+'</div>'+
-    '</div>';
+    '</div>'+
+    poDetailCard;
 }
 
 function mejoras(a){
@@ -677,6 +772,62 @@ function viewOperaciones(){
       '<div style="font-size:12px;color:var(--t2);">Configuración de cuentas, carriles y métricas del sistema.</div>'+
     '</div>';
 }
+
+// ── Filters state ────────────────────────────────────
+var _filters={carril:'',pais:'',grade:''};
+var _RAFiltered=RA.slice();
+
+function setWeek(el){
+  document.querySelectorAll('.filters .fpill:not(.filter-drop)').forEach(function(e){e.classList.remove('active');});
+  el.classList.add('active');
+}
+
+function setFilter(key,val){
+  _filters[key]=val;
+  // Close all dropdowns
+  document.querySelectorAll('.filter-drop').forEach(function(el){el.classList.remove('open');});
+  // Update button label
+  var labels={carril:{'':"Carril",Home:"🏠 Home",Road:"🚗 Road",Concierge:"💎 Concierge"},
+               pais:{'':"País","Costa Rica":"🇨🇷 CR","Panamá":"🇵🇦 PA","Guatemala":"🇬🇹 GT","Honduras":"🇭🇳 HN"},
+               grade:{'':"Rendimiento",A:"⭐ A",B:"👍 B",C:"⚠️ C"}};
+  var btn=document.getElementById('f-'+key);
+  if(btn){
+    var lbl=labels[key][val]||val||key;
+    btn.childNodes[0].textContent=lbl+' ';
+    btn.style.background=val?'rgba(232,68,10,.08)':'';
+    btn.style.color=val?'var(--a)':'';
+    btn.style.borderColor=val?'rgba(232,68,10,.3)':'';
+  }
+  // Apply filters
+  _RAFiltered=RA.filter(function(a){
+    return(!_filters.carril||a.carril===_filters.carril)&&
+           (!_filters.pais||a.pais===_filters.pais)&&
+           (!_filters.grade||a.grade===_filters.grade);
+  });
+  // Update filter tags
+  var tags=document.getElementById('filter-tags');
+  if(tags){
+    var active=Object.keys(_filters).filter(function(k){return _filters[k];});
+    tags.innerHTML=active.map(function(k){
+      return'<div class="filter-tag">'+_filters[k]+'<button onclick="setFilter(''+k+'','')">×</button></div>';
+    }).join('');
+  }
+  // Re-render current view
+  var active=document.querySelector('.sb-item.active');
+  if(active&&active.id){
+    var viewId=active.id.replace('nav-','');
+    nav(viewId);
+  }
+}
+
+// Toggle dropdowns
+document.addEventListener('click',function(e){
+  var drop=e.target.closest('.filter-drop');
+  document.querySelectorAll('.filter-drop').forEach(function(el){
+    if(el!==drop)el.classList.remove('open');
+  });
+  if(drop)drop.classList.toggle('open');
+});
 
 // ── Init ─────────────────────────────────────────────
 initRole();
