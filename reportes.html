@@ -385,7 +385,15 @@ function vAgentes(){
 // POR AGENTE
 function vPorAgente(){
   var data=ag();
-  // Agent list sidebar + detail panel
+  // If role is agente: show own profile only, no sidebar list
+  if(_role==='agente'){
+    if(!_selAg&&data.length>0)_selAg=data[0];
+    if(_selAg){
+      return'<div style="padding:20px;">'+agDet(_selAg)+'</div>';
+    }
+    return'<div style="padding:40px;text-align:center;color:var(--t2);font-size:13px;">Sin perfil disponible</div>';
+  }
+  // Other roles: show agent list sidebar + detail panel
   var listItems=data.map(function(a){
     var isActive=_selAg&&_selAg.id===a.id;
     var gc=a.grade==='A'?'#4a8a72':a.grade==='B'?'#a67c45':'#b85c6b';
@@ -753,11 +761,24 @@ try{
       var suv=document.getElementById('nav-supervisor');if(suv)suv.style.display='';
     }
     if(_role==='agente'){
+      // Lock agent to own data only
+      _filters.agente=_uname;
+      // Hide team navigation
       ['nav-agentes','nav-coaching','nav-feedback','sb-sec-formador'].forEach(function(id){
         var el=document.getElementById(id);if(el)el.style.display='none';
       });
+      // Also hide Agente filter pill (agent can't change agent filter)
+      var fAg=document.getElementById('f-agente');
+      if(fAg)fAg.style.display='none';
+      // Hide period filters row (not relevant for single agent)
+      // Pre-select this agent's profile
       var matchAg=RA.find(function(a){return a.name===_uname;});
-      if(matchAg)_selAg=matchAg;
+      if(!matchAg){
+        // Agent not in demo data - show empty state
+        go('agente_v');
+        return;
+      }
+      _selAg=matchAg;
       go('agente_v');
       return;
     }
