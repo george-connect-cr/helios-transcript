@@ -1290,6 +1290,9 @@ body.light .status-opt:hover{background:#f0ede8;}
   flex-direction: column;
   overflow: hidden;
 }
+
+#dtab-rep-content.rep-active{display:flex!important;flex:1!important;min-height:0!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}
+#dtab-dia-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 </style>
 </head>
 <body class="light">
@@ -1432,14 +1435,23 @@ body.light .status-opt:hover{background:#f0ede8;}
 </div>
 <div class="dash-ov" id="dash-ov">
   <div class="dash-head">
-    <div class="dash-head-l"><div class="dash-brand2">CONNECT</div><div><div class="dash-head-title" id="dash-view-title">Análisis del día</div><div class="dash-head-sub" id="dash-date">—</div></div></div>
-    <div style="display:flex;align-items:center;gap:5px;margin-left:auto;">
-      <button id="dtab-dia" onclick="switchDashTab('dia')" style="height:26px;padding:0 12px;border:1px solid rgba(255,255,255,.15);border-radius:6px;cursor:pointer;background:rgba(255,255,255,.1);color:#fff;font-family:var(--m);font-size:10px;font-weight:600;transition:all .15s;">📞 Mi día</button>
-      <button id="dtab-rep" onclick="switchDashTab('rep')" style="height:26px;padding:0 12px;border:1px solid rgba(255,255,255,.06);border-radius:6px;cursor:pointer;background:transparent;color:rgba(255,255,255,.4);font-family:var(--m);font-size:10px;font-weight:600;transition:all .15s;">📊 Reportes</button>
-      <button class="dash-close" onclick="closeDashboard()" style="padding:5px 10px;margin-left:4px;">✕</button>
+    <div class="dash-head-l">
+      <div class="dash-brand2">CONNECT</div>
+      <div>
+        <div class="dash-head-title" id="dash-view-title">Análisis del día</div>
+        <div class="dash-head-sub" id="dash-date">—</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+      <button id="dtab-dia" onclick="switchDashTab('dia')" style="height:28px;padding:0 14px;border:1px solid rgba(255,255,255,.15);border-radius:6px;cursor:pointer;background:rgba(255,255,255,.1);color:#fff;font-family:var(--m);font-size:10px;font-weight:600;transition:all .15s;">📞 Mi día</button>
+      <button id="dtab-rep" onclick="switchDashTab('rep')" style="height:28px;padding:0 14px;border:1px solid rgba(255,255,255,.06);border-radius:6px;cursor:pointer;background:transparent;color:rgba(255,255,255,.4);font-family:var(--m);font-size:10px;font-weight:600;transition:all .15s;">📊 Reportes</button>
+      <button class="dash-close" onclick="closeDashboard()">✕</button>
     </div>
   </div>
-  <div id="dtab-dia-content" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"><div class="dash-body">
+
+  <!-- TAB: Mi día -->
+  <div id="dtab-dia-content" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;">
+<div class="dash-body">
     <div class="dash-score-card">
       <div class="dash-score-ring-wrap">
         <svg class="dash-ring" viewBox="0 0 152 152">
@@ -1478,12 +1490,19 @@ body.light .status-opt:hover{background:#f0ede8;}
     </div>
   </div>
 </div></div>
-  <div id="dtab-rep-content" style="display:none;flex:1;min-height:0;overflow:hidden;">
-    <div style="display:flex;height:100%;overflow:hidden;">
-      <div id="rep-sb" style="width:180px;min-width:180px;border-right:1px solid rgba(255,255,255,.08);padding:10px 0;overflow-y:auto;flex-shrink:0;"></div>
-      <div style="flex:1;overflow-y:auto;padding:16px;min-width:0;"><div id="rep-content"></div></div>
+  </div>
+  </div><!-- /dtab-dia-content -->
+
+  <!-- TAB: Reportes -->
+  <div id="dtab-rep-content" style="display:none;flex:1;min-height:0;">
+    <div style="display:flex;width:100%;height:100%;overflow:hidden;">
+      <div id="rep-sb" style="width:190px;min-width:190px;flex-shrink:0;border-right:1px solid var(--gb);padding:12px 0;overflow-y:auto;background:var(--c1);"></div>
+      <div style="flex:1;min-width:0;overflow-y:auto;padding:20px;background:var(--bg);">
+        <div id="rep-content" style="min-height:200px;"></div>
+      </div>
     </div>
   </div>
+
 </div>
 <div class="toast" id="toast"></div>
 <div id="sfanalyzing" style="display:none"></div>
@@ -3209,7 +3228,14 @@ var RP=[{icon:'📉',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con 
 var RM=[{id:'resumen',i:'📊',l:'Resumen'},{id:'agentes',i:'🎧',l:'Agentes'},{id:'supervisor',i:'📈',l:'Supervisor'},{id:'formador',i:'🎓',l:'Formador'},{id:'agente_v',i:'👤',l:'Por Agente'},{id:'feedback',i:'💬',l:'Feedback'},{id:'coaching',i:'🎯',l:'Coaching'}];
 function switchDashTab(tab){
   try{var _uu=(JSON.parse(localStorage.getItem('helios_session')||'{}')||{}).user||{};if(_uu.role==='formador'&&tab==='dia')return;}catch(e){} // formador stays on rep
-  _dashTab=tab;var dia=document.getElementById('dtab-dia-content');var rep=document.getElementById('dtab-rep-content');var bDia=document.getElementById('dtab-dia');var bRep=document.getElementById('dtab-rep');var ttl=document.getElementById('dash-view-title');if(tab==='dia'){if(dia){dia.style.display='flex';dia.style.flexDirection='column';}if(rep){rep.style.display='none';rep.className='';}if(bDia){bDia.style.background='rgba(255,255,255,.1)';bDia.style.color='#fff';bDia.style.borderColor='rgba(255,255,255,.15)';}if(bRep){bRep.style.background='transparent';bRep.style.color='rgba(255,255,255,.4)';bRep.style.borderColor='rgba(255,255,255,.06)';}if(ttl)ttl.textContent='Análisis del día';}else{if(dia)dia.style.display='none';if(rep){rep.style.cssText='display:flex;flex:1;overflow:hidden;min-height:0;';rep.className='rep-active';}if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.4)';bDia.style.borderColor='rgba(255,255,255,.06)';}if(bRep){bRep.style.background='rgba(255,255,255,.1)';bRep.style.color='#fff';bRep.style.borderColor='rgba(255,255,255,.15)';}if(ttl)ttl.textContent='Reportes & Analytics';renderRepSb();renderRepView(_repView||'resumen');}}
+  _dashTab=tab;var dia=document.getElementById('dtab-dia-content');var rep=document.getElementById('dtab-rep-content');var bDia=document.getElementById('dtab-dia');var bRep=document.getElementById('dtab-rep');var ttl=document.getElementById('dash-view-title');if(tab==='dia'){if(dia){dia.style.display='flex';dia.style.flexDirection='column';}if(rep){rep.style.display='none';rep.className='';}if(bDia){bDia.style.background='rgba(255,255,255,.1)';bDia.style.color='#fff';bDia.style.borderColor='rgba(255,255,255,.15)';}if(bRep){bRep.style.background='transparent';bRep.style.color='rgba(255,255,255,.4)';bRep.style.borderColor='rgba(255,255,255,.06)';}if(ttl)ttl.textContent='Análisis del día';}else{if(dia)dia.style.display='none';if(rep){
+    rep.style.display='flex';
+    rep.style.flex='1';
+    rep.style.minHeight='0';
+    rep.style.height='calc(100vh - 56px)';
+    rep.style.overflow='hidden';
+    rep.className='rep-active';
+  }if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.4)';bDia.style.borderColor='rgba(255,255,255,.06)';}if(bRep){bRep.style.background='rgba(255,255,255,.1)';bRep.style.color='#fff';bRep.style.borderColor='rgba(255,255,255,.15)';}if(ttl)ttl.textContent='Reportes & Analytics';renderRepSb();renderRepView(_repView||'resumen');}}
 function renderRepSb(){var sb=document.getElementById('rep-sb');if(!sb)return;sb.innerHTML='';RM.forEach(function(it){var a=_repView===it.id;var d=document.createElement('div');d.setAttribute('data-view',it.id);d.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:11px;font-weight:'+(a?'600':'400')+';color:'+(a?'var(--a)':'var(--t1)')+';border-left:2px solid '+(a?'var(--a)':'transparent')+';background:'+(a?'rgba(255,92,0,.06)':'transparent')+';transition:all .12s;';d.innerHTML='<span style="font-size:13px;">'+it.i+'</span>'+it.l;d.onclick=function(){renderRepView(this.getAttribute('data-view'));};sb.appendChild(d);});}
 function renderRepView(v){_repView=v;renderRepSb();var c=document.getElementById('rep-content');if(!c)return;var ag=getRepF();if(v==='resumen')c.innerHTML=repResumen(ag);else if(v==='agentes')c.innerHTML=repTable(ag);else if(v==='supervisor')c.innerHTML=repSup(ag);else if(v==='formador')c.innerHTML=repForm();else if(v==='agente_v')c.innerHTML=repAgSel();else if(v==='feedback')c.innerHTML=repFb();else if(v==='coaching')c.innerHTML=repCoach();}
 function getRepF(){var fa=(document.getElementById('rf-agente')||{}).value||'';var fc=(document.getElementById('rf-carril')||{}).value||'';var fp=(document.getElementById('rf-pais')||{}).value||'';var fcu=(document.getElementById('rf-cuenta')||{}).value||'';var f=RA.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});return f.length?f:RA;}
