@@ -1779,28 +1779,7 @@ function triggerSmartFill(){
   }catch(e){console.warn("Demo fetch:",e);}
 }
 
-function setStatus(idOrText,colorOrState,label,icon){
-  // Support both 2-param (text,state) and 4-param (id,color,label,icon) calls
-  var dot=document.getElementById('cdot');
-  var lbl=document.getElementById('clbl');
-  var sBtn=document.getElementById('status-dot-btn');
-  var sLbl=document.getElementById('status-label');
-  
-  if(label){
-    // 4-param call: id, color, label, icon
-    if(dot){dot.className='cdot';dot.style.background=colorOrState;}
-    if(lbl)lbl.textContent=idOrText;
-    if(sBtn)sBtn.style.background=colorOrState;
-    if(sLbl)sLbl.textContent=(icon?' ':'')+label;
-  } else {
-    // 2-param call: text, state  
-    if(dot){dot.className='cdot '+(colorOrState||'');dot.style.background='';}
-    if(lbl)lbl.textContent=idOrText;
-    var stateColors={live:'#6aaa90',warn:'#bf9455',err:'#cc7580'};
-    var sc=stateColors[colorOrState]||'#6aaa90';
-    if(sBtn)sBtn.style.background=sc;
-  }
-}
+
 
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -3363,98 +3342,36 @@ function toggleStatusMenu(){
   m.style.display=open?"none":"block";
   if(!open){setTimeout(function(){document.addEventListener("click",function cl(e){var w=document.getElementById("status-wrap");if(w&&!w.contains(e.target)){m.style.display="none";document.removeEventListener("click",cl);}});},10);}
 }
-function setStatus(id,color,label,icon){
-  _currentStatus=id;
-  var dot=document.getElementById("status-dot-btn");
-  var lbl=document.getElementById("status-label");
-  if(dot)dot.style.background=color;
-  if(lbl)lbl.textContent=label;
-  document.getElementById("status-menu").style.display="none";
-  if(typeof showToast==="function")showToast(icon+" "+label);
-}
+
 
 var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
 var _curStatus='coaching_p';
 var _lastTranscriptText='';
 function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;m.innerHTML='';var s1=document.createElement('div');s1.className='status-sec';s1.textContent='Estado';m.appendChild(s1);PAUSAS.filter(function(p){return p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});var sep=document.createElement('div');sep.className='status-sep';m.appendChild(sep);var s2=document.createElement('div');s2.className='status-sec';s2.textContent='Pausas';m.appendChild(s2);PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});}
 function toggleStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;_buildStatusMenu();var open=m.style.display==='block';m.style.display=open?'none':'block';if(!open)setTimeout(function(){document.addEventListener('click',function cl(e){if(!document.getElementById('status-wrap').contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}});},10);}
-function setStatus(id,color,label,icon){_curStatus=id;var dot=document.getElementById('status-dot-btn');var lbl=document.getElementById('status-label');if(dot)dot.style.background=color;if(lbl)lbl.textContent=label;var m=document.getElementById('status-menu');if(m)m.style.display='none';showToast(icon+' '+label);}
-var _dashTab='dia',_repView='resumen';
-var RA=[{id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:2,name:'Carlos Mora',letter:'C',color:'#6aaa90',carril:'Road',pais:'Costa Rica',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:4,name:'Luis Arias',letter:'L',color:'#4a8a72',carril:'Home',pais:'Costa Rica',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:8,name:'José Quesada',letter:'J',color:'#0ea5e9',carril:'Road',pais:'Panamá',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'}];
-var RF=[
-  {agent:'Dayana García',by:'Ana Vega',role:'Supervisora',date:'23 abr',text:'Excelente manejo del cliente molesto. Lenguaje empático y resolución rápida.',tags:['Empatía','Resolución'],priority:'baja'},
-  {agent:'Luis Arias',by:'Roberto Salas',role:'Supervisor',date:'22 abr',text:'AHT elevado. Demora en confirmar ubicación. Requiere refuerzo en protocolo.',tags:['AHT','Protocolo'],priority:'alta'},
-  {agent:'Carlos Mora',by:'Ana Vega',role:'Supervisora',date:'21 abr',text:'Buen desempeño. No siempre comunica ETA antes de despedirse.',tags:['ETA','Cierre'],priority:'media'},
-  {agent:'María Solano',by:'Roberto Salas',role:'Supervisor',date:'21 abr',text:'Speech bajo. Omite saludo en 4 de 10 llamadas.',tags:['Speech','Saludo'],priority:'alta'}
-];
-var RC=[
-  {agent:'Luis Arias',obj:'Reducir AHT a menos de 4:30',acts:['Preguntas clave en primeros 60s','Role-play apertura'],dl:'30 abr',pct:35,coach:'Roberto Salas'},
-  {agent:'María Solano',obj:'Speech compliance al 90%',acts:['5 grabaciones propias/semana','Sesión con formador'],dl:'5 may',pct:20,coach:'Ana Vega'},
-  {agent:'Carlos Mora',obj:'Comunicar ETA en 100% llamadas',acts:['Checklist visual','Feedback diario'],dl:'28 abr',pct:60,coach:'Roberto Salas'}
-];
-var RP=[{icon:'📉',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},{icon:'⭐',title:'Alto rendimiento Concierge',type:'pos',desc:'Satisfacción +90% consistente.',agents:'Valeria Núñez, Andrés Fallas'},{icon:'⚠️',title:'Omisión de ETA',type:'neg',desc:'40% de agentes no comunican ETA al cerrar.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},{icon:'📈',title:'Mejora en speech',type:'pos',desc:'Speech compliance +8% en 2 semanas.',agents:'Dayana García, Sofía Ramírez'}];
-var RM=[{id:'resumen',i:'📊',l:'Resumen'},{id:'agentes',i:'🎧',l:'Agentes'},{id:'supervisor',i:'📈',l:'Supervisor'},{id:'formador',i:'🎓',l:'Formador'},{id:'agente_v',i:'👤',l:'Por Agente'},{id:'feedback',i:'💬',l:'Feedback'},{id:'coaching',i:'🎯',l:'Coaching'}];
-function switchDashTab(tab){
-  try{var _uu=(JSON.parse(localStorage.getItem('helios_session')||'{}')||{}).user||{};if(_uu.role==='formador'&&tab==='dia')return;}catch(e){} // formador stays on rep
-  _dashTab=tab;var dia=document.getElementById('dtab-dia-content');var rep=document.getElementById('dtab-rep-content');var bDia=document.getElementById('dtab-dia');var bRep=document.getElementById('dtab-rep');var ttl=document.getElementById('dash-view-title');if(tab==='dia'){if(dia){dia.style.display='flex';dia.style.flexDirection='column';}if(rep){rep.style.display='none';rep.className='';}if(bDia){bDia.style.background='rgba(255,255,255,.1)';bDia.style.color='#fff';bDia.style.borderColor='rgba(255,255,255,.15)';}if(bRep){bRep.style.background='transparent';bRep.style.color='rgba(255,255,255,.4)';bRep.style.borderColor='rgba(255,255,255,.06)';}if(ttl)ttl.textContent='Análisis del día';}else{if(dia)dia.style.display='none';if(rep){
-    rep.style.display='flex';
-    rep.style.flexDirection='column';
-    rep.style.flex='1';
-    rep.style.minHeight='0';
-    rep.style.height='calc(100vh - 56px)';
-    rep.style.overflow='hidden';
-    rep.className='rep-active';
-    // Force inner container
-    var inner=rep.querySelector('div');
-    if(inner){inner.style.flex='1';inner.style.minHeight='0';inner.style.display='flex';}
-  }if(bDia){bDia.style.background='transparent';bDia.style.color='rgba(255,255,255,.4)';bDia.style.borderColor='rgba(255,255,255,.06)';}if(bRep){bRep.style.background='rgba(255,255,255,.1)';bRep.style.color='#fff';bRep.style.borderColor='rgba(255,255,255,.15)';}if(ttl)ttl.textContent='Reportes & Analytics';try{
-    renderRepSb();
-    renderRepView(_repView||'resumen');
-    // Force fallback if rep-content is empty after render
-    setTimeout(function(){
-      var c=document.getElementById('rep-content');
-      var sb=document.getElementById('rep-sb');
-      if(c){
-        try{c.innerHTML=repResumen(getRepF());}
-        catch(err){c.innerHTML='<div style="padding:20px;color:red;">'+err.message+'</div>';}
-      }
-      if(sb){try{renderRepSb();}catch(e2){}}
-    },50);
-  }catch(err){
-    var c=document.getElementById('rep-content');
-    if(c)c.innerHTML='<div style="padding:20px;font-size:12px;color:var(--t0);">Error al cargar: '+err.message+'</div>';
-  }}}
-function renderRepSb(){var sb=document.getElementById('rep-sb');if(!sb)return;sb.innerHTML='';RM.forEach(function(it){var a=_repView===it.id;var d=document.createElement('div');d.setAttribute('data-view',it.id);d.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:11px;font-weight:'+(a?'600':'400')+';color:'+(a?'var(--a)':'var(--t1)')+';border-left:2px solid '+(a?'var(--a)':'transparent')+';background:'+(a?'rgba(255,92,0,.06)':'transparent')+';transition:all .12s;';d.innerHTML='<span style="font-size:13px;">'+it.i+'</span>'+it.l;d.onclick=function(){renderRepView(this.getAttribute('data-view'));};sb.appendChild(d);});}
-function renderRepView(v){_repView=v;renderRepSb();var c=document.getElementById('rep-content');if(!c)return;var ag=getRepF();if(v==='resumen')c.innerHTML=repResumen(ag);else if(v==='agentes')c.innerHTML=repTable(ag);else if(v==='supervisor')c.innerHTML=repSup(ag);else if(v==='formador')c.innerHTML=repForm();else if(v==='agente_v')c.innerHTML=repAgSel();else if(v==='feedback')c.innerHTML=repFb();else if(v==='coaching')c.innerHTML=repCoach();}
-function getRepF(){var fa=(document.getElementById('rf-agente')||{}).value||'';var fc=(document.getElementById('rf-carril')||{}).value||'';var fp=(document.getElementById('rf-pais')||{}).value||'';var fcu=(document.getElementById('rf-cuenta')||{}).value||'';var f=RA.filter(function(a){return(!fa||a.name===fa)&&(!fc||a.carril===fc)&&(!fp||a.pais===fp)&&(!fcu||a.cuenta===fcu);});return f.length?f:RA;}
-function applyRepFilters(){renderRepView(_repView);}
-function _rc(v){return v>=85?'var(--g)':v>=70?'var(--y)':'var(--r)';}
-function _rScore(a){var bg=a.grade==='A'?'rgba(106,170,144,.15)':a.grade==='B'?'rgba(191,148,85,.15)':'rgba(204,117,128,.15)';var c=a.grade==='A'?'var(--g)':a.grade==='B'?'var(--y)':'var(--r)';return'<span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:20px;border-radius:5px;font-family:var(--m);font-size:10px;font-weight:700;background:'+bg+';color:'+c+';">'+a.score+'</span>';}
-function _rBar(v){return'<div style="width:60px;height:3px;background:var(--gb2);border-radius:2px;overflow:hidden;margin-top:2px;"><div style="height:100%;width:'+v+'%;background:'+_rc(v)+'"></div></div>';}
-var _cC={Home:'#6366f1',Road:'var(--g)',Concierge:'var(--y)'};
-var _pC={'Costa Rica':'var(--r)','Panamá':'var(--y)','Guatemala':'var(--g)','Honduras':'var(--t2)'};
-function repResumen(ag){var tot={calls:0,pos:0,sat:0,sp:0,sc:0};ag.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;});var n=ag.length||1;var kpis=[['Llamadas',tot.calls],['POs',tot.pos],['Satisfacción',tot.calls?Math.round(tot.sat/n)+'%':'—'],['Speech',tot.calls?Math.round(tot.sp/n)+'%':'—'],['Score',tot.calls?Math.round(tot.sc/n):'—']];var out='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';kpis.forEach(function(k){out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;"><div style="font-family:var(--m);font-size:22px;font-weight:600;color:var(--t0);">'+k[1]+'</div><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">'+k[0]+'</div></div>';});return out+'</div>'+repTable(ag);}
-function repTable(ag){var ths=['Agente','Llamadas','AHT','Satisf.','Speech','Score'].map(function(x){return'<th style="padding:8px 12px;text-align:left;font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;">'+x+'</th>';}).join('');var trs=ag.map(function(a){var sc=_rc(a.sat);var sp=_rc(a.speech);return'<tr style="border-bottom:1px solid var(--gb);"><td style="padding:9px 12px;"><div style="display:flex;align-items:center;gap:9px;"><div style="width:28px;height:28px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">'+a.letter+'</div><div><div style="font-size:12px;font-weight:600;color:var(--t0);">'+a.name+'</div><div style="font-family:var(--m);font-size:9px;color:var(--t2);">'+a.carril+' · '+a.pais+'</div></div></div></td><td style="padding:9px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">'+a.calls+'</td><td style="padding:9px 12px;font-family:var(--m);font-size:11px;color:var(--t0);">'+a.aht+'</td><td style="padding:9px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:'+sc+';">'+a.sat+'%</div>'+_rBar(a.sat)+'</td><td style="padding:9px 12px;"><div style="font-family:var(--m);font-size:11px;font-weight:600;color:'+sp+';">'+a.speech+'%</div></td><td style="padding:9px 12px;">'+_rScore(a)+'</td></tr>';}).join('');return'<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;overflow:hidden;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--c2);">'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div>';}
-function repSup(ag){var tc={pos:'var(--g)',neg:'var(--r)',neu:'var(--y)'};var out=RP.map(function(p){var c=tc[p.type];return'<div style="background:var(--c1);border:1px solid var(--gb2);border-left:3px solid '+c+';border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:16px;">'+p.icon+'</span><span style="font-size:13px;font-weight:600;color:var(--t0);flex:1;">'+p.title+'</span></div><div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:4px;">'+p.desc+'</div><div style="font-family:var(--m);font-size:9px;color:var(--t2);">👥 '+p.agents+'</div></div>';}).join('');var sorted=ag.slice().sort(function(a,b){return b.score-a.score;});out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;"><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Ranking</div>';sorted.forEach(function(a,i){out+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gb);"><span style="font-family:var(--m);font-size:11px;width:18px;color:var(--t2);">'+(i+1)+'</span><div style="width:24px;height:24px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">'+a.letter+'</div><span style="flex:1;font-size:12px;color:var(--t0);">'+a.name+'</span>'+_rScore(a)+_rBar(a.score)+'</div>';});return out+'</div>';}
-function repForm(){var opps=[{a:'Protocolo de apertura',imp:'alto',ag:'Luis Arias, María Solano',d:'Estandarizar saludo y preguntas clave.'},{a:'Comunicación de ETA',imp:'alto',ag:'Carlos Mora, Luis Arias',d:'Confirmar ETA antes de cerrar.'},{a:'Clientes molestos',imp:'medio',ag:'Luis Arias, María Solano',d:'Técnicas de desescalada.'}];var iC={alto:'var(--r)',medio:'var(--y)',bajo:'var(--g)'};var out='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"><div><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Oportunidades</div>';opps.forEach(function(o){out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="display:flex;margin-bottom:4px;"><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+o.a+'</span><span style="font-family:var(--m);font-size:8px;color:'+iC[o.imp]+';">'+o.imp+'</span></div><div style="font-size:11px;color:var(--t1);margin-bottom:3px;">'+o.d+'</div><div style="font-family:var(--m);font-size:9px;color:var(--t2);">'+o.ag+'</div></div>';});return out+'</div><div><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Planes activos</div><div style="font-size:11px;color:var(--t2);padding:20px;text-align:center;">Sin planes activos</div></div></div>';}
-function repAgSel(){var opts=RA.map(function(a){return'<option value="'+a.name+'">'+a.name+'</option>';}).join('');return'<select id="rep-ag-sel" onchange="repShowAg(this.value)" style="margin-bottom:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--gb2);background:var(--c1);color:var(--t0);font-family:var(--m);font-size:12px;width:240px;cursor:pointer;"><option value="">Seleccionar agente...</option>'+opts+'</select><div id="rep-ag-det" style="padding:32px;text-align:center;font-family:var(--m);font-size:11px;color:var(--t2);">Selecciona un agente</div>';}
-function repShowAg(name){var a=RA.find(function(x){return x.name===name;});var d=document.getElementById('rep-ag-det');if(!d||!a)return;d.innerHTML='<div style="text-align:center;padding:20px;"><div style="width:48px;height:48px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;margin:0 auto 10px;">'+a.letter+'</div><div style="font-size:16px;font-weight:700;color:var(--t0);">'+a.name+'</div></div>';}
-function repFb(){
-  if(!RF.length)return'<div style="padding:32px;text-align:center;font-size:11px;color:var(--t2);">Sin observaciones registradas</div>';
-  return RF.map(function(f){
-    var pc=f.priority==='alta'?'var(--r)':f.priority==='media'?'var(--y)':'var(--g)';
-    var a=RA.find(function(x){return x.name===f.agent;})||{color:'#9ca3af',letter:'?'};
-    return'<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:16px 18px;margin-bottom:10px;">'+
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
-        '<div style="width:32px;height:32px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">'+a.letter+'</div>'+
-        '<div><div style="font-size:13px;font-weight:600;color:var(--t0);">'+f.agent+'</div>'+
-        '<div style="font-family:var(--m);font-size:10px;color:var(--t2);">'+f.by+' · '+f.role+' · '+f.date+'</div></div>'+
-        '<span style="margin-left:auto;font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:'+pc+';border:1px solid var(--gb2);">'+f.priority.toUpperCase()+'</span>'+
-      '</div>'+
-      '<div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:8px;">'+f.text+'</div>'+
-      '<div>'+f.tags.map(function(t){return'<span style="font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:var(--t2);border:1px solid var(--gb2);margin-right:4px;">'+t+'</span>';}).join('')+'</div>'+
-    '</div>';
-  }).join('');
+function setStatus(id,colorOrState,label,icon){
+  _curStatus=id;
+  var dot=document.getElementById('status-dot-btn');
+  var lbl=document.getElementById('status-label');
+  var cdot=document.getElementById('cdot');
+  var clbl=document.getElementById('clbl');
+  if(label){
+    // 4-param: id, color, label, icon (from status menu)
+    if(dot)dot.style.background=colorOrState;
+    if(lbl)lbl.textContent=(icon?icon+' ':'')+label;
+    if(cdot){cdot.className='cdot';cdot.style.background=colorOrState;}
+    if(clbl)clbl.textContent=id;
+    var m=document.getElementById('status-menu');
+    if(m)m.style.display='none';
+    showToast((icon||'')+' '+label);
+  }else{
+    // 2-param: text, state (from WebPubSub)
+    var stateColors={live:'#6aaa90',warn:'#bf9455',err:'#cc7580'};
+    var sc=stateColors[colorOrState]||'#6aaa90';
+    if(cdot){cdot.className='cdot '+(colorOrState||'');cdot.style.background='';}
+    if(clbl)clbl.textContent=id;
+    if(dot)dot.style.background=sc;
+  }
 }
 function repCoach(){
   if(!RC.length)return'<div style="padding:32px;text-align:center;font-size:11px;color:var(--t2);">Sin planes de coaching activos</div>';
