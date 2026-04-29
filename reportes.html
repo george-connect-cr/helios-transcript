@@ -2,14 +2,15 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CONNECT · Reportes</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f0ede8;color:#0d1018;}
+html,body{height:100%;font-family:var(--f);background:#f0ede8;color:#0d1018;}
 :root{--a:#E8440A;--g:#4a8a72;--y:#a67c45;--r:#b85c6b;--m:'SF Mono','Fira Code',monospace;--c1:#fff;--gb:rgba(0,0,0,.07);--gb2:rgba(0,0,0,.12);--t0:#0d1018;--t1:#374151;--t2:#6b7280;--t3:#9ca3af;}
 .hd{height:54px;background:#fff;border-bottom:1px solid var(--gb);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:10;}
-.hd-brand{font-size:19px;font-weight:800;color:var(--a);letter-spacing:-.03em;}
+.hd-brand{font-family:var(--f);font-size:19px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .hd-sep{width:1px;height:20px;background:var(--gb);margin:0 8px;}
 .hd-title{font-size:13px;font-weight:600;}
 .hd-role{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(232,68,10,.08);color:var(--a);border:1px solid rgba(232,68,10,.2);font-weight:600;margin-left:6px;}
@@ -21,7 +22,7 @@ html,body{height:100%;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
 body{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 .body-wrap{display:flex;flex:1;min-height:0;overflow:hidden;}
 .sb{width:210px;min-width:210px;background:#fff;border-right:1px solid var(--gb);padding:16px 0;overflow-y:auto;flex-shrink:0;}
-.sb-sec{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;padding:10px 18px 4px;font-weight:700;}
+.sb-sec{font-family:var(--m);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;padding:10px 18px 4px;font-weight:700;}
 .sb-item{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;font-size:12px;color:var(--t1);border-left:2px solid transparent;transition:all .12s;}
 .sb-item:hover{background:#f9f8f6;color:var(--t0);}
 .sb-item.active{background:rgba(232,68,10,.05);color:var(--a);border-left-color:var(--a);font-weight:600;}
@@ -52,7 +53,7 @@ body{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .tbl-wrap{background:#fff;border:1px solid var(--gb);border-radius:12px;overflow:hidden;margin-bottom:16px;}
 table{width:100%;border-collapse:collapse;}
-th{padding:10px 14px;text-align:left;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;background:#f9f8f6;border-bottom:1px solid var(--gb);}
+th{padding:10px 14px;text-align:left;font-family:var(--m);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;background:#f9f8f6;border-bottom:1px solid var(--gb);}
 td{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.04);font-size:12px;color:var(--t1);}
 tr:last-child td{border-bottom:none;}
 tr.clickable:hover td{background:#fafaf8;cursor:pointer;}
