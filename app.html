@@ -1352,9 +1352,9 @@ body.light .status-opt:hover{background:#f0ede8;}
     <button class="qbtn" onclick="toggleQ()" title="Cola">📋 Cola <span class="qn" id="q-cnt">4</span></button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
       <div style="position:relative" id="status-wrap">
-        <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);white-space:nowrap;">
+        <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:11px;color:var(--t0);white-space:nowrap;font-weight:500;">
           <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6366f1;flex-shrink:0;transition:background .3s;"></div>
-          <span id="status-label">Coaching</span>
+          <span id="status-label" style="color:var(--t0);">Coaching</span>
         </button>
         <div id="status-menu" style="position:absolute;top:calc(100% + 8px);right:0;background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:6px;min-width:185px;max-height:360px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:21;display:none;"></div>
       </div>
@@ -1636,6 +1636,8 @@ function appendTranscript(speaker,text){
     _showScrollArrow();
   }
   if(typeof CallTimer!=='undefined') CallTimer.start();
+  // Guardar estado actual antes de que llegue la llamada (para restaurar al finalizar)
+  if(typeof _curStatus!=='undefined' && typeof _preCallStatus!=='undefined') _preCallStatus=_curStatus;
   if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
   // Re-check recs on every transcript line
   if(typeof Recs!=='undefined' && typeof lastAnalysis!=='undefined' && lastAnalysis){
@@ -2009,7 +2011,17 @@ const CallTimer=(()=>{
     const d=document.getElementById('t-dot');if(d)d.className='td-dot';
     const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
     const al=document.getElementById('t-alert');if(al){al.className='t-row-alert';al.style.display='none';}
-    setTimeout(function(){if(typeof setStatus==='function')setStatus('coaching_p','#6366f1','Coaching','🎯');if(typeof showCallRating==='function')showCallRating();},600);
+    setTimeout(function(){
+      if(typeof setStatus==='function'){
+        // Si el agente estaba en capacitación antes de la llamada, volver ahí automáticamente
+        var returnStatus = (typeof _preCallStatus!=='undefined' && _preCallStatus==='capacitacion')
+          ? {id:'capacitacion',color:'#6366f1',label:'Capacitación',icon:'📚'}
+          : {id:'coaching_p',  color:'#6366f1',label:'Coaching',    icon:'🎯'};
+        setStatus(returnStatus.id, returnStatus.color, returnStatus.label, returnStatus.icon);
+        _preCallStatus = null;
+      }
+      if(typeof showCallRating==='function')showCallRating();
+    },600);
   }
   return{start,reset};
 })();
@@ -3359,6 +3371,7 @@ function setStatus(id,color,label,icon){
 
 var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
 var _curStatus='coaching_p';
+var _preCallStatus=null; // estado previo al inicio de llamada, para restaurar al finalizar
 var _lastTranscriptText='';
 function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;m.innerHTML='';var s1=document.createElement('div');s1.className='status-sec';s1.textContent='Estado';m.appendChild(s1);PAUSAS.filter(function(p){return p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});var sep=document.createElement('div');sep.className='status-sep';m.appendChild(sep);var s2=document.createElement('div');s2.className='status-sec';s2.textContent='Pausas';m.appendChild(s2);PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});}
 function toggleStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;_buildStatusMenu();var open=m.style.display==='block';m.style.display=open?'none':'block';if(!open)setTimeout(function(){document.addEventListener('click',function cl(e){if(!document.getElementById('status-wrap').contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}});},10);}
