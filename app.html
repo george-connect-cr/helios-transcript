@@ -1288,6 +1288,37 @@ body.light .status-opt:hover{background:#f0ede8;}
 
 #dtab-rep-content.rep-active{display:flex!important;flex:1!important;min-height:0!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}
 #dtab-dia-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+
+/* Queue */
+.qbtn{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);}
+.qbtn:hover{border-color:var(--a);color:var(--a);}
+.qbtn .qn{font-weight:700;color:var(--a);}
+.q-ov{position:fixed;top:0;right:0;bottom:0;left:0;z-index:300;display:none;pointer-events:none;}
+.q-ov.show{display:block;pointer-events:all;}
+.q-bd{position:absolute;inset:0;}
+.q-panel{position:absolute;top:56px;right:12px;width:360px;background:var(--c1);border:1px solid var(--gb2);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden;}
+.q-hd{padding:14px 18px;border-bottom:1px solid var(--gb);display:flex;align-items:center;justify-content:space-between;}
+.q-htitle{font-size:13px;font-weight:700;color:var(--t0);}
+.q-hsub{font-family:var(--m);font-size:10px;color:var(--t2);margin-top:2px;}
+.q-item{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--gb);}
+.q-item:last-child{border-bottom:none;}
+.q-pos{width:22px;height:22px;border-radius:50%;background:var(--gb);display:flex;align-items:center;justify-content:center;font-family:var(--m);font-size:9px;font-weight:700;color:var(--t2);flex-shrink:0;}
+.q-pos.top{background:rgba(232,68,10,.12);color:var(--a);}
+.q-svc{font-size:12px;font-weight:600;color:var(--t0);}
+.q-meta{font-size:10px;color:var(--t2);}
+.q-wait{font-family:var(--m);font-size:12px;font-weight:700;margin-left:auto;}
+.q-wait.hi{color:var(--r);}
+.q-wait.md{color:var(--y);}
+.q-wait.lo{color:var(--g);}
+.q-sec{padding:14px 18px;border-bottom:1px solid var(--gb);}
+.q-sec-title{font-family:var(--m);font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.kb-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+.kb-row:last-child{border-bottom:none;}
+.kb-ic{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.kb-ic.ok{background:rgba(74,138,114,.12);color:var(--g);}
+.kb-ic.no{background:rgba(184,92,107,.1);color:var(--r);}
+.kb-nm{font-size:11px;font-weight:600;color:var(--t0);}
+.kb-ds{font-size:10px;color:var(--t2);margin-top:1px;line-height:1.4;}
 </style>
 </head>
 <body class="light">
@@ -1313,6 +1344,7 @@ body.light .status-opt:hover{background:#f0ede8;}
       <button class="n-to on" id="th-light" onclick="setTheme('light')" title="Modo claro">☀️</button>
     </div>
     <button class="n-dash" onclick="window.location.href='reportes.html'" title="Reportes & Analytics">📊</button>
+    <button class="qbtn" onclick="toggleQ()" title="Cola">📋 Cola <span class="qn" id="q-cnt">4</span></button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
       <div style="position:relative" id="status-wrap">
         <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);white-space:nowrap;">
@@ -1759,6 +1791,74 @@ function showToast(msg){
   t.textContent=msg;t.classList.add('show');
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
+
+var _qOpen=false;
+var _qData=[
+  {pos:1,svc:'Grúa / Remolque',meta:'Home · Costa Rica',wait:312},
+  {pos:2,svc:'Batería descargada',meta:'Road · Panamá',wait:185},
+  {pos:3,svc:'Llanta ponchada',meta:'Concierge · CR',wait:97},
+  {pos:4,svc:'Asistencia vial',meta:'Home · Guatemala',wait:52}
+];
+var _qKB=[
+  {ok:true,nm:'Saludo de bienvenida',ds:'Identificó nombre y extensión correctamente'},
+  {ok:true,nm:'Validación de ubicación',ds:'Confirmó coordenadas y referencia'},
+  {ok:false,nm:'Comunicación de ETA',ds:'No informó el tiempo estimado antes de cerrar'},
+  {ok:true,nm:'Servicio correcto',ds:'Seleccionó el tipo de servicio adecuado'},
+  {ok:false,nm:'Cierre formal',ds:'Cerró sin confirmar datos del cliente'}
+];
+function toggleQ(){
+  _qOpen=!_qOpen;
+  var ov=document.getElementById('q-ov');
+  if(ov)ov.classList.toggle('show',_qOpen);
+  if(_qOpen)renderQ();
+}
+function renderQ(){
+  var list=document.getElementById('q-list');
+  if(list){
+    list.innerHTML=_qData.map(function(q){
+      var m=Math.floor(q.wait/60),sec=('0'+q.wait%60).slice(-2);
+      var wc=q.wait>240?'hi':q.wait>120?'md':'lo';
+      return'<div class="q-item">'+
+        '<div class="q-pos'+(q.pos===1?' top':'')+'">'+q.pos+'</div>'+
+        '<div style="flex:1"><div class="q-svc">'+q.svc+'</div><div class="q-meta">'+q.meta+'</div></div>'+
+        '<div class="q-wait '+wc+'">'+m+':'+sec+'</div>'+
+      '</div>';
+    }).join('');
+  }
+  var ok=_qKB.filter(function(k){return k.ok;}).length;
+  var score=Math.round(ok/_qKB.length*100);
+  var sc=document.getElementById('q-score');
+  if(sc){sc.textContent=score;sc.style.color=score>=80?'var(--g)':score>=60?'var(--y)':'var(--r)';}
+  var tags=document.getElementById('q-tags');
+  if(tags){
+    tags.innerHTML='<div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+      _qKB.map(function(k){
+        var bg=k.ok?'rgba(74,138,114,.12)':'rgba(184,92,107,.1)';
+        var col=k.ok?'var(--g)':'var(--r)';
+        return'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+bg+';color:'+col+';font-weight:600;">'+(k.ok?'✓':'✗')+' '+k.nm+'</span>';
+      }).join('')+
+    '</div>';
+  }
+  var kb=document.getElementById('q-kb');
+  if(kb){
+    kb.innerHTML=_qKB.map(function(k){
+      return'<div class="kb-row">'+
+        '<div class="kb-ic '+(k.ok?'ok':'no')+'">'+(k.ok?'✓':'⚠')+'</div>'+
+        '<div><div class="kb-nm">'+k.nm+'</div><div class="kb-ds">'+k.ds+'</div></div>'+
+      '</div>';
+    }).join('');
+  }
+  var sub=document.getElementById('q-sub');
+  if(sub){
+    var avg=Math.round(_qData.reduce(function(a,q){return a+q.wait;},0)/(_qData.length||1));
+    sub.textContent=_qData.length+' en espera · Promedio '+Math.floor(avg/60)+':'+(avg%60<10?'0':'')+avg%60;
+  }
+}
+setInterval(function(){
+  _qData.forEach(function(q){q.wait+=5;});
+  var cnt=document.getElementById('q-cnt');
+  if(cnt)cnt.textContent=_qData.length;
+},5000);
 
 window.addEventListener('DOMContentLoaded', ()=>{
   try{
@@ -3362,6 +3462,28 @@ function showCallRating(){
     <div class="celebrate-title">¡Meta alcanzada!</div>
     <div class="celebrate-sub">Completaste tu objetivo del día.<br>¡Excelente trabajo, sigue así!</div>
     <button class="celebrate-close" onclick="closeCelebration()">Continuar</button>
+  </div>
+</div>
+
+<div class="q-ov" id="q-ov">
+  <div class="q-bd" onclick="toggleQ()"></div>
+  <div class="q-panel">
+    <div class="q-hd">
+      <div><div class="q-htitle">📋 Cola de llamadas</div><div class="q-hsub" id="q-sub">Cargando...</div></div>
+      <button onclick="toggleQ()" style="background:none;border:none;cursor:pointer;font-size:15px;color:var(--t2);">✕</button>
+    </div>
+    <div id="q-list"></div>
+    <div class="q-sec">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="q-sec-title" style="margin-bottom:0;">Mi última calificación</div>
+        <div id="q-score" style="font-size:22px;font-weight:800;">—</div>
+      </div>
+      <div id="q-tags"></div>
+    </div>
+    <div class="q-sec">
+      <div class="q-sec-title">Adopción de KB · Última llamada</div>
+      <div id="q-kb"></div>
+    </div>
   </div>
 </div>
 </body>
