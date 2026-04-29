@@ -2247,38 +2247,38 @@ const AgentBar = (() => {
     const sEl = document.getElementById('ag-star');
 
     if(dEl) dEl.textContent = done;
-    if(bEl){
+    if(bEl && bEl.classList){
       bEl.style.width = Math.min(pct, 100) + '%';
       bEl.classList.toggle('done', pct >= 100);
     }
 
     // Star fills progressively based on % toward goal
-    if(sEl){
+    if(sEl && sEl.classList){
       if(pct <= 0){
         // Empty — grayscale
         sEl.style.filter = 'grayscale(1) brightness(10)';
         sEl.style.opacity = '.25';
-        sEl.classList.remove('on');
+        if(sEl.classList)sEl.classList.remove('on');
       } else if(pct < 50){
         // Quarter fill — slight color
         sEl.style.filter = 'sepia(1) saturate(1.5) hue-rotate(5deg)';
         sEl.style.opacity = '.5';
-        sEl.classList.remove('on');
+        if(sEl.classList)sEl.classList.remove('on');
       } else if(pct < 80){
         // Half fill — more color
         sEl.style.filter = 'sepia(1) saturate(2) hue-rotate(5deg)';
         sEl.style.opacity = '.75';
-        sEl.classList.remove('on');
+        if(sEl.classList)sEl.classList.remove('on');
       } else if(pct < 100){
         // Almost there — vivid
         sEl.style.filter = 'none';
         sEl.style.opacity = '.9';
-        sEl.classList.remove('on');
+        if(sEl.classList)sEl.classList.remove('on');
       } else {
         // 100% — full glow + animation
         sEl.style.filter = 'none';
         sEl.style.opacity = '1';
-        if(!sEl.classList.contains('on')){
+        if(sEl.classList && !sEl.classList.contains('on')){
           sEl.classList.add('on');
           showCelebration(done, goal);
         }
