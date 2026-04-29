@@ -91,11 +91,17 @@ select{padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);backgroun
     <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html'" class="btn btn-danger" style="height:30px;font-size:12px;">Salir</button>
   </div>
 </div></div>
-<div style="background:#fff;border-bottom:1px solid var(--gb);padding:0 24px;display:flex;align-items:center;gap:6px;height:44px;flex-shrink:0;">
+
+<div style="background:#fff;border-bottom:1px solid var(--gb);padding:0 20px;display:flex;align-items:center;gap:6px;height:42px;flex-shrink:0;z-index:9;">
   <div class="fp active" onclick="selPeriod(this,'week')">Esta semana</div>
-  <div class="fp" onclick="selPeriod(this,'prev')">Semana anterior</div>
+  <div class="fp" onclick="selPeriod(this,'prev')">Sem. anterior</div>
   <div class="fp" onclick="selPeriod(this,'month')">Este mes</div>
-  <div style="width:1px;height:18px;background:var(--gb);margin:0 4px;"></div>
+  <div style="width:1px;height:16px;background:var(--gb);margin:0 2px;"></div>
+  <div class="fp" id="f-agente">Agente ▾
+    <div class="fdrop" id="fdrop-agente">
+      <div class="fdrop-item" onclick="setF('agente','',event)">Todos</div>
+    </div>
+  </div>
   <div class="fp" id="f-carril">Carril ▾
     <div class="fdrop">
       <div class="fdrop-item" onclick="setF('carril','',event)">Todos</div>
@@ -119,11 +125,6 @@ select{padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);backgroun
       <div class="fdrop-item" onclick="setF('grade','A',event)">⭐ Excelente (A)</div>
       <div class="fdrop-item" onclick="setF('grade','B',event)">👍 Bueno (B)</div>
       <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ Atención (C)</div>
-    </div>
-  </div>
-  <div class="fp" id="f-agente">Agente ▾
-    <div class="fdrop" id="fdrop-agente">
-      <div class="fdrop-item" onclick="setF('agente','',event)">Todos</div>
     </div>
   </div>
   <div id="ftags" style="display:flex;gap:4px;margin-left:4px;"></div>
