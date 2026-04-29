@@ -3479,7 +3479,7 @@ function showCallRating(){
     '<div style="margin-bottom:16px;"><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Speech compliance</div>'+spHtml+'</div>'+
     '<div style="margin-bottom:16px;"><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Observaciones</div><textarea placeholder="Agrega una observación..." style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--gb2);background:var(--c2);color:var(--t0);font-family:var(--f);font-size:12px;resize:none;height:60px;outline:none;box-sizing:border-box;"></textarea></div>'+
     '<div style="display:flex;gap:8px;" id="cr-btns"></div>';
-  var row=card.querySelector('#cr-btns');
+  var row=card.querySelector('#cr-btns')||card;
   var bd=document.createElement('button');bd.style.cssText='flex:1;padding:10px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:12px;cursor:pointer;';bd.textContent='Descartar';bd.onclick=function(){ov.remove();_lastTranscriptText='';};
   var bs=document.createElement('button');bs.style.cssText='flex:2;padding:10px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;';bs.textContent='Guardar calificación';bs.onclick=function(){ov.remove();_lastTranscriptText='';showToast('✓ Calificación guardada');};
   row.appendChild(bd);row.appendChild(bs);
