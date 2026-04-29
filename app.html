@@ -1784,9 +1784,12 @@ window.addEventListener('DOMContentLoaded', ()=>{
     // Roles that auto-open the reports dashboard
     var _dashRoles=['formador','supervisor','admin'];
     if(_dashRoles.indexOf(_u.role)>=0){
-      // Redirect to standalone reports page
-      window.location.href='reportes.html';
-      return;
+      // Only redirect if not coming from reportes.html
+      if(document.referrer.indexOf('reportes.html')<0&&!sessionStorage.getItem('from_reportes')){
+        window.location.href='reportes.html';
+        return;
+      }
+      sessionStorage.removeItem('from_reportes');
     }
   }catch(e){}
   setTheme('light');

@@ -145,7 +145,8 @@ tr:hover td{background:#fafaf8;}
   <div class="hd-sep"></div>
   <span class="hd-title">Reportes & Analytics</span>
   <span class="hd-role" id="hd-role-badge">Formador</span>
-  <a href="app.html" class="hd-back">← Volver</a>
+  <a href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="hd-back">← App</a>
+  <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html';" style="margin-left:8px;padding:6px 14px;border-radius:8px;border:1px solid rgba(200,0,0,.2);background:#fff;color:#b85c6b;font-size:12px;cursor:pointer;">Cerrar sesión</button>
 </div>
 
 <div class="layout">
@@ -196,17 +197,7 @@ tr:hover td{background:#fafaf8;}
         <div class="fdrop" id="fdrop-grade">
           <div onclick="setFilter('grade','')">Todos</div>
           <div onclick="setFilter('grade','A')">⭐ Excelente (A)</div>
-          <div onclick="setFilter('grade','B')">👍 Bueno (B)</div>
-          <div onclick="setFilter('grade','C')">⚠️ Requiere atención (C)</div>
-        </div>
-      </div>
-      <div id="filter-tags" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
-    </div>
-    <div class="content" id="main-content">Cargando...</div>
-  </div>
-</div>
-
-<script>
+          <div onclick="s
 // ── Data ──────────────────────────────────────────────
 var RA=[
   {id:1,name:'Dayana García',letter:'D',color:'#E8440A',carril:'Home',pais:'Costa Rica',calls:187,pos:142,aht:232,ahtStr:'3:52',sat:92,speech:96,score:91,grade:'A',
@@ -297,7 +288,11 @@ var RP=[
 
 // ── Helpers ──────────────────────────────────────────
 var _role = 'formador';
-try{var _s=JSON.parse(localStorage.getItem('helios_session')||'{}');_role=(_s.user||{}).role||'formador';}catch(e){}
+try{
+  var _sess=JSON.parse(localStorage.getItem('helios_session')||'null');
+  if(!_sess||(Date.now()-_sess.ts>3600000)){window.location.href='index.html';throw '';}
+  _role=(_sess.user||{}).role||'formador';
+}catch(e){}
 
 function rc(v){return v>=85?'var(--g)':v>=70?'var(--y)':'var(--r)';}
 function rcHex(v){return v>=85?'#4a8a72':v>=70?'#a67c45':'#b85c6b';}
@@ -827,6 +822,17 @@ function setFilter(key,val){
 
 // Toggle dropdowns
 document.addEventListener('click',function(e){
+  var drop=e.target.closest('.filter-drop');
+  document.querySelectorAll('.filter-drop').forEach(function(el){
+    if(el!==drop)el.classList.remove('open');
+  });
+  if(drop)drop.classList.toggle('open');
+});
+
+// ── Init ─────────────────────────────────────────────
+initRole();
+nav('resumen');
+tListener('click',function(e){
   var drop=e.target.closest('.filter-drop');
   document.querySelectorAll('.filter-drop').forEach(function(el){
     if(el!==drop)el.classList.remove('open');
