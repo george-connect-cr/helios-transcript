@@ -3367,28 +3367,25 @@ function setStatus(id,color,label,icon){
 }
 
 function _triggerSimulatedCall(){
-  var session={};
-  try{session=JSON.parse(localStorage.getItem('helios_session')||'{}');}catch(e){}
-  var agentId=(session.user||{}).id||'unknown';
-  var agentName=(session.user||{}).name||'Agente';
   showToast('📞 Iniciando llamada de capacitación...');
-  fetch('/api/trigger-call',{
+  fetch('https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/sendCall?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({agentId:agentId,agentName:agentName})
+    body:JSON.stringify({source:'4001',destination:'17876065812',accountName:'Connect',branch:'PR',poNumber:'4117472'})
   })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(data.ok){
+  .then(function(r){return r.text().then(function(t){return{status:r.status,body:t};});})
+  .then(function(res){
+    if(res.status>=200&&res.status<300){
       showToast('✓ Llamada de capacitación en camino');
+      console.log('sendCall ok:',res.body);
     } else {
-      showToast('⚠ Error al disparar llamada: '+(data.error||'desconocido'));
-      console.warn('trigger-call error:',data);
+      showToast('⚠ Error al disparar llamada ('+res.status+')');
+      console.warn('sendCall error:',res.status,res.body);
     }
   })
   .catch(function(err){
     showToast('⚠ No se pudo conectar con el servidor');
-    console.error('trigger-call fetch error:',err);
+    console.error('sendCall fetch error:',err);
   });
 }
 var _dashTab='dia',_repView='resumen';
