@@ -8,7 +8,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f0ede8;color:#0d1018;}
 :root{--a:#E8440A;--g:#4a8a72;--y:#a67c45;--r:#b85c6b;--m:'SF Mono','Fira Code',monospace;--c1:#fff;--gb:rgba(0,0,0,.07);--gb2:rgba(0,0,0,.12);--t0:#0d1018;--t1:#374151;--t2:#6b7280;--t3:#9ca3af;}
-.hd{height:54px;background:#fff;border-bottom:1px solid var(--gb);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:10;}
+.hd{height:54px;flex-wrap:wrap;background:#fff;border-bottom:1px solid var(--gb);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:10;}
 .hd-brand{font-size:19px;font-weight:800;color:var(--a);letter-spacing:-.03em;}
 .hd-sep{width:1px;height:20px;background:var(--gb);margin:0 8px;}
 .hd-title{font-size:13px;font-weight:600;}
@@ -86,9 +86,39 @@ select{padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);backgroun
   <div class="hd-sep"></div>
   <span class="hd-title">Reportes & Analytics</span>
   <span class="hd-role" id="hd-role">Formador</span>
-  <div class="hd-actions">
-    <a href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn">← App</a>
-    <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html'" class="btn btn-danger">Cerrar sesión</button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+    <div class="fp active" onclick="selPeriod(this,'week')" style="height:28px;font-size:11px;">Esta semana</div>
+    <div class="fp" onclick="selPeriod(this,'prev')" style="height:28px;font-size:11px;">Sem. anterior</div>
+    <div class="fp" onclick="selPeriod(this,'month')" style="height:28px;font-size:11px;">Este mes</div>
+    <div class="fp" id="f-carril" style="height:28px;font-size:11px;">Carril ▾
+      <div class="fdrop">
+        <div class="fdrop-item" onclick="setF('carril','',event)">Todos</div>
+        <div class="fdrop-item" onclick="setF('carril','Home',event)">🏠 Home</div>
+        <div class="fdrop-item" onclick="setF('carril','Road',event)">🚗 Road</div>
+        <div class="fdrop-item" onclick="setF('carril','Concierge',event)">💎 Concierge</div>
+      </div>
+    </div>
+    <div class="fp" id="f-pais" style="height:28px;font-size:11px;">País ▾
+      <div class="fdrop">
+        <div class="fdrop-item" onclick="setF('pais','',event)">Todos</div>
+        <div class="fdrop-item" onclick="setF('pais','Costa Rica',event)">🇨🇷 Costa Rica</div>
+        <div class="fdrop-item" onclick="setF('pais','Panamá',event)">🇵🇦 Panamá</div>
+        <div class="fdrop-item" onclick="setF('pais','Guatemala',event)">🇬🇹 Guatemala</div>
+        <div class="fdrop-item" onclick="setF('pais','Honduras',event)">🇭🇳 Honduras</div>
+      </div>
+    </div>
+    <div class="fp" id="f-grade" style="height:28px;font-size:11px;">Rendimiento ▾
+      <div class="fdrop" style="right:0;left:auto;">
+        <div class="fdrop-item" onclick="setF('grade','',event)">Todos</div>
+        <div class="fdrop-item" onclick="setF('grade','A',event)">⭐ A</div>
+        <div class="fdrop-item" onclick="setF('grade','B',event)">👍 B</div>
+        <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ C</div>
+      </div>
+    </div>
+    <div id="ftags" style="display:flex;gap:4px;"></div>
+    <div style="width:1px;height:20px;background:var(--gb);margin:0 4px;"></div>
+    <a href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:28px;font-size:11px;">← App</a>
+    <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html'" class="btn btn-danger" style="height:28px;font-size:11px;">Salir</button>
   </div>
 </div></div>
 <div class="body-wrap">
@@ -107,37 +137,6 @@ select{padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);backgroun
   </div>
 
   <div class="main">
-<div class="filters" id="filters-bar">
-      <div class="fp active" onclick="selPeriod(this,'week')">Esta semana</div>
-      <div class="fp" onclick="selPeriod(this,'prev')">Semana anterior</div>
-      <div class="fp" onclick="selPeriod(this,'month')">Este mes</div>
-      <div class="fp" id="f-carril">Carril ▾
-        <div class="fdrop">
-          <div class="fdrop-item" onclick="setF('carril','',event)">Todos</div>
-          <div class="fdrop-item" onclick="setF('carril','Home',event)">🏠 Home</div>
-          <div class="fdrop-item" onclick="setF('carril','Road',event)">🚗 Road</div>
-          <div class="fdrop-item" onclick="setF('carril','Concierge',event)">💎 Concierge</div>
-        </div>
-      </div>
-      <div class="fp" id="f-pais">País ▾
-        <div class="fdrop">
-          <div class="fdrop-item" onclick="setF('pais','',event)">Todos</div>
-          <div class="fdrop-item" onclick="setF('pais','Costa Rica',event)">🇨🇷 Costa Rica</div>
-          <div class="fdrop-item" onclick="setF('pais','Panamá',event)">🇵🇦 Panamá</div>
-          <div class="fdrop-item" onclick="setF('pais','Guatemala',event)">🇬🇹 Guatemala</div>
-          <div class="fdrop-item" onclick="setF('pais','Honduras',event)">🇭🇳 Honduras</div>
-        </div>
-      </div>
-      <div class="fp" id="f-grade">Rendimiento ▾
-        <div class="fdrop">
-          <div class="fdrop-item" onclick="setF('grade','',event)">Todos</div>
-          <div class="fdrop-item" onclick="setF('grade','A',event)">⭐ Excelente (A)</div>
-          <div class="fdrop-item" onclick="setF('grade','B',event)">👍 Bueno (B)</div>
-          <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ Atención (C)</div>
-        </div>
-      </div>
-      <div id="ftags"></div>
-    </div>
     </div>
     <div class="content" id="content">Cargando...</div>
   </div>
