@@ -5,7 +5,7 @@
 <meta http-equiv="cache-control" content="no-cache, no-store"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Helios</title>
-<script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js" async></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -1552,7 +1552,7 @@ async function connectWebPubSub(){
     const res=await fetch(CONFIG.NEGOTIATE_URL+'?userId=viewer-'+Date.now(),{headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN}});
     if(!res.ok)throw new Error('Negotiate '+res.status);
     const{url}=await res.json();
-    if(window.WebPubSubClient){
+    if(typeof WebPubSubClient !== "undefined" && window.WebPubSubClient){
       wpsClient=new WebPubSubClient(url);
       wpsClient.on('connected',()=>{setStatus('conectado','live');_retries=0;});
       wpsClient.on('disconnected',()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);});
