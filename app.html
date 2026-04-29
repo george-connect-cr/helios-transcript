@@ -173,7 +173,7 @@ body.light .nav{background:rgba(255,255,255,.8);}
 .n-to{height:24px;padding:0 10px;border:none;background:transparent;color:var(--t2);font-size:12px;cursor:pointer;border-radius:18px;transition:all .15s;filter:grayscale(1) brightness(10);opacity:.85;transition:filter .2s,opacity .2s;}
 
 .n-to:hover{color:var(--t0);filter:grayscale(1) contrast(0.8) brightness(0.85);opacity:1;}
-.n-to.on{background:var(--c1);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.2);filter:grayscale(1) brightness(3);opacity:1;}
+.n-to.on{background:var(--c1);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.15);filter:none;opacity:1;}
 
 .n-dash{
   width:36px;height:36px;display:flex;align-items:center;justify-content:center;
@@ -1930,7 +1930,29 @@ window.addEventListener('DOMContentLoaded', ()=>{
   connectWebPubSub();
 });
 
-function triggerDemo(){ AgentBar.setDemo(); triggerSmartFill(); }
+function triggerDemo(){
+  AgentBar.setDemo();
+  // Inject demo data into PO builder
+  var demoData={
+    nombre_cliente:'Carlos Rodríguez',
+    placa:'CRC-1234',
+    marca:'Toyota',
+    modelo:'Corolla',
+    año:'2019',
+    color:'Blanco',
+    ubicacion:'Av. Central, frente al Banco Nacional, San José',
+    tipo_asistencia:'Grúa / Remolque'
+  };
+  var d=0;
+  Object.keys(demoData).forEach(function(k){
+    setTimeout(function(){POBuilder.addField(k,demoData[k],true);},d);
+    d+=200;
+  });
+  setTimeout(function(){
+    ServiceDetector.analyze('necesito una grúa mi carro no arranca varado');
+  },400);
+  showToast('🎬 Demo activado · Datos de ejemplo cargados');
+}
 let _poList = [];
 let _activeDetail = -1;
 let _poCount = 0;
@@ -1938,8 +1960,11 @@ let _poCount = 0;
 function setTheme(t){
   isDark = (t === 'dark');
   document.body.classList.toggle('light', !isDark);
-  document.getElementById('th-dark').classList.toggle('on', isDark);
-  document.getElementById('th-light').classList.toggle('on', !isDark);
+  document.body.classList.toggle('dark', isDark);
+  var td=document.getElementById('th-dark');
+  var tl=document.getElementById('th-light');
+  if(td)td.classList.toggle('on', isDark);
+  if(tl)tl.classList.toggle('on', !isDark);
 }
 
 const CallTimer=(()=>{
