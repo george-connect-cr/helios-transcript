@@ -1,0 +1,12 @@
+{
+  "name": "helios-api",
+  "version": "1.0.0",
+  "description": "Helios Transcript — Azure Functions backend proxy",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet\""
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

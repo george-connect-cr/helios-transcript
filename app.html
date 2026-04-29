@@ -3354,7 +3354,43 @@ var _curStatus='coaching_p';
 var _lastTranscriptText='';
 function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;m.innerHTML='';var s1=document.createElement('div');s1.className='status-sec';s1.textContent='Estado';m.appendChild(s1);PAUSAS.filter(function(p){return p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});var sep=document.createElement('div');sep.className='status-sep';m.appendChild(sep);var s2=document.createElement('div');s2.className='status-sec';s2.textContent='Pausas';m.appendChild(s2);PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});}
 function toggleStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;_buildStatusMenu();var open=m.style.display==='block';m.style.display=open?'none':'block';if(!open)setTimeout(function(){document.addEventListener('click',function cl(e){if(!document.getElementById('status-wrap').contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}});},10);}
-function setStatus(id,color,label,icon){_curStatus=id;var dot=document.getElementById('status-dot-btn');var lbl=document.getElementById('status-label');if(dot)dot.style.background=color;if(lbl)lbl.textContent=label;var m=document.getElementById('status-menu');if(m)m.style.display='none';showToast(icon+' '+label);}
+function setStatus(id,color,label,icon){
+  _curStatus=id;
+  var dot=document.getElementById('status-dot-btn');
+  var lbl=document.getElementById('status-label');
+  if(dot)dot.style.background=color;
+  if(lbl)lbl.textContent=label;
+  var m=document.getElementById('status-menu');
+  if(m)m.style.display='none';
+  showToast(icon+' '+label);
+  if(id==='capacitacion') _triggerSimulatedCall();
+}
+
+function _triggerSimulatedCall(){
+  var session={};
+  try{session=JSON.parse(localStorage.getItem('helios_session')||'{}');}catch(e){}
+  var agentId=(session.user||{}).id||'unknown';
+  var agentName=(session.user||{}).name||'Agente';
+  showToast('📞 Iniciando llamada de capacitación...');
+  fetch('/api/trigger-call',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({agentId:agentId,agentName:agentName})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.ok){
+      showToast('✓ Llamada de capacitación en camino');
+    } else {
+      showToast('⚠ Error al disparar llamada: '+(data.error||'desconocido'));
+      console.warn('trigger-call error:',data);
+    }
+  })
+  .catch(function(err){
+    showToast('⚠ No se pudo conectar con el servidor');
+    console.error('trigger-call fetch error:',err);
+  });
+}
 var _dashTab='dia',_repView='resumen';
 var RA=[{id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:2,name:'Carlos Mora',letter:'C',color:'#6aaa90',carril:'Road',pais:'Costa Rica',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:4,name:'Luis Arias',letter:'L',color:'#4a8a72',carril:'Home',pais:'Costa Rica',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:8,name:'José Quesada',letter:'J',color:'#0ea5e9',carril:'Road',pais:'Panamá',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'}];
 var RF=[
