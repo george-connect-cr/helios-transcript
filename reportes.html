@@ -8,7 +8,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f0ede8;color:#0d1018;}
 :root{--a:#E8440A;--g:#4a8a72;--y:#a67c45;--r:#b85c6b;--m:'SF Mono','Fira Code',monospace;--c1:#fff;--gb:rgba(0,0,0,.07);--gb2:rgba(0,0,0,.12);--t0:#0d1018;--t1:#374151;--t2:#6b7280;--t3:#9ca3af;}
-.hd{height:54px;flex-wrap:wrap;background:#fff;border-bottom:1px solid var(--gb);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:10;}
+.hd{height:54px;background:#fff;border-bottom:1px solid var(--gb);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:10;}
 .hd-brand{font-size:19px;font-weight:800;color:var(--a);letter-spacing:-.03em;}
 .hd-sep{width:1px;height:20px;background:var(--gb);margin:0 8px;}
 .hd-title{font-size:13px;font-weight:600;}
@@ -18,7 +18,7 @@ html,body{height:100%;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
 .btn:hover{background:#f5f3f0;color:var(--t0);}
 .btn-danger{border-color:rgba(184,92,107,.3);color:var(--r);}
 .btn-danger:hover{background:rgba(184,92,107,.06);}
-body{display:flex;flex-direction:column;}
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 .body-wrap{display:flex;flex:1;min-height:0;overflow:hidden;}
 .sb{width:210px;min-width:210px;background:#fff;border-right:1px solid var(--gb);padding:16px 0;overflow-y:auto;flex-shrink:0;}
 .sb-sec{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;padding:10px 18px 4px;font-weight:700;}
@@ -39,7 +39,7 @@ body{display:flex;flex-direction:column;}
 .fdrop-item:hover{background:#f5f3f0;}
 .ftag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:rgba(232,68,10,.1);color:var(--a);font-size:11px;font-weight:600;border:1px solid rgba(232,68,10,.2);}
 .ftag button{background:none;border:none;cursor:pointer;color:var(--a);font-size:13px;padding:0;line-height:1;margin-left:2px;}
-.content{flex:1;overflow-y:auto;padding:24px;min-height:0;}
+.content{flex:1;overflow-y:auto;padding:0;min-height:0;}
 .pt{font-size:18px;font-weight:700;margin-bottom:4px;}
 .ps{font-size:12px;color:var(--t2);margin-bottom:20px;}
 .stitle{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
@@ -86,41 +86,48 @@ select{padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);backgroun
   <div class="hd-sep"></div>
   <span class="hd-title">Reportes & Analytics</span>
   <span class="hd-role" id="hd-role">Formador</span>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-    <div class="fp active" onclick="selPeriod(this,'week')" style="height:28px;font-size:11px;">Esta semana</div>
-    <div class="fp" onclick="selPeriod(this,'prev')" style="height:28px;font-size:11px;">Sem. anterior</div>
-    <div class="fp" onclick="selPeriod(this,'month')" style="height:28px;font-size:11px;">Este mes</div>
-    <div class="fp" id="f-carril" style="height:28px;font-size:11px;">Carril ▾
-      <div class="fdrop">
-        <div class="fdrop-item" onclick="setF('carril','',event)">Todos</div>
-        <div class="fdrop-item" onclick="setF('carril','Home',event)">🏠 Home</div>
-        <div class="fdrop-item" onclick="setF('carril','Road',event)">🚗 Road</div>
-        <div class="fdrop-item" onclick="setF('carril','Concierge',event)">💎 Concierge</div>
-      </div>
-    </div>
-    <div class="fp" id="f-pais" style="height:28px;font-size:11px;">País ▾
-      <div class="fdrop">
-        <div class="fdrop-item" onclick="setF('pais','',event)">Todos</div>
-        <div class="fdrop-item" onclick="setF('pais','Costa Rica',event)">🇨🇷 Costa Rica</div>
-        <div class="fdrop-item" onclick="setF('pais','Panamá',event)">🇵🇦 Panamá</div>
-        <div class="fdrop-item" onclick="setF('pais','Guatemala',event)">🇬🇹 Guatemala</div>
-        <div class="fdrop-item" onclick="setF('pais','Honduras',event)">🇭🇳 Honduras</div>
-      </div>
-    </div>
-    <div class="fp" id="f-grade" style="height:28px;font-size:11px;">Rendimiento ▾
-      <div class="fdrop" style="right:0;left:auto;">
-        <div class="fdrop-item" onclick="setF('grade','',event)">Todos</div>
-        <div class="fdrop-item" onclick="setF('grade','A',event)">⭐ A</div>
-        <div class="fdrop-item" onclick="setF('grade','B',event)">👍 B</div>
-        <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ C</div>
-      </div>
-    </div>
-    <div id="ftags" style="display:flex;gap:4px;"></div>
-    <div style="width:1px;height:20px;background:var(--gb);margin:0 4px;"></div>
-    <a href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:28px;font-size:11px;">← App</a>
-    <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html'" class="btn btn-danger" style="height:28px;font-size:11px;">Salir</button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+    <a href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:30px;font-size:12px;">← App</a>
+    <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html'" class="btn btn-danger" style="height:30px;font-size:12px;">Salir</button>
   </div>
 </div></div>
+<div style="background:#fff;border-bottom:1px solid var(--gb);padding:0 24px;display:flex;align-items:center;gap:6px;height:44px;flex-shrink:0;">
+  <div class="fp active" onclick="selPeriod(this,'week')">Esta semana</div>
+  <div class="fp" onclick="selPeriod(this,'prev')">Semana anterior</div>
+  <div class="fp" onclick="selPeriod(this,'month')">Este mes</div>
+  <div style="width:1px;height:18px;background:var(--gb);margin:0 4px;"></div>
+  <div class="fp" id="f-carril">Carril ▾
+    <div class="fdrop">
+      <div class="fdrop-item" onclick="setF('carril','',event)">Todos</div>
+      <div class="fdrop-item" onclick="setF('carril','Home',event)">🏠 Home</div>
+      <div class="fdrop-item" onclick="setF('carril','Road',event)">🚗 Road</div>
+      <div class="fdrop-item" onclick="setF('carril','Concierge',event)">💎 Concierge</div>
+    </div>
+  </div>
+  <div class="fp" id="f-pais">País ▾
+    <div class="fdrop">
+      <div class="fdrop-item" onclick="setF('pais','',event)">Todos</div>
+      <div class="fdrop-item" onclick="setF('pais','Costa Rica',event)">🇨🇷 Costa Rica</div>
+      <div class="fdrop-item" onclick="setF('pais','Panamá',event)">🇵🇦 Panamá</div>
+      <div class="fdrop-item" onclick="setF('pais','Guatemala',event)">🇬🇹 Guatemala</div>
+      <div class="fdrop-item" onclick="setF('pais','Honduras',event)">🇭🇳 Honduras</div>
+    </div>
+  </div>
+  <div class="fp" id="f-grade">Rendimiento ▾
+    <div class="fdrop">
+      <div class="fdrop-item" onclick="setF('grade','',event)">Todos</div>
+      <div class="fdrop-item" onclick="setF('grade','A',event)">⭐ Excelente (A)</div>
+      <div class="fdrop-item" onclick="setF('grade','B',event)">👍 Bueno (B)</div>
+      <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ Atención (C)</div>
+    </div>
+  </div>
+  <div class="fp" id="f-agente">Agente ▾
+    <div class="fdrop" id="fdrop-agente">
+      <div class="fdrop-item" onclick="setF('agente','',event)">Todos</div>
+    </div>
+  </div>
+  <div id="ftags" style="display:flex;gap:4px;margin-left:4px;"></div>
+</div>
 <div class="body-wrap">
   <div class="sb">
     <div class="sb-sec">General</div>
@@ -230,7 +237,7 @@ var RF=[
 ];
 
 // HELPERS
-var _filters={carril:'',pais:'',grade:''};
+var _filters={carril:'',pais:'',grade:'',agente:''};
 var _selAg=null;
 var _role='formador';
 
@@ -238,7 +245,8 @@ function ag(){
   return RA.filter(function(a){
     return(!_filters.carril||a.carril===_filters.carril)&&
            (!_filters.pais||a.pais===_filters.pais)&&
-           (!_filters.grade||a.grade===_filters.grade);
+           (!_filters.grade||a.grade===_filters.grade)&&
+           (!_filters.agente||a.name===_filters.agente);
   });
 }
 function rc(v){return v>=85?'#4a8a72':v>=70?'#a67c45':'#b85c6b';}
@@ -260,7 +268,8 @@ function setF(key,val,e){
   var btn=document.getElementById('f-'+key);
   var lbl={carril:{'':"Carril",Home:"🏠 Home",Road:"🚗 Road",Concierge:"💎 Concierge"},
             pais:{'':"País","Costa Rica":"🇨🇷 CR","Panamá":"🇵🇦 PA","Guatemala":"🇬🇹 GT","Honduras":"🇭🇳 HN"},
-            grade:{'':"Rendimiento",A:"⭐ A",B:"👍 B",C:"⚠️ C"}};
+            grade:{'':"Rendimiento",A:"⭐ A",B:"👍 B",C:"⚠️ C"},
+            agente:{'':"Agente"}};
   if(btn){
     btn.childNodes[0].nodeValue=(lbl[key][val]||key)+' ▾';
     btn.className='fp'+(val?' filtered':'');
@@ -278,7 +287,12 @@ function setF(key,val,e){
       t.appendChild(b);tags.appendChild(t);
     });
   }
-  go(_cur);
+  if(key==='agente'&&val){
+    _selAg=RA.find(function(a){return a.name===val;})||_selAg;
+    go('agente_v');
+  } else {
+    go(_cur);
+  }
 }
 
 document.addEventListener('click',function(e){
@@ -295,7 +309,9 @@ function go(v){
   var el=document.getElementById('nav-'+v);if(el)el.classList.add('active');
   var views={resumen:vResumen,agentes:vAgentes,agente_v:vPorAgente,coaching:vCoaching,feedback:vFeedback,supervisor:vSupervisor};
   var fn=views[v]||function(){return'<p style="padding:20px;color:var(--t2);">En construcción</p>';};
-  document.getElementById('content').innerHTML=fn();
+  var html=fn();
+  if(v!=='agente_v') html='<div style="padding:24px;">'+html+'</div>';
+  document.getElementById('content').innerHTML=html;
 }
 
 // RESUMEN
@@ -363,20 +379,44 @@ function vAgentes(){
 // POR AGENTE
 function vPorAgente(){
   var data=ag();
-  var opts='<option value="">Seleccionar agente...</option>'+data.map(function(a){return'<option value="'+a.id+'"'+(_selAg&&_selAg.id===a.id?' selected':'')+'>'+a.name+'</option>';}).join('');
-  return'<div class="ag-sel-wrap">'+
-    '<select onchange="selAg(parseInt(this.value))">'+opts+'</select>'+
-    '<span style="font-size:12px;color:var(--t2);">'+data.length+' agentes disponibles</span>'+
-  '</div>'+
-  '<div id="ag-det">'+(_selAg?agDet(_selAg):'<div class="card" style="text-align:center;padding:40px;"><div style="font-size:32px;margin-bottom:10px;">👤</div><div style="font-size:13px;color:var(--t2);">Selecciona un agente para ver su análisis completo</div></div>')+'</div>';
+  // Agent list sidebar + detail panel
+  var listItems=data.map(function(a){
+    var isActive=_selAg&&_selAg.id===a.id;
+    var gc=a.grade==='A'?'#4a8a72':a.grade==='B'?'#a67c45':'#b85c6b';
+    return'<div onclick="selAg('+a.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(0,0,0,.04);transition:background .1s;background:'+(isActive?'rgba(232,68,10,.04)':'#fff')+';border-left:2px solid '+(isActive?'var(--a)':'transparent')+';">'+
+      '<div class="av av28" style="background:'+a.color+';flex-shrink:0;">'+a.lt+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="font-size:12px;font-weight:'+(isActive?'700':'500')+';color:'+(isActive?'var(--a)':'var(--t0)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.name+'</div>'+
+        '<div style="font-size:10px;color:var(--t3);">'+a.carril+'</div>'+
+      '</div>'+
+      '<span style="font-size:11px;font-weight:700;color:'+gc+';">'+a.score+'</span>'+
+    '</div>';
+  }).join('');
+
+  var detailPanel=_selAg?agDet(_selAg):
+    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--t3);"><div style="font-size:40px;margin-bottom:12px;">👤</div><div style="font-size:13px;">Selecciona un agente para ver su análisis</div></div>';
+
+  return'<div style="display:flex;gap:0;height:100%;min-height:0;">'+
+    '<div style="width:200px;min-width:200px;flex-shrink:0;border-right:1px solid var(--gb);overflow-y:auto;background:#fff;">'+
+      '<div style="padding:10px 14px;border-bottom:1px solid var(--gb);background:#f9f8f6;">'+
+        '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;">'+data.length+' agentes</div>'+
+      '</div>'+
+      listItems+
+    '</div>'+
+    '<div style="flex:1;min-width:0;overflow-y:auto;padding:20px;" id="ag-det">'+detailPanel+'</div>'+
+  '</div>';
 }
 
 function selAg(id){
   _selAg=RA.find(function(a){return a.id===id;})||null;
-  var d=document.getElementById('ag-det');
-  var s=document.querySelector('#content select');
-  if(s)s.value=id;
-  if(d&&_selAg)d.innerHTML=agDet(_selAg);
+  // Re-render full por agente view to update active state in list
+  var c=document.getElementById('content');
+  if(c&&_cur==='agente_v'){
+    c.innerHTML=vPorAgente();
+  } else {
+    var d=document.getElementById('ag-det');
+    if(d&&_selAg)d.innerHTML=agDet(_selAg);
+  }
 }
 
 function agDet(a){
@@ -676,6 +716,23 @@ try{
     }
   }
 }catch(e){}
+// Populate agente dropdown
+(function(){
+  var drop=document.getElementById('fdrop-agente');
+  if(!drop)return;
+  RA.forEach(function(a){
+    var d=document.createElement('div');
+    d.className='fdrop-item';
+    d.textContent=a.name;
+    d.onclick=(function(name){return function(e){
+      e.stopPropagation();
+      setF('agente',name,e);
+      // Also select this agent in Por agente view
+      _selAg=RA.find(function(x){return x.name===name;})||_selAg;
+    };})(a.name);
+    drop.appendChild(d);
+  });
+})();
 go('resumen');
 </script>
 </body>
