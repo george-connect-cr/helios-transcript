@@ -1498,7 +1498,7 @@ body.light .status-opt:hover{background:#f0ede8;}
     <div style="display:flex;flex:1;min-height:0;overflow:hidden;">
       <div id="rep-sb" style="width:190px;min-width:190px;flex-shrink:0;border-right:1px solid var(--gb);padding:12px 0;overflow-y:auto;background:var(--c1);"></div>
       <div style="flex:1;min-width:0;overflow-y:auto;padding:20px;background:var(--bg);">
-        <div id="rep-content" style="min-height:200px;width:100%;"></div>
+        <div id="rep-content" style="min-height:200px;width:100%;"><p style="padding:20px;color:#ff5c00;font-size:16px;font-weight:700;">Panel activo</p></div>
       </div>
     </div>
   </div>
@@ -3246,13 +3246,12 @@ function switchDashTab(tab){
     setTimeout(function(){
       var c=document.getElementById('rep-content');
       var sb=document.getElementById('rep-sb');
-      if(c&&!c.innerHTML.trim()){
-        try{c.innerHTML=repResumen(getRepF());}catch(err){c.innerHTML='<div style="padding:20px;color:var(--t0);">Error: '+err.message+'</div>';}
+      if(c){
+        try{c.innerHTML=repResumen(getRepF());}
+        catch(err){c.innerHTML='<div style="padding:20px;color:red;">'+err.message+'</div>';}
       }
-      if(sb&&!sb.innerHTML.trim()){
-        try{renderRepSb();}catch(err){}
-      }
-    },100);
+      if(sb){try{renderRepSb();}catch(e2){}}
+    },50);
   }catch(err){
     var c=document.getElementById('rep-content');
     if(c)c.innerHTML='<div style="padding:20px;font-size:12px;color:var(--t0);">Error al cargar: '+err.message+'</div>';
