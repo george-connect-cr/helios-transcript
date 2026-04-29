@@ -1779,11 +1779,27 @@ function triggerSmartFill(){
   }catch(e){console.warn("Demo fetch:",e);}
 }
 
-function setStatus(text,state){
-  const dot=document.getElementById('cdot');
-  const lbl=document.getElementById('clbl');
-  dot.className='cdot '+state;
-  lbl.textContent=text;
+function setStatus(idOrText,colorOrState,label,icon){
+  // Support both 2-param (text,state) and 4-param (id,color,label,icon) calls
+  var dot=document.getElementById('cdot');
+  var lbl=document.getElementById('clbl');
+  var sBtn=document.getElementById('status-dot-btn');
+  var sLbl=document.getElementById('status-label');
+  
+  if(label){
+    // 4-param call: id, color, label, icon
+    if(dot){dot.className='cdot';dot.style.background=colorOrState;}
+    if(lbl)lbl.textContent=idOrText;
+    if(sBtn)sBtn.style.background=colorOrState;
+    if(sLbl)sLbl.textContent=(icon?' ':'')+label;
+  } else {
+    // 2-param call: text, state  
+    if(dot){dot.className='cdot '+(colorOrState||'');dot.style.background='';}
+    if(lbl)lbl.textContent=idOrText;
+    var stateColors={live:'#6aaa90',warn:'#bf9455',err:'#cc7580'};
+    var sc=stateColors[colorOrState]||'#6aaa90';
+    if(sBtn)sBtn.style.background=sc;
+  }
 }
 
 function showToast(msg){
@@ -1926,7 +1942,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
       sessionStorage.removeItem('from_reportes');
     }
   }catch(e){}
-  setTheme('light');
+  try{var _savedTheme=localStorage.getItem('helios_theme')||'light';setTheme(_savedTheme);}catch(e){setTheme('light');}
   connectWebPubSub();
 });
 
@@ -1965,6 +1981,8 @@ function setTheme(t){
   var tl=document.getElementById('th-light');
   if(td)td.classList.toggle('on', isDark);
   if(tl)tl.classList.toggle('on', !isDark);
+  // Store preference
+  try{localStorage.setItem('helios_theme',t);}catch(e){}
 }
 
 const CallTimer=(()=>{
@@ -2400,7 +2418,6 @@ const SF = (() => {
           _applyField(key, String(val));
           _removeBubble(key);
           showToast('✓ ' + f.label + ' aplicado');
-          AgentBar.checkComplete(data);
         };
         wrap.appendChild(b);
       }, delay);
@@ -2481,7 +2498,7 @@ const AgentBar = (() => {
     }
   }
 
-  return { init, increment, setDemo };
+  function checkComplete(data){} return { init, increment, setDemo, checkComplete };
 })();
 
 
