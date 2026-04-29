@@ -1551,24 +1551,35 @@ body.light .status-opt:hover{background:#f0ede8;}
 };
 let wpsClient=null,lastAnalysis=null,isDark=false,_retries=0;
 
+var _intentionalDisconnect = false;
+
 async function connectWebPubSub(){
   try{
-    setStatus('conectando','warn');
+    _intentionalDisconnect = false;
+    _updateConnStatus('conectando','warn');
     const res=await fetch(CONFIG.NEGOTIATE_URL+'?userId=viewer-'+Date.now(),{headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN}});
     if(!res.ok)throw new Error('Negotiate '+res.status);
     const{url}=await res.json();
     if(window.WebPubSubClient){
       wpsClient=new WebPubSubClient(url);
-      wpsClient.on('connected',()=>{setStatus('conectado','live');_retries=0;});
-      wpsClient.on('disconnected',()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);});
+      wpsClient.on('connected',()=>{_updateConnStatus('conectado','live');_retries=0;});
+      wpsClient.on('disconnected',()=>{
+        if(_intentionalDisconnect) return;
+        _updateConnStatus('desconectado','err');
+        setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
+      });
       wpsClient.on('server-message',e=>handleMessage(e.message.data));
       await wpsClient.start();
     }else{
       const ws=new WebSocket(url);
       window._ws=ws;
-      ws.onopen=()=>{setStatus('conectado','live');showToast('✓ Conectado');_retries=0;};
-      ws.onclose=()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);};
-      ws.onerror=()=>setStatus('error','err');
+      ws.onopen=()=>{_updateConnStatus('conectado','live');showToast('✓ Conectado');_retries=0;};
+      ws.onclose=()=>{
+        if(_intentionalDisconnect) return;
+        _updateConnStatus('desconectado','err');
+        setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
+      };
+      ws.onerror=()=>_updateConnStatus('error','err');
       ws.onmessage=e=>{
         try{
           const raw=JSON.parse(e.data);
@@ -1582,9 +1593,26 @@ async function connectWebPubSub(){
     }
   }catch(err){
     console.error('WPS connect error:',err);
-    setStatus('error · '+err.message.substring(0,20),'err');
-    setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
+    _updateConnStatus('error · '+err.message.substring(0,20),'err');
+    if(!_intentionalDisconnect) setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
   }
+}
+
+function disconnectWebPubSub(){
+  _intentionalDisconnect = true;
+  try{
+    if(wpsClient){ wpsClient.stop(); wpsClient=null; }
+    if(window._ws){ window._ws.close(); window._ws=null; }
+  }catch(e){}
+  _updateConnStatus('desconectado','err');
+}
+
+// Actualiza solo el dot de conexión en el nav (independiente del estado del agente)
+function _updateConnStatus(label, state){
+  var dot = document.getElementById('cdot');
+  var lbl = document.getElementById('clbl');
+  if(dot){ dot.className='cdot '+(state||''); dot.style.background=''; }
+  if(lbl) lbl.textContent = label;
 }
 
 function handleMessage(p){
@@ -1940,7 +1968,9 @@ window.addEventListener('DOMContentLoaded', ()=>{
     }
   }catch(e){}
   try{setTheme(localStorage.getItem('helios_theme')||'light');}catch(e){setTheme('light');}
-  connectWebPubSub();
+  // La conexión cc-rtt se inicia solo cuando el agente cambia a estado Disponible
+  setStatus('disponible','#6aaa90','Disponible','🟢');
+  _updateConnStatus('desconectado','err');
 });
 
 function triggerDemo(){
@@ -3384,7 +3414,13 @@ function setStatus(id,color,label,icon){
   var m=document.getElementById('status-menu');
   if(m)m.style.display='none';
   showToast(icon+' '+label);
-  if(id==='capacitacion') _triggerSimulatedCall();
+  // Conexión cc-rtt: solo activa en estado Disponible
+  if(id==='disponible'){
+    connectWebPubSub();
+  } else {
+    disconnectWebPubSub();
+    if(id==='capacitacion') _triggerSimulatedCall();
+  }
 }
 
 function _triggerSimulatedCall(){
