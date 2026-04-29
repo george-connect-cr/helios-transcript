@@ -1813,9 +1813,38 @@ function toggleQ(){
   if(_qOpen)renderQ();
 }
 function renderQ(){
+  // Get current user role
+  var _role='agente';
+  try{var _sess=JSON.parse(localStorage.getItem('helios_session')||'{}');_role=(_sess.user||{}).role||'agente';}catch(e){}
+  var isAgent=_role==='agente'||_role==='demo';
+
+  // Update panel title based on role
+  var htitle=document.querySelector('.q-htitle');
+  if(htitle)htitle.textContent=isAgent?'📊 Mis métricas del día':'📋 Cola de llamadas';
+  
   var list=document.getElementById('q-list');
   if(list){
-    list.innerHTML=_qData.map(function(q){
+    if(isAgent){
+      // Agente: show their own call stats instead of queue
+      var _u={};try{_u=(JSON.parse(localStorage.getItem('helios_session')||'{}')).user||{};}catch(e){}
+      var pos=(_poList||[]);
+      var n=pos.length;
+      var avgSat=n?Math.round(pos.reduce(function(a,p){return a+(p.meta&&p.meta.scores?p.meta.scores.satisfaction:0);},0)/n):0;
+      var avgSpeech=n?Math.round(pos.reduce(function(a,p){return a+(p.meta&&p.meta.scores?p.meta.scores.speechScore:0);},0)/n):0;
+      list.innerHTML='<div style="padding:14px 18px;border-bottom:1px solid var(--gb);">'+
+        '<div style="font-family:var(--m);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Mis llamadas hoy</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'+
+          [['📞','Llamadas',n||0],['⭐','Satisf. prom.',avgSat?avgSat+'%':'—'],['🎙','Speech',avgSpeech?avgSpeech+'%':'—']].map(function(m){
+            return'<div style="background:var(--gb);border-radius:10px;padding:10px;text-align:center;">'+
+              '<div style="font-size:18px;margin-bottom:4px;">'+m[0]+'</div>'+
+              '<div style="font-size:16px;font-weight:700;color:var(--t0);">'+m[2]+'</div>'+
+              '<div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">'+m[1]+'</div>'+
+            '</div>';
+          }).join('')+
+        '</div>'+
+      '</div>';
+    } else {
+      list.innerHTML=_qData.map(function(q){
       var m=Math.floor(q.wait/60),sec=('0'+q.wait%60).slice(-2);
       var wc=q.wait>240?'hi':q.wait>120?'md':'lo';
       return'<div class="q-item">'+
@@ -1850,8 +1879,13 @@ function renderQ(){
   }
   var sub=document.getElementById('q-sub');
   if(sub){
-    var avg=Math.round(_qData.reduce(function(a,q){return a+q.wait;},0)/(_qData.length||1));
-    sub.textContent=_qData.length+' en espera · Promedio '+Math.floor(avg/60)+':'+(avg%60<10?'0':'')+avg%60;
+    if(isAgent){
+      var pn=(_poList||[]).length;
+      sub.textContent=pn+' PO'+(pn!==1?'s':'')+' creados hoy';
+    } else {
+      var avg=Math.round(_qData.reduce(function(a,q){return a+q.wait;},0)/(_qData.length||1));
+      sub.textContent=_qData.length+' en espera · Promedio '+Math.floor(avg/60)+':'+(avg%60<10?'0':'')+avg%60;
+    }
   }
 }
 setInterval(function(){
@@ -2790,6 +2824,7 @@ function _buildDashboard(){
         const c=tot>=80?'g':tot>=65?'y':'r';
         return`<div class="dpo-row" id="dpo_${idx}" onclick="_toggleDPO(${idx})"><span class="dash-call-num">${po.num}</span><span class="dash-call-svc">${po.data.tipo_asistencia||'—'} · ${po.data.nombre_cliente||'—'}</span><span class="dash-call-score ${c}">${tot}%</span><span class="dash-call-ts">${po.ts}</span><span class="dpo-chevron">›</span></div><div class="dpo-detail" id="dpod_${idx}"></div>`;
       }).join('');
+      } // end else (non-agent)
     }
   }
 
