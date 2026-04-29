@@ -1286,7 +1286,7 @@ body.light .status-opt:hover{background:#f5f5f5;}
 
 <nav class="nav">
   <div class="n-brand">
-    <span class="n-brand-word">CONNECT</span><span class="n-brand-reg">®</span>
+    <span class="n-brand-word">CONNECT</span><span class="n-brand-reg">®</span><span id="n-brand-sub" style="font-family:var(--m);font-size:8px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase;margin-left:2px;display:none;">Academy</span>
   </div>
   <div class="n-conn"><div class="cdot" id="cdot"></div><span id="clbl">conectando</span></div>
   <div class="n-timer" id="timer-row">
@@ -1491,11 +1491,7 @@ body.light .status-opt:hover{background:#f5f5f5;}
 </div>
 <div class="toast" id="toast"></div>
 <div id="sfanalyzing" style="display:none"></div>
-<div id="sfwrap" style="display:none"></div>
-<div id="bubbles-section" style="display:none"></div>
-<div id="insight" style="display:none"><div id="insighttxt"></div></div>
-
-<script>const CONFIG={
+<div id="const CONFIG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
   AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
@@ -1755,6 +1751,11 @@ window.addEventListener('DOMContentLoaded', ()=>{
     var _u=_s.user||{};
     var _ne=document.getElementById('ag-name');
     if(_ne&&_u.name)_ne.textContent=_u.name.split(' ')[0];
+    // Show Academy badge if agente
+    if(_u.role==='agente'){
+      var _sub=document.getElementById('n-brand-sub');
+      if(_sub)_sub.style.display='inline';
+    }
     var lb=document.getElementById('btn-logout');
     if(lb)lb.addEventListener('click',function(){localStorage.removeItem('helios_session');window.location.href='index.html';});
   }catch(e){}
@@ -3551,6 +3552,11 @@ function showCallRating(){
   card.appendChild(spSection);
   card.appendChild(obsSection);
   card.appendChild(btnRow);
+  ov.appendChild(card);
+  document.body.appendChild(ov);
+  ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
+}
+ild(btnRow);
   ov.appendChild(card);
   document.body.appendChild(ov);
   ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
