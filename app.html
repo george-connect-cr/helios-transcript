@@ -1289,14 +1289,13 @@ body.light .status-opt:hover{background:#f0ede8;}
 #dtab-rep-content.rep-active{display:flex!important;flex:1!important;min-height:0!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}
 #dtab-dia-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 
-/* Queue */
 .qbtn{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);}
 .qbtn:hover{border-color:var(--a);color:var(--a);}
 .qbtn .qn{font-weight:700;color:var(--a);}
 .q-ov{position:fixed;top:0;right:0;bottom:0;left:0;z-index:300;display:none;pointer-events:none;}
 .q-ov.show{display:block;pointer-events:all;}
 .q-bd{position:absolute;inset:0;}
-.q-panel{position:absolute;top:56px;right:12px;width:360px;background:var(--c1);border:1px solid var(--gb2);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden;}
+.q-panel{position:absolute;top:56px;right:12px;width:360px;background:var(--c1);border:1px solid var(--gb2);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden;max-height:calc(100vh - 70px);overflow-y:auto;}
 .q-hd{padding:14px 18px;border-bottom:1px solid var(--gb);display:flex;align-items:center;justify-content:space-between;}
 .q-htitle{font-size:13px;font-weight:700;color:var(--t0);}
 .q-hsub{font-family:var(--m);font-size:10px;color:var(--t2);margin-top:2px;}
@@ -1552,7 +1551,7 @@ async function connectWebPubSub(){
     const res=await fetch(CONFIG.NEGOTIATE_URL+'?userId=viewer-'+Date.now(),{headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN}});
     if(!res.ok)throw new Error('Negotiate '+res.status);
     const{url}=await res.json();
-    if(typeof WebPubSubClient !== "undefined" && window.WebPubSubClient){
+    if(window.WebPubSubClient){
       wpsClient=new WebPubSubClient(url);
       wpsClient.on('connected',()=>{setStatus('conectado','live');_retries=0;});
       wpsClient.on('disconnected',()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);});
@@ -1785,13 +1784,11 @@ function setStatus(id,colorOrState,label,icon){
   var sBtn=document.getElementById('status-dot-btn');
   var sLbl=document.getElementById('status-label');
   if(label){
-    // 4-param: setStatus(id, color, label, icon)
     if(dot){dot.className='cdot';dot.style.background=colorOrState||'';}
     if(lbl)lbl.textContent=id;
     if(sBtn)sBtn.style.background=colorOrState||'';
     if(sLbl)sLbl.textContent=label;
   } else {
-    // 2-param: setStatus(text, state)
     if(dot){dot.className='cdot '+(colorOrState||'');dot.style.background='';}
     if(lbl)lbl.textContent=id;
     var sc={live:'#6aaa90',warn:'#bf9455',err:'#cc7580'};
@@ -1804,6 +1801,7 @@ function showToast(msg){
   t.textContent=msg;t.classList.add('show');
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
+
 
 var _qOpen=false;
 var _qData=[
@@ -1826,51 +1824,45 @@ function toggleQ(){
   if(_qOpen)renderQ();
 }
 function renderQ(){
-  // Get current user role
   var _role='agente';
-  try{var _sess=JSON.parse(localStorage.getItem('helios_session')||'{}');_role=(_sess.user||{}).role||'agente';}catch(e){}
-  var isAgent=_role==='agente'||_role==='demo';
-
-  // Update panel title based on role
+  try{var _s2=JSON.parse(localStorage.getItem('helios_session')||'{}');_role=(_s2.user||{}).role||'agente';}catch(e){}
+  var isAgent=(_role==='agente'||_role==='demo');
   var htitle=document.querySelector('.q-htitle');
-  if(htitle)htitle.textContent=isAgent?'📊 Mis métricas del día':'📋 Cola de llamadas';
-  
+  if(htitle)htitle.textContent=isAgent?'📊 Mis métricas':'📋 Cola de llamadas';
   var list=document.getElementById('q-list');
   if(list){
     if(isAgent){
-      // Agente: show their own call stats instead of queue
-      var _u={};try{_u=(JSON.parse(localStorage.getItem('helios_session')||'{}')).user||{};}catch(e){}
-      var pos=(_poList||[]);
-      var n=pos.length;
-      var avgSat=n?Math.round(pos.reduce(function(a,p){return a+(p.meta&&p.meta.scores?p.meta.scores.satisfaction:0);},0)/n):0;
-      var avgSpeech=n?Math.round(pos.reduce(function(a,p){return a+(p.meta&&p.meta.scores?p.meta.scores.speechScore:0);},0)/n):0;
-      list.innerHTML='<div style="padding:14px 18px;border-bottom:1px solid var(--gb);">'+
+      var pos2=(_poList||[]);
+      var nn=pos2.length;
+      var avgSat=nn?Math.round(pos2.reduce(function(a,p){return a+(p.meta&&p.meta.scores?p.meta.scores.satisfaction:0);},0)/nn):0;
+      var avgSp=nn?Math.round(pos2.reduce(function(a,p){return a+(p.meta&&p.meta.scores?p.meta.scores.speechScore:0);},0)/nn):0;
+      list.innerHTML='<div style="padding:14px 18px;">'+
         '<div style="font-family:var(--m);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Mis llamadas hoy</div>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'+
-          [['📞','Llamadas',n||0],['⭐','Satisf. prom.',avgSat?avgSat+'%':'—'],['🎙','Speech',avgSpeech?avgSpeech+'%':'—']].map(function(m){
-            return'<div style="background:var(--gb);border-radius:10px;padding:10px;text-align:center;">'+
-              '<div style="font-size:18px;margin-bottom:4px;">'+m[0]+'</div>'+
-              '<div style="font-size:16px;font-weight:700;color:var(--t0);">'+m[2]+'</div>'+
-              '<div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">'+m[1]+'</div>'+
-            '</div>';
-          }).join('')+
-        '</div>'+
-      '</div>';
+        [['📞','Llamadas',nn||0],['⭐','Satisf.',avgSat?avgSat+'%':'—'],['🎙','Speech',avgSp?avgSp+'%':'—']].map(function(mm){
+          return'<div style="background:var(--gb);border-radius:10px;padding:10px;text-align:center;">'+
+            '<div style="font-size:18px;margin-bottom:4px;">'+mm[0]+'</div>'+
+            '<div style="font-size:16px;font-weight:700;color:var(--t0);">'+mm[2]+'</div>'+
+            '<div style="font-size:9px;color:var(--t3);text-transform:uppercase;margin-top:2px;">'+mm[1]+'</div>'+
+          '</div>';
+        }).join('')+
+        '</div></div>';
     } else {
       list.innerHTML=_qData.map(function(q){
-      var m=Math.floor(q.wait/60),sec=('0'+q.wait%60).slice(-2);
-      var wc=q.wait>240?'hi':q.wait>120?'md':'lo';
-      return'<div class="q-item">'+
-        '<div class="q-pos'+(q.pos===1?' top':'')+'">'+q.pos+'</div>'+
-        '<div style="flex:1"><div class="q-svc">'+q.svc+'</div><div class="q-meta">'+q.meta+'</div></div>'+
-        '<div class="q-wait '+wc+'">'+m+':'+sec+'</div>'+
-      '</div>';
-    }).join('');
+        var mm=Math.floor(q.wait/60),sec=('0'+q.wait%60).slice(-2);
+        var wc=q.wait>240?'hi':q.wait>120?'md':'lo';
+        return'<div class="q-item">'+
+          '<div class="q-pos'+(q.pos===1?' top':'')+'">'+ q.pos+'</div>'+
+          '<div style="flex:1"><div class="q-svc">'+q.svc+'</div><div class="q-meta">'+q.meta+'</div></div>'+
+          '<div class="q-wait '+wc+'">'+mm+':'+sec+'</div>'+
+        '</div>';
+      }).join('');
+    }
   }
-  var ok=_qKB.filter(function(k){return k.ok;}).length;
-  var score=Math.round(ok/_qKB.length*100);
-  var sc=document.getElementById('q-score');
-  if(sc){sc.textContent=score;sc.style.color=score>=80?'var(--g)':score>=60?'var(--y)':'var(--r)';}
+  var ok2=_qKB.filter(function(k){return k.ok;}).length;
+  var score=Math.round(ok2/(_qKB.length||1)*100);
+  var sc2=document.getElementById('q-score');
+  if(sc2){sc2.textContent=score;sc2.style.color=score>=80?'var(--g)':score>=60?'var(--y)':'var(--r)';}
   var tags=document.getElementById('q-tags');
   if(tags){
     tags.innerHTML='<div style="display:flex;gap:4px;flex-wrap:wrap;">'+
@@ -1944,14 +1936,15 @@ window.addEventListener('DOMContentLoaded', ()=>{
 });
 
 function triggerDemo(){
-  console.log('[CONNECT] triggerDemo called', arguments[0]||'');
   AgentBar.setDemo();
   var dd={nombre_cliente:'Carlos Rodríguez',placa:'CRC-1234',marca:'Toyota',
     modelo:'Corolla',año:'2019',color:'Blanco',
-    ubicación:'Av. Central, frente al Banco Nacional, San José',
+    ubicación:'Av. Central frente al Banco Nacional, San José',
     tipo_asistencia:'Grúa / Remolque'};
   var d=0;
-  Object.keys(dd).forEach(function(k){setTimeout(function(){POBuilder.addField(k,dd[k],true);},d);d+=150;});
+  Object.keys(dd).forEach(function(k){
+    setTimeout(function(){POBuilder.addField(k,dd[k],true);},d);d+=150;
+  });
   setTimeout(function(){ServiceDetector.analyze('grúa varado no arranca');},300);
   showToast('🎬 Demo · Datos de ejemplo cargados');
 }
@@ -1960,7 +1953,6 @@ let _activeDetail = -1;
 let _poCount = 0;
 
 function setTheme(t){
-  console.log('[CONNECT] setTheme called', arguments[0]||'');
   isDark = (t === 'dark');
   document.body.classList.toggle('light', !isDark);
   document.body.classList.toggle('dark', isDark);
@@ -2853,7 +2845,6 @@ function _buildDashboard(){
         const c=tot>=80?'g':tot>=65?'y':'r';
         return`<div class="dpo-row" id="dpo_${idx}" onclick="_toggleDPO(${idx})"><span class="dash-call-num">${po.num}</span><span class="dash-call-svc">${po.data.tipo_asistencia||'—'} · ${po.data.nombre_cliente||'—'}</span><span class="dash-call-score ${c}">${tot}%</span><span class="dash-call-ts">${po.ts}</span><span class="dpo-chevron">›</span></div><div class="dpo-detail" id="dpod_${idx}"></div>`;
       }).join('');
-      } // end else (non-agent)
     }
   }
 
@@ -3343,7 +3334,6 @@ function _buildStatusMenu(){
   menu.innerHTML=out;
 }
 function toggleStatusMenu(){
-  console.log('[CONNECT] toggleStatusMenu called', arguments[0]||'');
   var m=document.getElementById("status-menu");
   if(!m)return;
   _buildStatusMenu();
@@ -3534,7 +3524,7 @@ function showCallRating(){
   <div class="q-bd" onclick="toggleQ()"></div>
   <div class="q-panel">
     <div class="q-hd">
-      <div><div class="q-htitle">📋 Cola de llamadas</div><div class="q-hsub" id="q-sub">Cargando...</div></div>
+      <div><div class="q-htitle">📋 Cola de llamadas</div><div class="q-hsub" id="q-sub">—</div></div>
       <button onclick="toggleQ()" style="background:none;border:none;cursor:pointer;font-size:15px;color:var(--t2);">✕</button>
     </div>
     <div id="q-list"></div>
