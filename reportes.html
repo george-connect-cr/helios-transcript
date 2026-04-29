@@ -808,9 +808,14 @@ function setFilter(key,val){
   var tags=document.getElementById('filter-tags');
   if(tags){
     var active=Object.keys(_filters).filter(function(k){return _filters[k];});
-    tags.innerHTML=active.map(function(k){
-      return'<div class="filter-tag">'+_filters[k]+'<button onclick="setFilter(''+k+'','')">×</button></div>';
-    }).join('');
+    tags.innerHTML='';
+    active.forEach(function(k){
+      var tag=document.createElement('div');tag.className='filter-tag';
+      var span=document.createElement('span');span.textContent=_filters[k];
+      var btn=document.createElement('button');btn.textContent='×';
+      btn.onclick=(function(key){return function(e){e.stopPropagation();setFilter(key,'');};})(k);
+      tag.appendChild(span);tag.appendChild(btn);tags.appendChild(tag);
+    });
   }
   // Re-render current view
   var active=document.querySelector('.sb-item.active');
