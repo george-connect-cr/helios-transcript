@@ -6,334 +6,681 @@
 <title>CONNECT · Reportes & Analytics</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#eef0f7;color:#0d1018;height:100vh;display:flex;flex-direction:column;}
-:root{--a:#E8440A;--g:#6aaa90;--y:#bf9455;--r:#cc7580;--m:'SF Mono','Fira Code',monospace;}
+html,body{height:100%;}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f0ede8;color:#0d1018;display:flex;flex-direction:column;}
+:root{
+  --a:#E8440A;--g:#4a8a72;--y:#a67c45;--r:#b85c6b;
+  --m:'SF Mono','Fira Code',monospace;
+  --c1:#fff;--c2:#f9f8f6;--gb:rgba(0,0,0,.07);--gb2:rgba(0,0,0,.12);
+  --t0:#0d1018;--t1:#374151;--t2:#6b7280;--t3:#9ca3af;
+}
 
-/* Header */
-.hd{height:52px;background:#fff;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
-.hd-brand{font-size:18px;font-weight:800;color:#E8440A;letter-spacing:-.02em;}
-.hd-reg{font-size:10px;color:#E8440A;margin-left:1px;}
-.hd-title{font-size:13px;font-weight:600;color:#0d1018;margin-left:4px;}
-.hd-back{margin-left:auto;padding:6px 14px;border-radius:8px;border:1px solid rgba(0,0,0,.1);background:#fff;color:#6b7280;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px;}
-.hd-back:hover{background:#f5f5f5;}
+/* ── Header ── */
+.hd{height:54px;background:#fff;border-bottom:1px solid var(--gb);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.hd-brand{font-size:19px;font-weight:800;color:var(--a);letter-spacing:-.03em;}
+.hd-reg{font-size:10px;color:var(--a);}
+.hd-sep{width:1px;height:20px;background:var(--gb);margin:0 8px;}
+.hd-title{font-size:13px;font-weight:600;color:var(--t0);}
+.hd-role{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(232,68,10,.08);color:var(--a);border:1px solid rgba(232,68,10,.2);font-weight:600;letter-spacing:.02em;margin-left:6px;}
+.hd-back{margin-left:auto;padding:6px 14px;border-radius:8px;border:1px solid var(--gb2);background:#fff;color:var(--t2);font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px;transition:all .15s;}
+.hd-back:hover{background:#f5f3f0;color:var(--t0);}
 
-/* Layout */
+/* ── Layout ── */
 .layout{display:flex;flex:1;min-height:0;overflow:hidden;}
 
-/* Sidebar */
-.sb{width:200px;min-width:200px;background:#fff;border-right:1px solid rgba(0,0,0,.08);padding:16px 0;overflow-y:auto;flex-shrink:0;}
-.sb-sec{font-family:var(--m);font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;padding:8px 16px 4px;font-weight:600;}
-.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:12px;color:#374151;transition:all .1s;border-left:2px solid transparent;}
-.sb-item:hover{background:#f9fafb;color:#0d1018;}
-.sb-item.active{background:rgba(232,68,10,.05);color:#E8440A;border-left-color:#E8440A;font-weight:600;}
-.sb-item .ico{font-size:14px;}
-.sb-divider{height:1px;background:rgba(0,0,0,.06);margin:8px 0;}
+/* ── Sidebar ── */
+.sb{width:210px;min-width:210px;background:#fff;border-right:1px solid var(--gb);padding:16px 0;overflow-y:auto;flex-shrink:0;}
+.sb-sec{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;padding:10px 18px 4px;font-weight:700;font-family:var(--m);}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;font-size:12px;color:var(--t1);transition:all .12s;border-left:2px solid transparent;position:relative;}
+.sb-item:hover{background:#f9f8f6;color:var(--t0);}
+.sb-item.active{background:rgba(232,68,10,.05);color:var(--a);border-left-color:var(--a);font-weight:600;}
+.sb-item .ico{font-size:15px;line-height:1;}
+.sb-divider{height:1px;background:var(--gb);margin:6px 0;}
 
-/* Filters */
-.filters{display:flex;align-items:center;gap:8px;padding:12px 20px;background:#fff;border-bottom:1px solid rgba(0,0,0,.06);flex-shrink:0;flex-wrap:wrap;}
-.filter-pill{padding:5px 12px;border-radius:20px;border:1px solid rgba(0,0,0,.1);background:#fff;font-size:11px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .1s;}
-.filter-pill:hover{border-color:#E8440A;color:#E8440A;}
-.filter-pill.active{background:#E8440A;color:#fff;border-color:#E8440A;}
-.filter-pill .arr{font-size:9px;opacity:.6;}
+/* ── Filters ── */
+.filters{display:flex;align-items:center;gap:8px;padding:10px 22px;background:#fff;border-bottom:1px solid var(--gb);flex-shrink:0;flex-wrap:wrap;}
+.fpill{padding:5px 13px;border-radius:20px;border:1px solid var(--gb2);background:#fff;font-size:11px;color:var(--t1);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .12s;font-weight:500;}
+.fpill:hover{border-color:var(--a);color:var(--a);}
+.fpill.active{background:var(--a);color:#fff;border-color:var(--a);}
+.fpill .arr{font-size:9px;opacity:.5;}
 
-/* Content */
-.content{flex:1;min-width:0;overflow-y:auto;padding:20px;}
+/* ── Main content ── */
+.content{flex:1;min-width:0;overflow-y:auto;padding:24px;}
 
-/* Cards */
-.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
-.kpi-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:16px;}
-.kpi-val{font-size:26px;font-weight:700;color:#0d1018;letter-spacing:-.03em;line-height:1;}
-.kpi-lbl{font-family:var(--m);font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-top:5px;}
-.kpi-delta{font-size:11px;color:#6aaa90;margin-top:4px;}
+/* ── Typography ── */
+.sec-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-family:var(--m);}
+.page-title{font-size:18px;font-weight:700;color:var(--t0);margin-bottom:4px;}
+.page-sub{font-size:12px;color:var(--t2);margin-bottom:20px;}
 
-.sec-title{font-family:var(--m);font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:10px;}
-.card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:16px;margin-bottom:12px;}
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+.kpi-card{background:#fff;border:1px solid var(--gb);border-radius:12px;padding:16px 18px;}
+.kpi-val{font-size:28px;font-weight:700;color:var(--t0);letter-spacing:-.04em;line-height:1;}
+.kpi-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:5px;font-family:var(--m);}
+.kpi-delta{font-size:11px;font-weight:600;color:var(--g);margin-top:4px;display:flex;align-items:center;gap:3px;}
+.kpi-delta.down{color:var(--r);}
 
-/* Table */
-.tbl-wrap{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+/* ── Cards ── */
+.card{background:#fff;border:1px solid var(--gb);border-radius:12px;padding:18px;margin-bottom:12px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.card-title{font-size:13px;font-weight:700;color:var(--t0);}
+
+/* ── Table ── */
+.tbl-wrap{background:#fff;border:1px solid var(--gb);border-radius:12px;overflow:hidden;margin-bottom:16px;}
 table{width:100%;border-collapse:collapse;}
-th{padding:9px 14px;text-align:left;font-family:var(--m);font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;background:#f9fafb;border-bottom:1px solid rgba(0,0,0,.06);}
-td{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.04);font-size:12px;color:#374151;}
+th{padding:10px 16px;text-align:left;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;background:#f9f8f6;border-bottom:1px solid var(--gb);font-family:var(--m);font-weight:600;}
+td{padding:11px 16px;border-bottom:1px solid rgba(0,0,0,.04);font-size:12px;color:var(--t1);}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:#fafafa;}
-.av{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
-.tag{display:inline-block;font-family:var(--m);font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid;font-weight:500;}
-.bar{height:3px;border-radius:2px;overflow:hidden;background:rgba(0,0,0,.07);margin-top:3px;}
-.bar-fill{height:100%;border-radius:2px;}
-.score-badge{display:inline-flex;align-items:center;justify-content:center;width:36px;height:22px;border-radius:6px;font-family:var(--m);font-size:11px;font-weight:700;}
+tr:hover td{background:#fafaf8;}
 
-/* Coaching */
-.plan-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:18px;margin-bottom:12px;}
-.plan-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.plan-pct{font-size:22px;font-weight:700;margin-left:auto;}
-.plan-bar{height:6px;background:rgba(0,0,0,.07);border-radius:3px;overflow:hidden;margin-bottom:10px;}
-.plan-bar-fill{height:100%;border-radius:3px;}
-.plan-act{font-size:12px;color:#6b7280;padding:2px 0;display:flex;align-items:center;gap:6px;}
-.plan-act::before{content:'→';color:#9ca3af;}
+/* ── Agent avatar ── */
+.av{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;}
+.av-sm{width:28px;height:28px;font-size:11px;}
+.av-md{width:36px;height:36px;font-size:14px;}
+.av-lg{width:48px;height:48px;font-size:18px;}
+
+/* ── Tags/badges ── */
+.tag{display:inline-block;font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid;font-weight:600;font-family:var(--m);}
+.score-badge{display:inline-flex;align-items:center;justify-content:center;width:38px;height:24px;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--m);}
+
+/* ── Progress bar ── */
+.bar{height:4px;border-radius:2px;overflow:hidden;background:rgba(0,0,0,.07);margin-top:3px;}
+.bar-fill{height:100%;border-radius:2px;transition:width .4s ease;}
+.bar-lg{height:6px;border-radius:3px;overflow:hidden;background:rgba(0,0,0,.07);}
+.bar-lg-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+
+/* ── Sentiment ── */
+.sent-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.sent-label{position:absolute;font-size:11px;font-weight:700;color:var(--t0);}
+.sent-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;}
+
+/* ── Coaching plan card ── */
+.plan-card{background:#fff;border:1px solid var(--gb);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+.plan-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.plan-pct{font-size:24px;font-weight:700;margin-left:auto;line-height:1;}
+
+/* ── Detail tabs ── */
+.dtabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--gb);padding-bottom:0;}
+.dtab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s;}
+.dtab:hover{color:var(--t0);}
+.dtab.active{color:var(--a);border-bottom-color:var(--a);font-weight:600;}
+
+/* ── Sparkline-like duration chart ── */
+.dur-bar{display:flex;align-items:flex-end;gap:3px;height:40px;}
+.dur-col{border-radius:3px 3px 0 0;min-width:8px;transition:all .3s;}
+
+/* ── Alert/pattern card ── */
+.pattern-card{border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid;}
+.pattern-card.pos{background:rgba(74,138,114,.06);border-color:var(--g);}
+.pattern-card.neg{background:rgba(184,92,107,.06);border-color:var(--r);}
+.pattern-card.neu{background:rgba(166,124,69,.06);border-color:var(--y);}
+
+/* ── Grid layouts ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ── Mini metric ── */
+.mini-metric{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);}
+.mini-metric:last-child{border-bottom:none;}
+.mini-lbl{font-size:12px;color:var(--t2);}
+.mini-val{font-size:13px;font-weight:700;color:var(--t0);}
+
+/* ── Scroll area ── */
+.scroll-x{overflow-x:auto;}
 </style>
 </head>
 <body>
 
 <div class="hd">
   <span class="hd-brand">CONNECT</span><span class="hd-reg">®</span>
+  <div class="hd-sep"></div>
   <span class="hd-title">Reportes & Analytics</span>
-  <a href="app.html" class="hd-back">← Volver a la app</a>
+  <span class="hd-role" id="hd-role-badge">Formador</span>
+  <a href="app.html" class="hd-back">← Volver</a>
 </div>
 
 <div class="layout">
+
   <!-- Sidebar -->
   <div class="sb">
     <div class="sb-sec">General</div>
-    <div class="sb-item active" onclick="showView('resumen')"><span class="ico">📊</span>Resumen</div>
-    <div class="sb-item" onclick="showView('agentes')"><span class="ico">🎧</span>Agentes</div>
+    <div class="sb-item active" onclick="nav('resumen')" id="nav-resumen"><span class="ico">📊</span>Resumen</div>
     <div class="sb-divider"></div>
-    <div class="sb-sec">Por Rol</div>
-    <div class="sb-item" onclick="showView('supervisor')"><span class="ico">📈</span>Supervisor</div>
-    <div class="sb-item" onclick="showView('formador')"><span class="ico">🎓</span>Formador</div>
-    <div class="sb-item" onclick="showView('agente_v')"><span class="ico">👤</span>Por agente</div>
-    <div class="sb-divider"></div>
-    <div class="sb-sec">Análisis</div>
-    <div class="sb-item" onclick="showView('feedback')"><span class="ico">💬</span>Feedback</div>
-    <div class="sb-item" onclick="showView('coaching')"><span class="ico">🎯</span>Coaching</div>
+    <div class="sb-sec" id="sb-sec-formador">Formador</div>
+    <div class="sb-item" onclick="nav('agentes')" id="nav-agentes"><span class="ico">🎧</span>Agentes</div>
+    <div class="sb-item" onclick="nav('agente_v')" id="nav-agente_v"><span class="ico">👤</span>Por agente</div>
+    <div class="sb-item" onclick="nav('coaching')" id="nav-coaching"><span class="ico">🎯</span>Coaching</div>
+    <div class="sb-item" onclick="nav('feedback')" id="nav-feedback"><span class="ico">💬</span>Feedback</div>
+    <div class="sb-divider" id="sb-div-admin" style="display:none;"></div>
+    <div class="sb-sec" id="sb-sec-admin" style="display:none;">Admin / Supervisor</div>
+    <div class="sb-item" onclick="nav('supervisor')" id="nav-supervisor" style="display:none;"><span class="ico">📈</span>Supervisor</div>
+    <div class="sb-item" onclick="nav('operaciones')" id="nav-operaciones" style="display:none;"><span class="ico">⚙️</span>Operaciones</div>
   </div>
 
-  <!-- Main -->
+  <!-- Right panel -->
   <div style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;">
-    <!-- Filters -->
     <div class="filters">
-      <div class="filter-pill active">Esta semana</div>
-      <div class="filter-pill">Agente <span class="arr">▾</span></div>
-      <div class="filter-pill">Carril <span class="arr">▾</span></div>
-      <div class="filter-pill">País <span class="arr">▾</span></div>
-      <div class="filter-pill">Cuenta <span class="arr">▾</span></div>
+      <div class="fpill active">Esta semana</div>
+      <div class="fpill">Agente <span class="arr">▾</span></div>
+      <div class="fpill">Carril <span class="arr">▾</span></div>
+      <div class="fpill">País <span class="arr">▾</span></div>
+      <div class="fpill">Cuenta <span class="arr">▾</span></div>
     </div>
-    <!-- Content -->
-    <div class="content" id="main-content"></div>
+    <div class="content" id="main-content">Cargando...</div>
   </div>
 </div>
 
 <script>
+// ── Data ──────────────────────────────────────────────
 var RA=[
-  {id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',pais:'Costa Rica',calls:187,pos:142,aht:'3:52',sat:92,speech:96,score:91,grade:'A'},
-  {id:2,name:'Carlos Mora',letter:'C',color:'#6aaa90',carril:'Road',pais:'Costa Rica',calls:164,pos:118,aht:'4:31',sat:84,speech:88,score:83,grade:'B'},
-  {id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',calls:201,pos:167,aht:'3:44',sat:95,speech:98,score:94,grade:'A'},
-  {id:4,name:'Luis Arias',letter:'L',color:'#4a8a72',carril:'Home',pais:'Costa Rica',calls:143,pos:98,aht:'5:12',sat:71,speech:79,score:72,grade:'C'},
-  {id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',calls:178,pos:134,aht:'4:05',sat:88,speech:91,score:87,grade:'B'},
-  {id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',calls:156,pos:121,aht:'4:22',sat:82,speech:86,score:81,grade:'B'},
-  {id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',calls:132,pos:89,aht:'5:44',sat:68,speech:74,score:68,grade:'C'},
-  {id:8,name:'José Quesada',letter:'J',color:'#0ea5e9',carril:'Road',pais:'Panamá',calls:169,pos:128,aht:'4:18',sat:86,speech:90,score:85,grade:'B'}
+  {id:1,name:'Dayana García',letter:'D',color:'#E8440A',carril:'Home',pais:'Costa Rica',calls:187,pos:142,aht:232,ahtStr:'3:52',sat:92,speech:96,score:91,grade:'A',
+   sentiment:{pos:78,neu:14,neg:8},
+   durations:[210,185,265,190,245,178,220,195,240,200,185,230,195,210,188],
+   poScores:[88,92,85,94,90,87,93,89,91,86],
+   mejoras:['Comunicar ETA consistentemente','Reducir pausas en silencio > 5s']},
+  {id:2,name:'Carlos Mora',letter:'C',color:'#4a8a72',carril:'Road',pais:'Costa Rica',calls:164,pos:118,aht:271,ahtStr:'4:31',sat:84,speech:88,score:83,grade:'B',
+   sentiment:{pos:62,neu:22,neg:16},
+   durations:[280,310,265,290,320,285,260,295,305,270,285,310,275,290,265],
+   poScores:[80,85,78,83,86,79,84,81,83,77],
+   mejoras:['ETA antes de despedirse','Reducir AHT en apertura','Confirmar ubicación en primeros 60s']},
+  {id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',calls:201,pos:167,aht:224,ahtStr:'3:44',sat:95,speech:98,score:94,grade:'A',
+   sentiment:{pos:85,neu:12,neg:3},
+   durations:[220,210,235,195,225,215,205,230,210,225,195,215,220,210,205],
+   poScores:[95,93,96,94,97,92,95,94,96,93],
+   mejoras:['Mantener consistencia en horarios pico']},
+  {id:4,name:'Luis Arias',letter:'L',color:'#6366f1',carril:'Home',pais:'Costa Rica',calls:143,pos:98,aht:312,ahtStr:'5:12',sat:71,speech:79,score:72,grade:'C',
+   sentiment:{pos:48,neu:28,neg:24},
+   durations:[320,290,340,315,360,280,325,295,345,310,330,285,315,300,340],
+   poScores:[68,72,65,70,74,67,71,69,72,66],
+   mejoras:['Reducir AHT: preguntas abiertas → cerradas','Saludo de bienvenida completo','Speech compliance: protocolo de apertura','Manejo de clientes molestos','Confirmar datos antes de registrar']},
+  {id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',calls:178,pos:134,aht:245,ahtStr:'4:05',sat:88,speech:91,score:87,grade:'B',
+   sentiment:{pos:70,neu:22,neg:8},
+   durations:[240,255,235,260,245,250,240,265,248,255,242,258,245,252,240],
+   poScores:[86,88,84,89,87,85,88,86,87,84],
+   mejoras:['ETA en el 100% de llamadas','Confirmación de referencia de ubicación']},
+  {id:6,name:'Andrés Fallas',letter:'A',color:'#0ea5e9',carril:'Concierge',pais:'Costa Rica',calls:156,pos:121,aht:262,ahtStr:'4:22',sat:82,speech:86,score:81,grade:'B',
+   sentiment:{pos:65,neu:24,neg:11},
+   durations:[260,275,250,265,280,255,270,260,275,265,258,272,260,268,252],
+   poScores:[80,83,79,84,82,80,83,81,83,79],
+   mejoras:['Protocolo de apertura completo','Comunicar ETA']},
+  {id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',calls:132,pos:89,aht:344,ahtStr:'5:44',sat:68,speech:74,score:68,grade:'C',
+   sentiment:{pos:42,neu:30,neg:28},
+   durations:[350,320,370,340,380,330,355,345,365,335,350,325,360,340,375],
+   poScores:[65,68,63,67,70,64,68,66,69,63],
+   mejoras:['Speech compliance: saludo en 100% de llamadas','Reducir AHT significativamente','Manejo de clientes molestos','Validación de datos del cliente','Cierre de llamada con ETA']},
+  {id:8,name:'José Quesada',letter:'J',color:'#f59e0b',carril:'Road',pais:'Panamá',calls:169,pos:128,aht:258,ahtStr:'4:18',sat:86,speech:90,score:85,grade:'B',
+   sentiment:{pos:68,neu:24,neg:8},
+   durations:[255,270,248,262,275,258,265,260,272,255,260,268,255,265,258],
+   poScores:[84,87,82,86,88,83,86,84,87,82],
+   mejoras:['ETA consistente al cierre','Reducción de silencios']}
 ];
+
 var RC=[
-  {agent:'Luis Arias',obj:'Reducir AHT a menos de 4:30',acts:['Preguntas clave en primeros 60s','Role-play apertura'],dl:'30 abr',pct:35,coach:'Roberto Salas'},
-  {agent:'María Solano',obj:'Speech compliance al 90%',acts:['5 grabaciones/semana','Sesión con formador'],dl:'5 may',pct:20,coach:'Ana Vega'},
-  {agent:'Carlos Mora',obj:'Comunicar ETA en 100% llamadas',acts:['Checklist visual','Feedback diario'],dl:'28 abr',pct:60,coach:'Roberto Salas'}
+  {agent:'Luis Arias',obj:'Reducir AHT a menos de 4:30',acts:['Preguntas clave en primeros 60s','Role-play de apertura semanal','Revisión de grabaciones con coach'],dl:'30 abr',pct:35,coach:'Roberto Salas',sessions:3,nextSession:'29 abr'},
+  {agent:'María Solano',obj:'Speech compliance al 90%+',acts:['5 auto-grabaciones/semana','Sesión semanal con formador','Checklist pre-llamada'],dl:'5 may',pct:20,coach:'Ana Vega',sessions:2,nextSession:'30 abr'},
+  {agent:'Carlos Mora',obj:'Comunicar ETA en 100% de llamadas',acts:['Checklist visual en pantalla','Feedback diario del supervisor','Role-play de cierre'],dl:'28 abr',pct:60,coach:'Roberto Salas',sessions:4,nextSession:'28 abr'}
 ];
+
 var RF=[
-  {agent:'Dayana García',by:'Ana Vega',role:'Supervisora',date:'23 abr',text:'Excelente manejo del cliente molesto. Resolución rápida.',tags:['Empatía','Resolución'],priority:'baja'},
-  {agent:'Luis Arias',by:'Roberto Salas',role:'Supervisor',date:'22 abr',text:'AHT elevado. Demora en confirmar ubicación.',tags:['AHT','Protocolo'],priority:'alta'},
-  {agent:'Carlos Mora',by:'Ana Vega',role:'Supervisora',date:'21 abr',text:'No siempre comunica ETA antes de despedirse.',tags:['ETA','Cierre'],priority:'media'},
-  {agent:'María Solano',by:'Roberto Salas',role:'Supervisor',date:'21 abr',text:'Speech bajo. Omite saludo en 4 de 10 llamadas.',tags:['Speech','Saludo'],priority:'alta'}
+  {agent:'Dayana García',by:'Ana Vega',role:'Supervisora',date:'23 abr',text:'Excelente manejo del cliente molesto en llamada #1847. Lenguaje empático y resolución en menos de 4 minutos.',tags:['Empatía','Resolución'],priority:'baja',type:'pos'},
+  {agent:'Luis Arias',by:'Roberto Salas',role:'Supervisor',date:'22 abr',text:'AHT elevado en turno de la tarde. Demora en confirmar ubicación. Requiere refuerzo en protocolo de apertura.',tags:['AHT','Protocolo'],priority:'alta',type:'neg'},
+  {agent:'Carlos Mora',by:'Ana Vega',role:'Supervisora',date:'21 abr',text:'Buen desempeño general. Sin embargo, no comunica ETA antes de despedirse en 3 de 5 llamadas monitoreadas.',tags:['ETA','Cierre'],priority:'media',type:'neg'},
+  {agent:'María Solano',by:'Roberto Salas',role:'Supervisor',date:'21 abr',text:'Speech compliance bajo (74%). Omite saludo de bienvenida en 4 de 10 llamadas del día.',tags:['Speech','Saludo'],priority:'alta',type:'neg'},
+  {agent:'Valeria Núñez',by:'Ana Vega',role:'Supervisora',date:'20 abr',text:'Rendimiento consistente. Maneja múltiples servicios con excelente satisfacción. Candidata a mentor de equipo.',tags:['Rendimiento','Liderazgo'],priority:'baja',type:'pos'},
+  {agent:'Sofía Ramírez',by:'Roberto Salas',role:'Supervisor',date:'19 abr',text:'Mejora notable en speech compliance esta semana. ETA comunicado en 80% de llamadas, mejora del 20%.',tags:['Mejora','Speech'],priority:'baja',type:'pos'}
 ];
+
 var RP=[
-  {icon:'📉',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},
-  {icon:'⭐',title:'Alto rendimiento Concierge',type:'pos',desc:'Satisfacción +90% consistente.',agents:'Valeria Núñez, Andrés Fallas'},
-  {icon:'⚠️',title:'Omisión de ETA',type:'neg',desc:'40% de agentes no comunican ETA al cerrar.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},
-  {icon:'📈',title:'Mejora en speech',type:'pos',desc:'Speech compliance +8% en 2 semanas.',agents:'Dayana García, Sofía Ramírez'}
+  {icon:'📉',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con AHT 18% sobre objetivo semanal. Impacto en satisfacción medible.',agents:['Carlos Mora','Luis Arias','José Quesada']},
+  {icon:'⭐',title:'Alto rendimiento Concierge',type:'pos',desc:'Satisfacción +90% y speech +94% consistentes durante toda la semana.',agents:['Valeria Núñez','Andrés Fallas']},
+  {icon:'⚠️',title:'Omisión de ETA al cierre',type:'neg',desc:'40% de agentes no comunican ETA antes de despedirse. Protocolo requiere refuerzo.',agents:['Carlos Mora','Luis Arias','Andrés Fallas']},
+  {icon:'📈',title:'Mejora en speech compliance',type:'pos',desc:'Speech compliance del equipo +8% vs semana anterior. Tendencia positiva.',agents:['Dayana García','Sofía Ramírez','José Quesada']}
 ];
 
-function rc(v){return v>=85?'#6aaa90':v>=70?'#bf9455':'#cc7580';}
-function rbar(v){return '<div class="bar"><div class="bar-fill" style="width:'+v+'%;background:'+rc(v)+'"></div></div>';}
-function rscore(a){var bg=a.grade==='A'?'rgba(106,170,144,.15)':a.grade==='B'?'rgba(191,148,85,.15)':'rgba(204,117,128,.15)';var c=a.grade==='A'?'#6aaa90':a.grade==='B'?'#bf9455':'#cc7580';return'<span class="score-badge" style="background:'+bg+';color:'+c+';">'+a.score+'</span>';}
+// ── Helpers ──────────────────────────────────────────
+var _role = 'formador';
+try{var _s=JSON.parse(localStorage.getItem('helios_session')||'{}');_role=(_s.user||{}).role||'formador';}catch(e){}
 
-function showView(v){
-  // Update sidebar
+function rc(v){return v>=85?'var(--g)':v>=70?'var(--y)':'var(--r)';}
+function rcHex(v){return v>=85?'#4a8a72':v>=70?'#a67c45':'#b85c6b';}
+function rbar(v,w){w=w||60;return'<div class="bar" style="width:'+w+'px"><div class="bar-fill" style="width:'+v+'%;background:'+rcHex(v)+'"></div></div>';}
+function rscore(a){var c=a.grade==='A'?'#4a8a72':a.grade==='B'?'#a67c45':'#b85c6b';var bg=a.grade==='A'?'rgba(74,138,114,.12)':a.grade==='B'?'rgba(166,124,69,.12)':'rgba(184,92,107,.12)';return'<span class="score-badge" style="color:'+c+';background:'+bg+'">'+a.score+'</span>';}
+function fmtSec(s){return Math.floor(s/60)+':'+('0'+s%60).slice(-2);}
+function sentColor(v){return v>=70?'#4a8a72':v>=50?'#a67c45':'#b85c6b';}
+
+function nav(v){
   document.querySelectorAll('.sb-item').forEach(function(el){el.classList.remove('active');});
-  var clicked=document.querySelector('[onclick="showView(\''+v+'\')"]');
-  if(clicked)clicked.classList.add('active');
-  
-  var c=document.getElementById('main-content');
-  if(v==='resumen'){
-    var tot={calls:0,pos:0,sat:0,sp:0,sc:0};
-    RA.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;});
-    var n=RA.length;
-    c.innerHTML=
-      '<div class="kpi-grid">'+
-        [['Llamadas',tot.calls,'▲12%'],['POs Creados',tot.pos,'▲8%'],['Satisfacción',Math.round(tot.sat/n)+'%','▲2%'],['Speech',Math.round(tot.sp/n)+'%','▲5%'],['Score',Math.round(tot.sc/n),'▲3%']].map(function(k){
-          return'<div class="kpi-card"><div class="kpi-val">'+k[1]+'</div><div class="kpi-lbl">'+k[0]+'</div><div class="kpi-delta">'+k[2]+'</div></div>';
-        }).join('')+
-      '</div>'+
-      '<div class="sec-title">Resumen por agente</div>'+viewAgentes();
-  }else if(v==='agentes'){
-    c.innerHTML='<div class="sec-title">Todos los agentes</div>'+viewAgentes();
-  }else if(v==='supervisor'){
-    c.innerHTML=viewSupervisor();
-  }else if(v==='formador'){
-    c.innerHTML=viewFormador();
-  }else if(v==='agente_v'){
-    c.innerHTML=viewPorAgente();
-  }else if(v==='feedback'){
-    c.innerHTML=viewFeedback();
-  }else if(v==='coaching'){
-    c.innerHTML='<div class="sec-title">Planes de coaching activos</div>'+viewCoaching();
+  var el=document.getElementById('nav-'+v);
+  if(el)el.classList.add('active');
+  var renders={resumen:viewResumen,agentes:viewAgentes,agente_v:viewPorAgente,coaching:viewCoaching,feedback:viewFeedback,supervisor:viewSupervisor,operaciones:viewOperaciones};
+  var fn=renders[v];
+  if(fn)document.getElementById('main-content').innerHTML=fn();
+  else document.getElementById('main-content').innerHTML='<p style="padding:20px;color:var(--t2);">Vista en construcción</p>';
+}
+
+function initRole(){
+  var badge=document.getElementById('hd-role-badge');
+  if(badge)badge.textContent=_role.charAt(0).toUpperCase()+_role.slice(1);
+  if(_role==='admin'||_role==='supervisor'){
+    document.getElementById('sb-div-admin').style.display='';
+    document.getElementById('sb-sec-admin').style.display='';
+    document.getElementById('nav-supervisor').style.display='';
+    document.getElementById('nav-operaciones').style.display='';
   }
 }
 
-function viewAgentes(){
-  var ths=['Agente','Carril','País','Llamadas','AHT','Satisf.','Speech','Score'].map(function(x){return'<th>'+x+'</th>';}).join('');
+// ── RESUMEN ──────────────────────────────────────────
+function viewResumen(){
+  var tot={calls:0,pos:0,sat:0,sp:0,sc:0,aht:0};
+  RA.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;tot.aht+=a.aht;});
+  var n=RA.length;
+  var avgAht=fmtSec(Math.round(tot.aht/n));
+  var kpis=[
+    ['Llamadas',tot.calls,'▲12%',false],
+    ['POs Creados',tot.pos,'▲8%',false],
+    ['Satisfacción',Math.round(tot.sat/n)+'%','▲2%',false],
+    ['Speech Comp.',Math.round(tot.sp/n)+'%','▲5%',false],
+    ['AHT Promedio',avgAht,'▼3%',true]
+  ];
+  var html='<div class="page-title">Resumen del equipo</div><div class="page-sub">Semana actual · '+n+' agentes activos</div>';
+  html+='<div class="kpi-grid">';
+  kpis.forEach(function(k){
+    html+='<div class="kpi-card"><div class="kpi-val">'+k[1]+'</div><div class="kpi-lbl">'+k[0]+'</div><div class="kpi-delta'+(k[3]?' down':'')+'">'+k[2]+'</div></div>';
+  });
+  html+='</div>';
+
+  // Grade distribution
+  var grades={A:0,B:0,C:0};
+  RA.forEach(function(a){grades[a.grade]++;});
+  html+='<div class="grid-2" style="margin-bottom:16px;">';
+  html+='<div><div class="sec-title">Distribución de rendimiento</div><div class="card">';
+  [['A','Excelente','#4a8a72',grades.A],['B','Bueno','#a67c45',grades.B],['C','Requiere atención','#b85c6b',grades.C]].forEach(function(g){
+    var pct=Math.round(g[3]/n*100);
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);">'+
+      '<span style="font-size:13px;font-weight:700;color:'+g[2]+';width:18px;">'+g[0]+'</span>'+
+      '<div style="flex:1;"><div style="font-size:12px;color:var(--t1);margin-bottom:3px;">'+g[1]+'</div>'+
+      '<div class="bar-lg" style="width:100%"><div class="bar-lg-fill" style="width:'+pct+'%;background:'+g[2]+'"></div></div></div>'+
+      '<span style="font-size:13px;font-weight:700;color:var(--t0);">'+g[3]+'</span>'+
+    '</div>';
+  });
+  html+='</div></div>';
+
+  // Sentiment overview
+  var totSent={pos:0,neu:0,neg:0};
+  RA.forEach(function(a){totSent.pos+=a.sentiment.pos;totSent.neu+=a.sentiment.neu;totSent.neg+=a.sentiment.neg;});
+  var st=totSent.pos+totSent.neu+totSent.neg;
+  html+='<div><div class="sec-title">Análisis de sentimiento del equipo</div><div class="card">';
+  [['Positivo',Math.round(totSent.pos/n),'#4a8a72','😊'],['Neutro',Math.round(totSent.neu/n),'#a67c45','😐'],['Negativo',Math.round(totSent.neg/n),'#b85c6b','😞']].forEach(function(s){
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);">'+
+      '<span style="font-size:16px;">'+s[3]+'</span>'+
+      '<div style="flex:1;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:12px;color:var(--t1);">'+s[0]+'</span><span style="font-size:12px;font-weight:700;color:'+s[2]+';">'+s[1]+'%</span></div>'+
+      '<div class="bar-lg"><div class="bar-lg-fill" style="width:'+s[1]+'%;background:'+s[2]+'"></div></div></div>'+
+    '</div>';
+  });
+  html+='</div></div></div>';
+
+  html+='<div class="sec-title">Todos los agentes</div>'+tableAgentes();
+  return html;
+}
+
+// ── TABLA AGENTES ────────────────────────────────────
+function tableAgentes(){
+  var ths=['Agente','Carril','País','Llamadas','AHT','Satisf.','Speech','Sentimiento','Score'].map(function(x){return'<th>'+x+'</th>';}).join('');
+  var cC={Home:'#6366f1',Road:'#4a8a72',Concierge:'#a67c45'};
   var trs=RA.map(function(a){
-    var cC={Home:'#6366f1',Road:'#6aaa90',Concierge:'#bf9455'};
-    return'<tr>'+
-      '<td><div style="display:flex;align-items:center;gap:9px;"><div class="av" style="background:'+a.color+'">'+a.letter+'</div><div><div style="font-weight:600;color:#0d1018;">'+a.name+'</div></div></div></td>'+
+    var sentV=a.sentiment.pos;
+    return'<tr onclick="nav(\'agente_v\');setTimeout(function(){showAgente('+a.id+');},50);" style="cursor:pointer;">'+
+      '<td><div style="display:flex;align-items:center;gap:10px;"><div class="av av-sm" style="background:'+a.color+'">'+a.letter+'</div>'+
+        '<div><div style="font-weight:600;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t3);">'+a.carril+' · '+a.pais+'</div></div></div></td>'+
       '<td><span class="tag" style="color:'+( cC[a.carril]||'#374151')+';border-color:currentColor;background:rgba(0,0,0,.03);">'+a.carril+'</span></td>'+
-      '<td style="color:#6b7280;">'+a.pais+'</td>'+
-      '<td style="font-weight:600;">'+a.calls+'</td>'+
-      '<td>'+a.aht+'</td>'+
-      '<td><div style="font-weight:600;color:'+rc(a.sat)+';">'+a.sat+'%</div>'+rbar(a.sat)+'</td>'+
-      '<td><div style="font-weight:600;color:'+rc(a.speech)+';">'+a.speech+'%</div></td>'+
+      '<td style="color:var(--t2);font-size:11px;">'+a.pais+'</td>'+
+      '<td style="font-weight:700;">'+a.calls+'</td>'+
+      '<td style="font-family:var(--m);font-size:11px;color:'+(a.aht>280?'var(--r)':'var(--t1)')+';">'+a.ahtStr+'</td>'+
+      '<td><div style="font-weight:700;color:'+rcHex(a.sat)+';">'+a.sat+'%</div>'+rbar(a.sat,56)+'</td>'+
+      '<td><div style="font-weight:700;color:'+rcHex(a.speech)+';">'+a.speech+'%</div>'+rbar(a.speech,56)+'</td>'+
+      '<td><div style="display:flex;align-items:center;gap:5px;"><div class="sent-dot" style="background:'+sentColor(sentV)+'"></div><span style="font-size:11px;font-weight:600;color:'+sentColor(sentV)+';">'+sentV+'%</span></div></td>'+
       '<td>'+rscore(a)+'</td>'+
     '</tr>';
   }).join('');
-  return'<div class="tbl-wrap"><table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div>';
+  return'<div class="tbl-wrap scroll-x"><table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div>';
 }
 
+function viewAgentes(){
+  return'<div class="page-title">Todos los agentes</div><div class="page-sub">Haz clic en un agente para ver su perfil detallado</div>'+tableAgentes();
+}
+
+// ── POR AGENTE (DETALLE COMPLETO) ───────────────────
+var _selAgent = null;
+
+function viewPorAgente(){
+  var opts=RA.map(function(a){return'<option value="'+a.id+'"'+(a===_selAgent?' selected':'')+'>'+a.name+'</option>';}).join('');
+  var sel='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'+
+    '<select id="ag-sel" onchange="showAgente(parseInt(this.value))" style="padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);background:#fff;font-size:13px;width:260px;cursor:pointer;color:var(--t0);">'+
+    '<option value="">Seleccionar agente...</option>'+opts+'</select>'+
+    '<div style="font-size:12px;color:var(--t2);">'+RA.length+' agentes disponibles</div>'+
+  '</div>';
+  return sel+'<div id="ag-detail">'+(
+    _selAgent ? agentDetail(_selAgent) :
+    '<div style="padding:40px;text-align:center;color:var(--t3);font-size:13px;background:#fff;border-radius:12px;border:1px solid var(--gb);">Selecciona un agente para ver su análisis completo</div>'
+  )+'</div>';
+}
+
+function showAgente(id){
+  _selAgent=RA.find(function(a){return a.id===id;});
+  var detail=document.getElementById('ag-detail');
+  var sel=document.getElementById('ag-sel');
+  if(sel)sel.value=id;
+  if(detail&&_selAgent)detail.innerHTML=agentDetail(_selAgent);
+}
+
+function agentDetail(a){
+  var af=RF.filter(function(f){return f.agent===a.name;});
+  var ap=RC.find(function(p){return p.agent===a.name;});
+  var gradeColor=a.grade==='A'?'#4a8a72':a.grade==='B'?'#a67c45':'#b85c6b';
+
+  // ── Header card ──
+  var header='<div class="card" style="display:flex;align-items:center;gap:20px;margin-bottom:16px;padding:20px 24px;">'+
+    '<div class="av av-lg" style="background:'+a.color+';">'+a.letter+'</div>'+
+    '<div style="flex:1;">'+
+      '<div style="font-size:20px;font-weight:700;color:var(--t0);margin-bottom:2px;">'+a.name+'</div>'+
+      '<div style="font-size:12px;color:var(--t2);">'+a.carril+' · '+a.pais+'</div>'+
+    '</div>'+
+    '<div style="text-align:center;margin-right:8px;">'+
+      '<div style="font-size:40px;font-weight:800;color:var(--t0);line-height:1;letter-spacing:-.03em;">'+a.score+'</div>'+
+      '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Score</div>'+
+    '</div>'+
+    '<div style="text-align:center;padding-left:20px;border-left:1px solid var(--gb);">'+
+      '<div style="font-size:32px;font-weight:800;color:'+gradeColor+';line-height:1;">'+a.grade+'</div>'+
+      '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Grado</div>'+
+    '</div>'+
+  '</div>';
+
+  // ── KPI strip ──
+  var kpis=[
+    ['Llamadas',a.calls,'📞'],
+    ['POs',a.pos,'📋'],
+    ['AHT',a.ahtStr,'⏱'],
+    ['Satisfacción',a.sat+'%','⭐'],
+    ['Speech',a.speech+'%','🎙'],
+    ['Sentimiento',a.sentiment.pos+'% pos','💬']
+  ];
+  var kpiRow='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;">';
+  kpis.forEach(function(k){
+    kpiRow+='<div class="card" style="text-align:center;padding:12px 8px;">'+
+      '<div style="font-size:16px;margin-bottom:4px;">'+k[2]+'</div>'+
+      '<div style="font-size:15px;font-weight:700;color:var(--t0);">'+k[1]+'</div>'+
+      '<div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">'+k[0]+'</div>'+
+    '</div>';
+  });
+  kpiRow+='</div>';
+
+  // ── Grid: Calificación PO + Puntos de mejora ──
+  var avgPO=a.poScores.length?Math.round(a.poScores.reduce(function(s,v){return s+v;},0)/a.poScores.length):0;
+  var poCard='<div class="sec-title">Calificación por PO</div>'+
+    '<div class="card">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
+        '<div><div style="font-size:26px;font-weight:700;color:var(--t0);">'+avgPO+'<span style="font-size:13px;color:var(--t3);font-weight:400;">/100</span></div><div style="font-size:11px;color:var(--t2);">Promedio últimos '+a.poScores.length+' POs</div></div>'+
+        '<div style="display:flex;align-items:flex-end;gap:3px;height:40px;">'+
+          a.poScores.map(function(v){
+            var h=Math.round(v/100*38)+2;
+            var col=rcHex(v);
+            return'<div style="width:10px;height:'+h+'px;background:'+col+';border-radius:2px 2px 0 0;opacity:.8;"></div>';
+          }).join('')+
+        '</div>'+
+      '</div>'+
+      '<div class="bar-lg"><div class="bar-lg-fill" style="width:'+avgPO+'%;background:'+rcHex(avgPO)+'"></div></div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.05);">'+
+        [['Mín',Math.min.apply(null,a.poScores)],['Máx',Math.max.apply(null,a.poScores)],['Tendencia',a.poScores[a.poScores.length-1]>a.poScores[0]?'↑ Mejorando':'↓ Bajando']].map(function(m){
+          return'<div style="text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--t0);">'+m[1]+'</div><div style="font-size:10px;color:var(--t3);">'+m[0]+'</div></div>';
+        }).join('')+
+      '</div>'+
+    '</div>';
+
+  var mejCard='<div class="sec-title">Puntos de mejora</div>'+
+    '<div class="card">'+
+      (a.mejoras.length===0?'<div style="font-size:12px;color:var(--t2);padding:8px 0;">Sin puntos de mejora registrados ✓</div>':
+      a.mejoras.map(function(m,i){
+        var priority=i<2?'alta':'media';
+        var c=i<2?'var(--r)':'var(--y)';
+        return'<div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);">'+
+          '<div style="width:7px;height:7px;border-radius:50%;background:'+c+';flex-shrink:0;margin-top:4px;"></div>'+
+          '<div style="flex:1;font-size:12px;color:var(--t1);line-height:1.5;">'+m+'</div>'+
+          '<span class="tag" style="color:'+c+';border-color:'+c+';background:rgba(0,0,0,.02);flex-shrink:0;">'+priority+'</span>'+
+        '</div>';
+      }).join(''))+
+    '</div>';
+
+  // ── Duración de llamadas ──
+  var avgDur=Math.round(a.durations.reduce(function(s,v){return s+v;},0)/a.durations.length);
+  var maxD=Math.max.apply(null,a.durations);
+  var durCard='<div class="sec-title">Duración de llamadas</div>'+
+    '<div class="card">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">'+
+        '<div><div style="font-size:22px;font-weight:700;color:var(--t0);">'+fmtSec(avgDur)+'</div><div style="font-size:11px;color:var(--t2);">AHT promedio</div></div>'+
+        '<div style="text-align:right;"><div style="font-size:11px;color:var(--t2);">Meta: 4:00</div><div style="font-size:11px;color:'+(avgDur>240?'var(--r)':'var(--g)')+';">'+(avgDur>240?'▲ Por encima':'✓ Dentro')+'</div></div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:flex-end;gap:4px;height:60px;border-bottom:1px solid var(--gb);margin-bottom:10px;">'+
+        a.durations.map(function(d,i){
+          var h=Math.round(d/maxD*56)+2;
+          var col=d>280?'#b85c6b':d>240?'#a67c45':'#4a8a72';
+          return'<div title="'+fmtSec(d)+'" style="flex:1;height:'+h+'px;background:'+col+';border-radius:2px 2px 0 0;opacity:.75;min-width:6px;"></div>';
+        }).join('')+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);">'+
+        ['1','','','','5','','','','','10','','','','','15'].map(function(l){return'<span>'+l+'</span>';}).join('')+
+      '</div>'+
+      '<div style="display:flex;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.05);">'+
+        [['Mín',fmtSec(Math.min.apply(null,a.durations))],['Máx',fmtSec(maxD)],['Bajo meta',a.durations.filter(function(d){return d<=240;}).length+'/'+a.durations.length]].map(function(m){
+          return'<div><span style="font-size:12px;font-weight:700;color:var(--t0);">'+m[1]+'</span><span style="font-size:10px;color:var(--t3);margin-left:4px;">'+m[0]+'</span></div>';
+        }).join('')+
+      '</div>'+
+    '</div>';
+
+  // ── Análisis de sentimiento ──
+  var s=a.sentiment;
+  var sentCard='<div class="sec-title">Análisis de sentimiento</div>'+
+    '<div class="card">'+
+      '<div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">'+
+        '<div style="text-align:center;">'+
+          '<div style="font-size:28px;font-weight:700;color:'+sentColor(s.pos)+';">'+s.pos+'%</div>'+
+          '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;">Positivo</div>'+
+        '</div>'+
+        '<div style="flex:1;">'+
+          [['😊','Positivo',s.pos,'#4a8a72'],['😐','Neutro',s.neu,'#a67c45'],['😞','Negativo',s.neg,'#b85c6b']].map(function(ss){
+            return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
+              '<span style="font-size:14px;">'+ss[0]+'</span>'+
+              '<span style="font-size:11px;color:var(--t2);width:60px;">'+ss[1]+'</span>'+
+              '<div class="bar" style="flex:1;"><div class="bar-fill" style="width:'+ss[2]+'%;background:'+ss[3]+'"></div></div>'+
+              '<span style="font-size:12px;font-weight:700;color:'+ss[3]+';width:36px;text-align:right;">'+ss[2]+'%</span>'+
+            '</div>';
+          }).join('')+
+        '</div>'+
+      '</div>'+
+      '<div style="padding:10px;background:#f9f8f6;border-radius:8px;border:1px solid var(--gb);">'+
+        '<div style="font-size:11px;font-weight:600;color:var(--t0);margin-bottom:3px;">Interpretación</div>'+
+        '<div style="font-size:11px;color:var(--t2);line-height:1.6;">'+(
+          s.pos>=75?'Excelente relación con el cliente. Tono positivo dominante en la mayoría de interacciones.':
+          s.pos>=60?'Buen manejo emocional. Oportunidad de mejorar cierre de llamadas con tono más empático.':
+          'Requiere atención. Alto porcentaje de sentimiento negativo puede indicar manejo difícil de clientes o tono inadecuado.'
+        )+'</div>'+
+      '</div>'+
+    '</div>';
+
+  // ── Speech compliance ──
+  var spItems=['Saludo de bienvenida','Identificación del cliente','Validación de ubicación','Confirmación del servicio','ETA comunicado','Cierre cordial'];
+  var spVals=[a.speech>90?95:a.speech>80?85:75, a.speech>90?92:a.speech>80?82:70, a.speech>90?90:a.speech>80?80:65, a.speech>90?95:a.speech>80?88:72, a.speech>85?80:a.speech>75?65:45, a.speech>90?93:a.speech>80?85:70];
+  var spCard='<div class="sec-title">Speech compliance</div>'+
+    '<div class="card">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
+        '<div style="font-size:24px;font-weight:700;color:'+rcHex(a.speech)+';">'+a.speech+'%</div>'+
+        '<div style="font-size:11px;color:var(--t2);">Meta: 90%</div>'+
+      '</div>'+
+      spItems.map(function(item,i){
+        var v=spVals[i];
+        return'<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.04);">'+
+          '<div style="font-size:11px;color:var(--t1);width:160px;flex-shrink:0;">'+item+'</div>'+
+          '<div class="bar" style="flex:1;"><div class="bar-fill" style="width:'+v+'%;background:'+rcHex(v)+'"></div></div>'+
+          '<span style="font-size:11px;font-weight:700;color:'+rcHex(v)+';width:36px;text-align:right;">'+v+'%</span>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+
+  // ── Observaciones ──
+  var obsCard='<div class="sec-title">Observaciones recibidas</div>'+
+    '<div class="card">'+
+      (af.length===0?'<div style="font-size:12px;color:var(--t3);padding:8px 0;text-align:center;">Sin observaciones registradas</div>':
+      af.map(function(f){
+        var pc=f.priority==='alta'?'var(--r)':f.priority==='media'?'var(--y)':'var(--g)';
+        return'<div style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05);">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
+            '<div style="width:7px;height:7px;border-radius:50%;background:'+pc+';flex-shrink:0;"></div>'+
+            '<span style="font-size:11px;color:var(--t2);">'+f.by+' · '+f.role+' · '+f.date+'</span>'+
+            '<span class="tag" style="margin-left:auto;color:'+pc+';border-color:'+pc+';background:rgba(0,0,0,.02);">'+f.priority+'</span>'+
+          '</div>'+
+          '<div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:6px;">'+f.text+'</div>'+
+          '<div>'+f.tags.map(function(t){return'<span class="tag" style="color:var(--t2);border-color:var(--gb2);background:rgba(0,0,0,.02);margin-right:4px;">'+t+'</span>';}).join('')+'</div>'+
+        '</div>';
+      }).join(''))+
+    '</div>';
+
+  // ── Plan coaching ──
+  var planCard='<div class="sec-title">Plan de coaching</div>'+
+    (ap?
+      '<div class="card" style="border-left:3px solid '+(ap.pct>=70?'#4a8a72':ap.pct>=40?'#a67c45':'#b85c6b')+';">'+
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">'+
+          '<div><div style="font-size:13px;font-weight:700;color:var(--t0);margin-bottom:3px;">🎯 '+ap.obj+'</div>'+
+          '<div style="font-size:11px;color:var(--t2);">Coach: '+ap.coach+' · '+ap.sessions+' sesiones · Próxima: '+ap.nextSession+'</div></div>'+
+          '<div style="font-size:28px;font-weight:700;color:'+(ap.pct>=70?'#4a8a72':ap.pct>=40?'#a67c45':'#b85c6b')+';">'+ap.pct+'%</div>'+
+        '</div>'+
+        '<div class="bar-lg" style="margin-bottom:8px;"><div class="bar-lg-fill" style="width:'+ap.pct+'%;background:'+(ap.pct>=70?'#4a8a72':ap.pct>=40?'#a67c45':'#b85c6b')+'"></div></div>'+
+        '<div style="font-size:11px;color:var(--t2);margin-bottom:10px;">Plazo: '+ap.dl+'</div>'+
+        ap.acts.map(function(ac){return'<div style="font-size:12px;color:var(--t1);padding:4px 0;display:flex;align-items:center;gap:6px;"><span style="color:var(--t3);">→</span>'+ac+'</div>';}).join('')+
+      '</div>'
+    :'<div class="card" style="text-align:center;padding:20px;"><div style="font-size:28px;margin-bottom:6px;">✓</div><div style="font-size:12px;color:var(--t2);">Sin plan de coaching activo</div></div>');
+
+  return header+kpiRow+
+    '<div class="grid-2">'+
+      '<div>'+poCard+mejoras(a)+'</div>'+
+      '<div>'+durCard+sentCard+'</div>'+
+    '</div>'+
+    '<div class="grid-2">'+
+      '<div>'+spCard+'</div>'+
+      '<div>'+obsCard+planCard+'</div>'+
+    '</div>';
+}
+
+function mejoras(a){
+  return'<div class="sec-title">Resumen de puntos de mejora</div>'+
+    '<div class="card">'+
+      (a.mejoras.length===0?'<div style="text-align:center;padding:12px;font-size:12px;color:var(--t2);">✓ Sin puntos pendientes</div>':
+      a.mejoras.map(function(m,i){
+        var c=i===0?'var(--r)':i<2?'var(--y)':'var(--g)';
+        return'<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.04);">'+
+          '<div style="width:6px;height:6px;border-radius:50%;background:'+c+';flex-shrink:0;margin-top:4px;"></div>'+
+          '<div style="font-size:12px;color:var(--t1);line-height:1.5;">'+m+'</div>'+
+        '</div>';
+      }).join(''))+
+    '</div>';
+}
+
+// ── COACHING ─────────────────────────────────────────
+function viewCoaching(){
+  var html='<div class="page-title">Planes de coaching activos</div><div class="page-sub">'+RC.length+' planes en curso</div>';
+  html+=RC.map(function(p){
+    var col=p.pct>=70?'#4a8a72':p.pct>=40?'#a67c45':'#b85c6b';
+    var a=RA.find(function(x){return x.name===p.agent;})||{color:'#9ca3af',letter:'?',score:0};
+    return'<div class="plan-card">'+
+      '<div class="plan-header">'+
+        '<div class="av av-sm" style="background:'+a.color+';">'+a.letter+'</div>'+
+        '<div style="flex:1;">'+
+          '<div style="font-size:14px;font-weight:700;color:var(--t0);">'+p.agent+'</div>'+
+          '<div style="font-size:11px;color:var(--t2);">Coach: '+p.coach+' · '+p.sessions+' sesiones · Plazo: '+p.dl+'</div>'+
+        '</div>'+
+        '<div class="plan-pct" style="color:'+col+';">'+p.pct+'%</div>'+
+      '</div>'+
+      '<div style="font-size:13px;font-weight:600;color:var(--t0);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span>🎯</span>'+p.obj+'</div>'+
+      '<div class="bar-lg" style="margin-bottom:12px;"><div class="bar-lg-fill" style="width:'+p.pct+'%;background:'+col+'"></div></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">'+
+        [['Sesiones',p.sessions],['Próxima',p.nextSession],['Plazo',p.dl]].map(function(m){
+          return'<div style="background:#f9f8f6;border-radius:8px;padding:8px 10px;"><div style="font-size:12px;font-weight:700;color:var(--t0);">'+m[1]+'</div><div style="font-size:10px;color:var(--t3);">'+m[0]+'</div></div>';
+        }).join('')+
+      '</div>'+
+      '<div>'+p.acts.map(function(ac){return'<div style="font-size:12px;color:var(--t1);padding:4px 0;display:flex;align-items:center;gap:6px;"><span style="color:var(--t3);">→</span>'+ac+'</div>';}).join('')+'</div>'+
+    '</div>';
+  }).join('');
+  return html;
+}
+
+// ── FEEDBACK ─────────────────────────────────────────
+function viewFeedback(){
+  var html='<div class="page-title">Observaciones del equipo</div><div class="page-sub">'+RF.length+' observaciones esta semana</div>';
+  html+=RF.map(function(f){
+    var pc=f.priority==='alta'?'var(--r)':f.priority==='media'?'var(--y)':'var(--g)';
+    var typeColor=f.type==='pos'?'#4a8a72':'#b85c6b';
+    var typeLabel=f.type==='pos'?'Positivo':'Atención';
+    var a=RA.find(function(x){return x.name===f.agent;})||{color:'#9ca3af',letter:'?'};
+    return'<div class="card" style="border-left:3px solid '+typeColor+';">'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">'+
+        '<div class="av av-sm" style="background:'+a.color+';">'+a.letter+'</div>'+
+        '<div style="flex:1;">'+
+          '<div style="font-size:13px;font-weight:700;color:var(--t0);">'+f.agent+'</div>'+
+          '<div style="font-size:11px;color:var(--t2);">'+f.by+' · '+f.role+' · '+f.date+'</div>'+
+        '</div>'+
+        '<span class="tag" style="color:'+typeColor+';border-color:'+typeColor+';background:rgba(0,0,0,.02);">'+typeLabel+'</span>'+
+        '<span class="tag" style="color:'+pc+';border-color:'+pc+';background:rgba(0,0,0,.02);">'+f.priority+'</span>'+
+      '</div>'+
+      '<div style="font-size:13px;color:var(--t1);line-height:1.7;margin-bottom:10px;">'+f.text+'</div>'+
+      '<div>'+f.tags.map(function(t){return'<span class="tag" style="color:var(--t2);border-color:var(--gb2);background:rgba(0,0,0,.02);margin-right:5px;">'+t+'</span>';}).join('')+'</div>'+
+    '</div>';
+  }).join('');
+  return html;
+}
+
+// ── SUPERVISOR (solo admin/supervisor) ───────────────
 function viewSupervisor(){
-  var pats=RP.map(function(p){
-    var c=p.type==='pos'?'#6aaa90':p.type==='neg'?'#cc7580':'#bf9455';
+  var html='<div class="page-title">Vista Supervisor</div><div class="page-sub">Patrones del equipo y ranking</div>';
+  html+='<div class="sec-title">Patrones detectados</div>';
+  html+=RP.map(function(p){
+    var c=p.type==='pos'?'#4a8a72':p.type==='neg'?'#b85c6b':'#a67c45';
     var lbl=p.type==='pos'?'Positivo':p.type==='neg'?'Atención':'Neutro';
-    return'<div class="card" style="border-left:3px solid '+c+';">'+
+    return'<div class="pattern-card '+p.type+'">'+
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
         '<span style="font-size:18px;">'+p.icon+'</span>'+
-        '<span style="font-size:13px;font-weight:600;color:#0d1018;flex:1;">'+p.title+'</span>'+
-        '<span class="tag" style="color:'+c+';border-color:'+c+';background:rgba(0,0,0,.03);">'+lbl+'</span>'+
+        '<span style="font-size:13px;font-weight:700;color:var(--t0);flex:1;">'+p.title+'</span>'+
+        '<span class="tag" style="color:'+c+';border-color:'+c+';background:rgba(0,0,0,.04);">'+lbl+'</span>'+
       '</div>'+
-      '<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">'+p.desc+'</div>'+
-      '<div style="font-size:11px;color:#9ca3af;">👥 '+p.agents+'</div>'+
+      '<div style="font-size:12px;color:var(--t1);margin-bottom:5px;">'+p.desc+'</div>'+
+      '<div style="font-size:11px;color:var(--t3);">👥 '+p.agents.join(', ')+'</div>'+
     '</div>';
   }).join('');
   var sorted=RA.slice().sort(function(a,b){return b.score-a.score;});
-  var ranking=sorted.map(function(a,i){
-    var mc=i===0?'#bf9455':i===1?'#9ca3af':i===2?'#a67c45':'#d1d5db';
-    return'<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);">'+
-      '<span style="font-weight:700;font-size:13px;width:20px;color:'+mc+';">'+(i+1)+'</span>'+
-      '<div class="av" style="background:'+a.color+';">'+a.letter+'</div>'+
-      '<span style="flex:1;font-size:13px;">'+a.name+'</span>'+
-      rscore(a)+rbar(a.score)+
+  html+='<div class="sec-title" style="margin-top:16px;">Ranking del equipo</div><div class="card">';
+  sorted.forEach(function(a,i){
+    var mc=i===0?'#a67c45':i===1?'#9ca3af':i===2?'#a67c45':'var(--t3)';
+    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.04);">'+
+      '<span style="width:28px;font-size:16px;text-align:center;">'+(medal||'<span style="font-size:12px;font-weight:600;color:var(--t3);">'+(i+1)+'</span>')+'</span>'+
+      '<div class="av av-sm" style="background:'+a.color+';">'+a.letter+'</div>'+
+      '<div style="flex:1;"><div style="font-size:12px;font-weight:600;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t2);">'+a.carril+' · '+a.sat+'% sat.</div></div>'+
+      rscore(a)+rbar(a.score,80)+
     '</div>';
-  }).join('');
-  return'<div class="sec-title">Patrones detectados</div>'+pats+
-    '<div class="sec-title">Ranking del equipo</div><div class="card">'+ranking+'</div>';
+  });
+  html+='</div>';
+  return html;
 }
 
-function viewFormador(){
-  var opps=[
-    {a:'Protocolo de apertura',imp:'alto',ag:'Luis Arias, María Solano',d:'Estandarizar saludo y preguntas clave en primeros 45 segundos.'},
-    {a:'Comunicación de ETA',imp:'alto',ag:'Carlos Mora, Luis Arias',d:'Confirmar ETA antes de cerrar TODAS las llamadas.'},
-    {a:'Clientes molestos',imp:'medio',ag:'Luis Arias, María Solano',d:'Técnicas de desescalada y lenguaje empático.'}
-  ];
-  var iC={alto:'#cc7580',medio:'#bf9455',bajo:'#6aaa90'};
-  var opHtml=opps.map(function(o){
-    return'<div class="card">'+
-      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">'+
-        '<span style="font-size:13px;font-weight:600;color:#0d1018;flex:1;">'+o.a+'</span>'+
-        '<span style="font-size:10px;font-weight:600;color:'+iC[o.imp]+';">'+o.imp+'</span>'+
-      '</div>'+
-      '<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">'+o.d+'</div>'+
-      '<div style="font-size:11px;color:#9ca3af;">'+o.ag+'</div>'+
+function viewOperaciones(){
+  return'<div class="page-title">Operaciones</div><div class="page-sub">Vista disponible para Admin</div>'+
+    '<div class="card" style="text-align:center;padding:40px;">'+
+      '<div style="font-size:32px;margin-bottom:10px;">⚙️</div>'+
+      '<div style="font-size:14px;font-weight:600;color:var(--t0);margin-bottom:6px;">Módulo de operaciones</div>'+
+      '<div style="font-size:12px;color:var(--t2);">Configuración de cuentas, carriles y métricas del sistema.</div>'+
     '</div>';
-  }).join('');
-  return'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'+
-    '<div><div class="sec-title">Oportunidades de mejora</div>'+opHtml+'</div>'+
-    '<div><div class="sec-title">Planes activos</div>'+viewCoaching()+'</div>'+
-  '</div>';
 }
 
-function viewPorAgente(){
-  var opts=RA.map(function(a){return'<option value="'+a.id+'">'+a.name+'</option>';}).join('');
-  return'<select id="ag-sel" onchange="renderAgente(this.value)" style="margin-bottom:16px;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.1);background:#fff;font-size:13px;width:240px;cursor:pointer;"><option value="">Seleccionar agente...</option>'+opts+'</select>'+
-    '<div id="ag-detail" style="color:#9ca3af;font-size:13px;padding:20px 0;">Selecciona un agente para ver su perfil.</div>';
-}
-
-function renderAgente(id){
-  var a=RA.find(function(x){return x.id==id;});
-  var d=document.getElementById('ag-detail');
-  if(!a||!d)return;
-  var af=RF.filter(function(f){return f.agent===a.name;});
-  var ap=RC.find(function(p){return p.agent===a.name;});
-  d.innerHTML='<div style="display:grid;grid-template-columns:200px 1fr;gap:16px;">'+
-    '<div>'+
-      '<div class="card" style="text-align:center;margin-bottom:12px;">'+
-        '<div class="av" style="background:'+a.color+';width:48px;height:48px;font-size:18px;margin:0 auto 10px;">'+a.letter+'</div>'+
-        '<div style="font-size:15px;font-weight:700;color:#0d1018;">'+a.name+'</div>'+
-        '<div style="font-size:32px;font-weight:700;color:#0d1018;margin:8px 0 2px;">'+a.score+'</div>'+
-        '<div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;">Score total</div>'+
-      '</div>'+
-      '<div class="card">'+
-        [['Llamadas',a.calls,''],['POs',a.pos,''],['AHT',a.aht,''],['Satisfacción',a.sat,'%'],['Speech',a.speech,'%']].map(function(m){
-          return'<div style="display:flex;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.05);"><span style="flex:1;font-size:12px;color:#6b7280;">'+m[0]+'</span><span style="font-size:12px;font-weight:600;color:#0d1018;">'+m[1]+m[2]+'</span></div>';
-        }).join('')+
-      '</div>'+
-    '</div>'+
-    '<div>'+
-      '<div class="card">'+
-        '<div style="font-size:13px;font-weight:600;color:#0d1018;margin-bottom:10px;">Observaciones</div>'+
-        (af.length?af.map(function(f){
-          var pc=f.priority==='alta'?'#cc7580':f.priority==='media'?'#bf9455':'#6aaa90';
-          return'<div style="padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);">'+
-            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">'+
-              '<div style="width:7px;height:7px;border-radius:50%;background:'+pc+';flex-shrink:0;"></div>'+
-              '<span style="font-size:10px;color:#9ca3af;">'+f.by+' · '+f.role+' · '+f.date+'</span>'+
-              '<span style="margin-left:auto;font-size:9px;padding:1px 7px;border-radius:20px;background:rgba(0,0,0,.04);color:'+pc+';border:1px solid '+pc+';">'+f.priority+'</span>'+
-            '</div>'+
-            '<div style="font-size:12px;color:#374151;line-height:1.6;">'+f.text+'</div>'+
-          '</div>';
-        }).join(''):'<div style="font-size:12px;color:#9ca3af;">Sin observaciones registradas.</div>')+
-      '</div>'+
-      (ap?'<div class="card" style="margin-top:12px;">'+
-        '<div style="font-size:13px;font-weight:600;color:#0d1018;margin-bottom:8px;">Plan de coaching</div>'+
-        '<div style="font-size:12px;color:#374151;margin-bottom:8px;">🎯 '+ap.obj+'</div>'+
-        '<div class="plan-bar"><div class="plan-bar-fill" style="width:'+ap.pct+'%;background:'+(ap.pct>=70?'#6aaa90':ap.pct>=40?'#bf9455':'#cc7580')+'"></div></div>'+
-        '<div style="font-size:11px;color:#9ca3af;margin-top:4px;">'+ap.pct+'% completado · '+ap.coach+' · '+ap.dl+'</div>'+
-      '</div>':'<div class="card" style="margin-top:12px;text-align:center;font-size:12px;color:#9ca3af;">Sin plan activo ✓</div>')+
-    '</div>'+
-  '</div>';
-}
-
-function viewFeedback(){
-  return'<div class="sec-title">Observaciones recibidas</div>'+
-  RF.map(function(f){
-    var pc=f.priority==='alta'?'#cc7580':f.priority==='media'?'#bf9455':'#6aaa90';
-    var a=RA.find(function(x){return x.name===f.agent;})||{color:'#9ca3af',letter:'?'};
-    return'<div class="card">'+
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
-        '<div class="av" style="background:'+a.color+';">'+a.letter+'</div>'+
-        '<div><div style="font-size:13px;font-weight:600;color:#0d1018;">'+f.agent+'</div><div style="font-size:11px;color:#9ca3af;">'+f.by+' · '+f.role+' · '+f.date+'</div></div>'+
-        '<span class="tag" style="margin-left:auto;color:'+pc+';border-color:'+pc+';background:rgba(0,0,0,.02);">'+f.priority.toUpperCase()+'</span>'+
-      '</div>'+
-      '<div style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:8px;">'+f.text+'</div>'+
-      '<div>'+f.tags.map(function(t){return'<span class="tag" style="color:#6b7280;border-color:rgba(0,0,0,.1);background:rgba(0,0,0,.02);margin-right:5px;">'+t+'</span>';}).join('')+'</div>'+
-    '</div>';
-  }).join('');
-}
-
-function viewCoaching(){
-  return RC.map(function(p){
-    var col=p.pct>=70?'#6aaa90':p.pct>=40?'#bf9455':'#cc7580';
-    var a=RA.find(function(x){return x.name===p.agent;})||{color:'#9ca3af',letter:'?'};
-    return'<div class="plan-card">'+
-      '<div class="plan-header">'+
-        '<div class="av" style="background:'+a.color+';">'+a.letter+'</div>'+
-        '<div><div style="font-size:13px;font-weight:600;color:#0d1018;">'+p.agent+'</div><div style="font-size:11px;color:#9ca3af;">Coach: '+p.coach+' · Plazo: '+p.dl+'</div></div>'+
-        '<div class="plan-pct" style="color:'+col+';">'+p.pct+'%</div>'+
-      '</div>'+
-      '<div style="font-size:13px;font-weight:600;color:#0d1018;margin-bottom:8px;">🎯 '+p.obj+'</div>'+
-      '<div class="plan-bar"><div class="plan-bar-fill" style="width:'+p.pct+'%;background:'+col+'"></div></div>'+
-      '<div style="margin-top:10px;">'+p.acts.map(function(ac){return'<div class="plan-act">'+ac+'</div>';}).join('')+'</div>'+
-    '</div>';
-  }).join('');
-}
-
-// Init
-showView('resumen');
+// ── Init ─────────────────────────────────────────────
+initRole();
+nav('resumen');
 </script>
 </body>
 </html>
