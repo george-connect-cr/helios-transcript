@@ -1351,6 +1351,7 @@ body.light .status-opt:hover{background:#f0ede8;}
     <button class="n-dash" onclick="window.location.href='reportes.html'" title="Reportes & Analytics">📊</button>
     <button class="qbtn" onclick="toggleQ()" title="Cola">📋 Cola <span class="qn" id="q-cnt">4</span></button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
+    <button id="btn-hangup" onclick="hangupTrainingCall()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:20px;border:none;background:#cc4455;color:#fff;font-family:var(--m);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.2px;animation:gp 2s infinite;transition:all .2s;">📵 Colgar</button>
       <div style="position:relative" id="status-wrap">
         <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:11px;color:var(--t0);white-space:nowrap;font-weight:500;">
           <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6366f1;flex-shrink:0;transition:background .3s;"></div>
@@ -1666,6 +1667,11 @@ function appendTranscript(speaker,text){
   if(typeof CallTimer!=='undefined') CallTimer.start();
   // Guardar estado actual antes de que llegue la llamada (para restaurar al finalizar)
   if(typeof _curStatus!=='undefined' && typeof _preCallStatus!=='undefined') _preCallStatus=_curStatus;
+  // Mostrar botón colgar si estamos en capacitación
+  if(_curStatus==='capacitacion'){
+    var hb=document.getElementById('btn-hangup');
+    if(hb) hb.style.display='flex';
+  }
   if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
   // Re-check recs on every transcript line
   if(typeof Recs!=='undefined' && typeof lastAnalysis!=='undefined' && lastAnalysis){
@@ -1968,8 +1974,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
     }
   }catch(e){}
   try{setTheme(localStorage.getItem('helios_theme')||'light');}catch(e){setTheme('light');}
-  // La conexión cc-rtt se inicia solo cuando el agente cambia a estado Disponible
-  setStatus('disponible','#6aaa90','Disponible','🟢');
+  // Estado inicial: Coaching
+  setStatus('coaching_p','#6366f1','Coaching','🎯');
   _updateConnStatus('desconectado','err');
 });
 
@@ -3550,7 +3556,115 @@ function repCoach(){
   return out;
 }
 
-function showCallRating(){
+function hangupTrainingCall(){
+  // Ocultar botón colgar
+  var hb=document.getElementById('btn-hangup');
+  if(hb) hb.style.display='none';
+  // Detener timer
+  if(typeof CallTimer!=='undefined') CallTimer.reset();
+  // Mostrar popup resumen de la llamada de capacitación
+  _showTrainingSummary();
+}
+
+function _showTrainingSummary(){
+  var ex=document.getElementById('training-summary-ov');if(ex)ex.remove();
+  var timerEl=document.getElementById('call-timer-val');
+  var aht=timerEl?timerEl.textContent:'—';
+  var txt=(_lastTranscriptText||'').toLowerCase();
+  var speechItems=['Saludo de bienvenida','Identificación del cliente','Validación de ubicación','Confirmación del servicio','ETA comunicado'];
+  var spOk=0;
+  var spHtml=speechItems.map(function(k){
+    var done=txt.includes(k.split(' ')[0].toLowerCase());
+    if(done)spOk++;
+    var col=done?'var(--g)':'var(--r)';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--gb);">'+
+      '<div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;background:'+col+';">'+(done?'✓':'✗')+'</div>'+
+      '<span style="font-size:12px;color:var(--t1);">'+k+'</span></div>';
+  }).join('');
+  var spPct=Math.round(spOk/speechItems.length*100);
+  var spCol=spPct>=80?'var(--g)':spPct>=60?'var(--y)':'var(--r)';
+  var data=typeof POBuilder!=='undefined'?POBuilder.getData():{};
+  var fields=[
+    {l:'Cliente',v:data.nombre_cliente,i:'👤'},
+    {l:'Placa',v:data.placa,i:'🪪'},
+    {l:'Servicio',v:data.tipo_asistencia,i:'🔧'},
+    {l:'Ubicación',v:data.ubicación,i:'📍'},
+  ];
+  var fieldsHtml=fields.filter(function(f){return f.v&&f.v!=='N/A';}).map(function(f){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--gb);">'+
+      '<span style="font-size:14px;">'+f.i+'</span>'+
+      '<div><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">'+f.l+'</div>'+
+      '<div style="font-size:12px;color:var(--t0);font-weight:500;">'+f.v+'</div></div></div>';
+  }).join('') || '<div style="font-family:var(--m);font-size:11px;color:var(--t2);padding:8px 0;">Sin datos capturados en esta llamada.</div>';
+
+  var ov=document.createElement('div');
+  ov.id='training-summary-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(12px);z-index:600;display:flex;align-items:center;justify-content:center;animation:fi .2s ease;';
+  ov.innerHTML=
+    '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:18px;padding:32px;width:480px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.3);">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">'+
+        '<div>'+
+          '<div style="font-size:16px;font-weight:700;color:var(--t0);">Resumen de llamada</div>'+
+          '<div style="font-family:var(--m);font-size:10px;color:var(--t2);margin-top:3px;">Sesión de capacitación finalizada</div>'+
+        '</div>'+
+        '<span style="font-size:32px;">🎓</span>'+
+      '</div>'+
+      // Métricas
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;">'+
+        '<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:12px;padding:14px;text-align:center;">'+
+          '<div style="font-size:20px;margin-bottom:4px;">⏱</div>'+
+          '<div style="font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);">'+aht+'</div>'+
+          '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Duración</div>'+
+        '</div>'+
+        '<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:12px;padding:14px;text-align:center;">'+
+          '<div style="font-size:20px;margin-bottom:4px;">🎙</div>'+
+          '<div style="font-family:var(--m);font-size:18px;font-weight:700;color:'+spCol+';">'+spPct+'%</div>'+
+          '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Speech</div>'+
+        '</div>'+
+        '<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:12px;padding:14px;text-align:center;">'+
+          '<div style="font-size:20px;margin-bottom:4px;">📋</div>'+
+          '<div style="font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);">'+fields.filter(function(f){return f.v&&f.v!=='N/A';}).length+'/'+fields.length+'</div>'+
+          '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Campos</div>'+
+        '</div>'+
+      '</div>'+
+      // Speech compliance
+      '<div style="margin-bottom:20px;">'+
+        '<div style="font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Speech compliance</div>'+
+        spHtml+
+      '</div>'+
+      // Datos capturados
+      '<div style="margin-bottom:24px;">'+
+        '<div style="font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Datos capturados</div>'+
+        fieldsHtml+
+      '</div>'+
+      // Botón finalizar
+      '<button onclick="_resetAfterTrainingCall()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.2px;">✓ Finalizar y volver a Coaching</button>'+
+    '</div>';
+  document.body.appendChild(ov);
+}
+
+function _resetAfterTrainingCall(){
+  // Cerrar popup
+  var ov=document.getElementById('training-summary-ov');if(ov)ov.remove();
+  // Limpiar transcripción
+  var tbody=document.getElementById('t-body');
+  if(tbody) tbody.innerHTML='<span style="font-family:var(--m);font-size:11px;color:var(--t2);display:block;padding:12px 0;">Esperando llamada...</span>';
+  // Limpiar PO Builder
+  if(typeof POBuilder!=='undefined') POBuilder.reset();
+  // Limpiar análisis
+  lastAnalysis=null;_lastTranscriptText='';_preCallStatus=null;
+  // Limpiar sentimiento e insight
+  var sent=document.getElementById('sent-wrap');if(sent)sent.style.display='none';
+  var ins=document.getElementById('insight-wrap');if(ins)ins.style.display='none';
+  // Cerrar popups abiertos
+  var pvp=document.getElementById('po-validate-popup');if(pvp)pvp.classList.remove('show');
+  var pvpOv=document.getElementById('po-confirm-ov');if(pvpOv)pvpOv.classList.remove('show');
+  // Ocultar botón colgar por si acaso
+  var hb=document.getElementById('btn-hangup');if(hb)hb.style.display='none';
+  // Volver a estado Coaching
+  setStatus('coaching_p','#6366f1','Coaching','🎯');
+  showToast('🎓 Sesión de capacitación completada');
+}
   var ex=document.getElementById('call-rating-popup');if(ex)ex.remove();
   var ov=document.createElement('div');ov.id='call-rating-popup';
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;animation:fi .2s ease;';
