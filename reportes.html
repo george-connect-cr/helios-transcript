@@ -139,7 +139,7 @@ select{padding:8px 14px;border-radius:10px;border:1px solid var(--gb2);backgroun
     <div class="sb-sec">General</div>
     <div class="sb-item active" id="nav-resumen" onclick="go('resumen')"><span class="sb-ico">📊</span>Resumen</div>
     <div class="sb-div"></div>
-    <div class="sb-sec">Formador</div>
+    <div class="sb-sec" id="sb-sec-formador">Formador</div>
     <div class="sb-item" id="nav-agentes" onclick="go('agentes')"><span class="sb-ico">🎧</span>Agentes</div>
     <div class="sb-item" id="nav-agente_v" onclick="go('agente_v')"><span class="sb-ico">👤</span>Por agente</div>
     <div class="sb-item" id="nav-coaching" onclick="go('coaching')"><span class="sb-ico">🎯</span>Coaching</div>
@@ -739,7 +739,31 @@ try{
     drop.appendChild(d);
   });
 })();
-go('resumen');
+
+(function(){
+  try{
+    var _sess=JSON.parse(localStorage.getItem('helios_session')||'null');
+    if(!_sess||(Date.now()-_sess.ts>3600000)){window.location.href='index.html';return;}
+    _role=(_sess.user||{}).role||'formador';
+    var _uname=(_sess.user||{}).name||'';
+    var rb=document.getElementById('hd-role');
+    if(rb)rb.textContent=_role.charAt(0).toUpperCase()+_role.slice(1);
+    if(_role==='admin'||_role==='supervisor'){
+      ['adm-div','adm-sec'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='';});
+      var suv=document.getElementById('nav-supervisor');if(suv)suv.style.display='';
+    }
+    if(_role==='agente'){
+      ['nav-agentes','nav-coaching','nav-feedback','sb-sec-formador'].forEach(function(id){
+        var el=document.getElementById(id);if(el)el.style.display='none';
+      });
+      var matchAg=RA.find(function(a){return a.name===_uname;});
+      if(matchAg)_selAg=matchAg;
+      go('agente_v');
+      return;
+    }
+  }catch(e){}
+  go('resumen');
+})();
 </script>
 </body>
 </html>
