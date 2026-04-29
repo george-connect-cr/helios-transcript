@@ -361,8 +361,8 @@ function tblAgentes(data){
   var cC={Home:'#6366f1',Road:'#4a8a72',Concierge:'#a67c45'};
   var ths=['Agente','Carril','Llamadas','AHT','Satisfacción','Speech','Sentimiento','Score'].map(function(x){return'<th>'+x+'</th>';}).join('');
   var trs=data.map(function(a){
-        var tr='<tr class="clickable" onclick="_rowClick('+a.id+')">';
-    tr+=      '<td><div style="display:flex;align-items:center;gap:9px;"><div class="av av28" style="background:'+a.color+'">'+a.lt+'</div>'+
+    var tr='<tr class="clickable" onclick="_rowClick('+a.id+')">';
+    tr+='<td><div style="display:flex;align-items:center;gap:9px;"><div class="av av28" style="background:'+a.color+'">'+a.lt+'</div>'+
       '<div><div style="font-weight:600;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t3);">'+a.pais+'</div></div></div></td>'+
       '<td><span class="tag" style="color:'+(cC[a.carril]||'#374151')+';border-color:currentColor;background:rgba(0,0,0,.03);">'+a.carril+'</span></td>'+
       '<td style="font-weight:600;">'+a.calls+'</td>'+
@@ -372,6 +372,7 @@ function tblAgentes(data){
       '<td><div style="display:flex;align-items:center;gap:5px;"><div class="sdot" style="background:'+sc(a.sent.p)+'"></div>'+
       '<span style="font-size:11px;font-weight:600;color:'+sc(a.sent.p)+';">'+a.sent.p+'%</span></div></td>'+
       '<td>'+badge(a)+'</td></tr>';
+    return tr;
   }).join('');
   return'<div class="tbl-wrap" style="overflow-x:auto;"><table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div>';
 }
