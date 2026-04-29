@@ -609,8 +609,8 @@ body.light .toast{background:rgba(255,255,255,.96);color:var(--t0);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
 /* ═══ DASHBOARD ════════════════════════════════════ */
-.dash-ov{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:var(--bg);z-index:200;display:none;flex-direction:column;overflow:hidden;}
-.dash-ov.show{display:flex;flex-direction:column;width:100%;height:100%;animation:fi .22s ease;}
+.dash-ov{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--bg);z-index:200;display:none;flex-direction:column;overflow:hidden;}
+.dash-ov.show{display:flex;flex-direction:column;animation:fi .22s ease;}
 .dash-head{
   height:56px;padding:0 36px;display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--gb);
@@ -1429,6 +1429,8 @@ body.light .status-opt:hover{background:#f0ede8;}
   </div>
 </div>
 <div class="dash-ov" id="dash-ov">
+
+  <!-- Header -->
   <div class="dash-head">
     <div class="dash-head-l">
       <div class="dash-brand2">CONNECT</div>
@@ -1444,61 +1446,60 @@ body.light .status-opt:hover{background:#f0ede8;}
     </div>
   </div>
 
-  <!-- TAB: Mi día -->
+  <!-- TAB Mi día -->
   <div id="dtab-dia-content" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;">
-<div class="dash-body">
-    <div class="dash-score-card">
-      <div class="dash-score-ring-wrap">
-        <svg class="dash-ring" viewBox="0 0 152 152">
-          <circle cx="76" cy="76" r="64" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="7"/>
-          <circle cx="76" cy="76" r="64" fill="none" stroke="var(--a)" stroke-width="7" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402" id="dash-ring-fill" style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1)"/>
-        </svg>
-        <div class="dash-ring-inner"><div class="dash-ring-score" id="dash-total-score">—</div><div class="dash-ring-lbl">Score</div></div>
+    <div class="dash-body">
+      <div class="dash-score-card">
+        <div class="dash-score-ring-wrap">
+          <svg class="dash-ring" viewBox="0 0 152 152">
+            <circle cx="76" cy="76" r="64" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="7"/>
+            <circle cx="76" cy="76" r="64" fill="none" stroke="var(--a)" stroke-width="7" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402" id="dash-ring-fill" style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1)"/>
+          </svg>
+          <div class="dash-ring-inner"><div class="dash-ring-score" id="dash-total-score">—</div><div class="dash-ring-lbl">Score</div></div>
+        </div>
+        <div class="dash-score-info">
+          <div class="dash-agent-name">Agente Activo</div>
+          <div class="dash-agent-shift">T. 08:00–16:00 · <span id="dash-date2">—</span></div>
+          <div class="dash-score-grade" id="dash-grade">—</div>
+          <div class="dash-score-desc" id="dash-grade-desc">—</div>
+        </div>
       </div>
-      <div class="dash-score-info">
-        <div class="dash-agent-name">Agente Activo</div>
-        <div class="dash-agent-shift">T. 08:00–16:00 · <span id="dash-date2">—</span></div>
-        <div class="dash-score-grade" id="dash-grade">—</div>
-        <div class="dash-score-desc" id="dash-grade-desc">—</div>
+      <div class="dash-kpi-row">
+        <div class="dash-kpi"><div class="dash-kpi-val" id="dk-pos">0</div><div class="dash-kpi-lbl">POs creados</div></div>
+        <div class="dash-kpi"><div class="dash-kpi-val g" id="dk-sat">—</div><div class="dash-kpi-lbl">Satisfacción prom.</div></div>
+        <div class="dash-kpi"><div class="dash-kpi-val y" id="dk-aht">—</div><div class="dash-kpi-lbl">AHT promedio</div></div>
+        <div class="dash-kpi"><div class="dash-kpi-val" id="dk-fcr">—</div><div class="dash-kpi-lbl">Resolución 1ra</div></div>
+        <div class="dash-kpi"><div class="dash-kpi-val" id="dk-speech">—</div><div class="dash-kpi-lbl">Speech compliance</div></div>
       </div>
-    </div>
-    <div class="dash-kpi-row">
-      <div class="dash-kpi"><div class="dash-kpi-val" id="dk-pos">0</div><div class="dash-kpi-lbl">POs creados</div></div>
-      <div class="dash-kpi"><div class="dash-kpi-val g" id="dk-sat">—</div><div class="dash-kpi-lbl">Satisfacción prom.</div></div>
-      <div class="dash-kpi"><div class="dash-kpi-val y" id="dk-aht">—</div><div class="dash-kpi-lbl">AHT promedio</div></div>
-      <div class="dash-kpi"><div class="dash-kpi-val" id="dk-fcr">—</div><div class="dash-kpi-lbl">Resolución 1ra</div></div>
-      <div class="dash-kpi"><div class="dash-kpi-val" id="dk-speech">—</div><div class="dash-kpi-lbl">Speech compliance</div></div>
-    </div>
-    <div class="dash-cols">
-      <div class="dash-col">
-        <div class="dash-sec-lbl">Desglose</div>
-        <div class="dash-score-bars" id="dash-score-bars"></div>
-        <div class="dash-sec-lbl">Llamadas del día</div>
-        <div class="dash-calls" id="dash-calls"><div class="dash-empty-calls">Sin POs registrados aún</div></div>
-      </div>
-      <div class="dash-col">
-        <div class="dash-sec-lbl">Recomendaciones</div>
-        <div class="dash-recs" id="dash-recs"></div>
-        <div class="dash-sec-lbl">Speech compliance</div>
-        <div class="dash-speech-detail" id="dash-speech-detail"></div>
+      <div class="dash-cols">
+        <div class="dash-col">
+          <div class="dash-sec-lbl">Desglose</div>
+          <div class="dash-score-bars" id="dash-score-bars"></div>
+          <div class="dash-sec-lbl">Llamadas del día</div>
+          <div class="dash-calls" id="dash-calls"><div class="dash-empty-calls">Sin POs registrados aún</div></div>
+        </div>
+        <div class="dash-col">
+          <div class="dash-sec-lbl">Recomendaciones</div>
+          <div class="dash-recs" id="dash-recs"></div>
+          <div class="dash-sec-lbl">Speech compliance</div>
+          <div class="dash-speech-detail" id="dash-speech-detail"></div>
+        </div>
       </div>
     </div>
   </div>
-</div></div>
-  </div>
-  </div><!-- /dtab-dia-content -->
 
-  <!-- TAB: Reportes -->
-  <div id="dtab-rep-content" style="display:none;">
-    <div style="display:flex;flex:1;min-height:0;overflow:hidden;">
-      <div id="rep-sb" style="width:190px;min-width:190px;flex-shrink:0;border-right:1px solid var(--gb);padding:12px 0;overflow-y:auto;background:var(--c1);"></div>
-      <div style="flex:1;min-width:0;overflow-y:auto;padding:20px;background:var(--bg);">
-        <div id="rep-content" style="min-height:200px;width:100%;"><p style="padding:20px;color:#ff5c00;font-size:16px;font-weight:700;">Panel activo</p></div>
+  <!-- TAB Reportes -->
+  <div id="dtab-rep-content" style="display:none;flex:1;min-height:0;overflow:hidden;">
+    <div style="display:flex;width:100%;height:100%;">
+      <div id="rep-sb" style="width:190px;min-width:190px;flex-shrink:0;border-right:1px solid var(--gb);padding:12px 0;overflow-y:auto;"></div>
+      <div style="flex:1;min-width:0;overflow-y:auto;padding:20px;">
+        <div id="rep-content"></div>
       </div>
     </div>
   </div>
 
 </div>
+
 <div class="toast" id="toast"></div>
 <div id="sfanalyzing" style="display:none"></div>
 <div id="sfwrap" style="display:none"></div>
