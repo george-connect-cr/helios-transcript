@@ -1944,6 +1944,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
 });
 
 function triggerDemo(){
+  console.log('[CONNECT] triggerDemo called', arguments[0]||'');
   AgentBar.setDemo();
   var dd={nombre_cliente:'Carlos Rodríguez',placa:'CRC-1234',marca:'Toyota',
     modelo:'Corolla',año:'2019',color:'Blanco',
@@ -1959,6 +1960,7 @@ let _activeDetail = -1;
 let _poCount = 0;
 
 function setTheme(t){
+  console.log('[CONNECT] setTheme called', arguments[0]||'');
   isDark = (t === 'dark');
   document.body.classList.toggle('light', !isDark);
   document.body.classList.toggle('dark', isDark);
@@ -3341,6 +3343,7 @@ function _buildStatusMenu(){
   menu.innerHTML=out;
 }
 function toggleStatusMenu(){
+  console.log('[CONNECT] toggleStatusMenu called', arguments[0]||'');
   var m=document.getElementById("status-menu");
   if(!m)return;
   _buildStatusMenu();
