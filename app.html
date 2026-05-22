@@ -75,16 +75,8 @@ body.light .nav{background:rgba(255,255,255,.8);}
 
 /* Brand */
 .n-brand{
-  display:flex;flex-direction:column;align-items:flex-start;
-  margin-right:16px;flex-shrink:0;white-space:nowrap;gap:2px;
-}
-.n-brand-ver{
-  font-family:var(--m);font-size:8px;font-weight:500;
-  letter-spacing:.4px;line-height:1;
-  color:rgba(255,255,255,.6);
-}
-body.light .n-brand-ver{
-  color:rgba(0,0,0,.5);
+  display:flex;align-items:baseline;gap:0;
+  margin-right:16px;flex-shrink:0;line-height:1;white-space:nowrap;
 }
 .n-brand-word{
   font-family:var(--f);font-weight:900;letter-spacing:-0.5px;
@@ -1332,7 +1324,7 @@ body.light .status-opt:hover{background:#f0ede8;}
 <div class="app">
 
 <nav class="nav">
-  <div class="n-brand"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;display:block;flex-shrink:0"><defs><linearGradient id="cag" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#e04500"/><stop offset="100%" style="stop-color:#ff8c44"/></linearGradient></defs><text x="1" y="30" font-family="Syne,Arial Black,sans-serif" font-size="26" font-weight="800" letter-spacing="-0.5" fill="url(#cag)">CONNECT</text><text x="155" y="18" font-family="Syne,Arial,sans-serif" font-size="9" font-weight="600" fill="#e04500" opacity="0.9">®</text><line x1="1" y1="37" x2="163" y2="37" stroke="rgba(255,255,255,.3)" stroke-width="0.8"/><text x="2" y="52" font-family="Syne,Arial,sans-serif" font-size="9.5" font-weight="600" letter-spacing="4" fill="rgba(255,255,255,.9)">ACADEMY</text></svg><span class="n-brand-ver">v1.16.0</span></div>
+  <div class="n-brand"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;display:block;flex-shrink:0"><defs><linearGradient id="cag" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#e04500"/><stop offset="100%" style="stop-color:#ff8c44"/></linearGradient></defs><text x="1" y="30" font-family="Syne,Arial Black,sans-serif" font-size="26" font-weight="800" letter-spacing="-0.5" fill="url(#cag)">CONNECT</text><text x="155" y="18" font-family="Syne,Arial,sans-serif" font-size="9" font-weight="600" fill="#e04500" opacity="0.9">®</text><line x1="1" y1="37" x2="163" y2="37" stroke="rgba(255,255,255,.3)" stroke-width="0.8"/><text x="2" y="52" font-family="Syne,Arial,sans-serif" font-size="9.5" font-weight="600" letter-spacing="4" fill="rgba(255,255,255,.9)">ACADEMY</text></svg></div>
   <div class="n-conn"><div class="cdot" id="cdot"></div><span id="clbl">conectando</span></div>
   <div class="n-timer" id="timer-row">
     <div class="n-div"></div>
@@ -1351,11 +1343,10 @@ body.light .status-opt:hover{background:#f0ede8;}
     <button class="n-dash" onclick="window.location.href='reportes.html'" title="Reportes & Analytics">📊</button>
     <button class="qbtn" onclick="toggleQ()" title="Cola">📋 Cola <span class="qn" id="q-cnt">4</span></button>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
-    <button id="btn-hangup" onclick="hangupTrainingCall()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:20px;border:none;background:#cc4455;color:#fff;font-family:var(--m);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.2px;animation:gp 2s infinite;transition:all .2s;">📵 Colgar</button>
       <div style="position:relative" id="status-wrap">
-        <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:11px;color:var(--t0);white-space:nowrap;font-weight:500;">
+        <button onclick="toggleStatusMenu()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:20px;border:1px solid var(--gb2);background:var(--gb);cursor:pointer;font-family:var(--m);font-size:10px;color:var(--t1);white-space:nowrap;">
           <div id="status-dot-btn" style="width:8px;height:8px;border-radius:50%;background:#6366f1;flex-shrink:0;transition:background .3s;"></div>
-          <span id="status-label" style="color:var(--t0);">Coaching</span>
+          <span id="status-label">Coaching</span>
         </button>
         <div id="status-menu" style="position:absolute;top:calc(100% + 8px);right:0;background:var(--c1);border:1px solid var(--gb2);border-radius:12px;padding:6px;min-width:185px;max-height:360px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:21;display:none;"></div>
       </div>
@@ -1552,35 +1543,24 @@ body.light .status-opt:hover{background:#f0ede8;}
 };
 let wpsClient=null,lastAnalysis=null,isDark=false,_retries=0;
 
-var _intentionalDisconnect = false;
-
 async function connectWebPubSub(){
   try{
-    _intentionalDisconnect = false;
-    _updateConnStatus('conectando','warn');
+    setStatus('conectando','warn');
     const res=await fetch(CONFIG.NEGOTIATE_URL+'?userId=viewer-'+Date.now(),{headers:{'Authorization':'Bearer '+CONFIG.AUTH_TOKEN}});
     if(!res.ok)throw new Error('Negotiate '+res.status);
     const{url}=await res.json();
     if(window.WebPubSubClient){
       wpsClient=new WebPubSubClient(url);
-      wpsClient.on('connected',()=>{_updateConnStatus('conectado','live');_retries=0;});
-      wpsClient.on('disconnected',()=>{
-        if(_intentionalDisconnect) return;
-        _updateConnStatus('desconectado','err');
-        setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
-      });
+      wpsClient.on('connected',()=>{setStatus('conectado','live');_retries=0;});
+      wpsClient.on('disconnected',()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);});
       wpsClient.on('server-message',e=>handleMessage(e.message.data));
       await wpsClient.start();
     }else{
       const ws=new WebSocket(url);
       window._ws=ws;
-      ws.onopen=()=>{_updateConnStatus('conectado','live');showToast('✓ Conectado');_retries=0;};
-      ws.onclose=()=>{
-        if(_intentionalDisconnect) return;
-        _updateConnStatus('desconectado','err');
-        setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
-      };
-      ws.onerror=()=>_updateConnStatus('error','err');
+      ws.onopen=()=>{setStatus('conectado','live');showToast('✓ Conectado');_retries=0;};
+      ws.onclose=()=>{setStatus('desconectado','err');setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);};
+      ws.onerror=()=>setStatus('error','err');
       ws.onmessage=e=>{
         try{
           const raw=JSON.parse(e.data);
@@ -1594,26 +1574,9 @@ async function connectWebPubSub(){
     }
   }catch(err){
     console.error('WPS connect error:',err);
-    _updateConnStatus('error · '+err.message.substring(0,20),'err');
-    if(!_intentionalDisconnect) setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
+    setStatus('error · '+err.message.substring(0,20),'err');
+    setTimeout(connectWebPubSub,CONFIG.RECONNECT_MS);
   }
-}
-
-function disconnectWebPubSub(){
-  _intentionalDisconnect = true;
-  try{
-    if(wpsClient){ wpsClient.stop(); wpsClient=null; }
-    if(window._ws){ window._ws.close(); window._ws=null; }
-  }catch(e){}
-  _updateConnStatus('desconectado','err');
-}
-
-// Actualiza solo el dot de conexión en el nav (independiente del estado del agente)
-function _updateConnStatus(label, state){
-  var dot = document.getElementById('cdot');
-  var lbl = document.getElementById('clbl');
-  if(dot){ dot.className='cdot '+(state||''); dot.style.background=''; }
-  if(lbl) lbl.textContent = label;
 }
 
 function handleMessage(p){
@@ -1665,13 +1628,6 @@ function appendTranscript(speaker,text){
     _showScrollArrow();
   }
   if(typeof CallTimer!=='undefined') CallTimer.start();
-  // Guardar estado actual antes de que llegue la llamada (para restaurar al finalizar)
-  if(typeof _curStatus!=='undefined' && typeof _preCallStatus!=='undefined') _preCallStatus=_curStatus;
-  // Mostrar botón colgar si estamos en capacitación
-  if(_curStatus==='capacitacion'){
-    var hb=document.getElementById('btn-hangup');
-    if(hb) hb.style.display='flex';
-  }
   if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
   // Re-check recs on every transcript line
   if(typeof Recs!=='undefined' && typeof lastAnalysis!=='undefined' && lastAnalysis){
@@ -1974,9 +1930,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     }
   }catch(e){}
   try{setTheme(localStorage.getItem('helios_theme')||'light');}catch(e){setTheme('light');}
-  // Estado inicial: Coaching
-  setStatus('coaching_p','#6366f1','Coaching','🎯');
-  _updateConnStatus('desconectado','err');
+  connectWebPubSub();
 });
 
 function triggerDemo(){
@@ -2047,17 +2001,7 @@ const CallTimer=(()=>{
     const d=document.getElementById('t-dot');if(d)d.className='td-dot';
     const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
     const al=document.getElementById('t-alert');if(al){al.className='t-row-alert';al.style.display='none';}
-    setTimeout(function(){
-      if(typeof setStatus==='function'){
-        // Si el agente estaba en capacitación antes de la llamada, volver ahí automáticamente
-        var returnStatus = (typeof _preCallStatus!=='undefined' && _preCallStatus==='capacitacion')
-          ? {id:'capacitacion',color:'#6366f1',label:'Capacitación',icon:'📚'}
-          : {id:'coaching_p',  color:'#6366f1',label:'Coaching',    icon:'🎯'};
-        setStatus(returnStatus.id, returnStatus.color, returnStatus.label, returnStatus.icon);
-        _preCallStatus = null;
-      }
-      if(typeof showCallRating==='function')showCallRating();
-    },600);
+    setTimeout(function(){if(typeof setStatus==='function')setStatus('coaching_p','#6366f1','Coaching','🎯');if(typeof showCallRating==='function')showCallRating();},600);
   }
   return{start,reset};
 })();
@@ -3407,50 +3351,10 @@ function setStatus(id,color,label,icon){
 
 var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
 var _curStatus='coaching_p';
-var _preCallStatus=null; // estado previo al inicio de llamada, para restaurar al finalizar
 var _lastTranscriptText='';
 function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;m.innerHTML='';var s1=document.createElement('div');s1.className='status-sec';s1.textContent='Estado';m.appendChild(s1);PAUSAS.filter(function(p){return p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});var sep=document.createElement('div');sep.className='status-sep';m.appendChild(sep);var s2=document.createElement('div');s2.className='status-sec';s2.textContent='Pausas';m.appendChild(s2);PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});}
 function toggleStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;_buildStatusMenu();var open=m.style.display==='block';m.style.display=open?'none':'block';if(!open)setTimeout(function(){document.addEventListener('click',function cl(e){if(!document.getElementById('status-wrap').contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}});},10);}
-function setStatus(id,color,label,icon){
-  _curStatus=id;
-  var dot=document.getElementById('status-dot-btn');
-  var lbl=document.getElementById('status-label');
-  if(dot)dot.style.background=color;
-  if(lbl)lbl.textContent=label;
-  var m=document.getElementById('status-menu');
-  if(m)m.style.display='none';
-  showToast(icon+' '+label);
-  // Conexión cc-rtt: solo activa en estado Disponible
-  if(id==='disponible'){
-    connectWebPubSub();
-  } else {
-    disconnectWebPubSub();
-    if(id==='capacitacion') _triggerSimulatedCall();
-  }
-}
-
-function _triggerSimulatedCall(){
-  showToast('📞 Iniciando llamada de capacitación...');
-  fetch('https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/sendCall?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({source:'17872003536',destination:'17876065812',accountName:'Connect',branch:'PR',poNumber:'4117472'})
-  })
-  .then(function(r){return r.text().then(function(t){return{status:r.status,body:t};});})
-  .then(function(res){
-    if(res.status>=200&&res.status<300){
-      showToast('✓ Llamada de capacitación en camino');
-      console.log('sendCall ok:',res.body);
-    } else {
-      showToast('⚠ Error al disparar llamada ('+res.status+')');
-      console.warn('sendCall error:',res.status,res.body);
-    }
-  })
-  .catch(function(err){
-    showToast('⚠ No se pudo conectar con el servidor');
-    console.error('sendCall fetch error:',err);
-  });
-}
+function setStatus(id,color,label,icon){_curStatus=id;var dot=document.getElementById('status-dot-btn');var lbl=document.getElementById('status-label');if(dot)dot.style.background=color;if(lbl)lbl.textContent=label;var m=document.getElementById('status-menu');if(m)m.style.display='none';showToast(icon+' '+label);}
 var _dashTab='dia',_repView='resumen';
 var RA=[{id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:2,name:'Carlos Mora',letter:'C',color:'#6aaa90',carril:'Road',pais:'Costa Rica',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:4,name:'Luis Arias',letter:'L',color:'#4a8a72',carril:'Home',pais:'Costa Rica',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:8,name:'José Quesada',letter:'J',color:'#0ea5e9',carril:'Road',pais:'Panamá',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'}];
 var RF=[
@@ -3556,115 +3460,7 @@ function repCoach(){
   return out;
 }
 
-function hangupTrainingCall(){
-  // Ocultar botón colgar
-  var hb=document.getElementById('btn-hangup');
-  if(hb) hb.style.display='none';
-  // Detener timer
-  if(typeof CallTimer!=='undefined') CallTimer.reset();
-  // Mostrar popup resumen de la llamada de capacitación
-  _showTrainingSummary();
-}
-
-function _showTrainingSummary(){
-  var ex=document.getElementById('training-summary-ov');if(ex)ex.remove();
-  var timerEl=document.getElementById('call-timer-val');
-  var aht=timerEl?timerEl.textContent:'—';
-  var txt=(_lastTranscriptText||'').toLowerCase();
-  var speechItems=['Saludo de bienvenida','Identificación del cliente','Validación de ubicación','Confirmación del servicio','ETA comunicado'];
-  var spOk=0;
-  var spHtml=speechItems.map(function(k){
-    var done=txt.includes(k.split(' ')[0].toLowerCase());
-    if(done)spOk++;
-    var col=done?'var(--g)':'var(--r)';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--gb);">'+
-      '<div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;background:'+col+';">'+(done?'✓':'✗')+'</div>'+
-      '<span style="font-size:12px;color:var(--t1);">'+k+'</span></div>';
-  }).join('');
-  var spPct=Math.round(spOk/speechItems.length*100);
-  var spCol=spPct>=80?'var(--g)':spPct>=60?'var(--y)':'var(--r)';
-  var data=typeof POBuilder!=='undefined'?POBuilder.getData():{};
-  var fields=[
-    {l:'Cliente',v:data.nombre_cliente,i:'👤'},
-    {l:'Placa',v:data.placa,i:'🪪'},
-    {l:'Servicio',v:data.tipo_asistencia,i:'🔧'},
-    {l:'Ubicación',v:data.ubicación,i:'📍'},
-  ];
-  var fieldsHtml=fields.filter(function(f){return f.v&&f.v!=='N/A';}).map(function(f){
-    return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--gb);">'+
-      '<span style="font-size:14px;">'+f.i+'</span>'+
-      '<div><div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">'+f.l+'</div>'+
-      '<div style="font-size:12px;color:var(--t0);font-weight:500;">'+f.v+'</div></div></div>';
-  }).join('') || '<div style="font-family:var(--m);font-size:11px;color:var(--t2);padding:8px 0;">Sin datos capturados en esta llamada.</div>';
-
-  var ov=document.createElement('div');
-  ov.id='training-summary-ov';
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(12px);z-index:600;display:flex;align-items:center;justify-content:center;animation:fi .2s ease;';
-  ov.innerHTML=
-    '<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:18px;padding:32px;width:480px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.3);">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">'+
-        '<div>'+
-          '<div style="font-size:16px;font-weight:700;color:var(--t0);">Resumen de llamada</div>'+
-          '<div style="font-family:var(--m);font-size:10px;color:var(--t2);margin-top:3px;">Sesión de capacitación finalizada</div>'+
-        '</div>'+
-        '<span style="font-size:32px;">🎓</span>'+
-      '</div>'+
-      // Métricas
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;">'+
-        '<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:12px;padding:14px;text-align:center;">'+
-          '<div style="font-size:20px;margin-bottom:4px;">⏱</div>'+
-          '<div style="font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);">'+aht+'</div>'+
-          '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Duración</div>'+
-        '</div>'+
-        '<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:12px;padding:14px;text-align:center;">'+
-          '<div style="font-size:20px;margin-bottom:4px;">🎙</div>'+
-          '<div style="font-family:var(--m);font-size:18px;font-weight:700;color:'+spCol+';">'+spPct+'%</div>'+
-          '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Speech</div>'+
-        '</div>'+
-        '<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:12px;padding:14px;text-align:center;">'+
-          '<div style="font-size:20px;margin-bottom:4px;">📋</div>'+
-          '<div style="font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);">'+fields.filter(function(f){return f.v&&f.v!=='N/A';}).length+'/'+fields.length+'</div>'+
-          '<div style="font-family:var(--m);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Campos</div>'+
-        '</div>'+
-      '</div>'+
-      // Speech compliance
-      '<div style="margin-bottom:20px;">'+
-        '<div style="font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Speech compliance</div>'+
-        spHtml+
-      '</div>'+
-      // Datos capturados
-      '<div style="margin-bottom:24px;">'+
-        '<div style="font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Datos capturados</div>'+
-        fieldsHtml+
-      '</div>'+
-      // Botón finalizar
-      '<button onclick="_resetAfterTrainingCall()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.2px;">✓ Finalizar y volver a Coaching</button>'+
-    '</div>';
-  document.body.appendChild(ov);
-}
-
-function _resetAfterTrainingCall(){
-  // Cerrar popup
-  var ov=document.getElementById('training-summary-ov');if(ov)ov.remove();
-  // Limpiar transcripción
-  var tbody=document.getElementById('t-body');
-  if(tbody) tbody.innerHTML='<span style="font-family:var(--m);font-size:11px;color:var(--t2);display:block;padding:12px 0;">Esperando llamada...</span>';
-  // Limpiar PO Builder
-  if(typeof POBuilder!=='undefined') POBuilder.reset();
-  // Limpiar análisis
-  lastAnalysis=null;_lastTranscriptText='';_preCallStatus=null;
-  // Limpiar sentimiento e insight
-  var sent=document.getElementById('sent-wrap');if(sent)sent.style.display='none';
-  var ins=document.getElementById('insight-wrap');if(ins)ins.style.display='none';
-  // Cerrar popups abiertos
-  var pvp=document.getElementById('po-validate-popup');if(pvp)pvp.classList.remove('show');
-  var pvpOv=document.getElementById('po-confirm-ov');if(pvpOv)pvpOv.classList.remove('show');
-  // Ocultar botón colgar por si acaso
-  var hb=document.getElementById('btn-hangup');if(hb)hb.style.display='none';
-  // Volver a estado Coaching
-  setStatus('coaching_p','#6366f1','Coaching','🎯');
-  showToast('🎓 Sesión de capacitación completada');
-}
+function showCallRating(){
   var ex=document.getElementById('call-rating-popup');if(ex)ex.remove();
   var ov=document.createElement('div');ov.id='call-rating-popup';
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;animation:fi .2s ease;';
