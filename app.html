@@ -8,6 +8,226 @@
 <script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js" async></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════════════════════════════════
+   CONNECT Academy — Design System v6
+   No borders · Shadow-based depth · Sentence case
+   ═══════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg:#f8f9fc; --c1:#ffffff; --c2:#f8f9fc; --c3:#f1f3f9; --c4:#e8ebf4;
+  --gb:rgba(0,0,0,.04); --gb2:rgba(0,0,0,.07);
+  --t0:#0d0f1a; --t1:#3a4060; --t2:#8892b0; --t3:#c4c8dc;
+  --a:#e04500; --a2:#ff6535;
+  --g:#0ea874; --y:#f0900a; --r:#e84040; --v:#7048e8;
+  --sh:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);
+  --sh-sm:0 1px 3px rgba(0,0,0,.05);
+  --f:'Inter',system-ui,sans-serif;
+  --m:'JetBrains Mono','Fira Mono',monospace;
+  --blue:#3b6ef8; --bl2:#eff3ff;
+  --gr2:#edfaf4; --re2:#fff3f3; --am2:#fff8ed; --pu2:#f3f0ff;
+}
+
+/* Light mode is the DEFAULT */
+html, body { background:var(--bg); font-family:var(--f); }
+body { color:var(--t0); }
+
+/* Dark mode overrides */
+body.dark {
+  --bg:#0d0f1a; --c1:#131620; --c2:#1a1e2c; --c3:#202538; --c4:#272d42;
+  --gb:rgba(255,255,255,.055); --gb2:rgba(255,255,255,.1);
+  --t0:#ffffff; --t1:#a0a8b8; --t2:#6a7288; --t3:#3a4155;
+  --sh:0 1px 3px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.25);
+}
+
+/* Keep body.light for toggle compat */
+body.light {
+  --bg:#f8f9fc; --c1:#fff; --c2:#f8f9fc; --c3:#f1f3f9; --c4:#e8ebf4;
+  --gb:rgba(0,0,0,.04); --gb2:rgba(0,0,0,.07);
+  --t0:#0d0f1a; --t1:#3a4060; --t2:#8892b0; --t3:#c4c8dc;
+  --a:#e04500; --a2:#ff6535;
+  --sh:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);
+}
+
+/* ── NAV ── */
+nav {
+  height:54px !important;
+  background:var(--c1) !important;
+  backdrop-filter:none !important;
+  border-bottom:none !important;
+  box-shadow:var(--sh) !important;
+  padding:0 20px !important;
+  position:relative;z-index:20;
+  display:flex;align-items:center;flex-shrink:0;gap:0;
+}
+nav::after { display:none !important; }
+.n-brand { display:flex;align-items:center;gap:0; }
+.n-brand svg line { stroke:rgba(0,0,0,.08) !important; }
+.n-brand svg text:last-child { fill:var(--t2) !important; }
+
+/* Nav buttons — no borders, shadow-based */
+.n-to {
+  height:28px !important; padding:0 10px !important;
+  border:none !important; background:transparent !important;
+  color:var(--t2) !important; font-size:12px !important;
+  cursor:pointer; border-radius:4px !important;
+  filter:none !important; opacity:.7 !important;
+  transition:opacity .15s !important;
+}
+.n-to.on { opacity:1 !important; background:var(--c2) !important; color:var(--t0) !important; }
+.n-to:hover { opacity:1 !important; }
+.n-th { background:var(--c2); border-radius:4px; display:flex; }
+
+.n-dash {
+  width:34px !important; height:34px !important;
+  background:var(--c2) !important; border:none !important;
+  border-radius:4px !important; box-shadow:var(--sh-sm) !important;
+  color:var(--t2) !important; filter:none !important; opacity:1 !important;
+}
+.n-dash:hover { background:var(--c3) !important; }
+
+.n-demo {
+  height:32px !important; padding:0 16px !important;
+  background:var(--t0) !important; border:none !important;
+  border-radius:4px !important; color:#fff !important;
+  font-family:var(--f) !important; font-size:11px !important;
+  font-weight:700 !important; cursor:pointer; letter-spacing:.2px;
+  box-shadow:none !important;
+}
+.n-demo:hover { background:#1a1f30 !important; }
+
+.qbtn {
+  height:30px !important; padding:0 12px !important;
+  border-radius:20px !important; border:none !important;
+  background:var(--c2) !important; box-shadow:var(--sh-sm) !important;
+  font-family:var(--f) !important; font-size:11px !important;
+  font-weight:600 !important; color:var(--t1) !important; cursor:pointer;
+}
+.qbtn .qn { color:var(--a) !important; font-weight:800 !important; }
+.qbtn:hover { background:var(--c3) !important; }
+
+/* Status pill */
+#status-wrap > button {
+  border-radius:20px !important; border:none !important;
+  background:var(--c2) !important; box-shadow:var(--sh-sm) !important;
+  font-family:var(--f) !important; font-size:11px !important;
+  font-weight:600 !important; color:var(--t1) !important;
+  height:30px !important;
+}
+#status-menu {
+  border:none !important; border-radius:6px !important;
+  box-shadow:var(--sh) !important; background:var(--c1) !important;
+}
+.status-opt { border-radius:4px !important; }
+
+/* Logout */
+#btn-logout {
+  border-radius:4px !important; border:none !important;
+  background:var(--c2) !important; box-shadow:var(--sh-sm) !important;
+}
+
+/* PO counter */
+.po-counter {
+  background:var(--c2) !important; border:none !important;
+  border-radius:4px !important; box-shadow:var(--sh-sm) !important;
+  font-size:11px !important; font-weight:700 !important;
+  color:var(--t1) !important;
+}
+
+/* ── MAIN PANEL ── */
+.panel {
+  background:var(--c1) !important;
+  border:none !important;
+  box-shadow:var(--sh) !important;
+}
+
+/* ── DASHBOARD ── */
+.dash-ov { background:var(--bg) !important; }
+.dash-hd {
+  background:var(--c1) !important; border-bottom:none !important;
+  box-shadow:var(--sh-sm) !important;
+}
+.dash-kpi {
+  background:var(--c2) !important; border:none !important;
+  border-radius:6px !important; box-shadow:var(--sh-sm) !important;
+}
+.dash-kpi:hover { box-shadow:var(--sh) !important; transform:translateY(-1px); }
+.dash-kpi-val { font-weight:800 !important; }
+.dash-score-card {
+  background:var(--c1) !important; border:none !important;
+  box-shadow:var(--sh) !important; border-radius:6px !important;
+}
+.dash-rec {
+  background:var(--c2) !important; border:none !important;
+  border-radius:4px !important; border-left:3px solid !important;
+  box-shadow:none !important;
+}
+.dash-rec.g { border-left-color:var(--g) !important; }
+.dash-rec.y { border-left-color:var(--y) !important; }
+.dash-rec.r { border-left-color:var(--r) !important; }
+.dash-tab-btn {
+  border-radius:4px !important; border:none !important;
+  background:transparent !important; font-family:var(--f) !important;
+  font-size:12px !important; font-weight:600 !important;
+}
+.dash-body { background:var(--bg) !important; }
+
+/* ── CALL TIMER (dark header when in call) ── */
+.t-row-active { background:#151c30 !important; }
+.td-dot.live { background:#0ea874 !important; }
+
+/* ── PO DRAWER ── */
+.po-drawer {
+  background:var(--c1) !important; border:none !important;
+  box-shadow:-8px 0 32px rgba(0,0,0,.1) !important;
+}
+.po-drawer-ov { background:rgba(0,0,0,.15) !important; }
+.po-validate-popup, .po-confirm-ov > div {
+  background:var(--c1) !important; border:none !important;
+  box-shadow:var(--sh) !important; border-radius:6px !important;
+}
+
+/* ── CARDS / INPUTS ── */
+.sf-item, .kb-row, .rec-done-btn {
+  border-radius:4px !important;
+}
+textarea, input[type=text], input[type=number], select {
+  border:none !important; background:var(--c2) !important;
+  border-radius:4px !important; font-family:var(--f) !important;
+  color:var(--t0) !important;
+}
+textarea:focus, input:focus { box-shadow:0 0 0 2px rgba(59,110,248,.12) !important; }
+
+/* ── QUEUE PANEL ── */
+.q-panel {
+  background:var(--c1) !important; border:none !important;
+  border-radius:6px !important; box-shadow:var(--sh) !important;
+}
+.q-item { border-bottom:0.5px solid rgba(0,0,0,.04) !important; }
+.kb-row { border-bottom:0.5px solid rgba(0,0,0,.04) !important; }
+
+/* ── POPUPS ── */
+.call-rating-popup > div,
+#call-rating-popup > div {
+  border:none !important; border-radius:6px !important;
+  box-shadow:var(--sh) !important;
+}
+.toast {
+  border-radius:4px !important; border:none !important;
+  box-shadow:var(--sh) !important;
+}
+
+/* ── GENERAL BUTTONS ── */
+button { font-family:var(--f) !important; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(0,0,0,.12); border-radius:2px; }
+
+
+/* ── EXISTING RULES ── */
+
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 
@@ -1324,7 +1544,7 @@ body.light .status-opt:hover{background:#f0ede8;}
 <div class="app">
 
 <nav class="nav">
-  <div class="n-brand"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;display:block;flex-shrink:0"><defs><linearGradient id="cag" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#e04500"/><stop offset="100%" style="stop-color:#ff8c44"/></linearGradient></defs><text x="1" y="30" font-family="Syne,Arial Black,sans-serif" font-size="26" font-weight="800" letter-spacing="-0.5" fill="url(#cag)">CONNECT</text><text x="155" y="18" font-family="Syne,Arial,sans-serif" font-size="9" font-weight="600" fill="#e04500" opacity="0.9">®</text><line x1="1" y1="37" x2="163" y2="37" stroke="rgba(255,255,255,.3)" stroke-width="0.8"/><text x="2" y="52" font-family="Syne,Arial,sans-serif" font-size="9.5" font-weight="600" letter-spacing="4" fill="rgba(255,255,255,.9)">ACADEMY</text></svg></div>
+  <div class="n-brand"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;display:block;flex-shrink:0"><defs><linearGradient id="cag" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#e04500"/><stop offset="100%" style="stop-color:#ff8c44"/></linearGradient></defs><text x="1" y="30" font-family="Syne,Arial Black,sans-serif" font-size="26" font-weight="800" letter-spacing="-0.5" fill="url(#cag)">CONNECT</text><text x="155" y="18" font-family="Syne,Arial,sans-serif" font-size="9" font-weight="600" fill="#e04500" opacity="0.9">®</text><line x1="1" y1="37" x2="163" y2="37" stroke="rgba(0,0,0,.08)" stroke-width="0.8"/><text x="2" y="52" font-family="Syne,Arial,sans-serif" font-size="9.5" font-weight="600" letter-spacing="4" fill="var(--t2)">ACADEMY</text></svg></div>
   <div class="n-conn"><div class="cdot" id="cdot"></div><span id="clbl">conectando</span></div>
   <div class="n-timer" id="timer-row">
     <div class="n-div"></div>
