@@ -5,94 +5,200 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="cache-control" content="no-cache, no-store"/>
 <title>CONNECT Academy · Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#f8f9fc;color:#0d0f1a;}
-.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
-.card{
-  background:#fff;border-radius:6px;padding:52px 48px;
-  width:100%;max-width:440px;
-  box-shadow:0 1px 3px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --s0:#fff;--s1:#f8f9fc;--s2:#f1f3f9;
+  --sh:0 1px 3px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+  --sh-sm:0 1px 3px rgba(0,0,0,.05);
+  --t0:#0d0f1a;--t1:#3a4060;--t2:#8892b0;--t3:#c4c8dc;
+  --acc:#e04500;--blue:#3b6ef8;
+  --g:#0ea874;--r:#e84040;
+  --gr2:#edfaf4;--bl2:#eff3ff;--pu2:#f3f0ff;--am2:#fff8ed;--re2:#fff3f3;
+  --f:'Inter',system-ui,sans-serif;
+  --r4:4px;--r6:6px;
 }
-.brand{text-align:center;margin-bottom:40px;}
-.brand-name{font-size:30px;font-weight:800;letter-spacing:-1px;color:#0d0f1a;}
-.brand-name em{color:#e04500;font-style:normal;}
-.brand-name sup{font-size:11px;color:#e04500;opacity:.5;}
-.brand-sub{font-size:9px;font-weight:700;letter-spacing:.22em;color:#c4c8dc;text-transform:uppercase;margin-top:5px;}
-.brand-rule{width:28px;height:1px;background:rgba(0,0,0,.06);margin:14px auto 0;}
+html,body{height:100%;font-family:var(--f);background:var(--s1);color:var(--t0);}
 
-/* Form */
-.form{display:flex;flex-direction:column;gap:16px;}
+/* ── LAYOUT ── */
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 20px;}
+.card{background:var(--s0);border-radius:var(--r6);padding:48px 44px;width:100%;max-width:420px;box-shadow:var(--sh);}
+
+/* ── BRAND ── */
+.brand{text-align:center;margin-bottom:36px;}
+.brand-name{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--t0);}
+.brand-name em{color:var(--acc);font-style:normal;}
+.brand-name sup{font-size:10px;color:var(--acc);opacity:.5;}
+.brand-sub{font-size:9px;font-weight:700;letter-spacing:.22em;color:var(--t3);text-transform:uppercase;margin-top:5px;}
+.brand-rule{width:28px;height:1px;background:rgba(0,0,0,.06);margin:12px auto 0;}
+
+/* ── FORM ── */
+.form{display:flex;flex-direction:column;gap:14px;}
 .field{display:flex;flex-direction:column;gap:5px;}
-.lbl{font-size:11px;font-weight:600;color:#3a4060;}
+.lbl{font-size:11px;font-weight:600;color:var(--t1);}
 .input{
-  width:100%;height:40px;border:none;border-radius:4px;
-  padding:0 12px;font-size:13px;color:#0d0f1a;
-  background:#f8f9fc;outline:none;font-family:inherit;
+  width:100%;height:40px;border:none;border-radius:var(--r4);
+  padding:0 12px;font-size:13px;color:var(--t0);
+  background:var(--s1);outline:none;font-family:var(--f);
   transition:box-shadow .14s;
 }
-.input:focus{background:#fff;box-shadow:0 0 0 2px rgba(59,110,248,.12);}
-.input::placeholder{color:#c4c8dc;}
+.input:focus{background:var(--s0);box-shadow:0 0 0 2px rgba(59,110,248,.12);}
+.input::placeholder{color:var(--t3);}
 .pwd-wrap{position:relative;}
 .pwd-wrap .input{padding-right:58px;}
 .pwd-toggle{
   position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  font-size:11px;font-weight:600;color:#8892b0;cursor:pointer;user-select:none;
+  font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;user-select:none;
 }
-.pwd-toggle:hover{color:#3a4060;}
+.pwd-toggle:hover{color:var(--t1);}
 .btn-primary{
-  width:100%;height:40px;border-radius:4px;border:none;
-  background:#e04500;color:#fff;font-size:13px;font-weight:700;
-  cursor:pointer;font-family:inherit;letter-spacing:.2px;
-  transition:background .15s;margin-top:2px;
-  box-shadow:0 3px 10px rgba(224,69,0,.2);
+  width:100%;height:40px;border-radius:var(--r4);border:none;
+  background:var(--acc);color:#fff;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:var(--f);letter-spacing:.2px;
+  transition:background .15s;box-shadow:0 3px 10px rgba(224,69,0,.2);
 }
 .btn-primary:hover{background:#c93d00;}
+.btn-primary:active{transform:scale(.99);}
 .sep{display:flex;align-items:center;gap:10px;}
 .sep-line{flex:1;height:0.5px;background:rgba(0,0,0,.06);}
-.sep-txt{font-size:11px;color:#c4c8dc;font-weight:500;}
+.sep-txt{font-size:11px;color:var(--t3);font-weight:500;}
 .btn-google{
-  width:100%;height:40px;border-radius:4px;border:none;
-  background:#f8f9fc;display:flex;align-items:center;justify-content:center;gap:10px;
-  font-size:13px;font-weight:600;color:#3a4060;cursor:pointer;font-family:inherit;
-  transition:all .14s;box-shadow:0 1px 3px rgba(0,0,0,.05);
+  width:100%;height:40px;border-radius:var(--r4);border:none;
+  background:var(--s1);display:flex;align-items:center;justify-content:center;gap:10px;
+  font-size:13px;font-weight:600;color:var(--t1);cursor:pointer;font-family:var(--f);
+  box-shadow:var(--sh-sm);transition:all .14s;
 }
-.btn-google:hover{background:#f1f3f9;box-shadow:0 2px 8px rgba(0,0,0,.07);}
-.footer{text-align:center;font-size:11px;color:#c4c8dc;margin-top:32px;line-height:1.8;}
-.footer a{color:#3b6ef8;text-decoration:none;font-weight:600;}
-.footer a:hover{text-decoration:underline;}
-.footer strong{color:#3a4060;}
+.btn-google:hover{background:var(--s2);box-shadow:var(--sh);}
+.footer-txt{text-align:center;font-size:11px;color:var(--t3);margin-top:28px;line-height:1.8;}
+.footer-txt a{color:var(--blue);text-decoration:none;font-weight:600;}
+.footer-txt strong{color:var(--t1);}
 
-/* Extension popup */
-.ext-ov{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:100;display:flex;align-items:center;justify-content:center;}
-.ext-card{
-  background:#fff;border-radius:6px;padding:36px 40px;width:360px;max-width:94vw;
-  box-shadow:0 4px 24px rgba(0,0,0,.12);text-align:center;
+/* ── OVERLAY BASE ── */
+.ov{
+  position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:100;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  animation:fadeIn .18s ease;
 }
-.ext-logo{height:48px;width:auto;margin:0 auto 20px;}
-.ext-title{font-size:15px;font-weight:700;color:#0d0f1a;margin-bottom:6px;}
-.ext-sub{font-size:12px;color:#8892b0;margin-bottom:20px;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.ov-card{
+  background:var(--s0);border-radius:var(--r6);
+  box-shadow:0 4px 24px rgba(0,0,0,.14);
+  width:100%;animation:slideUp .2s ease;
+}
+@keyframes slideUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── ROLE SELECTOR ── */
+.role-card{max-width:520px;}
+.role-hdr{padding:24px 28px 0;}
+.role-hdr h2{font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px;}
+.role-hdr p{font-size:12px;color:var(--t2);}
+.role-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:20px 28px;}
+.rc{
+  background:var(--s1);border-radius:var(--r4);padding:16px 8px 12px;
+  text-align:center;cursor:pointer;transition:all .15s;
+}
+.rc:hover{background:var(--s2);transform:translateY(-1px);box-shadow:var(--sh-sm);}
+.rc.sel{background:var(--s0);box-shadow:0 0 0 2px var(--acc),var(--sh-sm);}
+.rc-av{
+  width:38px;height:38px;border-radius:var(--r4);
+  margin:0 auto 8px;display:flex;align-items:center;
+  justify-content:center;font-size:17px;
+}
+.rc-av.bl{background:var(--bl2);}
+.rc-av.pu{background:var(--pu2);}
+.rc-av.am{background:var(--am2);}
+.rc-av.re{background:var(--re2);}
+.rc-av.gr{background:var(--gr2);}
+.rc-name{font-size:11px;font-weight:700;color:var(--t0);}
+.rc-sub{font-size:9px;color:var(--t2);margin-top:2px;}
+.role-footer{
+  padding:16px 28px;border-top:0.5px solid rgba(0,0,0,.05);
+  display:flex;gap:8px;justify-content:flex-end;
+}
+
+/* ── USER SELECTOR ── */
+.user-card{max-width:420px;}
+.user-hdr{
+  padding:20px 24px;border-bottom:0.5px solid rgba(0,0,0,.05);
+  display:flex;align-items:center;gap:10px;
+}
+.user-hdr h2{font-size:14px;font-weight:700;color:var(--t0);flex:1;}
+.back-btn{
+  height:30px;padding:0 12px;border-radius:var(--r4);border:none;
+  background:var(--s1);font-size:11px;font-weight:600;
+  color:var(--t1);cursor:pointer;font-family:var(--f);
+}
+.back-btn:hover{background:var(--s2);}
+.role-badge{
+  font-size:9px;font-weight:700;padding:3px 8px;border-radius:3px;
+  background:#fff8f5;color:var(--acc);
+}
+.user-list{padding:8px;}
+.user-item{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  border-radius:var(--r4);cursor:pointer;transition:background .12s;
+}
+.user-item:hover{background:var(--s1);}
+.user-av{
+  width:34px;height:34px;border-radius:var(--r4);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff;
+}
+.user-name{font-size:13px;font-weight:600;color:var(--t0);}
+.user-email{font-size:10px;color:var(--t2);margin-top:1px;}
+
+/* ── EXTENSION POPUP ── */
+.ext-card{max-width:380px;padding:32px 28px;text-align:center;}
+.ext-logo{font-size:32px;margin-bottom:14px;}
+.ext-title{font-size:15px;font-weight:700;color:var(--t0);margin-bottom:5px;}
+.ext-sub{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:24px;}
 .ext-input{
-  width:100%;height:40px;border:none;border-radius:4px;
-  background:#f8f9fc;font-size:15px;font-weight:700;
-  text-align:center;letter-spacing:.1em;color:#0d0f1a;
-  outline:none;font-family:inherit;margin-bottom:16px;
-  transition:box-shadow .14s;
+  width:100%;height:48px;border:none;border-radius:var(--r4);
+  background:var(--s1);font-size:24px;font-weight:700;
+  text-align:center;letter-spacing:.15em;color:var(--t0);
+  outline:none;font-family:'JetBrains Mono',monospace;
+  transition:box-shadow .14s;margin-bottom:6px;
 }
-.ext-input:focus{background:#fff;box-shadow:0 0 0 2px rgba(59,110,248,.12);}
-.ext-btn{
-  width:100%;height:40px;border:none;border-radius:4px;
-  background:#e04500;color:#fff;font-size:13px;font-weight:700;
-  cursor:pointer;font-family:inherit;
+.ext-input:focus{background:var(--s0);box-shadow:0 0 0 2px rgba(59,110,248,.12);}
+.ext-err{font-size:11px;color:var(--r);min-height:16px;margin-bottom:12px;}
+.ext-btns{display:flex;flex-direction:column;gap:8px;}
+
+/* ── LOADING ── */
+.loading-ov{
+  position:fixed;inset:0;background:var(--s0);z-index:200;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
+.loading-ov.show{display:flex;}
+.spinner{
+  width:32px;height:32px;border:3px solid var(--s2);
+  border-top-color:var(--acc);border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:13px;font-weight:600;color:var(--t2);}
+
+/* ── SHARED BUTTONS ── */
+.btn-outline{
+  height:38px;padding:0 18px;border-radius:var(--r4);border:none;
+  background:var(--s1);font-size:12px;font-weight:600;
+  color:var(--t1);cursor:pointer;font-family:var(--f);
+  transition:all .12s;
+}
+.btn-outline:hover{background:var(--s2);}
+.btn-cta{
+  height:38px;padding:0 20px;border-radius:var(--r4);border:none;
+  background:var(--acc);color:#fff;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:var(--f);letter-spacing:.2px;
   box-shadow:0 3px 10px rgba(224,69,0,.2);transition:background .15s;
 }
-.ext-btn:hover{background:#c93d00;}
-
+.btn-cta:hover{background:#c93d00;}
+.btn-cta:disabled{opacity:.5;cursor:not-allowed;}
 </style>
 </head>
 <body>
+
+<!-- Login principal -->
 <div class="wrap">
   <div class="card">
     <div class="brand">
@@ -112,9 +218,9 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#f8f9f
           <span class="pwd-toggle" onclick="togglePwd(this)">Mostrar</span>
         </div>
       </div>
-      <button class="btn-primary" onclick="doLogin()">Iniciar sesión</button>
+      <button class="btn-primary" onclick="doEmailLogin()">Iniciar sesión</button>
       <div class="sep"><div class="sep-line"></div><span class="sep-txt">o continúa con</span><div class="sep-line"></div></div>
-      <button class="btn-google" onclick="doLoginGoogle()">
+      <button class="btn-google" onclick="doGoogleSSO()">
         <svg width="16" height="16" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -124,178 +230,274 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#f8f9f
         Continuar con Google
       </button>
     </div>
-    <div class="footer">
+    <div class="footer-txt">
       <a href="#">¿Olvidaste tu contraseña?</a><br>
       Acceso restringido a cuentas <strong>@connect.inc</strong>
     </div>
   </div>
 </div>
+
+<!-- Loading screen -->
+<div class="loading-ov" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-txt">Iniciando sesión...</div>
+</div>
+
 <script>
-
 var USERS = {
-  admin:      [{name:'George Esna',     email:'george.esna@connect.inc',     color:'#6366f1', letter:'G'},
-               {name:'María Torres',    email:'maria.torres@connect.inc',     color:'#8b5cf6', letter:'M'}],
-  supervisor: [{name:'Ana Vega',        email:'ana.vega@connect.inc',         color:'#bf9455', letter:'A'},
-               {name:'Roberto Salas',   email:'roberto.salas@connect.inc',    color:'#a67c45', letter:'R'}],
-  agente:     [{name:'Dayana García',   email:'dayana.garcia@connect.inc',    color:'#ff5c00', letter:'D'},
-               {name:'Carlos Mora',     email:'carlos.mora@connect.inc',      color:'#6aaa90', letter:'C'},
-               {name:'Valeria Núñez',   email:'valeria.nunez@connect.inc',    color:'#cc7580', letter:'V'},
-               {name:'Luis Arias',      email:'luis.arias@connect.inc',       color:'#4a8a72', letter:'L'}],
-  formador:   [{name:'Laura Méndez',    email:'laura.mendez@connect.inc',     color:'#6366f1', letter:'L'},
-               {name:'Andrés Campos',   email:'andres.campos@connect.inc',    color:'#8b5cf6', letter:'A'}],
-  demo:       [{name:'Usuario Demo',    email:'demo@connect.inc',             color:'#9ca3af', letter:'D'}]
+  agente:     [{name:'Dayana García',  email:'dayana.garcia@connect.inc',  color:'#e04500', letter:'D'},
+               {name:'Carlos Mora',    email:'carlos.mora@connect.inc',    color:'#3b6ef8', letter:'C'},
+               {name:'Valeria Núñez',  email:'valeria.nunez@connect.inc',  color:'#7048e8', letter:'V'},
+               {name:'Luis Arias',     email:'luis.arias@connect.inc',     color:'#0ea874', letter:'L'}],
+  formador:   [{name:'Laura Méndez',   email:'laura.mendez@connect.inc',   color:'#7048e8', letter:'L'},
+               {name:'Andrés Campos',  email:'andres.campos@connect.inc',  color:'#3b6ef8', letter:'A'}],
+  supervisor: [{name:'Ana Vega',       email:'ana.vega@connect.inc',       color:'#f0900a', letter:'A'},
+               {name:'Roberto Salas',  email:'roberto.salas@connect.inc',  color:'#e04500', letter:'R'}],
+  admin:      [{name:'George Esna',    email:'george.esna@connect.inc',    color:'#7048e8', letter:'G'},
+               {name:'María Torres',   email:'maria.torres@connect.inc',   color:'#3b6ef8', letter:'M'}],
+  demo:       [{name:'Usuario Demo',   email:'demo@connect.inc',           color:'#8892b0', letter:'D'}]
 };
-var ROLE_LABELS = {admin:'Administrador',supervisor:'Supervisor',agente:'Agente',formador:'Formador',demo:'Demo'};
-var ROLE_COLORS = {
-  admin:      {bg:'rgba(99,102,241,.1)',color:'#6366f1',border:'rgba(99,102,241,.2)'},
-  supervisor: {bg:'rgba(191,148,85,.1)',color:'#a67c45',border:'rgba(191,148,85,.2)'},
-  agente:     {bg:'rgba(106,170,144,.1)',color:'#4a8a72',border:'rgba(106,170,144,.2)'},
-  formador:   {bg:'rgba(99,102,241,.1)', color:'#6366f1',border:'rgba(99,102,241,.2)'},
-  demo:       {bg:'rgba(156,163,175,.1)',color:'#6b7280',border:'rgba(156,163,175,.2)'}
-};
-var selectedRole = null;
+var ROLE_LABELS = {agente:'Agente',formador:'Formador',supervisor:'Supervisor',admin:'Admin',demo:'Demo'};
+var _pendingUser = null;
 
-window.addEventListener('DOMContentLoaded',function(){
-  var s=localStorage.getItem('helios_session');
-  if(s){try{var p=JSON.parse(s);if(p&&(Date.now()-p.ts<3600000)){window.location.href='app.html';return;}}catch{}}
-  var params=new URLSearchParams(window.location.search);
-  if(params.get('reason')==='timeout') document.getElementById('timeout').style.display='block';
+window.addEventListener('DOMContentLoaded', function(){
+  var s = localStorage.getItem('helios_session');
+  if(s){try{var p=JSON.parse(s);if(p&&(Date.now()-p.ts<3600000)){window.location.href='app.html';return;}}catch(e){}}
+  var params = new URLSearchParams(window.location.search);
+  if(params.get('reason')==='timeout'){
+    var msg = document.createElement('div');
+    msg.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#fff3f3;color:#e84040;padding:10px 20px;border-radius:4px;font-size:12px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:99;';
+    msg.textContent='Sesión expirada. Por favor ingresa de nuevo.';
+    document.body.appendChild(msg);
+    setTimeout(function(){msg.remove();},4000);
+  }
 });
-
-function showRoles(){
-  document.getElementById('step1').style.display='none';
-  document.getElementById('step2').style.display='block';
-}
-function selectRole(role){
-  selectedRole=role;
-  document.querySelectorAll('.role-card').forEach(function(c){c.classList.remove('selected');});
-  document.getElementById('rc-'+role).classList.add('selected');
-  document.getElementById('next-btn').disabled=false;
-}
-function showUsers(){
-  if(!selectedRole)return;
-  document.getElementById('step2').style.display='none';
-  var s3=document.getElementById('step3');
-  s3.style.display='block';
-  document.getElementById('role-lbl').textContent=ROLE_LABELS[selectedRole];
-  var rc=ROLE_COLORS[selectedRole];
-  document.getElementById('role-lbl').style.cssText='font-weight:600;padding:1px 8px;border-radius:20px;background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+';font-size:10px;font-family:monospace;';
-  var list=document.getElementById('users-list');
-  list.style.display='flex';
-  list.innerHTML='';
-  (USERS[selectedRole]||[]).forEach(function(u){
-    var div=document.createElement('div');
-    div.className='user';
-    div.onclick=function(){loginAs(u,selectedRole);};
-    var rc=ROLE_COLORS[selectedRole];
-    div.innerHTML='<div class="av" style="background:'+u.color+'">'+u.letter+'</div>'+
-      '<div style="flex:1"><div class="uname">'+u.name+'</div><div class="uemail">'+u.email+'</div></div>'+
-      '<div class="urole" style="background:'+rc.bg+';color:'+rc.color+';border:1px solid '+rc.border+'">'+ROLE_LABELS[selectedRole]+'</div>';
-    list.appendChild(div);
-  });
-}
-function backTo(show,hide){
-  document.getElementById(show).style.display='block';
-  document.getElementById(hide).style.display='none';
-}
-function loginAs(user,role){
-  if(role==='agente'){
-    showExtensionPopup(user,role);
-    return;
-  }
-  _doLogin(user,role,null);
-}
-
-function showExtensionPopup(user,role){
-  var ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;';
-  var card=document.createElement('div');
-  card.style.cssText='background:#fff;border-radius:16px;padding:32px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center;';
-  var ico=document.createElement('img');ico.src='data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADIAVwDASIAAhEBAxEB/8QAHQABAAIDAQEBAQAAAAAAAAAAAAcIBAUGAwIBCf/EAEYQAAEDAwEEBwUEBwYFBQAAAAEAAgMEBREGBxIhMQgTQVFhcYEUIjKRoRVCdLIjMzY3grHBFkNScpLRFzRzorM1RWJ1wv/EABsBAQABBQEAAAAAAAAAAAAAAAAFAQMEBgcC/8QAMxEAAgEDAgIIBgIDAAMAAAAAAAECAwQRBTESIQYTFCJBUWFxMoGRobHRweEVM/AjNXL/2gAMAwEAAhEDEQA/ALloiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiEgDJOAFDG0TbP7FWyW3S0UM7oiWyVko3mE/wDwHb5ngrVatCisyZI6bpVzqVXq7eOcbvwXuyZ0VYKPbFrqGpEstxgqWZ/VSUsYb82gH6qY9mG0m3awb7HNGKK6sbl0Bdlsg7Sw/wBOY8eas0b2lVfCuT9ST1LorqGn0utmlKK3cXnHvlJneIiLLNbCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIsW7V9Na7ZU3GskEdPTxmSR3cAEbxzPUYuTUYrLZHe3/V/2Hp4WWilDa+4tLXEc44fvHwJ5D1VbVuta6gqtT6kq7xVFw61+ImE/q4x8LfQfXK0q1u6r9dUb8PA7p0e0laZZxpv4nzl7/1sF90t4Nhrae6MrGUksEgfHI5wHvBfB4DJUV6zuZu12cWOzTw5ZEOw97vX/ZWqceKRm6jcxoUXlZzyx+T+i2gNTUWrtK0d8oZI3tmZiRrHZDJB8Tfn9MLfKkHRH2jyaR1m3TlzqHCy3h4jG8fdgqOTH+APwnzB7Fd9bHQqdZDPicO1Wz7LcOKWIvmvby+QREV4jQiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAKDOkhq7fkj0nRS+63EtaWnmebWH8x9FK2vNRU2ltMVV2nLS9jd2CM/3kh+Ef1PgCqiXGsqLhXz11XIZKieQySPPa4nJUbqNfhj1a3f4N66E6P2iu7you7Db1l/X5wY6IvahpZ62tho6WMyzzvEcbBzc4nAChdzq7aiss5rW1yNHbfZojiaoBb5N7T/RR51Xgri7ZdjtNLsdp22yBj71ZWOqXyNHvVAIzK3x5ZH+XHaqk9UsydGVDCl4mmQ1OlqspVKe0Xj+/nuYAjIII4Ecir3dGjaD/AG40DFDXTB15tYbT1eXZdIMe5L/EBx8QVSDql2mxfWdRoHXdJeGlxo3nqa6Mcd+FxGfUcCPJXbev1c+exG6xpfbLdqK7y5r9fMv+i8qKpp62jhrKWVk1POwSRSMOQ9pGQR6L1U2czaxyYREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBEXC7atXDS+lHx00m7ca4GGnweLB95/oPqQvFSapxcn4GTZ2lS8rxoUlzk8f97ERbetXfb+pja6OUm325xYMHhJLyc705D171Gy/SSTk8SvxazVqOpNyfid9sLKnY28LentFfXzfzCmbo36S9prZdVVsQMVOTFSBw5v8AvP8AQcPMnuUVaas9Vfr7SWijaTNUyBgOMho7XHwAyfRXB0/aqWyWWktVE3dgpowxvDie8nxJyT5rN0+hxz43svyar001fstt2Wm+9Pf0j4/Xb6mcQCMEZBVIukToP+xmvZnUkRbarlvVNJhuGsyffj/hJ+RCu6uG236Kj1voSqoI2A3CmzUUTu3rAPh8nDI+R7FJ3dHrafLdHPdB1HsV0nJ92XJ/v5fgoj1fgnV+Cy5YXxSvilY5kjHFrmuGC0jmCF87oUBk6vwFn+iPrw19ok0Tcpi6pommWhc8/FDniz+Enh4HwU/r+eel7zW6d1BRXu3SFlVRyiRh7D3tPgRkHwKvporUNDqrTFDfre4GGqjDi3OTG77zD4g5CmbGvxx4HujnHSjS+zV+0QXdn9n/AHv9TcIiLPNVCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgPOpmipqeSonkbHFE0ve9xwGgDJJVStpuqJdWarqLjkilYeqpWH7sYPD1PM+alrpF6vNBbGaYoZSKiraH1Rafhi7G/xEfIeKr8obUa/FLq14bnUuhGj9VSd9UXOXKPt4v5/j3CIuh2e6bn1VqqktUYcInO36h4+5GPiP8AQeJCjYxcmoo3qvXhb0pVajxGKyyX+jjpP2O2S6orIiJ6sGOlDh8MWeLvUj5DxUwLyo6eCjpIqWmjbFDCwMjY3k1oGAF6rZqNJUoKKOB6rqE9Rup3E/Hb0XggiIrpHlS+lPob7B1W3UlDBu2+7OJl3eUdRzd5b3xee8oZwO5X52i6XpNY6PrrFVBoMzMwyEfqpRxa4ev0JCojd7fV2q6VVsrojFVUsropWHsc04Kg76h1c+JbM6j0X1Ptdt1U33ocvdeD/gxMDuU3dFXXf2LqF+lLhMG0FzfmnLuUc+OA8nDh5gKEl9QyyQzMmhe6OSNwcxzTgtI4ggrGpVHSmpIm7+yhe28qE/H7PwZ/RdFwuxHWzNcaIp62V4+0abEFc3t6wD4/Jw4/Mdi7pbHCanFSXicZuKE7erKlUWGngIiL0WQiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgC12pbxSWCxVd3rXYhpoy4jOC49jR4k4C2Kr30itXfaN2ZpmilBpaJ29UlvJ8uOX8IPzJ7lYuayo03LxJjQtKlqd5Givh3k/Jf3siM9RXarvt7q7tWu3p6mQvdx4NHY0eAGAPJa9EWtNtvLO704RpxUIrCXJBWX2B6T+wdLi6VcQFfcgJDkcWRfdb68z5juUObHdKHVOroY52ZoKTE9USOBAPBnqfplWnqZoaSkknlIZDDGXuPY1oGT9ApTTqG9V/I57041ZpRsKT5vnL+F/P0NPq/Vti0rStnvFYInP/VwsG9JJ5NH8zwXJ23bTo6qqhDOa2iaTgSzQ5b67pJ+igHWl/q9S6jq7tVPeeteeqYT+rjHwtHkFpl5qalPi7mxkWXQW07Ou0ybm1zw8Y9Fy/JdK0Xe13eHrrZcKasZ2mGQOx545LOVJqKrqqKobUUdTNTzN5PieWuHqF3mm9sGr7S1sVTPFdIR92pb7wH+YYPzyr9PU4v41gib7oFcQ71rUUl5Pk/1+CzqrX0t9EdTUwa3oIgGS7sFeGt5O5MkPmPdPk3vUhac22aar9yO6wVFrlPAuI6yMHzbx+i7Wt/s/rXTdbbGVlNX0VXCYpepkDi0HkfAg8R4hZFR07mm4xZA21K+0O7jVrU3FbPya8eexQNFt9a6frNK6or7DXtPXUkpaHYwJG82vHgRg+q0+VAtNPDOqU6kakVOLynzO/2E63donW8FRPIRbKzEFa3PANJ4P82nj5Z71dmN7JI2yRua9jgC1zTkEHtC/nPlWy6LOuxftMHTNwn3rjamAQl3OSn5DzLeXluqT0+vh9W/kaV0u0vjirymua5S9vB/LYmhERSxz8IiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiEhoJJAA4klActtQ1THpPSlRXhw9rl/RUre+Qjn5Dn6Kpc8sk8755nuklkcXPc45LieJJXa7ZtWnVOrJPZ5CbfRZhpgDwd/if6n6ALh1r17X62phbI7V0V0f/AB1mpTXfnzfp5L5fkL6Y1z3tYxpc5xwABxJXypQ6P2kftrURvdZETQ25wczPJ833R445/JY9Km6s1FE1qN9TsLadxU2ivq/BfMl/ZFpVulNIw08rMV1TiaqOOIcRwb/COHnlb/VNLLXaaudHBxlnpJY2DvcWkBbJFs0aajDgWxwaveVa9y7mbzJvJSGRjo5HRvaWvaSHNIwQe5fKsRtO2RQ32ulu9gnipK2U700MmRHI7tcCPhPf2HwUM6j0TqjT7nm52eoZE3nNG3rI8d+83IHqterWtSk+a5eZ2vS+kNlqME4TSk94vk8/z8jnURFjE4F70VZV0NQ2ooqmammbyfE8tcPULwRVTweZRUlh7Hpq2prNUzwVN5rJKipgj6pkxA3y3OQHHHvYyefHiuWqbDVMyYJGSjuPuldKiq5NvLLHZKKjwxjhenI4aop6mnP6aCRniRw+a32zPUVdprW9tu9AXF8MuJGA8JIzwc0+BC3ZAIwRkLziggicXRwxsceZa0BVjPDytzHqafConCXOL3XoXZstxpbvaqa50Um/T1MYkYfA9h8exZagjo4au6mok0nWyARyky0ZceTvvM9eY8j3qd1sdvWVampHE9a0yemXkqEtt0/NeH6fqERFfIoIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgC4Dbxf5rHoOZlM7cnr3ima4c2tIJcfkCPVd+ot6Sdqqa7RtNW08bpG0NTvyhozhjmkb3ocfNWLptUZOJL6BClU1KjGr8PEv6+5XFERayd7Mq00FTdLnTW6jjMlRUSCONveSVb3RWn6XTGm6S0UoaeqZmV4H6yQ/E71P0wou6OOj+qhfqyviIfIDHRNc3k3k5/ryHhnvU1Kc0+34I8b3f4OS9NNZ7Tcdkpvuw39Zf1t75CIikTRwhAIwRkIiA5TUmzvSN+a41VohhmPHrqb9E8Hv4cD6gqM9SbCaqMul0/dmTN7Iaobrh5OHA/IKd0WPUtaVTdE1Y9IdRssKlUePJ8199vkU81DpDUtgc77UtFTCxvOUN34/8AU3IWiV33Na5pa4BzSMEEcCuQ1Js10ffQ501qjpZz/fUv6J3yHA+oWBU0x7wf1Nysen0XiN3Tx6x/T/ZU9FMmpNhVwhc6WwXSKqZzEVSNx/lvDgfoo01BpbUNge4Xa01VM0HHWFmWHycMg/NYFS3qU/iRuNjrdjff6Kib8tn9HzNMiIrBKnvb6uooK6CtpZDHPBIJI3DscDkK42lLq2+abt93a0N9qgbIWj7riOI9DlU1hjkmlZFExz5HuDWtaMkk8gFcDZ/apbJou1WucYmgp2iQdzzxcPmSpXS3LikvA550/hS6mjJ/Hl/THP74N6iIpg5gEREAREQBERAEREAREQBERAEREAREQBERAEREARF+Oc1rS5zg1oGSScAID9XxPFFPC+GaNskcjS17HDIcDzBC1kmptORyGN9+tbXg4INUzh9VsKSrpayLraSphqIz96J4cPmFRST5Jl2VGrTXFKLXyIl1dsPt9bUvqtP3D7PLySaeVpfGP8pHED5rD01sJbFWNmv93ZPC056imaRv+BceIHkPVTYsdtfQul6ltbTGQnd3BK3Oe7GViuzocXFgnYdKNWVHqo1Xjzws/XGfnuelJTwUlNFTU0TYoYmBkbGjAa0DAAXoi8KispKd4ZUVUELiMgPkDSR6rK5I1/vTfmz3Rfkb2SMD43NexwyHNOQQvyWSOKN0kr2sY0Zc5xwAO8lVKYecH0o/26ajvOmdMUtbZav2WeSrEbndW1+W7rjjDgRzAXRO1ppITdUdR2vfzjHtLf8AdcH0lJoajQlumglZLE+uaWvY4Oa4bj+IIWNc1F1UnF8yd0Ozl/kqMa9Put7Ncn9Tpdi19uuotEtuN4qfaao1EjN/q2s90YwMNAC7VRx0c/3bx/i5f6KR17t23Si35GLrdOFLUK0ILCUnhLYIsK4Xa124gV9yo6UnkJpmsJ+ZXnRX2yV0gio7vQVEh5MjqGOPyBV3iWcZMBUKjjxKLx54NivmRjJGOjkY17HDBa4ZBC+lr6692ahqRTVt2oaacgHq5Z2tdx5cCUbS3PMITm8QWX6HNal2X6OvYL321tFOf72kPVn/AE/CfkuDrdgbvaCaLUbRCTwEtNlwHmHYP0U2S1NPDTGplnijga3eMjngNA788sLV0uq9M1VSKanv1tkmccBjaluSe4cVjVLahJ95L8E7Y65q9CDVCcnFenEl9U8HLaB2UWPS9Wy4TTPudez4JJWBrIz3tbx4+JJUhIseurqKgi62urKelYfvTSBg+ZV6FOFKOIrCIu6vLm/q9ZWk5S/7ZfoyEWqp9SaeqJBHDfLbI88mtqmEn6raggjIIIPaF7TT2MadKdPlNNe4REVTwEREAREQBERAEREAREQBERAEREAREQBERAY9yrILfb6iuqn7kFPG6SR3c0DJVar1qDVe1DVItdudJHSvceqpWvLY2Rj78nf4k+QU17bXzM2XXp0Gd/q4wcf4TKwO+hKjjotx05ul7kdj2hsMQZ37pc7e+oao66bqVo0c4TN26PQp2em19T4VKcXiOfDbn9/se9NsDkdTA1OpWsnI4iOk3mg+ZcCfkFHOpbbd9A6skttPdpG1EQa4TUz3M3g4ZGf9lbhVg2/ysk2oVrWOBLI4Wux2HcB/qrN5bU6NNSgsPJKdFtcvtTvJUbqXFDhbxhea8l6lmqVxdSxOccksBJ9FVrTRP/Gqm4/+9n/ylWkov+Sh/wCm3+Sq1pr99VN/92f/AClXr7en7kb0R/13n/x+y1arx0nP2xt/4EfncrDqu/Sd/bG3/gR+dyuah/oZh9C//ax9n+CaNm37AWL8DF+UKD9t2sLhqDVMunLdJKKGll6gRR/38ucEnHPjwA8M9qm/Zv8Au/sX4CL8oVddFhrtslGK3n9qu397/HvHH/dhWbuT6uEF4kj0co01e3d1OOXT4ml65f6+529j2ESTW1kt3vTqare3PVQxB7Yz3Ek8fRcJtBsl/wBHAaZr6v2i2yyCpp3DO44jIyAfhPHiPJWvUP8AShbAdPWh7t32gVbgzv3Sz3vqGpc2lOnScocmj1oPSW9vNRhSuWpRk9sLk8ZTXsbno6fu2j/Fy/zC1e3baFV2FzNPWSXqq2WPfqJx8UTTya3uce/sGO/htOjp+7aL8XL/ADChzameu2uXIVxIj9sY1xPZGA0D/tVKtWVO1hw+OD1p9hRu+kNw6yyoOUsebzg32j9kl91TRsvV4unsUdUOsYZGmWaQHk45IxnxOfBeW0PZNPpOwy3uC9sq4YXND2OhMbxvOAGMEg8T4KyEbWMY1kbQ1jRhoA4ALgekDKyPZjXNe4AySwtb4nfB/kCvdWypQpN45pbmPYdKtRutRp0+JKEpJcKSxhv2zt6mj6NNyuFfZLrHW1tRUtgmjbEJZC7cBacgZ5DgtT0kNKwxsbq5lVJ10skdM+EtG7jdOCDz7FmdFv8A9Ivf/Xi/K5bfpKfu9i/Hx/levPCp2Xe8i66srfpS1S5JySfs0skS6Ot2rdeUcGmqWtcLZb8vc6Vx6uPePAHHM8Dgea6qu2D3aKJr6K+UlQ/I3mvidH8jk5+i6LowNaNKXN4aN41uCe8BjcfzKlxLezp1KSlPm2Nb6TXljf1KFriMIvbC5t8237sj/anq1ugtKUlHbsPr5WCCl6z3txrQAXnvxw9Sol0fobVG0aSS9XC5ujpi8t9qqSXuee0Mb3D0C2XSbdIdZUDHE9WKEFvq92VMuzFkEez6xNpw0R+xRnh3kZP1yjj2i4cJfDHwKxuHoujUrm3S62q+cms43/76kS6j2Hy22z1VwpNQtnNNC6V0clNubwaMnBDj3dy8ejZcrjJqye3SV1Q+jbRveIHSEsDg5vEDkOZU162e2PR15e84aKGbJ/gKgno0/t5UfgX/AJmLzOjCjcQUOWS7aalc6not3K6fE47PC/hFjkRFKnOwiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIDB1DbIbzY621TnEdVC6InGcZHA+h4qr1rrdQbMNavMlOBNFmOSN4O5PGTzB7jgEHw9Fa9a6+WKz3yEQ3e201Yxvw9awEt8jzHosW5tnValF4aNi0PXI6fGdCvDjpT3X6IprNvNCbe72Ow1PtpbwEsrerafMcSPQKI9W0l8FTDfL5DIyW7b1SwubjeG9jl2eA7sKzds2e6LttSKmk0/SiUHIdIXSYPgHEgLcXuy2m90zaa7W+nrImnLWyszunw7vRY9S0rVo/+SXPwJey6SabptXNlQai/ibfPHglzfj6ms2e6ooNV2BldQMmYIiIZGyNAIeGgnHHiOKr3tKttx0ftMnr2MLQ6r9tpJCPdeC7ex6HgQrMWKy2qx0jqS0UMVHA52+WRjgXd/0X7erPa7zS+y3WggrIc5DZWA4PeO4+Sv1reVamk33kRel63R029qVKcG6U+WHvgjOk26aedbmyVVtuDKvd96JgaW73g4nl6KI9ot2vGprizU9wo3U1JVl0NGPuhrMZAPb8XPtOVYil2Z6FppxPFp2nLwc/pJHvb/pc4j6Lc3rTtjvNsZbLlbYJ6SPHVx43QzHD3S3Bb6KzUtq9aOJyX/eZJWWvaTptwqtpQlz3bfNLyis+eN36HNbFtS2y96QpLfRyP9qttNFFUscwjdOCAQeRB3TyURbadMXDTGs5L9RNkbR1c/tEM7B+qlzktJ7DniPDyKn3S+lNP6YbMLHbm0fX460iR7y7GccXE95W1rKamrKZ9NVwRTwyDD45GhzXDxBV2ds6tFQm+a8iPtddpWGpVLi2i3TnvGWM4fN7ZW+3pyIYsm3enbbmMvNmnfWNbgvp3t3JD34ON36rh9eXnUGv46rUjqB1PaLW0RsaMlrN9wHPtceGfIKd3bNdDOqfaDp2l385wHPDf9OcfRdFFbLdFbTbY6GmZRFpYYGxgRkHmN3krbtq9SPDUnyM6nr2k2NZV7K3annnl8kvHHN7rl6fYifo36moX2g6VLJhWxvkqA7dG4WZb2555K1PSN0jVturdV0UDpKeVjWVe4MmNzRgOPgRgZ8PFS/ZdJ6cstc6utVnpaSoc0tMkbcHB5jw5LcyMZIx0cjWvY4Yc1wyCO5XOyuVDqpvYwnr8LfVXf2sXiW6fjnfb7EC6J22G22eG3362zVboGBjKiB43nNAwN4Ht8crUa31VfNpz5Ka1219Pa7dE+qkaTvH3Wn3nHv5gAd59JnrNnGiKuo6+bTtLvk5PVl0Y+TSAt9abTbLTR+yW2gp6SDtZEwNB8+/1Vvs1eUeCc+RmPXdJt6varS2aq+r5LzaWX+EQR0ddVUFpr6ixVcc3X3KeMU7mNBbvAEEO48OYXbdJT93sX4+P8r119LozStLdGXOmsVFDVsdvskYzG67vAHALY3u0Wy90Yo7rRRVdOHh4jkGRvDOD9SvcLeaoOk37GJda1a1NWp6hTg0k05J43Xl8iM+jB+yVy/Hf/hqlpa+xWS02KnfT2igho4pH77mRjALsYz9FsFkUKbp01F+BD6vexvr2pcQWFJ55kXdIPSFTfbLT3e2wOmq7fvB8bBlz4jzwO0gjOPEqPtmG1ao0pbhZ7lRPraFjiYix2JIsnJHHgRns4KyS5u86D0hd6h1RX2GlkmccuezMZce8lpGVj1rabqdZSeGTWm69bRsuw39Nzpp5TW6/H59CJNYbR7nr9selNMWueBlY4Nlc9wL3tzyOODW9pOeX15fZXqGk0PrapnvEU5jbFJTP6puXNdvDsJH+FWSsGnLFYWFtntdNR7ww5zG+84eLjxPzWLdNF6Uuda6trrDRTVDjl0hZguPecc/VW5WlWUlUcu8voZtHpHp1KlOzjQaoyXg+835vJv0RFImjhERAEREAREQBERAEREAREQBERAEREBiW25W+5Gp9grIKr2SodTVHVPDuqlbjeY7HJwyMjxS7XO32mkFXc6yGkgMjIhJK7dG+9wa0eZJARFXHMpnkZaxLfc7fcJqyGhrIaiSinNPUtY7JikwHbru44cD6oioVMtERAEREBi3e40Nots9yudVFSUdOzfmmldhrG95K8bzerXZ6SCquFW2KKomZBButc90sjzhrWtaCXE+A5AnkERVSKNmwREVCoREQGt1Df7Jp2hFdfbtRW2mLtxslTM2MOd3DPM+AWRablb7tb4rha66mrqOYZjnp5RIx/HBw4cDx4IirjlkpnngykRFQqEREB8VE0NPC6aeVkUTBlz3uDWtHeSeS+amogpqSWrqJmRU8UZkkkc7DWtAyXE9wHFEQGksGttH6grPYrJqe0XCqwXCGnq2PkIHMhoOSF0CIqtYKJ5QREVCoREQGBZbxbb1FPNbKkVMVPUPp3yNY4N6xhw4NJGHYPDIyMgjPBZ6IqsogiIqFQiIgCIiAIiID//Z';ico.style.cssText='width:120px;margin:0 auto 16px;display:block;';
-  var ttl=document.createElement('div');ttl.style.cssText='font-size:18px;font-weight:700;color:#111318;margin-bottom:6px;';ttl.textContent='Conectar a Audara';
-  var sub=document.createElement('div');sub.style.cssText='font-size:13px;color:#6b7280;line-height:1.5;margin-bottom:20px;';sub.textContent='Ingresa tu extensión para conectarte al sistema de llamadas';
-  var lbl=document.createElement('div');lbl.style.cssText='font-size:11px;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;text-align:left;';lbl.textContent='Extensión';
-  var inp=document.createElement('input');
-  inp.type='tel';inp.placeholder='Ej: 1023';inp.maxLength=6;
-  inp.style.cssText='width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:22px;text-align:center;letter-spacing:.15em;color:#111318;outline:none;box-sizing:border-box;';
-  inp.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'');});
-  inp.addEventListener('focus',function(){this.style.borderColor='#E8440A';});
-  inp.addEventListener('blur',function(){this.style.borderColor='#e5e7eb';});
-  var err=document.createElement('div');err.style.cssText='font-size:11px;color:#C0566A;margin:5px 0 0;min-height:16px;text-align:left;';
-  var btnOk=document.createElement('button');
-  btnOk.style.cssText='width:100%;padding:13px;border-radius:10px;border:none;background:#E8440A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px;';
-  btnOk.textContent='Conectar';
-  var btnNo=document.createElement('button');
-  btnNo.style.cssText='width:100%;padding:10px;border-radius:10px;border:1px solid #e5e7eb;background:transparent;color:#6b7280;font-size:13px;cursor:pointer;margin-top:8px;';
-  btnNo.textContent='Cancelar';
-  btnNo.onclick=function(){ov.remove();};
-  function doConn(){
-    var val=inp.value.trim();
-    if(val.length<3){err.textContent='Ingresa mínimo 3 dígitos';inp.focus();return;}
-    err.textContent='';btnOk.textContent='Conectando...';btnOk.disabled=true;btnOk.style.opacity='0.7';
-    setTimeout(function(){ov.remove();_doLogin(user,role,val);},900);
-  }
-  btnOk.onclick=doConn;
-  inp.addEventListener('keydown',function(e){if(e.key==='Enter')doConn();});
-  [ico,ttl,sub,lbl,inp,err,btnOk,btnNo].forEach(function(el){card.appendChild(el);});
-  ov.appendChild(card);document.body.appendChild(ov);
-  setTimeout(function(){inp.focus();},100);
-}
-
-function _connectAudara(userName,role){
-  var ext=document.getElementById('ext-input');
-  var err=document.getElementById('ext-error');
-  if(!ext||ext.value.length<3){if(err)err.style.display='block';return;}
-  if(err)err.style.display='none';
-  var extNum=ext.value;
-  // Find user object
-  var allUsers=[];
-  USERS.forEach(function(u){allUsers=allUsers.concat(u.users);});
-  var user=allUsers.find(function(u){return u.name===userName;})||{name:userName,email:'',color:'#ff5c00',letter:userName[0]};
-  // Store extension
-  var overlay=document.getElementById('ext-overlay');
-  if(overlay){
-    var btn=overlay.querySelector('button');
-    if(btn){btn.textContent='Conectando...';btn.disabled=true;}
-  }
-  setTimeout(function(){
-    if(overlay)overlay.remove();
-    _doLogin(user,role,extNum);
-  },900);
-}
-
-function _doLogin(user,role,extension){
-  document.getElementById('step3').style.display='none';
-  document.getElementById('loading').style.display='flex';
-  setTimeout(function(){
-    var session={user:{name:user.name,email:user.email,color:user.color,letter:user.letter,role:role,extension:extension},ts:Date.now()};
-    localStorage.setItem('helios_session',JSON.stringify(session));
-    window.location.href='app.html';
-  },1100);
-}
 
 function togglePwd(el){
   var i=document.getElementById('login-pwd');
   if(i.type==='password'){i.type='text';el.textContent='Ocultar';}
   else{i.type='password';el.textContent='Mostrar';}
 }
-function doLogin(){
-  var email=document.getElementById('login-email').value||'';
-  var role='agente';
-  if(email.includes('admin'))role='admin';
-  else if(email.includes('supervisor'))role='supervisor';
-  else if(email.includes('formador'))role='formador';
-  else if(email.includes('demo'))role='demo';
-  var user={name:email.split('@')[0]||'Usuario',email:email,role:role};
-  if(role==='agente'||role==='demo'){showExtensionPopup(user,role);}
-  else{_doLogin(user,role,null);}
-}
-function doLoginGoogle(){
-  // SSO demo — treat as agente
-  var user={name:'Demo Google',email:'demo@connect.inc',role:'demo'};
-  _doLogin(user,'demo',null);
+
+/* ── STEP 1: Email or Google login ── */
+function doEmailLogin(){
+  var email = (document.getElementById('login-email').value||'').trim();
+  if(!email){document.getElementById('login-email').focus();return;}
+  // Simulate SSO — find matching user
+  var found = null, foundRole = null;
+  Object.keys(USERS).forEach(function(role){
+    USERS[role].forEach(function(u){
+      if(u.email.toLowerCase()===email.toLowerCase()){found=u;foundRole=role;}
+    });
+  });
+  if(!found){
+    // create a guest user
+    var name = email.split('@')[0];
+    found = {name:name,email:email,color:'#8892b0',letter:name[0].toUpperCase()};
+  }
+  _pendingUser = found;
+  showRoleSelector(found);
 }
 
+function doGoogleSSO(){
+  // Demo SSO — show role selector immediately
+  var demoUser = {name:'Usuario Demo',email:'demo@connect.inc',color:'#8892b0',letter:'D'};
+  _pendingUser = demoUser;
+  showRoleSelector(demoUser);
+}
+
+/* ── STEP 2: Role selector popup ── */
+function showRoleSelector(user){
+  var ov = document.createElement('div');
+  ov.className = 'ov';
+  ov.id = 'role-ov';
+
+  var roles = [
+    {key:'agente',    icon:'🎯', av:'bl', sub:'Atención'},
+    {key:'formador',  icon:'📋', av:'pu', sub:'Coaching'},
+    {key:'supervisor',icon:'📊', av:'am', sub:'Equipo'},
+    {key:'admin',     icon:'⚙️', av:'re', sub:'Total'},
+    {key:'demo',      icon:'🎬', av:'gr', sub:'Preview'}
+  ];
+
+  var cards = roles.map(function(r){
+    return '<div class="rc" id="rc-'+r.key+'" onclick="selectRole(\''+r.key+'\')" role="button">'+
+      '<div class="rc-av '+r.av+'">'+r.icon+'</div>'+
+      '<div class="rc-name">'+ROLE_LABELS[r.key]+'</div>'+
+      '<div class="rc-sub">'+r.sub+'</div>'+
+    '</div>';
+  }).join('');
+
+  ov.innerHTML =
+    '<div class="ov-card role-card">'+
+      '<div class="role-hdr">'+
+        '<h2>Bienvenido, '+user.name.split(' ')[0]+'</h2>'+
+        '<p>Selecciona tu rol para continuar</p>'+
+      '</div>'+
+      '<div class="role-grid">'+cards+'</div>'+
+      '<div class="role-footer">'+
+        '<button class="btn-outline" onclick="closeRoleSelector()">Cancelar</button>'+
+        '<button class="btn-cta" id="role-next-btn" disabled onclick="confirmRole()">Continuar →</button>'+
+      '</div>'+
+    '</div>';
+
+  document.body.appendChild(ov);
+  window._selectedRole = null;
+}
+
+function selectRole(role){
+  window._selectedRole = role;
+  document.querySelectorAll('.rc').forEach(function(c){c.classList.remove('sel');});
+  var el = document.getElementById('rc-'+role);
+  if(el) el.classList.add('sel');
+  var btn = document.getElementById('role-next-btn');
+  if(btn) btn.disabled = false;
+}
+
+function closeRoleSelector(){
+  var ov = document.getElementById('role-ov');
+  if(ov) ov.remove();
+}
+
+function confirmRole(){
+  var role = window._selectedRole;
+  if(!role) return;
+  closeRoleSelector();
+  if(role === 'agente'){
+    showUserSelector(role);
+  } else if(role === 'demo'){
+    var demoUser = {name:'Usuario Demo',email:'demo@connect.inc',color:'#8892b0',letter:'D'};
+    saveAndRedirect(demoUser, role, null);
+  } else {
+    showUserSelector(role);
+  }
+}
+
+/* ── STEP 3: User selector (who exactly) ── */
+function showUserSelector(role){
+  var ov = document.createElement('div');
+  ov.className = 'ov';
+  ov.id = 'user-ov';
+
+  var users = USERS[role] || [];
+  var items = users.map(function(u){
+    return '<div class="user-item" onclick="selectUser(\''+role+'\',\''+u.name+'\')">'+
+      '<div class="user-av" style="background:'+u.color+'">'+u.letter+'</div>'+
+      '<div>'+
+        '<div class="user-name">'+u.name+'</div>'+
+        '<div class="user-email">'+u.email+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  ov.innerHTML =
+    '<div class="ov-card user-card">'+
+      '<div class="user-hdr">'+
+        '<button class="back-btn" onclick="backToRoles()">← Volver</button>'+
+        '<h2>Selecciona tu perfil</h2>'+
+        '<span class="role-badge">'+ROLE_LABELS[role]+'</span>'+
+      '</div>'+
+      '<div class="user-list">'+items+'</div>'+
+    '</div>';
+
+  document.body.appendChild(ov);
+}
+
+function backToRoles(){
+  var ov = document.getElementById('user-ov');
+  if(ov) ov.remove();
+  showRoleSelector(_pendingUser || {name:'Usuario',email:'',color:'#8892b0',letter:'U'});
+}
+
+function selectUser(role, userName){
+  var users = USERS[role] || [];
+  var user = null;
+  users.forEach(function(u){if(u.name===userName)user=u;});
+  if(!user) return;
+  var ov = document.getElementById('user-ov');
+  if(ov) ov.remove();
+  if(role === 'agente'){
+    showExtensionPopup(user, role);
+  } else {
+    saveAndRedirect(user, role, null);
+  }
+}
+
+/* ── STEP 4: Extension popup (only for agents) ── */
+function showExtensionPopup(user, role){
+  var ov = document.createElement('div');
+  ov.className = 'ov';
+  ov.id = 'ext-ov';
+
+  ov.innerHTML =
+    '<div class="ov-card ext-card">'+
+      '<div class="ext-logo">🎧</div>'+
+      '<div class="ext-title">Conectar a Audara</div>'+
+      '<div class="ext-sub">Ingresa tu extensión para conectarte al sistema de llamadas</div>'+
+      '<input class="ext-input" type="tel" id="ext-inp" placeholder="1023" maxlength="6">'+
+      '<div class="ext-err" id="ext-err"></div>'+
+      '<div class="ext-btns">'+
+        '<button class="btn-cta" onclick="connectExtension()">Conectar</button>'+
+        '<button class="btn-outline" onclick="skipExtension()">Omitir por ahora</button>'+
+      '</div>'+
+    '</div>';
+
+  document.body.appendChild(ov);
+  ov._user = user;
+  ov._role = role;
+
+  var inp = document.getElementById('ext-inp');
+  if(inp){
+    inp.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'');});
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter')connectExtension();});
+    setTimeout(function(){inp.focus();},100);
+  }
+}
+
+function connectExtension(){
+  var ov = document.getElementById('ext-ov');
+  var inp = document.getElementById('ext-inp');
+  var err = document.getElementById('ext-err');
+  var val = inp ? inp.value.trim() : '';
+  if(val.length < 3){
+    if(err) err.textContent = 'Ingresa mínimo 3 dígitos';
+    if(inp) inp.focus();
+    return;
+  }
+  if(err) err.textContent = '';
+  var user = ov ? ov._user : (_pendingUser||{});
+  var role = ov ? ov._role : 'agente';
+  if(ov) ov.remove();
+  saveAndRedirect(user, role, val);
+}
+
+function skipExtension(){
+  var ov = document.getElementById('ext-ov');
+  var user = ov ? ov._user : (_pendingUser||{});
+  var role = ov ? ov._role : 'agente';
+  if(ov) ov.remove();
+  saveAndRedirect(user, role, null);
+}
+
+/* ── FINAL: Save session and redirect ── */
+function saveAndRedirect(user, role, extension){
+  document.getElementById('loading').classList.add('show');
+  setTimeout(function(){
+    var session = {
+      user:{
+        name:user.name,
+        email:user.email,
+        color:user.color||'#8892b0',
+        letter:user.letter||(user.name[0]||'U').toUpperCase(),
+        role:role,
+        extension:extension
+      },
+      ts:Date.now()
+    };
+    localStorage.setItem('helios_session', JSON.stringify(session));
+    window.location.href = 'app.html';
+  }, 900);
+}
 </script>
 </body>
 </html>
