@@ -442,9 +442,9 @@ function showExtensionPopup(user, role){
       '</div>'+
     '</div>';
 
+  window._extUser = user;
+  window._extRole = role;
   document.body.appendChild(ov);
-  ov._user = user;
-  ov._role = role;
 
   var inp = document.getElementById('ext-inp');
   if(inp){
@@ -465,16 +465,16 @@ function connectExtension(){
     return;
   }
   if(err) err.textContent = '';
-  var user = ov ? ov._user : (_pendingUser||{});
-  var role = ov ? ov._role : 'agente';
+  var user = window._extUser || _pendingUser || {};
+  var role = window._extRole || 'agente';
   if(ov) ov.remove();
   saveAndRedirect(user, role, val);
 }
 
 function skipExtension(){
   var ov = document.getElementById('ext-ov');
-  var user = ov ? ov._user : (_pendingUser||{});
-  var role = ov ? ov._role : 'agente';
+  var user = window._extUser || _pendingUser || {};
+  var role = window._extRole || 'agente';
   if(ov) ov.remove();
   saveAndRedirect(user, role, null);
 }
