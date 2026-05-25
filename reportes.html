@@ -439,38 +439,96 @@ function vResumen(){
   var data=ag(),n=data.length||1;
   var t={calls:0,pos:0,sat:0,sp:0,sc:0,aht:0};
   data.forEach(function(a){t.calls+=a.calls;t.pos+=a.pos;t.sat+=a.sat;t.sp+=a.speech;t.sc+=a.score;t.aht+=a.aht;});
-  var kpis=[['Llamadas',t.calls,'▲12%'],['POs',t.pos,'▲8%'],['Satisfacción',Math.round(t.sat/n)+'%','▲2%'],['Speech',Math.round(t.sp/n)+'%','▲5%'],['AHT',fs(Math.round(t.aht/n)),'▼3%']];
-  var h='<div class="pt">Resumen del equipo</div><div class="ps">'+data.length+' agentes'+(_filters.carril||_filters.pais||_filters.grade?' · filtrado':'')+'</div>';
-  h+='<div class="kgrid">'+kpis.map(function(k){return'<div class="kcard"><div class="kval">'+k[1]+'</div><div class="klbl">'+k[0]+'</div><div class="kdelta">'+k[2]+'</div></div>';}).join('')+'</div>';
-  // Grade dist
+
+  // ── Page header ──
+  var h='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px;">'+
+    '<div style="font-size:18px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">Resumen del equipo</div>'+
+    '<div style="font-size:12px;color:var(--t2);">'+data.length+' agentes'+(_filters.carril||_filters.pais||_filters.grade?' · filtrado':'')+'</div>'+
+  '</div>';
+
+  // ── KPI strip — tint cards ──
+  var kpiDefs=[
+    {ico:'📞',lbl:'Llamadas',val:t.calls,     delta:'▲ 12%',cls:'bl',col:'var(--blue)'},
+    {ico:'📋',lbl:'POs',     val:t.pos,       delta:'▲ 8%', cls:'gr',col:'var(--g)'},
+    {ico:'⭐',lbl:'Satisf.', val:Math.round(t.sat/n)+'%',delta:'▲ 2%',cls:'am',col:'var(--y)'},
+    {ico:'🎙',lbl:'Speech',  val:Math.round(t.sp/n)+'%', delta:'▲ 5%',cls:'pu',col:'var(--v)'},
+    {ico:'⏱',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),delta:'▼ 3%',cls:'bl',col:'var(--blue)'}
+  ];
+  h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';
+  kpiDefs.forEach(function(k){
+    h+='<div class="kc '+k.cls+'" style="padding:14px 16px;">'+
+      '<div style="font-size:14px;margin-bottom:6px;">'+k.ico+'</div>'+
+      '<div style="font-size:24px;font-weight:800;letter-spacing:-.5px;color:'+k.col+';font-family:var(--m);line-height:1;">'+k.val+'</div>'+
+      '<div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;">'+k.lbl+'</div>'+
+      '<div style="font-size:10px;font-weight:600;color:var(--g);margin-top:3px;">'+k.delta+'</div>'+
+    '</div>';
+  });
+  h+='</div>';
+
+  // ── Grade dist + Sentimiento ──
   var gr={A:0,B:0,C:0};data.forEach(function(a){gr[a.grade]++;});
   var sentT={p:0,n:0,g:0};data.forEach(function(a){sentT.p+=a.sent.p;sentT.n+=a.sent.n;sentT.g+=a.sent.g;});
+
   h+='<div class="g2" style="margin-bottom:16px;">';
+
+  // Grade dist card
   h+='<div><div class="stitle">Distribución de rendimiento</div><div class="card">';
-  [['A','Excelente','var(--g)',gr.A],['B','Bueno','var(--y)',gr.B],['C','Requiere atención','var(--r)',gr.C]].forEach(function(g){
-    var pct=Math.round(g[3]/n*100);
-    h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid rgba(0,0,0,.04);">'+
-      '<span style="font-size:13px;font-weight:700;color:'+g[2]+';width:18px;">'+g[0]+'</span>'+
-      '<div style="flex:1;"><div style="font-size:12px;color:var(--t1);margin-bottom:3px;">'+g[1]+'</div>'+
-      '<div class="bar6"><div class="bar6f" style="width:'+pct+'%;background:'+g[2]+'"></div></div></div>'+
-      '<span style="font-size:13px;font-weight:700;color:var(--t0);">'+g[3]+'</span></div>';
+  [
+    ['A','Excelente',   'var(--g)','var(--gr2)',gr.A],
+    ['B','Bueno',       'var(--y)','var(--am2)',gr.B],
+    ['C','Requiere atención','var(--r)','var(--re2)',gr.C]
+  ].forEach(function(g){
+    var pct=Math.round(g[4]/n*100);
+    h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid rgba(0,0,0,.04);">'+
+      '<div style="width:28px;height:28px;border-radius:4px;background:'+g[3]+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:'+g[2]+';flex-shrink:0;">'+g[0]+'</div>'+
+      '<div style="flex:1;">'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">'+
+          '<span style="font-size:12px;font-weight:600;color:var(--t1);">'+g[1]+'</span>'+
+          '<span style="font-size:12px;font-weight:800;color:'+g[2]+';font-family:var(--m);">'+g[4]+'</span>'+
+        '</div>'+
+        '<div class="bar6"><div class="bar6f" style="width:'+pct+'%;background:'+g[2]+';"></div></div>'+
+      '</div>'+
+    '</div>';
   });
   h+='</div></div>';
+
+  // Sentimiento card
   h+='<div><div class="stitle">Sentimiento global</div><div class="card">';
-  [['😊','Positivo',Math.round(sentT.p/n),'var(--g)'],['😐','Neutro',Math.round(sentT.n/n),'var(--y)'],['😞','Negativo',Math.round(sentT.g/n),'var(--r)']].forEach(function(s){
-    h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid rgba(0,0,0,.04);">'+
-      '<span style="font-size:18px;">'+s[0]+'</span>'+
-      '<div style="flex:1;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;">'+
-      '<span style="font-size:12px;color:var(--t1);">'+s[1]+'</span>'+
-      '<span style="font-size:12px;font-weight:700;color:'+s[3]+';">'+s[2]+'%</span></div>'+
-      '<div class="bar6"><div class="bar6f" style="width:'+s[2]+'%;background:'+s[3]+'"></div></div></div></div>';
+  var avgP=Math.round(sentT.p/n),avgN=Math.round(sentT.n/n),avgG=Math.round(sentT.g/n);
+  // Big number
+  h+='<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">'+
+    '<div style="text-align:center;flex-shrink:0;">'+
+      '<div style="font-size:30px;font-weight:800;color:var(--g);font-family:var(--m);line-height:1;">'+avgP+'%</div>'+
+      '<div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;">Positivo</div>'+
+    '</div>'+
+    '<div style="width:0.5px;height:40px;background:rgba(0,0,0,.06);flex-shrink:0;"></div>'+
+    '<div style="flex:1;">';
+  [['😊','Positivo',avgP,'var(--g)'],['😐','Neutro',avgN,'var(--y)'],['😞','Negativo',avgG,'var(--r)']].forEach(function(s){
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
+      '<span style="font-size:14px;width:20px;text-align:center;">'+s[0]+'</span>'+
+      '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
+      '<div class="bar" style="flex:1;"><div class="barf" style="width:'+s[2]+'%;background:'+s[3]+';"></div></div>'+
+      '<span style="font-size:12px;font-weight:700;color:'+s[3]+';width:32px;text-align:right;font-family:var(--m);">'+s[2]+'%</span>'+
+    '</div>';
   });
+  h+='</div></div>';
+
+  // Score prom
+  var avgSc=Math.round(t.sc/n);
+  var scCol=avgSc>=85?'var(--g)':avgSc>=70?'var(--y)':'var(--r)';
+  h+='<div style="padding:10px 12px;background:var(--c2);border-radius:4px;display:flex;align-items:center;justify-content:space-between;">'+
+    '<div style="font-size:12px;font-weight:600;color:var(--t1);">Score QA promedio</div>'+
+    '<div style="font-size:18px;font-weight:800;color:'+scCol+';font-family:var(--m);">'+avgSc+'<span style="font-size:11px;color:var(--t2);font-weight:500;font-family:var(--f);">/100</span></div>'+
+  '</div>';
+
   h+='</div></div></div>';
+
+  // ── Tabla agentes ──
   h+='<div class="stitle">Todos los agentes</div>'+tblAgentes(data);
   return h;
 }
 
-// AGENTES TABLE
+
 function tblAgentes(data){
   data=data||ag();
   var cC={Home:'#6366f1',Road:'var(--g)',Concierge:'var(--y)'};
