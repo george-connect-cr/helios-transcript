@@ -1732,6 +1732,15 @@ body.light .dash-rec.g{border-left-color:#0ea874!important;}
 body.light .dash-rec.y{border-left-color:#f0900a!important;}
 body.light .dash-rec.r{border-left-color:#e84040!important;}
 
+
+/* t-body container fix for t-group system */
+body.light .tp-body{display:block!important;}
+body.light #t-body{display:flex!important;flex-direction:column!important;gap:0!important;}
+body.light .t-group-ag .t-bubble-ag:first-of-type{border-radius:0 6px 6px 6px!important;}
+body.light .t-group-ag .t-bubble-ag:not(:first-of-type){border-radius:6px!important;}
+body.light .t-group-cl .t-bubble-cl:first-of-type{border-radius:6px 0 6px 6px!important;}
+body.light .t-group-cl .t-bubble-cl:not(:first-of-type){border-radius:6px!important;}
+
 /* SCROLLBAR */
 body.light ::-webkit-scrollbar{width:4px;height:4px;}
 body.light ::-webkit-scrollbar-track{background:transparent;}
