@@ -1342,77 +1342,7 @@ nav{
     </div>
     <div class="tp-wrap">
       <div class="tp-body" id="t-body" onscroll="if(this.scrollHeight-this.scrollTop-this.clientHeight<80)_hideScrollArrow();">
-
-        <div class="msg-group msg-anim" data-step="1">
-          <div class="spk-row">
-            <div class="spk-av">AG</div>
-            <span class="spk-name">Jorge · Agente</span>
-            <span class="spk-time">02:14</span>
-          </div>
-          <div class="bubble ag">Buenas tardes, le habla Jorge de CONNECT Asistencia. ¿En qué le puedo ayudar?</div>
-        </div>
-
-        <div class="msg-group client msg-pre" data-step="2">
-          <div class="spk-row">
-            <span class="spk-time">02:21</span>
-            <span class="spk-name">Cliente</span>
-            <div class="spk-av">CL</div>
-          </div>
-          <div class="bubble cl">Hola, mi carro se quedó en la pista. No prende y estoy con mi hija pequeña.</div>
-        </div>
-
-        <div class="msg-group msg-pre" data-step="3">
-          <div class="spk-row">
-            <div class="spk-av">AG</div>
-            <span class="spk-name">Jorge · Agente</span>
-            <span class="spk-time">02:29</span>
-          </div>
-          <div class="bubble ag">Entiendo, lamento mucho la situación. ¿Me confirma su nombre completo y la placa del vehículo, por favor?</div>
-        </div>
-
-        <div class="msg-group client msg-pre" data-step="4">
-          <div class="spk-row">
-            <span class="spk-time">02:36</span>
-            <span class="spk-name">Cliente</span>
-            <div class="spk-av">CL</div>
-          </div>
-          <div class="bubble cl">María González Vargas, placa BTC-487. Es un Toyota Yaris 2020.</div>
-        </div>
-
-        <div class="msg-group msg-pre" data-step="5">
-          <div class="spk-row">
-            <div class="spk-av">AG</div>
-            <span class="spk-name">Jorge · Agente</span>
-            <span class="spk-time">02:42</span>
-          </div>
-          <div class="bubble ag">Perfecto María, ya tengo sus datos. Le voy a enviar un mensaje para capturar su ubicación exacta y coordinar la grúa.</div>
-        </div>
-
-        <div class="msg-group client msg-pre" data-step="6">
-          <div class="spk-row">
-            <span class="spk-time">02:47</span>
-            <span class="spk-name">Cliente</span>
-            <div class="spk-av">CL</div>
-          </div>
-          <div class="bubble cl streaming" id="streaming-msg">Estoy en la ruta 27, después del peaje de Atenas, sobre el carril derecho. Me bajé del carro porque siento que está muy caliente</div>
-        </div>
-
-        <div class="stream-row msg-pre" data-step="stream">
-          <div class="stream-dot"></div>
-          <div class="stream-dot"></div>
-          <div class="stream-dot"></div>
-          <span class="stream-lbl">KAI procesando…</span>
-        </div>
-
-        <div class="typing-row msg-pre" data-step="typing">
-          <div class="typing-bubble">
-            <div class="td"></div>
-            <div class="td"></div>
-            <div class="td"></div>
-          </div>
-          <span class="typing-lbl">Cliente escribiendo</span>
-        </div>
-
+        <!-- Transcripción se llena dinámicamente — real via WebPubSub, demo via triggerDemo() -->
       </div>
       <div id="t-inferred"></div><div id="sentiment-row"></div><div id="btn-analyze"></div>
       <button class="t-scroll-arrow" id="scroll-arrow" onclick="scrollBottom()">↓ nuevos mensajes</button>
@@ -1627,6 +1557,9 @@ async function triggerSimulatedCall() {
 
   _callInProgress = true;
   var destination = _nextUC();
+
+  // Limpiar sesión previa (demo u otra llamada) antes de iniciar
+  _clearSession();
   showToast('📞 Conectando llamada de entrenamiento...');
 
   // Deshabilitar Demo y mostrar botón Finalizar en el nav
@@ -2110,7 +2043,58 @@ window.addEventListener('DOMContentLoaded', ()=>{
   connectWebPubSub();
 });
 
+
+function _clearSession() {
+  // Limpiar transcripción
+  var tbody = document.getElementById('t-body');
+  if (tbody) tbody.innerHTML = '';
+  // Limpiar chips de inferencia
+  var tinf = document.getElementById('t-inferred');
+  if (tinf) { tinf.innerHTML = ''; tinf.style.display = 'none'; }
+  // Limpiar campos del PO visual
+  document.querySelectorAll('.fld[data-key]').forEach(function(fld) {
+    var inp = fld.querySelector('.fld-in');
+    if (inp) { inp.value = ''; inp.classList.add('empty'); inp.style.background = ''; }
+    fld.classList.remove('filled');
+  });
+  // Reset contadores de sección
+  document.querySelectorAll('[id^="r-"]').forEach(function(el) {
+    var sec = el.closest('.ps');
+    if (sec) {
+      var total = sec.querySelectorAll('.fld[data-key]').length;
+      el.textContent = '0 / ' + total;
+    }
+  });
+  // Reset barra de progreso
+  var bar = document.getElementById('po-progress-fill');
+  var pctEl = document.getElementById('po-progress-pct');
+  var statsEl = document.getElementById('po-progress-stats');
+  if (bar) bar.style.width = '0%';
+  if (pctEl) pctEl.textContent = '0%';
+  if (statsEl) statsEl.textContent = '0 / 16';
+  // Limpiar análisis previo
+  lastAnalysis = null;
+  _lastTranscriptText = '';
+  // Reset sentimiento
+  var emoji = document.getElementById('sent-emoji');
+  var label = document.getElementById('sentiment-label');
+  var fill = document.getElementById('sentiment-fill');
+  if (emoji) emoji.textContent = '😐';
+  if (label) { label.textContent = 'Neutro'; label.style.color = 'var(--y)'; }
+  if (fill) { fill.style.width = '50%'; fill.style.background = ''; }
+  // Limpiar KAI guidance
+  var kaiTxt = document.getElementById('kai-guidance-txt');
+  if (kaiTxt) kaiTxt.textContent = '—';
+  // Reset timer
+  if (typeof CallTimer !== 'undefined') CallTimer.reset ? CallTimer.reset() : null;
+  // Limpiar recs
+  if (typeof Recs !== 'undefined') Recs.reset();
+  if (typeof POBuilder !== 'undefined' && POBuilder.reset) POBuilder.reset();
+}
+
 function triggerDemo(){
+  // Limpiar transcripción, PO y estado previo antes de iniciar demo
+  _clearSession();
   AgentBar.setDemo();
   var dd={nombre_cliente:'Carlos Rodríguez',placa:'CRC-1234',marca:'Toyota',
     modelo:'Corolla',año:'2019',color:'Blanco',
