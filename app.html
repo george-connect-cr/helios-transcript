@@ -1481,15 +1481,15 @@ body.dark .n-th-thumb {
   border-bottom:1px solid var(--gb2);
 }
 .pm-email {
-  font-size:12px;color:var(--t1);font-family:var(--f);
-  margin-bottom:2px;
+  font-size:13px;font-weight:500;color:var(--t0);
+  font-family:var(--f);margin-bottom:1px;
 }
 .pm-role {
-  display:inline-flex;align-items:center;
-  padding:2px 8px;border-radius:20px;
-  background:rgba(224,69,0,.1);color:var(--a);
-  font-size:10px;font-weight:700;font-family:var(--f);
+  font-size:11px;font-weight:500;
+  color:var(--t2);font-family:var(--f);
   text-transform:capitalize;
+  margin-top:2px;
+  display:block;
 }
 
 .pm-section { padding:6px 0; border-bottom:1px solid var(--gb2); }
@@ -1502,11 +1502,13 @@ body.dark .n-th-thumb {
 }
 .pm-item:hover { background:var(--c2); }
 .pm-item-ico {
-  width:18px;text-align:center;font-size:14px;flex-shrink:0;
+  width:16px;text-align:center;flex-shrink:0;
+  color:var(--t2);
 }
 .pm-item-txt {
-  flex:1;font-size:13px;color:var(--t0);font-weight:500;
+  flex:1;font-size:13px;color:var(--t0);font-weight:400;
 }
+.pm-item.danger .pm-item-txt { color:var(--r);font-weight:400; }
 .pm-item-badge {
   font-size:10px;color:var(--t2);font-family:var(--f);
 }
@@ -1591,24 +1593,24 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         </div>
         <div class="pm-section">
           <div class="pm-theme-row" onclick="setTheme(document.body.classList.contains('dark')?'light':'dark')">
-            <div class="pm-item-ico">🎨</div>
+            <div class="pm-item-ico" style="font-size:11px;color:var(--t2);">◑</div>
             <span class="pm-theme-lbl" id="pm-theme-lbl">Modo claro</span>
             <div class="pm-theme-pill"><div class="pm-theme-thumb"></div></div>
           </div>
           <div class="pm-item" onclick="closeProfileMenu();showWizard();">
-            <div class="pm-item-ico">🎓</div>
-            <span class="pm-item-txt">Ver tutorial de KAI Academy</span>
+            <div class="pm-item-ico" style="font-size:11px;color:var(--t2);">?</div>
+            <span class="pm-item-txt">Ver tutorial</span>
           </div>
         </div>
         <div class="pm-section">
           <div class="pm-item" onclick="closeProfileMenu();openDash();">
-            <div class="pm-item-ico">📊</div>
+            <div class="pm-item-ico" style="font-size:11px;color:var(--t2);">↗</div>
             <span class="pm-item-txt">Reportes & Analytics</span>
           </div>
         </div>
         <div class="pm-section">
           <div class="pm-item danger" onclick="AUTH.logout()">
-            <div class="pm-item-ico">→</div>
+            <div class="pm-item-ico" style="font-size:11px;"></div>
             <span class="pm-item-txt">Cerrar sesión</span>
           </div>
         </div>
