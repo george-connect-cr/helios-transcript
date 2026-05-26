@@ -2890,11 +2890,20 @@ function _autoFillPO(data){
   toAdd.forEach(([key,val]) => POBuilder.addField(key, val, true));
 
   // También rellenar el nuevo layout visual de Dayana
+  // Si hay ubicacion_destino, mostrar campo destino primero
+  if (toAdd.some(([k]) => k === 'ubicacion_destino')) {
+    if (typeof showDestinoField === 'function') showDestinoField(true);
+  }
   toAdd.forEach(([key,val]) => {
     if(typeof fillVisiblePOField === 'function') fillVisiblePOField(key, val);
   });
 
-  if(data.tipo_asistencia) ServiceDetector.analyze(data.tipo_asistencia);
+  if(data.tipo_asistencia) {
+    ServiceDetector.analyze(data.tipo_asistencia);
+    // Si el tipo de asistencia es grúa/remolque, mostrar campo destino
+    var isGruaService = /gr[úu]a|remolque/i.test(data.tipo_asistencia);
+    if (isGruaService && typeof showDestinoField === 'function') showDestinoField(true);
+  }
 
   // After DOM settles, unblock and open popup once with complete data (unless user closed it)
   setTimeout(()=>{
@@ -3944,6 +3953,10 @@ function fillVisiblePOField(kaiKey, value) {
   // Ubicaciones — manejo especial con mapa
   if (kaiKey === 'ubicación' || kaiKey === 'ubicacion_destino') {
     var tipo = kaiKey === 'ubicación' ? 'origen' : 'destino';
+    // Si hay destino, asegurarse que el campo esté visible
+    if (tipo === 'destino' && typeof showDestinoField === 'function') {
+      showDestinoField(true);
+    }
     if (typeof setUbicacion === 'function') setUbicacion(tipo, value);
     return;
   }
