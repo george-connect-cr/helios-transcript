@@ -1578,6 +1578,52 @@ nav{
 </div>
 
 <script>
+// ── KAI Academy — llamadas simuladas ──────────────────
+var SEND_CALL_URL = "https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/sendCall?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==";
+var UC_DESTINATIONS = ["17876065812","17876065813","17876065814","17876065815","17876065816","17876065817"];
+var SESSION_MAX_CALLS = 5;
+var _sessionCallCount = 0;
+
+async function triggerSimulatedCall() {
+  var extension = '4001';
+  try {
+    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    if (s.user && s.user.extension) extension = s.user.extension;
+  } catch(e) {}
+
+  if (_sessionCallCount >= SESSION_MAX_CALLS) {
+    showToast('Sesion completa — ' + SESSION_MAX_CALLS + ' llamadas completadas');
+    return;
+  }
+
+  var destination = UC_DESTINATIONS[Math.floor(Math.random() * UC_DESTINATIONS.length)];
+  showToast('Conectando llamada simulada...');
+
+  try {
+    var res = await fetch(SEND_CALL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: extension,
+        destination: destination,
+        accountName: 'Connect',
+        branch: 'PR',
+        poNumber: '4117472'
+      })
+    });
+    if (res.ok) {
+      _sessionCallCount++;
+      showToast('Llamada entrante — sesion ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
+    } else {
+      showToast('Error al conectar la llamada (' + res.status + ')');
+    }
+  } catch(err) {
+    showToast('Error de red al disparar llamada');
+    console.error('triggerSimulatedCall:', err);
+  }
+}
+// ───────────────────────────────────────────────────────
+
 const CONFIG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
@@ -3372,6 +3418,11 @@ function setStatus(id,color,label,icon){
   if(lbl)lbl.textContent=label;
   document.getElementById("status-menu").style.display="none";
   if(typeof showToast==="function")showToast(icon+" "+label);
+
+  // KAI Academy: disparar llamada simulada al ponerse Disponible
+  if(id==='disponible' && typeof triggerSimulatedCall==='function'){
+    setTimeout(triggerSimulatedCall, 800);
+  }
 }
 
 var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
