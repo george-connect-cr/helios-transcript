@@ -1612,11 +1612,7 @@ function _nextUC() {
 }
 
 async function triggerSimulatedCall() {
-  var extension = '4001';
-  try {
-    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
-    if (s.user && s.user.extension) extension = s.user.extension;
-  } catch(e) {}
+  var extension = '7874120'; // extensión fija del agente KAI Academy
 
   if (_sessionCallCount >= SESSION_MAX_CALLS) {
     showToast('Sesión completa — ' + SESSION_MAX_CALLS + ' llamadas de entrenamiento realizadas');
