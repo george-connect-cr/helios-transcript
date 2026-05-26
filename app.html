@@ -4306,8 +4306,6 @@ function _updatePOProgress() {
 
 // ── KAI Academy Wizard ──────────────────────────────
 function showWizard() {
-  var noShow = localStorage.getItem('kai_wizard_no_show') === '1';
-  if (noShow) return;
   var ov = document.getElementById('kai-wizard-ov');
   if (ov) ov.style.display = 'flex';
 }
