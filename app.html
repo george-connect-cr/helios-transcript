@@ -109,47 +109,47 @@ nav{
 .po-counter-lbl{font-size:9px;opacity:.6;font-weight:500;}
 
 /* Theme toggle group */
-/* Theme toggle pill */
+/* Theme toggle */
 .n-th {
   position:relative;
-  width:52px;height:26px;
-  background:var(--c3);
-  border-radius:13px;
+  display:flex;align-items:center;gap:6px;
+  padding:5px 10px;
+  background:var(--c2);
+  border-radius:8px;
   border:1px solid var(--gb2);
   cursor:pointer;
   flex-shrink:0;
+  transition:background .2s, border-color .2s;
+  user-select:none;
+}
+.n-th:hover { background:var(--c3); }
+.n-th-lbl {
+  font-family:var(--f);font-size:11px;font-weight:600;
+  color:var(--t1);white-space:nowrap;
+  transition:color .2s;
+  min-width:32px;
+}
+.n-th-pill {
+  position:relative;
+  width:34px;height:18px;
+  background:var(--c3);
+  border-radius:9px;
+  border:1px solid var(--gb2);
+  flex-shrink:0;
   transition:background .25s;
 }
-.n-th-track {
-  position:absolute;inset:0;
-  display:flex;align-items:center;
-  justify-content:space-between;
-  padding:0 6px;pointer-events:none;
-}
-.n-th-ico {
-  font-size:11px;line-height:1;
-  transition:opacity .2s;
-}
-.n-th-ico.sun { opacity:.5; }
-.n-th-ico.moon { opacity:.3; }
-body.dark .n-th-ico.sun  { opacity:.3; }
-body.dark .n-th-ico.moon { opacity:.8; }
+body.dark .n-th-pill { background:#3b6ef8; border-color:#3b6ef8; }
 .n-th-thumb {
   position:absolute;
-  top:3px;left:3px;
-  width:18px;height:18px;
+  top:2px;left:2px;
+  width:12px;height:12px;
   border-radius:50%;
-  background:#fff;
-  box-shadow:0 1px 4px rgba(0,0,0,.2);
+  background:var(--t2);
   transition:transform .25s cubic-bezier(.4,0,.2,1), background .25s;
 }
 body.dark .n-th-thumb {
-  transform:translateX(26px);
-  background:var(--t0);
-}
-body.dark .n-th {
-  background:var(--c2);
-  border-color:var(--gb);
+  transform:translateX(16px);
+  background:#fff;
 }
 
 /* Dashboard button */
@@ -1426,12 +1426,9 @@ body.dark .n-th {
     <div class="po-counter show" id="po-counter" onclick="openDrawer()" title="Historial de POs">
       <span id="po-count-num">0</span><span class="po-counter-lbl"> POs</span>
     </div>
-    <div class="n-th" onclick="setTheme(document.body.classList.contains('dark')?'light':'dark')" title="Cambiar tema">
-      <div class="n-th-track">
-        <span class="n-th-ico sun">☀︎</span>
-        <span class="n-th-ico moon">☽</span>
-      </div>
-      <div class="n-th-thumb"></div>
+    <div class="n-th" id="theme-toggle" onclick="setTheme(document.body.classList.contains('dark')?'light':'dark')">
+      <span class="n-th-lbl" id="theme-lbl">☀︎ Claro</span>
+      <div class="n-th-pill"><div class="n-th-thumb"></div></div>
     </div>
     <button class="n-dash" onclick="openDash()" title="Reportes & Analytics">📊</button>
     <div class="q-wrap">
@@ -2839,6 +2836,8 @@ function setTheme(t){
   isDark = (t === 'dark');
   document.body.classList.toggle('light', !isDark);
   document.body.classList.toggle('dark', isDark);
+  var lbl = document.getElementById('theme-lbl');
+  if (lbl) lbl.textContent = isDark ? '☽ Oscuro' : '☀︎ Claro';
   try{localStorage.setItem('helios_theme',t);}catch(e){}
 }
 
