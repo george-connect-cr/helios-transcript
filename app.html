@@ -2578,44 +2578,67 @@ function quickExtractFromTranscript(text) {
   }
 
   // ── Teléfono (corregible) ──
-  // Detecta números de 8 dígitos costarricenses: 8xxx, 7xxx, 6xxx
-  // También formato dictado: "ocho ocho uno dos..." → solo si hay patron numérico
-  var telMatch = text.match(/(?:mi(?:\s+número)?(?:\s+de)?(?:\s+teléfono)?(?:\s+es)?(?:\s+el)?|número(?:\s+es)?|tel(?:éfono)?(?:\s+es)?|al|llamen(?:\s+al)?)\s*([267]\d{3}[-\s]?\d{4})/i);
-  if (!telMatch) {
-    // Detectar número suelto de 8 dígitos que empiece con 6, 7 u 8
-    telMatch = text.match(/\b([267]\d{3}[-\s]?\d{4})\b/);
+  // Detecta números costarricenses de 8 dígitos (6xxx, 7xxx, 8xxx)
+  // Primero busca con contexto verbal, luego número suelto
+  // Patrón A: con contexto verbal (número, teléfono, llámeme, al...)
+  var _telRaw = null;
+  var telCtxMatch = text.match(/(?:número|teléfono|tel|celular|llám[ae](?:n)?(?:me)?|contáct[ae](?:n)?(?:me)?|al)\s+(?:es\s+)?(?:el\s+)?([6-8]\d{3}[\s-]?\d{4})/i);
+  if (telCtxMatch) {
+    _telRaw = telCtxMatch[1];
+  } else {
+    // Patrón B: número con separador (guión o espacio) — más seguro que sin separador
+    var telSuelto = text.match(/\b([6-8]\d{3}[\s-]\d{4})\b/);
+    if (telSuelto) _telRaw = telSuelto[1];
   }
-  if (telMatch) {
-    var newTel = telMatch[1].replace(/[-\s]/g, '');
-    if (_quickExtracted.telefono !== newTel) {
+  if (_telRaw) {
+    var newTel = _telRaw.replace(/[-\s]/g, '');
+    if (newTel.length === 8 && _quickExtracted.telefono !== newTel) {
       _quickExtracted.telefono = newTel;
-      _setFldValue('telefono', newTel);
+      var telFormatted = newTel.slice(0,4) + '-' + newTel.slice(4);
+      _setFldValue('telefono', telFormatted);
       _updatePOProgress();
       changed = true;
     }
   }
 
   // ── Nombre del contacto (corregible) ──
-  // "el contacto es X", "el que recibe es X", "que llamen a X"
-  var contactoMatch = text.match(/(?:contacto(?:\s+es)?|que(?:\s+llamen)?(?:\s+a)?|quien(?:\s+recibe)?(?:\s+es)?|lo recibe)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})/i);
-  if (contactoMatch) {
-    var newContacto = contactoMatch[1];
-    if (_quickExtracted.contacto_nm !== newContacto) {
-      _quickExtracted.contacto_nm = newContacto;
-      _setFldValue('contacto_nm', newContacto);
-      changed = true;
+  // "el contacto es X", "lo recibe X", "que llamen a X", "el que recibe es X"
+  var contactoPatterns = [
+    /(?:el\s+contacto(?:\s+es)?|contacto(?:\s+es)?)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})/i,
+    /(?:lo\s+recibe|la\s+recibe)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})/i,
+    /(?:que\s+llamen\s+a|llamar\s+a)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})/i,
+    /(?:el\s+que\s+recibe\s+es|quien\s+recibe\s+es)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})/i,
+  ];
+  for (var cp = 0; cp < contactoPatterns.length; cp++) {
+    var cMatch = text.match(contactoPatterns[cp]);
+    if (cMatch && cMatch[1].split(' ').length >= 1) {
+      var newContacto = cMatch[1].trim();
+      if (_quickExtracted.contacto_nm !== newContacto) {
+        _quickExtracted.contacto_nm = newContacto;
+        _setFldValue('contacto_nm', newContacto);
+        changed = true;
+      }
+      break;
     }
   }
 
   // ── Teléfono de contacto (corregible) ──
-  // "el teléfono del contacto es X", "que lo llamen al X"
-  var contactoTelMatch = text.match(/(?:teléfono del contacto(?:\s+es)?|lo llamen al|número del contacto(?:\s+es)?)\s*([267]\d{3}[-\s]?\d{4})/i);
-  if (contactoTelMatch) {
-    var newCTel = contactoTelMatch[1].replace(/[-\s]/g, '');
-    if (_quickExtracted.contacto_tel !== newCTel) {
-      _quickExtracted.contacto_tel = newCTel;
-      _setFldValue('contacto_tel', newCTel);
-      changed = true;
+  var contactoTelPatterns = [
+    /(?:teléfono del contacto(?:\s+es)?|número del contacto(?:\s+es)?)\s*([6-8]\d{3}[\s-]?\d{4})/i,
+    /(?:que\s+lo\s+llamen\s+al|que\s+la\s+llamen\s+al)\s*([6-8]\d{3}[\s-]?\d{4})/i,
+    /(?:contacto.{1,20}al)\s*([6-8]\d{3}[\s-]?\d{4})/i,
+  ];
+  for (var ctp = 0; ctp < contactoTelPatterns.length; ctp++) {
+    var ctMatch = text.match(contactoTelPatterns[ctp]);
+    if (ctMatch) {
+      var newCTel = ctMatch[1].replace(/[-\s]/g, '');
+      if (newCTel.length === 8 && _quickExtracted.contacto_tel !== newCTel) {
+        _quickExtracted.contacto_tel = newCTel;
+        var ctFormatted = newCTel.slice(0,4) + '-' + newCTel.slice(4);
+        _setFldValue('contacto_tel', ctFormatted);
+        changed = true;
+      }
+      break;
     }
   }
 
