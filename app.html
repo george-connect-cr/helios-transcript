@@ -2155,8 +2155,12 @@ function initMap(mapId, lat, lng, label) {
     _maps[mapId].remove();
     delete _maps[mapId];
   }
+  // Asegurar que el wrapper sea visible antes de crear el mapa
   var wrap = document.getElementById(mapId + '-wrap');
-  if (wrap) wrap.classList.add('show');
+  if (wrap) {
+    wrap.style.display = 'block';
+    wrap.classList.add('show');
+  }
 
   var m = L.map(mapId, {
     zoomControl: false,
@@ -2190,7 +2194,9 @@ function initMap(mapId, lat, lng, label) {
     if (badge) badge.classList.add('show');
   }
 
+  // Múltiples invalidateSize para asegurar que el mapa se renderice
   setTimeout(function() { m.invalidateSize(); }, 100);
+  setTimeout(function() { m.invalidateSize(); }, 400);
 
   // Click en mapa → expandir
   var wrapEl = document.getElementById(mapId + '-wrap');
@@ -2223,6 +2229,18 @@ function setUbicacion(tipo, address) {
   // tipo: 'origen' | 'destino'
   var mapId = 'map-' + tipo;
   var dataKey = tipo === 'origen' ? 'ubicacion_origen' : 'ubicacion_destino';
+
+  // Para destino: asegurar que el campo y wrapper sean visibles primero
+  if (tipo === 'destino') {
+    showDestinoField(true);
+    // Esperar un tick para que el DOM se actualice antes de geocodificar
+    setTimeout(function() {
+      _setFldValue(dataKey, address);
+      _updatePOProgress();
+      geocodeAndShowMap(mapId, address);
+    }, 50);
+    return;
+  }
 
   // Rellenar el campo
   _setFldValue(dataKey, address);
