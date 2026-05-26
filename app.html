@@ -1344,7 +1344,7 @@ nav{
       <div class="tp-body" id="t-body" onscroll="if(this.scrollHeight-this.scrollTop-this.clientHeight<80)_hideScrollArrow();">
         <!-- Transcripción se llena dinámicamente — real via WebPubSub, demo via triggerDemo() -->
       </div>
-      <div id="t-inferred"></div><div id="sentiment-row"></div><div id="btn-analyze"></div>
+      <div id="sentiment-row"></div><div id="btn-analyze"></div>
       <button class="t-scroll-arrow" id="scroll-arrow" onclick="scrollBottom()">↓ nuevos mensajes</button>
     </div>
 
@@ -1794,28 +1794,7 @@ function _scrollToLatest(){
 }
 
 function renderTags(data){
-  const c=document.getElementById('t-inferred');
-  if(!c)return;
-  c.innerHTML='';
-  const map=[
-    {key:'nombre_cliente', icon:'👤'},
-    {key:'ubicación',      icon:'📍'},
-    {key:'tipo_asistencia',icon:'🔧'},
-    {key:'motivo_llamada', icon:'📞'},
-    {key:'placa',          icon:'🪪'},
-    {key:'marca',          icon:'🚗'},
-    {key:'color',          icon:'🎨'},
-  ];
-  const items = map.filter(f=>{const v=data[f.key];return v&&v.trim&&v.trim()&&v!=='N/A';});
-  if(!items.length){c.style.display='none';return;}
-  c.style.cssText='display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px 4px;border-top:1px solid var(--gb);';
-  items.forEach(f=>{
-    const v=data[f.key];
-    const chip=document.createElement('div');
-    chip.style.cssText='display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:var(--c2);border:1px solid var(--gb2);font-family:var(--m);font-size:11px;color:var(--t1);white-space:nowrap;';
-    chip.innerHTML='<span>'+f.icon+'</span><span>'+v+'</span>';
-    c.appendChild(chip);
-  });
+  // Los datos inferidos se muestran en el PO (col-l) via fillVisiblePOField
 }
 
 function applyNombre(name){
