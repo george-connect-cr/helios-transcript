@@ -1404,6 +1404,114 @@ body.dark .n-th-thumb {
   padding:8px 10px !important;
   border:1px solid var(--gb2) !important;
 }
+
+/* ── Menú de perfil ── */
+.n-profile-btn {
+  display:flex;align-items:center;gap:8px;
+  padding:4px 10px 4px 4px;
+  border-radius:20px;border:1px solid var(--gb2);
+  background:var(--c2);cursor:pointer;
+  transition:background .15s, border-color .15s;
+  flex-shrink:0;
+}
+.n-profile-btn:hover { background:var(--c3);border-color:var(--gb); }
+.n-profile-av {
+  width:24px;height:24px;border-radius:50%;
+  background:var(--a);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-family:var(--f);
+  flex-shrink:0;
+}
+.n-profile-name {
+  font-size:12px;font-weight:600;color:var(--t0);
+  font-family:var(--f);max-width:100px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.n-profile-chevron {
+  font-size:9px;color:var(--t2);margin-left:2px;
+  transition:transform .15s;
+}
+
+/* Dropdown */
+.profile-menu {
+  position:absolute;top:calc(100% + 8px);right:0;
+  width:260px;
+  background:var(--c1);
+  border:1px solid var(--gb2);
+  border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);
+  z-index:500;overflow:hidden;
+  display:none;
+  animation:fi .15s ease;
+}
+.profile-menu.open { display:block; }
+
+.pm-header {
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--gb2);
+}
+.pm-email {
+  font-size:12px;color:var(--t1);font-family:var(--f);
+  margin-bottom:2px;
+}
+.pm-role {
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:20px;
+  background:rgba(224,69,0,.1);color:var(--a);
+  font-size:10px;font-weight:700;font-family:var(--f);
+  text-transform:capitalize;
+}
+
+.pm-section { padding:6px 0; border-bottom:1px solid var(--gb2); }
+.pm-section:last-child { border-bottom:none; }
+
+.pm-item {
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;cursor:pointer;
+  transition:background .1s;font-family:var(--f);
+}
+.pm-item:hover { background:var(--c2); }
+.pm-item-ico {
+  width:18px;text-align:center;font-size:14px;flex-shrink:0;
+}
+.pm-item-txt {
+  flex:1;font-size:13px;color:var(--t0);font-weight:500;
+}
+.pm-item-badge {
+  font-size:10px;color:var(--t2);font-family:var(--f);
+}
+.pm-item.danger .pm-item-txt { color:var(--r); }
+.pm-item.danger:hover { background:rgba(232,64,64,.06); }
+
+/* Toggle tema inline */
+.pm-theme-row {
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;cursor:pointer;
+  transition:background .1s;
+}
+.pm-theme-row:hover { background:var(--c2); }
+.pm-theme-lbl {
+  flex:1;font-size:13px;color:var(--t0);font-weight:500;font-family:var(--f);
+}
+.pm-theme-pill {
+  position:relative;
+  width:36px;height:20px;
+  background:var(--c3);border-radius:10px;
+  border:1px solid var(--gb2);flex-shrink:0;
+  transition:background .25s;
+}
+body.dark .pm-theme-pill { background:#3b6ef8;border-color:#3b6ef8; }
+.pm-theme-thumb {
+  position:absolute;top:3px;left:3px;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--t2);
+  transition:transform .25s cubic-bezier(.4,0,.2,1), background .25s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
+
+/* Wrap para posicionamiento relativo */
+.n-profile-wrap { position:relative; }
 </style>
 </head>
 <body>
@@ -1426,10 +1534,6 @@ body.dark .n-th-thumb {
     <div class="po-counter show" id="po-counter" onclick="openDrawer()" title="Historial de POs">
       <span id="po-count-num">0</span><span class="po-counter-lbl"> POs</span>
     </div>
-    <div class="n-th" id="theme-toggle" onclick="setTheme(document.body.classList.contains('dark')?'light':'dark')">
-      <span class="n-th-lbl" id="theme-lbl">☀︎ Claro</span>
-      <div class="n-th-pill"><div class="n-th-thumb"></div></div>
-    </div>
     <button class="n-dash" onclick="openDash()" title="Reportes & Analytics">📊</button>
     <div class="q-wrap">
       <button class="qbtn" onclick="toggleQueue()" title="Cola">📋 Cola <span class="qn" id="q-cnt">4</span></button>
@@ -1443,7 +1547,43 @@ body.dark .n-th-thumb {
       </button>
       <div id="status-menu"></div>
     </div>
-    <button id="btn-logout" title="Cerrar sesión" onclick="AUTH.logout()">⏻</button>
+    <!-- Menú de perfil -->
+    <div class="n-profile-wrap" id="profile-wrap">
+      <button class="n-profile-btn" onclick="toggleProfileMenu()" id="profile-btn">
+        <div class="n-profile-av" id="profile-av">?</div>
+        <span class="n-profile-name" id="profile-name">Usuario</span>
+        <span class="n-profile-chevron">▾</span>
+      </button>
+      <div class="profile-menu" id="profile-menu">
+        <div class="pm-header">
+          <div class="pm-email" id="pm-email">—</div>
+          <span class="pm-role" id="pm-role">agente</span>
+        </div>
+        <div class="pm-section">
+          <div class="pm-theme-row" onclick="setTheme(document.body.classList.contains('dark')?'light':'dark')">
+            <div class="pm-item-ico">🎨</div>
+            <span class="pm-theme-lbl" id="pm-theme-lbl">Modo claro</span>
+            <div class="pm-theme-pill"><div class="pm-theme-thumb"></div></div>
+          </div>
+          <div class="pm-item" onclick="closeProfileMenu();showWizard();">
+            <div class="pm-item-ico">🎓</div>
+            <span class="pm-item-txt">Ver tutorial de KAI Academy</span>
+          </div>
+        </div>
+        <div class="pm-section">
+          <div class="pm-item" onclick="closeProfileMenu();openDash();">
+            <div class="pm-item-ico">📊</div>
+            <span class="pm-item-txt">Reportes & Analytics</span>
+          </div>
+        </div>
+        <div class="pm-section">
+          <div class="pm-item danger" onclick="AUTH.logout()">
+            <div class="pm-item-ico">→</div>
+            <span class="pm-item-txt">Cerrar sesión</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -2836,8 +2976,8 @@ function setTheme(t){
   isDark = (t === 'dark');
   document.body.classList.toggle('light', !isDark);
   document.body.classList.toggle('dark', isDark);
-  var lbl = document.getElementById('theme-lbl');
-  if (lbl) lbl.textContent = isDark ? '☽ Oscuro' : '☀︎ Claro';
+  var lbl = document.getElementById('pm-theme-lbl');
+  if (lbl) lbl.textContent = isDark ? 'Modo oscuro' : 'Modo claro';
   try{localStorage.setItem('helios_theme',t);}catch(e){}
 }
 
@@ -4431,6 +4571,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Mostrar wizard de bienvenida
     showWizard();
+    // Inicializar menú de perfil
+    initProfileMenu();
   }, 600);
 });
 
@@ -4563,6 +4705,49 @@ function closeWizard() {
 }
 function wizardToggle(cb) {
   localStorage.setItem('kai_wizard_no_show', cb.checked ? '1' : '0');
+}
+
+
+// ── Menú de perfil ────────────────────────────────────
+function toggleProfileMenu() {
+  var menu = document.getElementById('profile-menu');
+  if (!menu) return;
+  menu.classList.toggle('open');
+  // Cerrar al click fuera
+  if (menu.classList.contains('open')) {
+    setTimeout(function() {
+      document.addEventListener('click', _closeProfileOnOutside);
+    }, 10);
+  }
+}
+function closeProfileMenu() {
+  var menu = document.getElementById('profile-menu');
+  if (menu) menu.classList.remove('open');
+  document.removeEventListener('click', _closeProfileOnOutside);
+}
+function _closeProfileOnOutside(e) {
+  var wrap = document.getElementById('profile-wrap');
+  if (wrap && !wrap.contains(e.target)) closeProfileMenu();
+}
+function initProfileMenu() {
+  try {
+    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    var user = s.user || {};
+    var email = user.email || user.name || 'usuario@connect.inc';
+    var role = user.role || 'agente';
+    var initial = email.charAt(0).toUpperCase();
+    var shortName = email.split('@')[0];
+
+    var av = document.getElementById('profile-av');
+    var nm = document.getElementById('profile-name');
+    var em = document.getElementById('pm-email');
+    var rl = document.getElementById('pm-role');
+
+    if (av) av.textContent = initial;
+    if (nm) nm.textContent = shortName;
+    if (em) em.textContent = email;
+    if (rl) rl.textContent = role;
+  } catch(e) {}
 }
 
 // ── Aliases para compatibilidad HTML de Dayana ──
