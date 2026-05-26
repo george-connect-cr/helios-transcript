@@ -45,7 +45,7 @@ body.dark .bubble.cl{background:rgba(255,255,255,.035);}
 body.dark .bubble.cl:hover{background:rgba(255,255,255,.07);}
 body.dark .typing-bubble{background:rgba(255,255,255,.06);box-shadow:0 1px 2px rgba(0,0,0,.3);}
 body.dark .t-scroll-arrow{background:rgba(20,24,42,.92);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);}
-body.dark .n-brand svg line{stroke:rgba(255,255,255,.12);}
+
 body.dark .ps.tint-bl{background:#16203a;}
 body.dark .ps.tint-gr{background:#152b22;}
 body.dark .ps.tint-bl .fld,body.dark .ps.tint-gr .fld{background:rgba(255,255,255,.04);}
@@ -74,8 +74,8 @@ nav{
   display:flex;align-items:baseline;gap:0;
   margin-right:16px;flex-shrink:0;line-height:1;white-space:nowrap;
 }
-.n-brand svg line{stroke:rgba(0,0,0,.08);}
-.n-brand svg text:last-child{fill:var(--t2);}
+
+
 
 /* Connection status */
 .n-conn{
@@ -1199,16 +1199,10 @@ nav{
 
 <nav>
   <div class="n-brand">
-    <svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;display:block;flex-shrink:0">
-      <defs><linearGradient id="cag" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" style="stop-color:#e04500"/>
-        <stop offset="100%" style="stop-color:#ff8c44"/>
-      </linearGradient></defs>
-      <text x="1" y="30" font-family="Syne,Arial Black,sans-serif" font-size="26" font-weight="800" letter-spacing="-0.5" fill="url(#cag)">CONNECT</text>
-      <text x="155" y="18" font-family="Syne,Arial,sans-serif" font-size="9" font-weight="600" fill="#e04500" opacity="0.9">®</text>
-      <line x1="1" y1="37" x2="163" y2="37" stroke="rgba(0,0,0,.08)" stroke-width="0.8"/>
-      <text x="2" y="52" font-family="Syne,Arial,sans-serif" font-size="9.5" font-weight="600" letter-spacing="4" fill="#8892b0">ACADEMY</text>
-    </svg>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+      <img src="assets/connect-logo.png" alt="Connect" style="height:28px;width:auto;display:block;border-radius:4px;"/>
+      <span style="font-family:var(--f);font-size:9px;font-weight:700;letter-spacing:3px;color:var(--t2);text-transform:uppercase;line-height:1;">ACADEMY</span>
+    </div>
   </div>
   <div class="n-conn"><div class="cdot live" id="cdot"></div><span id="clbl">en línea</span></div>
     <div class="n-timer" id="timer-row">
