@@ -2258,12 +2258,28 @@ function onUbicacionInput(tipo, value) {
 }
 
 function showDestinoField(show) {
+  _isGrua = show;
   var fld = document.getElementById('fld-destino');
   var mapWrap = document.getElementById('map-destino-wrap');
-  if (fld) fld.style.display = show ? '' : 'none';
-  if (mapWrap && !show) { mapWrap.classList.remove('show'); mapWrap.style.display = 'none'; }
-  if (mapWrap && show) mapWrap.style.display = '';
-  _isGrua = show;
+
+  if (show) {
+    if (fld) fld.style.display = '';
+    if (mapWrap) { mapWrap.style.display = 'block'; }
+    // Actualizar contador — grúa tiene 2 campos de ubicación
+    var ratio = document.getElementById('r-ubicacion');
+    if (ratio) ratio.textContent = ratio.textContent.replace('/ 1', '/ 2');
+  } else {
+    if (fld) fld.style.display = 'none';
+    if (mapWrap) { mapWrap.classList.remove('show'); mapWrap.style.display = 'none'; }
+    // Limpiar mapa destino si existe
+    if (_maps['map-destino']) { _maps['map-destino'].remove(); delete _maps['map-destino']; }
+    // Restablecer contador
+    var ratio2 = document.getElementById('r-ubicacion');
+    if (ratio2) {
+      var filled = document.querySelectorAll('#ps-ubicacion .fld.filled').length;
+      ratio2.textContent = filled + ' / 1';
+    }
+  }
 }
 
 
@@ -2323,7 +2339,15 @@ function clearMaps() {
   });
   var badge = document.getElementById('map-destino-badge');
   if (badge) badge.classList.remove('show');
+  // Limpiar inputs de ubicación
+  ['ubicacion_origen','ubicacion_destino'].forEach(function(k) {
+    var inp = document.querySelector('.fld[data-key="' + k + '"] .fld-in');
+    if (inp) { inp.value = ''; inp.classList.add('empty'); }
+    var fld = document.querySelector('.fld[data-key="' + k + '"]');
+    if (fld) fld.classList.remove('filled');
+  });
   showDestinoField(false);
+  _updatePOProgress();
 }
 
 // ── KAI Academy — extracción rápida de datos sin esperar el LLM ──
@@ -2736,8 +2760,10 @@ const POBuilder = (() => {
     if(isNew){ const f=FIELDS[key]; if(f) FlashPill.show(f.i,f.l,String(value).substring(0,26)); }
   }
   function setService(svcId,svcName){
-    // Mostrar campo destino solo para grúa
-    if (typeof showDestinoField === 'function') showDestinoField(svcId === 'grua');
+    // Grúa → mostrar origen + destino | Otros → solo origen
+    if (typeof showDestinoField === 'function') {
+      showDestinoField(svcId === 'grua');
+    }
     if(typeof initKBChecklist !== 'undefined') initKBChecklist(svcId);
     const isNew = _currentService !== svcId;
     _currentService=svcId; _data.tipo_asistencia=svcName;
@@ -4137,8 +4163,12 @@ function _updatePOProgress() {
   // Contar campos completados por sección
   var sections = document.querySelectorAll('.ps');
   sections.forEach(function(sec) {
-    var total = sec.querySelectorAll('.fld[data-key]').length;
-    var filled = sec.querySelectorAll('.fld.filled').length;
+    // Para ubicación: contar solo campos visibles
+    var visibleFlds = Array.from(sec.querySelectorAll('.fld[data-key]')).filter(function(f) {
+      return f.style.display !== 'none';
+    });
+    var total = visibleFlds.length;
+    var filled = visibleFlds.filter(function(f) { return f.classList.contains('filled'); }).length;
     var ratio = sec.querySelector('[id^="r-"]');
     if (ratio) ratio.textContent = filled + ' / ' + total;
   });
