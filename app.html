@@ -2554,29 +2554,85 @@ function clearMaps() {
 // ── KAI Academy — extracción rápida de datos sin esperar el LLM ──
 var _quickExtracted = {};
 
+// Lógica de actualización:
+// - Datos CORREGIBLES (placa, nombre, teléfono, ubicación): siempre se actualizan
+//   si el cliente da un nuevo valor. El más reciente gana.
+// - Datos ESTABLES (marca, color, año): solo se llenan una vez para evitar
+//   falsos positivos por palabras comunes en la conversación.
+
 function quickExtractFromTranscript(text) {
   if (!text || text.length < 3) return;
   var t = text.toLowerCase();
   var changed = false;
 
-  // Nombre: "soy X", "me llamo X", "mi nombre es X"
-  var nameMatch = text.match(/(?:soy|me llamo|mi nombre es|habla)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){1,3})/i);
-  if (nameMatch && !_quickExtracted.nombre) {
-    _quickExtracted.nombre = nameMatch[1];
-    fillVisiblePOField('nombre_cliente', nameMatch[1]);
-    changed = true;
+  // ── Nombre (corregible) ──
+  // "soy X", "me llamo X", "mi nombre es X", "le habla X"
+  var nameMatch = text.match(/(?:soy|me llamo|mi nombre es|le habla|habla)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){1,3})/i);
+  if (nameMatch) {
+    var newName = nameMatch[1];
+    if (_quickExtracted.nombre !== newName) {
+      _quickExtracted.nombre = newName;
+      fillVisiblePOField('nombre_cliente', newName);
+      changed = true;
+    }
   }
 
-  // Placa: patrones ABC-123, ABC123, LMN 456
-  var placaMatch = text.match(/([A-Z]{2,3}[-\s]?\d{3,4})/i);
-  if (placaMatch && !_quickExtracted.placa) {
-    _quickExtracted.placa = placaMatch[1].replace(/\s/g,'-').toUpperCase();
-    fillVisiblePOField('placa', _quickExtracted.placa);
-    changed = true;
+  // ── Teléfono (corregible) ──
+  // Detecta números de 8 dígitos costarricenses: 8xxx, 7xxx, 6xxx
+  // También formato dictado: "ocho ocho uno dos..." → solo si hay patron numérico
+  var telMatch = text.match(/(?:mi(?:\s+número)?(?:\s+de)?(?:\s+teléfono)?(?:\s+es)?(?:\s+el)?|número(?:\s+es)?|tel(?:éfono)?(?:\s+es)?|al|llamen(?:\s+al)?)\s*([267]\d{3}[-\s]?\d{4})/i);
+  if (!telMatch) {
+    // Detectar número suelto de 8 dígitos que empiece con 6, 7 u 8
+    telMatch = text.match(/\b([267]\d{3}[-\s]?\d{4})\b/);
+  }
+  if (telMatch) {
+    var newTel = telMatch[1].replace(/[-\s]/g, '');
+    if (_quickExtracted.telefono !== newTel) {
+      _quickExtracted.telefono = newTel;
+      _setFldValue('telefono', newTel);
+      _updatePOProgress();
+      changed = true;
+    }
   }
 
-  // Marca: lista de marcas comunes
-  var marcas = ['Toyota','Hyundai','Kia','Honda','Nissan','Mitsubishi','Suzuki','Mazda','Ford','Chevrolet','Volkswagen','BMW','Mercedes','Land Rover','Jeep'];
+  // ── Nombre del contacto (corregible) ──
+  // "el contacto es X", "el que recibe es X", "que llamen a X"
+  var contactoMatch = text.match(/(?:contacto(?:\s+es)?|que(?:\s+llamen)?(?:\s+a)?|quien(?:\s+recibe)?(?:\s+es)?|lo recibe)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})/i);
+  if (contactoMatch) {
+    var newContacto = contactoMatch[1];
+    if (_quickExtracted.contacto_nm !== newContacto) {
+      _quickExtracted.contacto_nm = newContacto;
+      _setFldValue('contacto_nm', newContacto);
+      changed = true;
+    }
+  }
+
+  // ── Teléfono de contacto (corregible) ──
+  // "el teléfono del contacto es X", "que lo llamen al X"
+  var contactoTelMatch = text.match(/(?:teléfono del contacto(?:\s+es)?|lo llamen al|número del contacto(?:\s+es)?)\s*([267]\d{3}[-\s]?\d{4})/i);
+  if (contactoTelMatch) {
+    var newCTel = contactoTelMatch[1].replace(/[-\s]/g, '');
+    if (_quickExtracted.contacto_tel !== newCTel) {
+      _quickExtracted.contacto_tel = newCTel;
+      _setFldValue('contacto_tel', newCTel);
+      changed = true;
+    }
+  }
+
+  // ── Placa (corregible) ──
+  var placaMatch = text.match(/\b([A-Z]{2,3}[-\s]?\d{3,4})\b/i);
+  if (placaMatch) {
+    var newPlaca = placaMatch[1].replace(/\s/g,'-').toUpperCase();
+    if (_quickExtracted.placa !== newPlaca) {
+      _quickExtracted.placa = newPlaca;
+      fillVisiblePOField('placa', newPlaca);
+      changed = true;
+    }
+  }
+
+  // ── Marca (estable — solo primera vez) ──
+  var marcas = ['Toyota','Hyundai','Kia','Honda','Nissan','Mitsubishi','Suzuki',
+                'Mazda','Ford','Chevrolet','Volkswagen','BMW','Mercedes','Land Rover','Jeep'];
   if (!_quickExtracted.marca) {
     for (var i = 0; i < marcas.length; i++) {
       if (t.includes(marcas[i].toLowerCase())) {
@@ -2588,15 +2644,15 @@ function quickExtractFromTranscript(text) {
     }
   }
 
-  // Año: 4 dígitos entre 1990-2030
-  var yearMatch = text.match(/(19[9][0-9]|20[0-2][0-9]|2030)/);
+  // ── Año (estable — solo primera vez) ──
+  var yearMatch = text.match(/\b(19[9][0-9]|20[0-2][0-9]|2030)\b/);
   if (yearMatch && !_quickExtracted.año) {
     _quickExtracted.año = yearMatch[1];
     fillVisiblePOField('año', yearMatch[1]);
     changed = true;
   }
 
-  // Color
+  // ── Color (estable — solo primera vez) ──
   var colores = {negro:'negro',blanco:'blanco',rojo:'rojo',azul:'azul',gris:'gris',
                  plateado:'plateado',plata:'plateado',verde:'verde',amarillo:'amarillo',
                  naranja:'naranja',cafe:'café',marrón:'café'};
@@ -2611,25 +2667,26 @@ function quickExtractFromTranscript(text) {
     }
   }
 
-  // Ubicación origen: "estoy en X", "me encuentro en X"
+  // ── Ubicación origen (corregible) ──
   var ubicPatterns = [
     /(?:estoy en|me encuentro en|estoy aquí en|estoy ubicad[oa] en|mi ubicación es|estoy parad[oa] en)\s+(.{8,80}?)(?:[.,]|$)/i,
     /(?:aquí en|aquí frente a|frente a|cerca de)\s+(.{8,60}?)(?:[.,]|$)/i,
   ];
-  if (!_quickExtracted.ubicacion) {
-    for (var up = 0; up < ubicPatterns.length; up++) {
-      var ubicMatch = text.match(ubicPatterns[up]);
-      if (ubicMatch) {
-        _quickExtracted.ubicacion = ubicMatch[1].trim();
-        if (typeof setUbicacion === 'function') setUbicacion('origen', _quickExtracted.ubicacion);
+  for (var up = 0; up < ubicPatterns.length; up++) {
+    var ubicMatch = text.match(ubicPatterns[up]);
+    if (ubicMatch) {
+      var newUbic = ubicMatch[1].trim();
+      if (_quickExtracted.ubicacion !== newUbic) {
+        _quickExtracted.ubicacion = newUbic;
+        if (typeof setUbicacion === 'function') setUbicacion('origen', newUbic);
         changed = true;
-        break;
       }
+      break;
     }
   }
 
-  // Destino (taller): "llevar al taller X", "al taller X", "taller X en..."
-  if (!_quickExtracted.destino && _isGrua) {
+  // ── Destino taller (corregible) ──
+  if (_isGrua) {
     var tallerPatterns = [
       /(?:llevar(?:lo|la)?\s+(?:al?|hacia)\s+(?:el\s+)?taller\s+)([A-Za-záéíóúñÁÉÍÓÚÑ][\w\s,.]{4,60}?)(?:[.,]|$)/i,
       /(?:(?:al?)\s+taller\s+)([A-Za-záéíóúñÁÉÍÓÚÑ][\w\s,.]{4,60}?)(?:[.,]|$)/i,
@@ -2638,10 +2695,13 @@ function quickExtractFromTranscript(text) {
     for (var tp = 0; tp < tallerPatterns.length; tp++) {
       var tallerMatch = text.match(tallerPatterns[tp]);
       if (tallerMatch) {
-        _quickExtracted.destino = tallerMatch[1].trim();
-        if (typeof showDestinoField === 'function') showDestinoField(true);
-        if (typeof setUbicacion === 'function') setUbicacion('destino', _quickExtracted.destino);
-        changed = true;
+        var newDestino = tallerMatch[1].trim();
+        if (_quickExtracted.destino !== newDestino) {
+          _quickExtracted.destino = newDestino;
+          if (typeof showDestinoField === 'function') showDestinoField(true);
+          if (typeof setUbicacion === 'function') setUbicacion('destino', newDestino);
+          changed = true;
+        }
         break;
       }
     }
@@ -4328,16 +4388,21 @@ document.addEventListener('DOMContentLoaded', function() {
 // ── KAI Academy — bridge entre análisis KAI y campos visuales del PO ──
 // Mapeo: clave de análisis → data-key del layout de Dayana
 var KAI_FIELD_MAP = {
-  'nombre_cliente': 'nombre',
-  'placa':          'placa',
-  'tablilla':       'placa',
-  'marca':          'marca',
-  'modelo':         'modelo',
-  'año':            'anio',
-  'color':          'color',
-  'tipo_asistencia':'tipo_svc',
-  'ubicación':      'ubicacion_origen',
-  'ubicacion_destino': 'ubicacion_destino',
+  'nombre_cliente':  'nombre',
+  'placa':           'placa',
+  'tablilla':        'placa',
+  'marca':           'marca',
+  'modelo':          'modelo',
+  'año':             'anio',
+  'color':           'color',
+  'tipo_asistencia': 'tipo_svc',
+  'telefono':        'telefono',
+  'telefono_cliente':'telefono',
+  'contacto':        'contacto_nm',
+  'nombre_contacto': 'contacto_nm',
+  'telefono_contacto':'contacto_tel',
+  'ubicación':       'ubicacion_origen',
+  'ubicacion_destino':'ubicacion_destino',
 };
 
 
