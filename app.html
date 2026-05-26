@@ -416,10 +416,341 @@ body.light .nav{background:rgba(255,255,255,.8);}
 
 .n-demo:hover{box-shadow:0 6px 28px rgba(255,92,0,.45);transform:translateY(-1px);}
 
+/* Dashboard overlay (inline · functional in preview) */
+.dash-ov{
+  position:fixed;inset:0;background:rgba(13,16,24,.5);
+  backdrop-filter:blur(8px);z-index:300;
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.dash-ov.show{display:flex;}
+.dash-modal{
+  width:min(100%,920px);max-height:90vh;
+  background:var(--c1);border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1),0 24px 80px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:dashIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes dashIn{from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.dash-head{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 22px;flex-shrink:0;
+  box-shadow:var(--sh-sm);
+}
+.dash-head-ico{
+  width:32px;height:32px;border-radius:6px;
+  background:var(--c2);color:var(--t1);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.dash-head-title{font-family:var(--f);font-size:14px;font-weight:700;color:var(--t0);line-height:1.2;}
+.dash-head-sub{font-family:var(--m);font-size:10px;color:var(--t2);margin-top:2px;}
+.dash-head-close{
+  width:30px;height:30px;border-radius:4px;border:none;
+  background:var(--c2);color:var(--t2);cursor:pointer;
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  transition:background .12s,color .12s;
+}
+.dash-head-close:hover{background:var(--c3);color:var(--t0);}
+.dash-body{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:18px;}
+
+.dash-hero{
+  display:flex;align-items:center;gap:22px;
+  padding:18px 22px;
+  background:var(--c2);border-radius:6px;
+}
+.dash-ring-wrap{position:relative;width:104px;height:104px;flex-shrink:0;}
+.dash-ring{transform:rotate(-90deg);}
+.dash-ring-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.dash-ring-val{font-family:var(--m);font-size:26px;font-weight:700;color:var(--t0);line-height:1;}
+.dash-ring-lbl{font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+.dash-hero-info{flex:1;min-width:0;}
+.dash-agent-nm{font-size:16px;font-weight:700;color:var(--t0);margin-bottom:3px;}
+.dash-agent-shift{font-family:var(--m);font-size:10.5px;color:var(--t2);margin-bottom:10px;}
+.dash-grade{
+  display:inline-block;
+  font-family:var(--m);font-size:10px;font-weight:700;
+  padding:4px 11px;border-radius:20px;
+  background:var(--gr2);color:var(--g);
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.dash-grade-desc{font-size:12px;color:var(--t1);margin-top:8px;line-height:1.5;}
+
+.dash-section-lbl{
+  font-family:var(--m);font-size:9.5px;font-weight:700;
+  color:var(--t2);text-transform:uppercase;letter-spacing:.7px;
+  margin-bottom:8px;
+}
+.dash-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.dash-kpi{
+  padding:12px 14px;background:var(--c2);border-radius:6px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.dash-kpi-val{font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);line-height:1.1;}
+.dash-kpi-val.g{color:var(--g);}
+.dash-kpi-val.y{color:var(--y);}
+.dash-kpi-lbl{font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;}
+
+.dash-call-list{display:flex;flex-direction:column;gap:4px;}
+.dash-call{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 14px;background:var(--c2);border-radius:4px;
+  transition:background .12s;cursor:pointer;
+}
+.dash-call:hover{background:var(--c3);}
+.dash-call-no{font-family:var(--m);font-size:10px;font-weight:700;color:var(--t2);min-width:22px;}
+.dash-call-id{font-family:var(--m);font-size:10.5px;font-weight:600;color:var(--t0);flex:1;}
+.dash-call-id .nm{color:var(--t1);font-weight:500;margin-left:4px;}
+.dash-call-score{
+  font-family:var(--m);font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:20px;min-width:38px;text-align:center;
+}
+.dash-call-score.g{background:var(--gr2);color:var(--g);}
+.dash-call-score.y{background:var(--am2);color:var(--y);}
+
+.dash-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 22px;flex-shrink:0;
+  box-shadow:0 -1px 3px rgba(0,0,0,.04);
+}
+.dash-foot-note{font-family:var(--m);font-size:9.5px;color:var(--t2);}
+.dash-foot-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:4px;border:none;
+  background:var(--t0);color:#fff;
+  font-family:var(--f);font-size:12px;font-weight:600;
+  cursor:pointer;transition:background .15s;
+}
+.dash-foot-btn:hover{background:#1a1f30;}
+
 /* ═══ BODY — 3 COLUMNS ═════════════════════════════ */
 .body{flex:1;display:flex;overflow:hidden;}
 
+/* Dashboard overlay (inline · functional in preview) */
+.dash-ov{
+  position:fixed;inset:0;background:rgba(13,16,24,.5);
+  backdrop-filter:blur(8px);z-index:300;
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.dash-ov.show{display:flex;}
+.dash-modal{
+  width:min(100%,920px);max-height:90vh;
+  background:var(--c1);border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1),0 24px 80px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:dashIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes dashIn{from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.dash-head{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 22px;flex-shrink:0;
+  box-shadow:var(--sh-sm);
+}
+.dash-head-ico{
+  width:32px;height:32px;border-radius:6px;
+  background:var(--c2);color:var(--t1);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.dash-head-title{font-family:var(--f);font-size:14px;font-weight:700;color:var(--t0);line-height:1.2;}
+.dash-head-sub{font-family:var(--m);font-size:10px;color:var(--t2);margin-top:2px;}
+.dash-head-close{
+  width:30px;height:30px;border-radius:4px;border:none;
+  background:var(--c2);color:var(--t2);cursor:pointer;
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  transition:background .12s,color .12s;
+}
+.dash-head-close:hover{background:var(--c3);color:var(--t0);}
+.dash-body{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:18px;}
+
+.dash-hero{
+  display:flex;align-items:center;gap:22px;
+  padding:18px 22px;
+  background:var(--c2);border-radius:6px;
+}
+.dash-ring-wrap{position:relative;width:104px;height:104px;flex-shrink:0;}
+.dash-ring{transform:rotate(-90deg);}
+.dash-ring-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.dash-ring-val{font-family:var(--m);font-size:26px;font-weight:700;color:var(--t0);line-height:1;}
+.dash-ring-lbl{font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+.dash-hero-info{flex:1;min-width:0;}
+.dash-agent-nm{font-size:16px;font-weight:700;color:var(--t0);margin-bottom:3px;}
+.dash-agent-shift{font-family:var(--m);font-size:10.5px;color:var(--t2);margin-bottom:10px;}
+.dash-grade{
+  display:inline-block;
+  font-family:var(--m);font-size:10px;font-weight:700;
+  padding:4px 11px;border-radius:20px;
+  background:var(--gr2);color:var(--g);
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.dash-grade-desc{font-size:12px;color:var(--t1);margin-top:8px;line-height:1.5;}
+
+.dash-section-lbl{
+  font-family:var(--m);font-size:9.5px;font-weight:700;
+  color:var(--t2);text-transform:uppercase;letter-spacing:.7px;
+  margin-bottom:8px;
+}
+.dash-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.dash-kpi{
+  padding:12px 14px;background:var(--c2);border-radius:6px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.dash-kpi-val{font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);line-height:1.1;}
+.dash-kpi-val.g{color:var(--g);}
+.dash-kpi-val.y{color:var(--y);}
+.dash-kpi-lbl{font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;}
+
+.dash-call-list{display:flex;flex-direction:column;gap:4px;}
+.dash-call{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 14px;background:var(--c2);border-radius:4px;
+  transition:background .12s;cursor:pointer;
+}
+.dash-call:hover{background:var(--c3);}
+.dash-call-no{font-family:var(--m);font-size:10px;font-weight:700;color:var(--t2);min-width:22px;}
+.dash-call-id{font-family:var(--m);font-size:10.5px;font-weight:600;color:var(--t0);flex:1;}
+.dash-call-id .nm{color:var(--t1);font-weight:500;margin-left:4px;}
+.dash-call-score{
+  font-family:var(--m);font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:20px;min-width:38px;text-align:center;
+}
+.dash-call-score.g{background:var(--gr2);color:var(--g);}
+.dash-call-score.y{background:var(--am2);color:var(--y);}
+
+.dash-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 22px;flex-shrink:0;
+  box-shadow:0 -1px 3px rgba(0,0,0,.04);
+}
+.dash-foot-note{font-family:var(--m);font-size:9.5px;color:var(--t2);}
+.dash-foot-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:4px;border:none;
+  background:var(--t0);color:#fff;
+  font-family:var(--f);font-size:12px;font-weight:600;
+  cursor:pointer;transition:background .15s;
+}
+.dash-foot-btn:hover{background:#1a1f30;}
+
 /* ═══ BODY — 3 COLUMNS ═════════════════════════════ */
+.body{flex:1;display:flex;overflow:hidden;background:var(--bg);}
+
+
+/* Dashboard overlay (inline · functional in preview) */
+.dash-ov{
+  position:fixed;inset:0;background:rgba(13,16,24,.5);
+  backdrop-filter:blur(8px);z-index:300;
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.dash-ov.show{display:flex;}
+.dash-modal{
+  width:min(100%,920px);max-height:90vh;
+  background:var(--c1);border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1),0 24px 80px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:dashIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes dashIn{from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.dash-head{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 22px;flex-shrink:0;
+  box-shadow:var(--sh-sm);
+}
+.dash-head-ico{
+  width:32px;height:32px;border-radius:6px;
+  background:var(--c2);color:var(--t1);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.dash-head-title{font-family:var(--f);font-size:14px;font-weight:700;color:var(--t0);line-height:1.2;}
+.dash-head-sub{font-family:var(--m);font-size:10px;color:var(--t2);margin-top:2px;}
+.dash-head-close{
+  width:30px;height:30px;border-radius:4px;border:none;
+  background:var(--c2);color:var(--t2);cursor:pointer;
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  transition:background .12s,color .12s;
+}
+.dash-head-close:hover{background:var(--c3);color:var(--t0);}
+.dash-body{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:18px;}
+
+.dash-hero{
+  display:flex;align-items:center;gap:22px;
+  padding:18px 22px;
+  background:var(--c2);border-radius:6px;
+}
+.dash-ring-wrap{position:relative;width:104px;height:104px;flex-shrink:0;}
+.dash-ring{transform:rotate(-90deg);}
+.dash-ring-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.dash-ring-val{font-family:var(--m);font-size:26px;font-weight:700;color:var(--t0);line-height:1;}
+.dash-ring-lbl{font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+.dash-hero-info{flex:1;min-width:0;}
+.dash-agent-nm{font-size:16px;font-weight:700;color:var(--t0);margin-bottom:3px;}
+.dash-agent-shift{font-family:var(--m);font-size:10.5px;color:var(--t2);margin-bottom:10px;}
+.dash-grade{
+  display:inline-block;
+  font-family:var(--m);font-size:10px;font-weight:700;
+  padding:4px 11px;border-radius:20px;
+  background:var(--gr2);color:var(--g);
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.dash-grade-desc{font-size:12px;color:var(--t1);margin-top:8px;line-height:1.5;}
+
+.dash-section-lbl{
+  font-family:var(--m);font-size:9.5px;font-weight:700;
+  color:var(--t2);text-transform:uppercase;letter-spacing:.7px;
+  margin-bottom:8px;
+}
+.dash-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.dash-kpi{
+  padding:12px 14px;background:var(--c2);border-radius:6px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.dash-kpi-val{font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);line-height:1.1;}
+.dash-kpi-val.g{color:var(--g);}
+.dash-kpi-val.y{color:var(--y);}
+.dash-kpi-lbl{font-family:var(--m);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;}
+
+.dash-call-list{display:flex;flex-direction:column;gap:4px;}
+.dash-call{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 14px;background:var(--c2);border-radius:4px;
+  transition:background .12s;cursor:pointer;
+}
+.dash-call:hover{background:var(--c3);}
+.dash-call-no{font-family:var(--m);font-size:10px;font-weight:700;color:var(--t2);min-width:22px;}
+.dash-call-id{font-family:var(--m);font-size:10.5px;font-weight:600;color:var(--t0);flex:1;}
+.dash-call-id .nm{color:var(--t1);font-weight:500;margin-left:4px;}
+.dash-call-score{
+  font-family:var(--m);font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:20px;min-width:38px;text-align:center;
+}
+.dash-call-score.g{background:var(--gr2);color:var(--g);}
+.dash-call-score.y{background:var(--am2);color:var(--y);}
+
+.dash-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 22px;flex-shrink:0;
+  box-shadow:0 -1px 3px rgba(0,0,0,.04);
+}
+.dash-foot-note{font-family:var(--m);font-size:9.5px;color:var(--t2);}
+.dash-foot-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:4px;border:none;
+  background:var(--t0);color:#fff;
+  font-family:var(--f);font-size:12px;font-weight:600;
+  cursor:pointer;transition:background .15s;
+}
+.dash-foot-btn:hover{background:#1a1f30;}
+
+/* ═══ BODY — 3 COLUMNS═════════════════════════════ */
 .body{flex:1;display:flex;overflow:hidden;background:var(--bg);}
 
 /* ══ LEFT — PO Console (PRIMARY workspace) ══════════ */
@@ -1486,6 +1817,87 @@ body.light .nav{background:rgba(255,255,255,.8);}
   </aside>
 
 </div>
+
+<!-- Dashboard overlay -->
+<div class="dash-ov" id="dash-ov" onclick="if(event.target===this)closeDash()">
+  <div class="dash-modal">
+    <div class="dash-head">
+      <div class="dash-head-ico">📊</div>
+      <div style="flex:1;min-width:0;">
+        <div class="dash-head-title">Análisis del día</div>
+        <div class="dash-head-sub">Lunes, 25 de mayo · turno 08:00–16:00</div>
+      </div>
+      <button class="dash-head-close" onclick="closeDash()" title="Cerrar">✕</button>
+    </div>
+    <div class="dash-body">
+      <div class="dash-hero">
+        <div class="dash-ring-wrap">
+          <svg class="dash-ring" width="104" height="104" viewBox="0 0 104 104">
+            <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c3)" stroke-width="6"/>
+            <circle cx="52" cy="52" r="44" fill="none" stroke="var(--g)" stroke-width="6" stroke-linecap="round" stroke-dasharray="276" stroke-dashoffset="36"/>
+          </svg>
+          <div class="dash-ring-inner">
+            <div class="dash-ring-val">87</div>
+            <div class="dash-ring-lbl">score</div>
+          </div>
+        </div>
+        <div class="dash-hero-info">
+          <div class="dash-agent-nm">Jorge Mora</div>
+          <div class="dash-agent-shift">T. 08:00–16:00 · 6h 24m activo</div>
+          <span class="dash-grade">Sobresaliente</span>
+          <div class="dash-grade-desc">Por encima del promedio del equipo (74%) — buen ritmo. Mantené el speech compliance arriba del 90%.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="dash-section-lbl">KPIs del día</div>
+        <div class="dash-kpi-row">
+          <div class="dash-kpi"><div class="dash-kpi-val">12</div><div class="dash-kpi-lbl">POs creados</div></div>
+          <div class="dash-kpi"><div class="dash-kpi-val g">4.8</div><div class="dash-kpi-lbl">Satisfacción</div></div>
+          <div class="dash-kpi"><div class="dash-kpi-val y">4:32</div><div class="dash-kpi-lbl">AHT promedio</div></div>
+          <div class="dash-kpi"><div class="dash-kpi-val">87%</div><div class="dash-kpi-lbl">Resolución 1ra</div></div>
+          <div class="dash-kpi"><div class="dash-kpi-val">92%</div><div class="dash-kpi-lbl">Speech compl.</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="dash-section-lbl">Llamadas del día</div>
+        <div class="dash-call-list">
+          <div class="dash-call"><div class="dash-call-no">12</div><div class="dash-call-id">PO-2026-05-1834 <span class="nm">· María González</span></div><div class="dash-call-score g">94</div></div>
+          <div class="dash-call"><div class="dash-call-no">11</div><div class="dash-call-id">PO-2026-05-1833 <span class="nm">· Carlos Méndez</span></div><div class="dash-call-score g">89</div></div>
+          <div class="dash-call"><div class="dash-call-no">10</div><div class="dash-call-id">PO-2026-05-1832 <span class="nm">· Lucía Brenes</span></div><div class="dash-call-score y">76</div></div>
+          <div class="dash-call"><div class="dash-call-no">9</div><div class="dash-call-id">PO-2026-05-1831 <span class="nm">· José Soto</span></div><div class="dash-call-score g">92</div></div>
+          <div class="dash-call"><div class="dash-call-no">8</div><div class="dash-call-id">PO-2026-05-1830 <span class="nm">· Ana Rojas</span></div><div class="dash-call-score y">81</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-foot">
+      <span class="dash-foot-note">Datos del turno · actualización en vivo</span>
+      <button class="dash-foot-btn" onclick="window.location.href='reportes.html'">Ver reportes completos →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PO history drawer -->
+<div id="po-drawer-ov" onclick="if(event.target===this)closeDrawer()">
+  <div id="po-drawer">
+    <div class="pdh">
+      <span style="font-size:14px">📋</span>
+      <span class="pdh-title">Historial de POs</span>
+      <span class="pdh-count" id="pdh-count">0 POs</span>
+      <button class="pdh-close" onclick="closeDrawer()" title="Cerrar">✕</button>
+    </div>
+    <div class="pd-list" id="pd-list">
+      <div class="pd-empty">
+        <div class="pd-empty-o">📋</div>
+        <div class="pd-empty-t">No hay POs aún</div>
+        <div class="pd-empty-h">Los POs que creés durante el turno aparecerán aquí con su detalle completo.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flash-stage" id="flash-stage"></div>
 
 <!-- Dashboard overlay -->
 <div class="dash-ov" id="dash-ov" onclick="if(event.target===this)closeDash()">
