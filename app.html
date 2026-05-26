@@ -109,21 +109,47 @@ nav{
 .po-counter-lbl{font-size:9px;opacity:.6;font-weight:500;}
 
 /* Theme toggle group */
-.n-th{
-  background:var(--c2);border-radius:4px;
-  display:flex;align-items:center;padding:2px;gap:1px;
+/* Theme toggle pill */
+.n-th {
+  position:relative;
+  width:52px;height:26px;
+  background:var(--c3);
+  border-radius:13px;
+  border:1px solid var(--gb2);
+  cursor:pointer;
+  flex-shrink:0;
+  transition:background .25s;
 }
-.n-to{
-  height:26px;padding:0 10px;
-  border:none;background:transparent;color:var(--t2);
-  font-size:12px;cursor:pointer;border-radius:4px;
-  transition:all .15s;filter:grayscale(1) brightness(1.2);opacity:.7;
+.n-th-track {
+  position:absolute;inset:0;
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:0 6px;pointer-events:none;
 }
-.n-to:hover{color:var(--t0);opacity:1;}
-.n-to.on{
-  background:var(--c1);color:var(--t0);
-  box-shadow:var(--sh-sm);
-  filter:none;opacity:1;
+.n-th-ico {
+  font-size:11px;line-height:1;
+  transition:opacity .2s;
+}
+.n-th-ico.sun { opacity:.5; }
+.n-th-ico.moon { opacity:.3; }
+body.dark .n-th-ico.sun  { opacity:.3; }
+body.dark .n-th-ico.moon { opacity:.8; }
+.n-th-thumb {
+  position:absolute;
+  top:3px;left:3px;
+  width:18px;height:18px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+  transition:transform .25s cubic-bezier(.4,0,.2,1), background .25s;
+}
+body.dark .n-th-thumb {
+  transform:translateX(26px);
+  background:var(--t0);
+}
+body.dark .n-th {
+  background:var(--c2);
+  border-color:var(--gb);
 }
 
 /* Dashboard button */
@@ -1400,9 +1426,12 @@ nav{
     <div class="po-counter show" id="po-counter" onclick="openDrawer()" title="Historial de POs">
       <span id="po-count-num">0</span><span class="po-counter-lbl"> POs</span>
     </div>
-    <div class="n-th">
-      <button class="n-to" id="th-dark" onclick="setTheme('dark')" title="Modo oscuro">🌙</button>
-      <button class="n-to on" id="th-light" onclick="setTheme('light')" title="Modo claro">☀️</button>
+    <div class="n-th" onclick="setTheme(document.body.classList.contains('dark')?'light':'dark')" title="Cambiar tema">
+      <div class="n-th-track">
+        <span class="n-th-ico sun">☀︎</span>
+        <span class="n-th-ico moon">☽</span>
+      </div>
+      <div class="n-th-thumb"></div>
     </div>
     <button class="n-dash" onclick="openDash()" title="Reportes & Analytics">📊</button>
     <div class="q-wrap">
@@ -2810,10 +2839,6 @@ function setTheme(t){
   isDark = (t === 'dark');
   document.body.classList.toggle('light', !isDark);
   document.body.classList.toggle('dark', isDark);
-  var td=document.getElementById('th-dark');
-  var tl=document.getElementById('th-light');
-  if(td)td.classList.toggle('on', isDark);
-  if(tl)tl.classList.toggle('on', !isDark);
   try{localStorage.setItem('helios_theme',t);}catch(e){}
 }
 
