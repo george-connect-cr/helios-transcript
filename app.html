@@ -1657,11 +1657,11 @@ async function triggerSimulatedCall() {
 
   // Limpiar sesión previa (demo u otra llamada) antes de iniciar
   _clearSession();
-  showToast('📞 Conectando llamada de entrenamiento...');
 
-  // Deshabilitar Demo y mostrar botón Finalizar en el nav
+  // Mostrar botón Finalizar INMEDIATAMENTE — no esperar el fetch
   _setDemoState(false);
   _showEndCallButton();
+  showToast('📞 Conectando llamada de entrenamiento...');
 
   try {
     var res = await fetch(SEND_CALL_URL, {
@@ -1725,21 +1725,30 @@ function _setDemoState(enabled) {
 }
 
 function _showEndCallButton() {
-  // Reemplazar el botón Demo en el nav con el botón Finalizar
-  var demoBtn = document.querySelector('.n-demo');
-  if (!demoBtn) return;
   if (document.getElementById('btn-end-call')) return;
   var btn = document.createElement('button');
   btn.id = 'btn-end-call';
   btn.textContent = '📵 Finalizar';
-  btn.style.cssText = demoBtn.style.cssText;
-  btn.className = demoBtn.className;
-  btn.style.background = '#e84040';
-  btn.style.color = '#fff';
-  btn.style.borderColor = '#e84040';
+  btn.style.cssText = [
+    'height:32px','padding:0 14px','border-radius:20px',
+    'border:none','background:#e84040','color:#fff',
+    'font-family:var(--f)','font-size:12px','font-weight:600',
+    'cursor:pointer','display:inline-flex','align-items:center',
+    'gap:5px','transition:background .15s','white-space:nowrap',
+  ].join(';');
+  btn.onmouseover = function(){ btn.style.background='#c42020'; };
+  btn.onmouseout  = function(){ btn.style.background='#e84040'; };
   btn.onclick = endCall;
-  demoBtn.style.display = 'none';
-  demoBtn.parentNode.insertBefore(btn, demoBtn);
+  // Ocultar Demo e insertar Finalizar en su lugar
+  var demoBtn = document.querySelector('.n-demo');
+  if (demoBtn) {
+    demoBtn.style.display = 'none';
+    demoBtn.parentNode.insertBefore(btn, demoBtn);
+  } else {
+    // Fallback: insertar en el nav
+    var navR = document.querySelector('.n-r');
+    if (navR) navR.insertBefore(btn, navR.firstChild);
+  }
 }
 
 function _hideEndCallButton() {
