@@ -1134,10 +1134,10 @@ nav{
 .fld-map-wrap {
   border-radius:8px;overflow:hidden;
   height:120px;background:var(--c3);
-  position:relative;display:none;
+  position:relative;display:none !important;
   border:1px solid var(--gb2);
 }
-.fld-map-wrap.show { display:block; }
+.fld-map-wrap.show { display:block !important; cursor:pointer; }
 .fld-map-inner { width:100%;height:100%; }
 .fld-map-label {
   position:absolute;bottom:6px;left:6px;z-index:400;
@@ -1184,7 +1184,7 @@ nav{
   box-shadow:0 1px 4px rgba(0,0,0,.15);
   max-width:calc(100% - 24px);
 }
-.fld-map-wrap { cursor:pointer; }
+
 .fld-map-wrap:hover::after {
   content:'🔍';
   position:absolute;top:6px;right:8px;
@@ -2158,8 +2158,8 @@ function initMap(mapId, lat, lng, label) {
   // Asegurar que el wrapper sea visible antes de crear el mapa
   var wrap = document.getElementById(mapId + '-wrap');
   if (wrap) {
-    wrap.style.display = 'block';
     wrap.classList.add('show');
+    wrap.style.setProperty('display', 'block', 'important');
   }
 
   var m = L.map(mapId, {
@@ -2264,7 +2264,10 @@ function showDestinoField(show) {
 
   if (show) {
     if (fld) fld.style.display = '';
-    if (mapWrap) { mapWrap.style.display = 'block'; }
+    if (mapWrap) {
+      mapWrap.classList.add('show');
+      mapWrap.style.setProperty('display', 'block', 'important');
+    }
     // Actualizar contador — grúa tiene 2 campos de ubicación
     var ratio = document.getElementById('r-ubicacion');
     if (ratio) ratio.textContent = ratio.textContent.replace('/ 1', '/ 2');
@@ -2333,7 +2336,10 @@ function clearMaps() {
   ['map-origen', 'map-destino'].forEach(function(id) {
     if (_maps[id]) { _maps[id].remove(); delete _maps[id]; }
     var wrap = document.getElementById(id + '-wrap');
-    if (wrap) { wrap.classList.remove('show'); }
+    if (wrap) {
+      wrap.classList.remove('show');
+      wrap.style.removeProperty('display');
+    }
     var lbl = document.getElementById(id + '-label');
     if (lbl) lbl.textContent = '';
   });
