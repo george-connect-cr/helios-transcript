@@ -2175,11 +2175,11 @@ const FlashPill = (() => {
     pill.innerHTML = `<span class="flash-ico">${icon}</span><span class="flash-lbl">${label}</span><span class="flash-val">${value}</span>`;
     stage.appendChild(pill);
 
-    // auto-remove after 2s
+    // auto-remove after 600ms — más rápido para no bloquear la cola
     setTimeout(() => {
       pill.classList.add('out');
-      setTimeout(() => { pill.remove(); _next(); }, 300);
-    }, 1800);
+      setTimeout(() => { pill.remove(); _next(); }, 200);
+    }, 600);
   }
 
   return { show };
@@ -2445,7 +2445,7 @@ const POBuilder = (() => {
   function loadFromAnalysis(data){
     let d=0;
     Object.keys(FIELDS).forEach(k=>{
-      const val=data[k]; if(val&&String(val).trim()&&val!=='N/A'){setTimeout(()=>addField(k,val),d);d+=130;}
+      const val=data[k]; if(val&&String(val).trim()&&val!=='N/A'){addField(k,val);}
     });
   }
   function reset(){
