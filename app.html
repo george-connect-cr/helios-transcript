@@ -3559,6 +3559,10 @@ function showCallRating(){
   ov.appendChild(card);document.body.appendChild(ov);
   ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
 }
+
+// ── Aliases para compatibilidad HTML de Dayana ──
+function openDash(){ if(typeof openDashboard==='function') openDashboard(); }
+function closeDash(){ if(typeof closeDashboard==='function') closeDashboard(); }
 </script>
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t0);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;"></div>
 <div class="flash-stage" id="flash-stage"></div>
