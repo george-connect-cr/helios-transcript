@@ -979,73 +979,103 @@ body.dark .n-th-thumb {
 .ctx-scroll::-webkit-scrollbar{width:5px;}
 .ctx-scroll::-webkit-scrollbar-thumb{background:var(--c4);border-radius:5px;}
 
+/* ── col-r cards rediseño ── */
 .ctx-card{
   background:var(--c1);
-  border-radius:6px;
-  padding:12px 13px;
-  box-shadow:var(--sh-sm);
+  border-radius:10px;
+  border:0.5px solid var(--gb2);
+  overflow:hidden;
 }
 .ctx-head{
-  display:flex;align-items:center;gap:7px;
-  margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 13px 9px;
+  border-bottom:0.5px solid var(--gb2);
+  margin-bottom:0;
 }
-.ctx-head-ico{font-size:12px;}
+.ctx-head-ico{
+  width:22px;height:22px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;
+}
 .ctx-head-lbl{
-  font-family:var(--f);font-size:9px;font-weight:700;
-  color:var(--t2);letter-spacing:.1px;
-  flex:1;
+  font-family:var(--f);font-size:11px;font-weight:600;
+  color:var(--t0);letter-spacing:.01em;flex:1;
 }
 .ctx-head-conf{
-  font-family:var(--f);font-size:8px;font-weight:700;
-  padding:2px 7px;border-radius:20px;
+  font-family:var(--f);font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:20px;
   background:var(--gr2);color:var(--g);
-  letter-spacing:.1px;
 }
 
 /* Service detected */
 .svc-detected{
-  display:flex;align-items:center;gap:11px;
-  padding:10px;background:var(--am2);border-radius:6px;
-  margin-bottom:8px;
+  display:flex;align-items:flex-start;gap:9px;
+  padding:10px 13px 8px;
 }
 .svc-ico{
-  width:34px;height:34px;border-radius:6px;flex-shrink:0;
-  background:rgba(240,144,10,.18);color:var(--a);
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:var(--am2);
   display:flex;align-items:center;justify-content:center;
-  font-size:16px;
+  font-size:16px;margin-top:1px;
 }
 .svc-nm{font-size:12px;font-weight:600;color:var(--t0);margin-bottom:2px;}
-.svc-ht{font-size:10.5px;color:var(--t1);}
+.svc-ht{font-size:10.5px;color:var(--t1);line-height:1.4;}
+.svc-conf-row{
+  display:flex;align-items:center;gap:6px;
+  padding:0 13px 10px;
+}
+.svc-conf-dot{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0;}
+.svc-conf-lbl{font-size:10px;color:var(--t2);font-family:var(--f);}
+.svc-conf-bar{flex:1;height:3px;background:var(--c3);border-radius:3px;overflow:hidden;}
+.svc-conf-fill{height:100%;background:var(--g);border-radius:3px;transition:width .4s;}
+.svc-conf-pct{font-size:10px;font-weight:600;color:var(--g);font-family:var(--m);}
 
 /* Sentiment */
-.sent-row{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
-.sent-emo{font-size:22px;}
-.sent-lbl{font-size:12.5px;font-weight:700;color:var(--y);flex:1;}
-.sent-pct{font-family:var(--f);font-size:11px;font-weight:700;color:var(--t1);}
-.sent-bar{height:4px;background:var(--c3);border-radius:4px;overflow:hidden;margin-top:2px;}
-.sent-fill{height:100%;background:var(--y);transition:width .6s;}
+.sent-body{padding:10px 13px 12px;}
+.sent-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sent-emo{font-size:26px;line-height:1;}
+.sent-info{flex:1;}
+.sent-lbl{font-size:13px;font-weight:600;color:var(--t0);}
+.sent-sub{font-size:10px;color:var(--t2);margin-top:1px;font-family:var(--f);}
+.sent-pct{font-family:var(--m);font-size:12px;font-weight:700;color:var(--t1);}
+.sent-track{height:5px;background:var(--c3);border-radius:5px;overflow:hidden;}
+.sent-fill{height:100%;background:var(--y);border-radius:5px;transition:width .6s;}
+.sent-scale{display:flex;justify-content:space-between;margin-top:4px;}
+.sent-scale span{font-size:9px;color:var(--t3);font-family:var(--f);}
 
-/* Checklist */
-.cl-row{
+/* Checklist rediseñado */
+.kai-check-item{
   display:flex;align-items:center;gap:9px;
-  padding:7px 4px;
-  font-size:11.5px;color:var(--t1);
-  border-radius:4px;
-  cursor:pointer;
-  transition:background .12s;
+  padding:7px 13px;
+  cursor:pointer;transition:background .12s;
+  border-radius:0;
 }
-.cl-row:hover{background:var(--c2);}
-.cl-row.done{color:var(--t2);}
-.cl-row.done .cl-txt{text-decoration:line-through;text-decoration-color:var(--t3);}
-.cl-check{
-  width:14px;height:14px;flex-shrink:0;border-radius:3px;
-  background:var(--c3);
+.kai-check-item:hover{background:var(--c2);}
+.kai-check-item.done .kai-check-txt{
+  text-decoration:line-through;
+  color:var(--t3);
+}
+.kai-check-item.done .kai-check-box{
+  background:var(--g);border-color:var(--g);color:#fff;
+}
+.kai-check-box{
+  width:16px;height:16px;border-radius:4px;
+  border:1.5px solid var(--gb2);flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:9px;color:transparent;
+  font-size:9px;background:var(--c1);
   transition:all .15s;
 }
-.cl-row.done .cl-check{background:var(--g);color:#fff;}
-.cl-txt{flex:1;}
+.kai-check-txt{font-size:11.5px;color:var(--t0);line-height:1.4;flex:1;}
+.kai-check-num{font-size:9px;color:var(--t3);font-weight:500;flex-shrink:0;}
+.kai-chk-progress{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 13px 10px;
+  border-top:0.5px solid var(--gb2);
+  margin-top:4px;
+}
+.kai-chk-bar{flex:1;height:3px;background:var(--c3);border-radius:3px;overflow:hidden;}
+.kai-chk-fill{height:100%;background:var(--g);border-radius:3px;transition:width .3s;}
+.kai-chk-lbl{font-size:10px;color:var(--t2);font-weight:500;white-space:nowrap;font-family:var(--f);}
 
 /* Recs — emergent stack inside the context panel (col-r) */
 .rec-popup-stack{
@@ -1833,14 +1863,22 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- Service detected -->
       <div class="ctx-card">
         <div class="ctx-head">
-          <span class="ctx-head-ico">🎯</span>
+          <span class="ctx-head-ico" style="background:var(--am2);">🔧</span>
           <span class="ctx-head-lbl">Servicio detectado</span>
           <span class="ctx-head-conf">Alta</span>
         </div>
         <div class="svc-detected" id="svc-detected">
           <div class="svc-ico"><span id="svc-ico">🔧</span></div>
-          <div><div class="svc-nm" id="svc-name">—</div><div class="svc-ht" id="svc-hint">—</div></div>
-          <div class="svc-chip hi" id="svc-conf">Alta</div>
+          <div style="flex:1;min-width:0;">
+            <div class="svc-nm" id="svc-name">—</div>
+            <div class="svc-ht" id="svc-hint">—</div>
+          </div>
+        </div>
+        <div class="svc-conf-row">
+          <div class="svc-conf-dot"></div>
+          <span class="svc-conf-lbl">Confianza</span>
+          <div class="svc-conf-bar"><div class="svc-conf-fill" id="svc-conf-fill" style="width:80%"></div></div>
+          <span class="svc-conf-pct" id="svc-conf">Alta</span>
         </div>
       </div>
 
@@ -1850,18 +1888,27 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
           <span class="ctx-head-ico">💭</span>
           <span class="ctx-head-lbl">Análisis de sentimiento</span>
         </div>
-        <div class="sent-row">
-          <span class="sent-emo" id="sent-emoji">😐</span>
-          <span class="sent-lbl" id="sentiment-label">Neutro</span>
-          <span class="sent-pct" id="sent-pct"></span>
+        <div class="sent-body">
+          <div class="sent-row">
+            <span class="sent-emo" id="sent-emoji">😐</span>
+            <div class="sent-info">
+              <div class="sent-lbl" id="sentiment-label">Neutro</div>
+              <div class="sent-sub" id="sentiment-sub">Sin tensión detectada</div>
+            </div>
+            <span class="sent-pct" id="sent-pct"></span>
+          </div>
+          <div class="sent-track"><div class="sent-fill" id="sentiment-fill" style="width:50%"></div></div>
+          <div class="sent-scale">
+            <span>😠 Negativo</span>
+            <span>Positivo 😄</span>
+          </div>
         </div>
-        <div class="sent-bar"><div class="sent-fill" id="sentiment-fill" style="width:50%"></div></div>
       </div>
 
       <!-- KAI guidance -->
       <div class="ctx-card">
         <div class="ctx-head">
-          <span class="ctx-head-ico">🧠</span>
+          <span class="ctx-head-ico" style="background:var(--pu2);">🧠</span>
           <span class="ctx-head-lbl">KAI · Recomendaciones</span>
         </div>
         <!-- KAI insight desde LLM -->
@@ -1874,6 +1921,10 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
           <div style="font-size:10px;color:var(--t2);padding:8px 4px;font-family:var(--f);">
             Protocolo cargará al detectar el tipo de servicio
           </div>
+        </div>
+        <div id="kai-chk-progress-bar" class="kai-chk-progress" style="display:none">
+          <div class="kai-chk-bar"><div class="kai-chk-fill" id="kai-chk-fill" style="width:0%"></div></div>
+          <span class="kai-chk-lbl" id="kai-chk-lbl">0 / 0</span>
         </div>
         <div id="rec-stack"></div>
         <div class="kai-pill" style="display:none">
@@ -2939,10 +2990,12 @@ function _clearSession() {
   // Reset sentimiento
   var emoji = document.getElementById('sent-emoji');
   var label = document.getElementById('sentiment-label');
+  var sub = document.getElementById('sentiment-sub');
   var fill = document.getElementById('sentiment-fill');
   if (emoji) emoji.textContent = '😐';
-  if (label) { label.textContent = 'Neutro'; label.style.color = 'var(--y)'; }
-  if (fill) { fill.style.width = '50%'; fill.style.background = ''; }
+  if (label) { label.textContent = 'Neutro'; label.style.color = ''; }
+  if (sub) sub.textContent = 'Sin tensión detectada';
+  if (fill) { fill.style.width = '50%'; fill.style.background = 'var(--y)'; }
   // Limpiar KAI guidance
   var kaiTxt = document.getElementById('kai-guidance-txt');
   if (kaiTxt) kaiTxt.textContent = '—';
@@ -4298,21 +4351,42 @@ function renderKBSugs(sugs) {
   var cl = document.getElementById('kai-checklist');
   if (!cl) return;
   if (!sugs || sugs.length === 0) {
-    cl.innerHTML = '<div style="font-size:10px;color:var(--t2);padding:8px 4px;font-family:var(--f);">Sin protocolo definido para este servicio</div>';
+    cl.innerHTML = '<div style="font-size:10px;color:var(--t2);padding:10px 13px;font-family:var(--f);">Sin protocolo definido para este servicio.</div>';
+    var pb = document.getElementById('kai-chk-progress-bar');
+    if (pb) pb.style.display = 'none';
     return;
   }
   cl.innerHTML = sugs.map(function(s, i) {
     return '<div class="kai-check-item" id="kc-' + i + '" onclick="toggleCheckItem(this)">' +
-      '<div class="kai-check-box" id="kcb-' + i + '"></div>' +
-      '<div><div class="kai-check-txt">' + s + '</div></div>' +
+      '<div class="kai-check-box"></div>' +
+      '<span class="kai-check-txt">' + s + '</span>' +
+      '<span class="kai-check-num">' + (i+1) + '</span>' +
     '</div>';
   }).join('');
+  var pb = document.getElementById('kai-chk-progress-bar');
+  if (pb) pb.style.display = 'flex';
+  _updateCheckProgress();
 }
 
 function toggleCheckItem(el) {
   el.classList.toggle('done');
   var box = el.querySelector('.kai-check-box');
   if (box) box.textContent = el.classList.contains('done') ? '✓' : '';
+  _updateCheckProgress();
+}
+
+function _updateCheckProgress() {
+  var items = document.querySelectorAll('#kai-checklist .kai-check-item');
+  var done = document.querySelectorAll('#kai-checklist .kai-check-item.done').length;
+  var total = items.length;
+  if (!total) return;
+  var pct = Math.round(done / total * 100);
+  var fill = document.getElementById('kai-chk-fill');
+  var lbl = document.getElementById('kai-chk-lbl');
+  var badge = document.querySelector('.ctx-card:last-child .ctx-head-conf');
+  if (fill) fill.style.width = pct + '%';
+  if (lbl) lbl.textContent = done + ' / ' + total + ' completados';
+  if (badge) badge.textContent = done + ' / ' + total;
 }
 
 // Marcar automáticamente un ítem del checklist desde la transcripción
