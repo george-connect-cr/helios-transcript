@@ -1599,11 +1599,19 @@ async function triggerSimulatedCall() {
 }
 
 function endCall() {
+  if (!_callInProgress) return; // Evitar doble disparo
   _callInProgress = false;
   _hideEndCallButton();
   _setDemoState(true);
-  // Volver a Coaching
-  setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+  // Volver a Coaching sin disparar lógica de estado
+  var dot = document.getElementById('status-dot-btn');
+  var lbl = document.getElementById('status-label');
+  var menu = document.getElementById('status-menu');
+  if (dot) dot.style.background = '#6366f1';
+  if (lbl) lbl.textContent = 'Coaching';
+  if (menu) menu.style.display = 'none';
+  _curStatus = 'coaching_p';
+  showToast('🎯 Coaching');
   // Mostrar popup de resultados
   setTimeout(function() {
     if (typeof showCallRating === 'function') showCallRating();
@@ -2162,7 +2170,7 @@ const CallTimer=(()=>{
     const d=document.getElementById('t-dot');if(d)d.className='td-dot';
     const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
     const al=document.getElementById('t-alert');if(al){al.className='t-row-alert';al.style.display='none';}
-    setTimeout(function(){if(typeof setStatus==='function')setStatus('coaching_p','#6366f1','Coaching','🎯');if(typeof showCallRating==='function')showCallRating();},600);
+    setTimeout(function(){if(typeof setStatus==='function')setStatus('coaching_p','#6366f1','Coaching','🎯');},600);
   }
   return{start,reset};
 })();
@@ -3513,6 +3521,7 @@ function setStatus(id,color,label,icon){
     setTimeout(triggerSimulatedCall, 800);
   }
   if (id === 'coaching_p' || id === 'coaching') {
+    // Solo ocultar el botón — el popup lo maneja exclusivamente endCall()
     _hideEndCallButton();
   }
 }
