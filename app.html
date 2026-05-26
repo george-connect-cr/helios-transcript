@@ -71,17 +71,14 @@ nav{
 
 /* Brand */
 .n-brand{
-  display:flex;align-items:baseline;gap:0;
-  margin-right:16px;flex-shrink:0;line-height:1;white-space:nowrap;
+  display:flex;align-items:center;gap:0;
+  margin-right:20px;flex-shrink:0;line-height:1;white-space:nowrap;
 }
 
 
 
 /* Connection status */
-.n-conn{
-  display:flex;align-items:center;gap:6px;margin-right:14px;
-  font-family:var(--f);font-size:10px;color:var(--t2);
-}
+.n-conn{ display:none; }
 .cdot{width:6px;height:6px;border-radius:50%;background:var(--t3);}
 .cdot.live{background:var(--g);animation:gp 2s infinite;}
 .cdot.warn{background:var(--y);}
@@ -177,6 +174,17 @@ nav{
   transition:background .15s;
 }
 #status-wrap > button:hover{background:var(--c3);}
+#status-wrap > button {
+  display:flex;align-items:center;gap:7px;
+  padding:5px 10px;border-radius:20px;
+  border:1px solid var(--gb2);background:var(--c2);
+  cursor:pointer;
+}
+#status-wrap > button:hover { background:var(--c3); }
+#status-label {
+  font-size:12px;font-weight:600;
+  color:var(--t0);font-family:var(--f);
+}
 #status-dot-btn{
   width:8px;height:8px;border-radius:50%;
   background:var(--g);flex-shrink:0;transition:background .3s;
@@ -1304,19 +1312,15 @@ nav{
 
 <nav>
   <div class="n-brand">
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-      <img src="assets/connect-logo.png" alt="Connect" style="height:28px;width:auto;display:block;border-radius:4px;"/>
-      <span style="font-family:var(--f);font-size:9px;font-weight:700;letter-spacing:3px;color:var(--t2);text-transform:uppercase;line-height:1;">ACADEMY</span>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <img src="assets/connect-logo.png" alt="Connect" style="height:36px;width:auto;display:block;border-radius:5px;"/>
+      <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
+        <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
+        <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
+      </div>
     </div>
   </div>
-  <div class="n-conn"><div class="cdot live" id="cdot"></div><span id="clbl">en línea</span></div>
-    <div class="n-timer" id="timer-row">
-    <div class="n-div"></div>
-    <div class="td-dot" id="t-dot"></div>
-    <span class="td-num" id="call-timer-val">0:00</span>
-    <div class="td-alert" id="t-alert" style="display:none">⚠</div>
-  </div>
-  <span class="n-preview" title="Esta vista es solo para revisión">Preview v7</span>
+
   <div class="n-r">
     <div class="po-counter show" id="po-counter" onclick="openDrawer()" title="Historial de POs">
       <span id="po-count-num">0</span><span class="po-counter-lbl"> POs</span>
@@ -1535,7 +1539,14 @@ nav{
   <main class="col-c">
     <div class="tp-hd">
       <span class="tp-lbl">📝 Helios · Documentación de PO</span>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:var(--t2);font-weight:500;">Transcripción en vivo</span><div class="live-b"><div class="ldot"></div>En vivo</div></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="timer-row" style="display:none;align-items:center;gap:5px;">
+          <div class="td-dot" id="t-dot"></div>
+          <span class="td-num" id="call-timer-val" style="font-family:var(--m);font-size:12px;font-weight:600;color:var(--t0);">0:00</span>
+          <div id="t-alert" style="display:none;font-size:11px;">⚠</div>
+        </div>
+        <div class="live-b"><div class="ldot"></div>En vivo</div>
+      </div>
     </div>
     <div class="tp-wrap">
       <div class="tp-body" id="t-body" onscroll="if(this.scrollHeight-this.scrollTop-this.clientHeight<80)_hideScrollArrow();">
@@ -2666,12 +2677,12 @@ const CallTimer=(()=>{
   }
   function start(){
     if(_on)return;_on=true;_s=Date.now();
-    const row=document.getElementById('timer-row');if(row)row.classList.add('on');
+    const row=document.getElementById('timer-row');if(row){ row.style.display='flex'; row.classList.add('on') };
     tick();
   }
   function reset(){
     _on=false;clearTimeout(_t);
-    const row=document.getElementById('timer-row');if(row)row.classList.remove('on');
+    const row=document.getElementById('timer-row');if(row){ row.style.display='none'; row.classList.remove('on') };
     const v=document.getElementById('call-timer-val');if(v){v.textContent='0:00';v.className='td-num';}
     const d=document.getElementById('t-dot');if(d)d.className='td-dot';
     const l=document.getElementById('call-timer-lbl');if(l)l.textContent='En llamada';
