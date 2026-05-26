@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 /* ═══ DS v6 TOKENS ═══════════════════════════════════ */
 :root{
@@ -1126,6 +1128,34 @@ nav{
 .fld.filled { border-color: var(--g) !important; }
 .fld.filled .fld-lbl { color: var(--g); }
 .fld.filled .fld-in { color: var(--t0); font-weight: 500; }
+
+/* ── Ubicación fields ── */
+.fld-ubicacion-wrap { display:flex;flex-direction:column;gap:7px; }
+.fld-map-wrap {
+  border-radius:8px;overflow:hidden;
+  height:120px;background:var(--c3);
+  position:relative;display:none;
+  border:1px solid var(--gb2);
+}
+.fld-map-wrap.show { display:block; }
+.fld-map-inner { width:100%;height:100%; }
+.fld-map-label {
+  position:absolute;bottom:6px;left:6px;z-index:400;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(4px);
+  padding:3px 8px;border-radius:20px;
+  font-family:var(--m);font-size:10px;color:var(--t0);
+  max-width:calc(100% - 12px);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+  box-shadow:0 1px 4px rgba(0,0,0,.15);
+}
+.fld-map-dest-badge {
+  position:absolute;top:6px;right:6px;z-index:400;
+  background:var(--a);color:#fff;
+  padding:2px 8px;border-radius:20px;
+  font-family:var(--m);font-size:9px;font-weight:700;
+  display:none;
+}
+.fld-map-dest-badge.show { display:block; }
 </style>
 </head>
 <body>
@@ -1285,6 +1315,37 @@ nav{
           <div class="fld pending" data-key="campania">
             <div class="fld-lbl-row"><span class="fld-lbl">Campaña</span></div>
             <input class="fld-in empty" placeholder="—"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ubicación section -->
+      <div class="ps" id="ps-ubicacion">
+        <div class="ps-head">
+          <div class="ps-head-ico">📍</div>
+          <div class="ps-head-lbl">Ubicación</div>
+          <div class="ps-head-ratio" id="r-ubicacion">0 / 1</div>
+        </div>
+        <div class="ps-body">
+          <div class="fld-ubicacion-wrap">
+            <div class="fld pending" data-key="ubicacion_origen">
+              <div class="fld-lbl-row"><span class="fld-lbl">Ubicación de origen</span></div>
+              <input class="fld-in empty" placeholder="—" oninput="onUbicacionInput('origen', this.value)"/>
+            </div>
+            <div class="fld-map-wrap" id="map-origen-wrap">
+              <div id="map-origen" class="fld-map-inner"></div>
+              <div class="fld-map-label" id="map-origen-label"></div>
+            </div>
+            <!-- Solo visible si servicio = grúa -->
+            <div class="fld pending" data-key="ubicacion_destino" id="fld-destino" style="display:none">
+              <div class="fld-lbl-row"><span class="fld-lbl">Ubicación de destino (taller)</span></div>
+              <input class="fld-in empty" placeholder="—" oninput="onUbicacionInput('destino', this.value)"/>
+            </div>
+            <div class="fld-map-wrap" id="map-destino-wrap" style="display:none">
+              <div id="map-destino" class="fld-map-inner"></div>
+              <div class="fld-map-label" id="map-destino-label"></div>
+              <div class="fld-map-dest-badge" id="map-destino-badge">TALLER</div>
+            </div>
           </div>
         </div>
       </div>
@@ -2037,6 +2098,118 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 
 
+
+// ── KAI Academy — Mapas de ubicación ──────────────────
+var _maps = {};
+var _markers = {};
+var _geocodeTimers = {};
+var _isGrua = false;
+
+function initMap(mapId, lat, lng, label) {
+  if (_maps[mapId]) {
+    _maps[mapId].remove();
+    delete _maps[mapId];
+  }
+  var wrap = document.getElementById(mapId + '-wrap');
+  if (wrap) wrap.classList.add('show');
+
+  var m = L.map(mapId, {
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+  });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17
+  }).addTo(m);
+
+  var icon = L.divIcon({
+    html: '<div style="width:14px;height:14px;border-radius:50%;background:' +
+          (mapId==='map-destino'?'#e04500':'#0ea874') +
+          ';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>',
+    className: '',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+
+  _markers[mapId] = L.marker([lat, lng], {icon: icon}).addTo(m);
+  m.setView([lat, lng], 15);
+  _maps[mapId] = m;
+
+  var lbl = document.getElementById(mapId + '-label');
+  if (lbl) lbl.textContent = label;
+
+  if (mapId === 'map-destino') {
+    var badge = document.getElementById('map-destino-badge');
+    if (badge) badge.classList.add('show');
+  }
+
+  setTimeout(function() { m.invalidateSize(); }, 100);
+}
+
+function geocodeAndShowMap(mapId, address, callback) {
+  if (!address || address.length < 5) return;
+  if (_geocodeTimers[mapId]) clearTimeout(_geocodeTimers[mapId]);
+  _geocodeTimers[mapId] = setTimeout(function() {
+    var query = address + ', Costa Rica';
+    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' +
+          encodeURIComponent(query) + '&limit=1&countrycodes=cr')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.length > 0) {
+          var lat = parseFloat(data[0].lat);
+          var lng = parseFloat(data[0].lon);
+          initMap(mapId, lat, lng, address);
+          if (callback) callback(lat, lng);
+        }
+      })
+      .catch(function(e) { console.warn('Geocode error:', e); });
+  }, 800); // debounce 800ms
+}
+
+function setUbicacion(tipo, address) {
+  // tipo: 'origen' | 'destino'
+  var mapId = 'map-' + tipo;
+  var dataKey = tipo === 'origen' ? 'ubicacion_origen' : 'ubicacion_destino';
+
+  // Rellenar el campo
+  _setFldValue(dataKey, address);
+  _updatePOProgress();
+
+  // Geocodificar y mostrar mapa
+  geocodeAndShowMap(mapId, address);
+}
+
+function onUbicacionInput(tipo, value) {
+  // El usuario editó el campo manualmente
+  if (value.length > 5) {
+    geocodeAndShowMap('map-' + tipo, value);
+  }
+}
+
+function showDestinoField(show) {
+  var fld = document.getElementById('fld-destino');
+  var mapWrap = document.getElementById('map-destino-wrap');
+  if (fld) fld.style.display = show ? '' : 'none';
+  if (mapWrap && !show) { mapWrap.classList.remove('show'); mapWrap.style.display = 'none'; }
+  if (mapWrap && show) mapWrap.style.display = '';
+  _isGrua = show;
+}
+
+function clearMaps() {
+  ['map-origen', 'map-destino'].forEach(function(id) {
+    if (_maps[id]) { _maps[id].remove(); delete _maps[id]; }
+    var wrap = document.getElementById(id + '-wrap');
+    if (wrap) { wrap.classList.remove('show'); }
+    var lbl = document.getElementById(id + '-label');
+    if (lbl) lbl.textContent = '';
+  });
+  var badge = document.getElementById('map-destino-badge');
+  if (badge) badge.classList.remove('show');
+  showDestinoField(false);
+}
+
 // ── KAI Academy — extracción rápida de datos sin esperar el LLM ──
 var _quickExtracted = {};
 
@@ -2132,6 +2305,7 @@ function _clearSession() {
   lastAnalysis = null;
   _lastTranscriptText = '';
   _quickExtracted = {};
+  if (typeof clearMaps === 'function') clearMaps();
   // Reset sentimiento
   var emoji = document.getElementById('sent-emoji');
   var label = document.getElementById('sentiment-label');
@@ -2409,6 +2583,8 @@ const POBuilder = (() => {
     if(isNew){ const f=FIELDS[key]; if(f) FlashPill.show(f.i,f.l,String(value).substring(0,26)); }
   }
   function setService(svcId,svcName){
+    // Mostrar campo destino solo para grúa
+    if (typeof showDestinoField === 'function') showDestinoField(svcId === 'grua');
     if(typeof initKBChecklist !== 'undefined') initKBChecklist(svcId);
     const isNew = _currentService !== svcId;
     _currentService=svcId; _data.tipo_asistencia=svcName;
@@ -3732,8 +3908,8 @@ var KAI_FIELD_MAP = {
   'año':            'anio',
   'color':          'color',
   'tipo_asistencia':'tipo_svc',
-  'ubicación':      null,  // no hay campo ubicación en el nuevo layout de PO
-  'ubicacion_destino': null,
+  'ubicación':      'ubicacion_origen',
+  'ubicacion_destino': 'ubicacion_destino',
 };
 
 
@@ -3762,6 +3938,13 @@ function fillVisiblePOField(kaiKey, value) {
     _setFldValue('nombre', nombre);
     if (apellido) _setFldValue('apellido', apellido);
     _updatePOProgress();
+    return;
+  }
+
+  // Ubicaciones — manejo especial con mapa
+  if (kaiKey === 'ubicación' || kaiKey === 'ubicacion_destino') {
+    var tipo = kaiKey === 'ubicación' ? 'origen' : 'destino';
+    if (typeof setUbicacion === 'function') setUbicacion(tipo, value);
     return;
   }
 
