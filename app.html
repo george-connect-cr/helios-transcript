@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Helios</title>
+<title>KAI Academy</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js" async></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1193,6 +1193,111 @@ nav{
   background:rgba(255,255,255,.9);
   padding:2px 6px;border-radius:4px;
 }
+
+/* ── Títulos de sección mejorados ── */
+.tp-lbl {
+  font-size:13px !important;
+  font-weight:700 !important;
+  letter-spacing:.01em !important;
+  color:var(--t0) !important;
+}
+.ctx-head {
+  padding:12px 14px 8px !important;
+  border-bottom:1px solid var(--gb2) !important;
+  margin-bottom:8px !important;
+}
+.ctx-head-lbl {
+  font-size:12px !important;
+  font-weight:700 !important;
+  color:var(--t0) !important;
+  letter-spacing:.01em !important;
+}
+.ctx-head-ico {
+  font-size:14px !important;
+}
+/* Override de títulos de sección PO */
+.ps-head-lbl {
+  font-size:12px !important;
+  font-weight:700 !important;
+  color:var(--t0) !important;
+}
+
+/* ── KAI Academy Wizard ── */
+.kai-wizard-ov {
+  position:fixed;inset:0;
+  background:rgba(13,16,24,.65);
+  backdrop-filter:blur(6px);
+  z-index:800;
+  display:flex;align-items:center;justify-content:center;
+  animation:fi .3s ease;
+}
+.kai-wizard {
+  width:min(92vw,520px);
+  background:var(--c1);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.25);
+}
+.kai-wizard-hero {
+  background:linear-gradient(135deg,#e04500,#ff8c44);
+  padding:28px 28px 20px;
+  position:relative;
+}
+.kai-wizard-logo {
+  height:28px;width:auto;display:block;
+  border-radius:3px;margin-bottom:14px;
+}
+.kai-wizard-title {
+  font-size:22px;font-weight:800;color:#fff;
+  line-height:1.2;margin-bottom:6px;
+  font-family:var(--f);
+}
+.kai-wizard-sub {
+  font-size:13px;color:rgba(255,255,255,.85);
+  font-family:var(--f);font-weight:400;line-height:1.5;
+}
+.kai-wizard-body { padding:24px 28px; }
+.kai-wizard-features {
+  display:flex;flex-direction:column;gap:14px;
+  margin-bottom:20px;
+}
+.kai-wizard-feat {
+  display:flex;align-items:flex-start;gap:12px;
+}
+.kai-wizard-feat-ico {
+  width:36px;height:36px;border-radius:10px;
+  background:var(--c2);display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex-shrink:0;
+  border:1px solid var(--gb2);
+}
+.kai-wizard-feat-info {}
+.kai-wizard-feat-title {
+  font-size:13px;font-weight:700;color:var(--t0);
+  font-family:var(--f);margin-bottom:2px;
+}
+.kai-wizard-feat-desc {
+  font-size:12px;color:var(--t1);font-family:var(--f);line-height:1.5;
+}
+.kai-wizard-footer {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 28px 20px;
+  border-top:1px solid var(--gb2);
+  gap:12px;
+}
+.kai-wizard-toggle {
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--t2);font-family:var(--f);
+  cursor:pointer;user-select:none;
+}
+.kai-wizard-toggle input { cursor:pointer; }
+.kai-wizard-btn {
+  padding:10px 24px;border-radius:8px;
+  background:var(--a);color:#fff;border:none;
+  font-family:var(--f);font-size:13px;font-weight:700;
+  cursor:pointer;flex-shrink:0;
+  transition:background .15s;
+}
+.kai-wizard-btn:hover { background:#c42020; }
 </style>
 </head>
 <body>
@@ -1429,8 +1534,8 @@ nav{
   <!-- CENTER — Transcript -->
   <main class="col-c">
     <div class="tp-hd">
-      <span class="tp-lbl">Transcripción en vivo</span>
-      <div class="live-b"><div class="ldot"></div>En vivo</div>
+      <span class="tp-lbl">📝 Helios · Documentación de PO</span>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:var(--t2);font-weight:500;">Transcripción en vivo</span><div class="live-b"><div class="ldot"></div>En vivo</div></div>
     </div>
     <div class="tp-wrap">
       <div class="tp-body" id="t-body" onscroll="if(this.scrollHeight-this.scrollTop-this.clientHeight<80)_hideScrollArrow();">
@@ -1491,7 +1596,7 @@ nav{
       <div class="ctx-card">
         <div class="ctx-head">
           <span class="ctx-head-ico">💭</span>
-          <span class="ctx-head-lbl">Sentimiento</span>
+          <span class="ctx-head-lbl">Análisis de sentimiento</span>
         </div>
         <div class="sent-row">
           <span class="sent-emo" id="sent-emoji">😐</span>
@@ -1505,7 +1610,7 @@ nav{
       <div class="ctx-card">
         <div class="ctx-head">
           <span class="ctx-head-ico">🧠</span>
-          <span class="ctx-head-lbl">KAI guidance</span>
+          <span class="ctx-head-lbl">KAI · Recomendaciones</span>
         </div>
         <div class="kai-pill">
           <div class="kai-pill-ico">K</div>
@@ -4082,7 +4187,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof setStatus === 'function') {
       setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     }
-  }, 300);
+    // Mostrar wizard de bienvenida
+    showWizard();
+  }, 600);
 });
 
 
@@ -4185,11 +4292,89 @@ function _updatePOProgress() {
   if (statsEl) statsEl.textContent = allFilled + ' / ' + allFields;
 }
 
+
+// ── KAI Academy Wizard ──────────────────────────────
+function showWizard() {
+  var noShow = localStorage.getItem('kai_wizard_no_show') === '1';
+  if (noShow) return;
+  var ov = document.getElementById('kai-wizard-ov');
+  if (ov) ov.style.display = 'flex';
+}
+function closeWizard() {
+  var ov = document.getElementById('kai-wizard-ov');
+  if (ov) {
+    ov.style.opacity = '0';
+    ov.style.transition = 'opacity .2s';
+    setTimeout(function() { ov.style.display = 'none'; }, 200);
+  }
+}
+function wizardToggle(cb) {
+  localStorage.setItem('kai_wizard_no_show', cb.checked ? '1' : '0');
+}
+
 // ── Aliases para compatibilidad HTML de Dayana ──
 function openDash(){ if(typeof openDashboard==='function') openDashboard(); }
 function closeDash(){ if(typeof closeDashboard==='function') closeDashboard(); }
 </script>
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t0);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;"></div>
+
+<!-- KAI Academy Welcome Wizard -->
+<div class="kai-wizard-ov" id="kai-wizard-ov" style="display:none;">
+  <div class="kai-wizard">
+    <div class="kai-wizard-hero">
+      <img src="assets/connect-logo.png" alt="Connect" class="kai-wizard-logo"/>
+      <div class="kai-wizard-title">Bienvenido a KAI Academy</div>
+      <div class="kai-wizard-sub">Tu portal de entrenamiento para agentes de Contact Center.<br>Practica con clientes virtuales y mejora tu desempeño en tiempo real.</div>
+    </div>
+    <div class="kai-wizard-body">
+      <div class="kai-wizard-features">
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico">📞</div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Llamadas de entrenamiento</div>
+            <div class="kai-wizard-feat-desc">Recibís llamadas simuladas de clientes virtuales con IA. Cada llamada es un escenario diferente — cliente feliz, molesto o con consultas de gestión.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico">📝</div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Helios · Documentación de PO</div>
+            <div class="kai-wizard-feat-desc">Durante la llamada, KAI infiere automáticamente los datos del cliente y los llena en el formulario. Podés editar y completar manualmente lo que falte.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico">😊</div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Análisis de sentimiento</div>
+            <div class="kai-wizard-feat-desc">KAI analiza el tono del cliente en tiempo real y te muestra si está satisfecho, neutro o molesto para que ajustes tu comunicación.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico">🧠</div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">KAI · Recomendaciones</div>
+            <div class="kai-wizard-feat-desc">Recibís sugerencias en tiempo real basadas en la transcripción y el protocolo de atención, para guiarte durante la llamada.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico">🏆</div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Evaluación y feedback</div>
+            <div class="kai-wizard-feat-desc">Al finalizar cada llamada, recibís tu nota de calidad, análisis de sentimiento, tiempo promedio y oportunidades de mejora personalizadas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="kai-wizard-footer">
+      <label class="kai-wizard-toggle">
+        <input type="checkbox" id="wizard-no-show" onchange="wizardToggle(this)"/>
+        No volver a mostrar
+      </label>
+      <button class="kai-wizard-btn" onclick="closeWizard()">¡Comenzar entrenamiento! →</button>
+    </div>
+  </div>
+</div>
+
 <div class="flash-stage" id="flash-stage"></div>
 </body>
 </html>
