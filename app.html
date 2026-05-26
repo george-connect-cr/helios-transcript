@@ -1163,7 +1163,7 @@ nav{
     <div id="status-wrap">
       <button onclick="toggleStatusMenu()" title="Cambiar estado">
         <div id="status-dot-btn"></div>
-        <span id="status-label">Disponible</span>
+        <span id="status-label">Coaching</span>
       </button>
       <div id="status-menu"></div>
     </div>
@@ -1580,16 +1580,36 @@ nav{
 <script>
 // ── KAI Academy — llamadas simuladas ──────────────────
 var SEND_CALL_URL = "https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/sendCall?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==";
-var UC_DESTINATIONS = [
-  "17876065812",  // UC-1: Asistencia Tranquilo F — ACTIVO
-  // "17876065813",  // UC-2: Asistencia Tranquilo M — pendiente configurar en Audara
-  // "17876065814",  // UC-3: Asistencia Molesto F — pendiente configurar en Audara
-  "17879654585",  // UC-4: Asistencia Molesto M — ACTIVO
-  // "17876065816",  // UC-5: Gestión F — pendiente configurar en Audara
-  // "17876065817",  // UC-6: Gestión M — pendiente configurar en Audara
+// UCs activos — agregar/descomentar cuando estén configurados en Audara
+var UC_DESTINATIONS_ALL = [
+  "17876065812",  // UC-1: Asistencia Tranquilo F
+  // "17876065813",  // UC-2: Asistencia Tranquilo M — pendiente
+  // "17876065814",  // UC-3: Asistencia Molesto F — pendiente
+  "17879654585",  // UC-4: Asistencia Molesto M
+  // "17876065816",  // UC-5: Gestión F — pendiente
+  // "17876065817",  // UC-6: Gestión M — pendiente
 ];
 var SESSION_MAX_CALLS = 5;
 var _sessionCallCount = 0;
+var _ucQueue = [];  // cola barajada sin repetición
+var _callInProgress = false;
+
+// Barajar array (Fisher-Yates)
+function _shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function _nextUC() {
+  if (_ucQueue.length === 0) {
+    _ucQueue = _shuffle(UC_DESTINATIONS_ALL);
+  }
+  return _ucQueue.shift();
+}
 
 async function triggerSimulatedCall() {
   var extension = '4001';
@@ -1599,12 +1619,17 @@ async function triggerSimulatedCall() {
   } catch(e) {}
 
   if (_sessionCallCount >= SESSION_MAX_CALLS) {
-    showToast('Sesion completa — ' + SESSION_MAX_CALLS + ' llamadas completadas');
+    showToast('Sesión completa — ' + SESSION_MAX_CALLS + ' llamadas de entrenamiento realizadas');
+    setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     return;
   }
 
-  var destination = UC_DESTINATIONS[Math.floor(Math.random() * UC_DESTINATIONS.length)];
-  showToast('Conectando llamada simulada...');
+  _callInProgress = true;
+  var destination = _nextUC();
+  showToast('📞 Conectando llamada de entrenamiento...');
+
+  // Mostrar botón Finalizar llamada
+  _showEndCallButton();
 
   try {
     var res = await fetch(SEND_CALL_URL, {
@@ -1620,14 +1645,52 @@ async function triggerSimulatedCall() {
     });
     if (res.ok) {
       _sessionCallCount++;
-      showToast('Llamada entrante — sesion ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
+      showToast('🎯 Llamada entrante — ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
     } else {
-      showToast('Error al conectar la llamada (' + res.status + ')');
+      showToast('⚠ Error al conectar (' + res.status + ')');
+      _callInProgress = false;
+      _hideEndCallButton();
+      setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     }
   } catch(err) {
-    showToast('Error de red al disparar llamada');
+    showToast('⚠ Error de red al disparar llamada');
+    _callInProgress = false;
+    _hideEndCallButton();
+    setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     console.error('triggerSimulatedCall:', err);
   }
+}
+
+function endCall() {
+  _callInProgress = false;
+  _hideEndCallButton();
+  // Volver a Coaching
+  setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+  // Mostrar popup de resultados
+  setTimeout(function() {
+    if (typeof showCallRating === 'function') showCallRating();
+  }, 400);
+}
+
+function _showEndCallButton() {
+  var existing = document.getElementById('btn-end-call');
+  if (existing) return;
+  var btn = document.createElement('button');
+  btn.id = 'btn-end-call';
+  btn.innerHTML = '📵 Finalizar llamada';
+  btn.style.cssText = 'position:fixed;bottom:80px;right:24px;z-index:300;' +
+    'background:#e84040;color:#fff;border:none;border-radius:8px;' +
+    'padding:10px 18px;font-family:var(--f);font-size:13px;font-weight:600;' +
+    'cursor:pointer;box-shadow:0 4px 16px rgba(232,64,64,.4);' +
+    'display:flex;align-items:center;gap:7px;' +
+    'animation:fi .2s ease;';
+  btn.onclick = endCall;
+  document.body.appendChild(btn);
+}
+
+function _hideEndCallButton() {
+  var btn = document.getElementById('btn-end-call');
+  if (btn) btn.remove();
 }
 // ───────────────────────────────────────────────────────
 
@@ -3426,9 +3489,12 @@ function setStatus(id,color,label,icon){
   document.getElementById("status-menu").style.display="none";
   if(typeof showToast==="function")showToast(icon+" "+label);
 
-  // KAI Academy: disparar llamada simulada al ponerse Disponible
-  if(id==='disponible' && typeof triggerSimulatedCall==='function'){
+  // KAI Academy: lógica de estados
+  if (id === 'disponible' && typeof triggerSimulatedCall === 'function') {
     setTimeout(triggerSimulatedCall, 800);
+  }
+  if (id === 'coaching_p' || id === 'coaching') {
+    _hideEndCallButton();
   }
 }
 
@@ -3566,6 +3632,16 @@ function showCallRating(){
   ov.appendChild(card);document.body.appendChild(ov);
   ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
 }
+
+
+// KAI Academy — estado inicial: Coaching
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    if (typeof setStatus === 'function') {
+      setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+    }
+  }, 300);
+});
 
 // ── Aliases para compatibilidad HTML de Dayana ──
 function openDash(){ if(typeof openDashboard==='function') openDashboard(); }
