@@ -1854,34 +1854,26 @@ function _scrollToLatest(){
 
 function renderTags(data){
   const c=document.getElementById('t-inferred');
+  if(!c)return;
   c.innerHTML='';
   const map=[
-    {key:'nombre_cliente',icon:'👤',hint:'Nombre',fn:applyNombre},
-    {key:'placa',icon:'🪪',hint:'Placa',fn:v=>setField('f-plate',v)},
-    {key:'marca',icon:'🚗',hint:'Marca',fn:v=>setField('f-make',v)},
-    {key:'modelo',icon:'🔖',hint:'Modelo',fn:v=>setField('f-model',v)},
-    {key:'año',icon:'📅',hint:'Año',fn:v=>setField('f-year',v)},
-    {key:'color',icon:'🎨',hint:'Color',fn:v=>setField('f-color',v)},
-    {key:'ubicación',icon:'📍',hint:'Ubicación',fn:v=>setField('f-location',v)},
-    {key:'tipo_asistencia',icon:'🔧',hint:'Asistencia',fn:()=>{}},
-    {key:'motivo_llamada',icon:'📞',hint:'Motivo',fn:()=>{}},
+    {key:'nombre_cliente', icon:'👤'},
+    {key:'ubicación',      icon:'📍'},
+    {key:'tipo_asistencia',icon:'🔧'},
+    {key:'motivo_llamada', icon:'📞'},
+    {key:'placa',          icon:'🪪'},
+    {key:'marca',          icon:'🚗'},
+    {key:'color',          icon:'🎨'},
   ];
-  let d=0;
-  map.forEach(f=>{
+  const items = map.filter(f=>{const v=data[f.key];return v&&v.trim&&v.trim()&&v!=='N/A';});
+  if(!items.length){c.style.display='none';return;}
+  c.style.cssText='display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px 4px;border-top:1px solid var(--gb);';
+  items.forEach(f=>{
     const v=data[f.key];
-    if(!v||!v.trim()||v==='N/A')return;
-    const tag=document.createElement('div');
-    tag.className='tag';
-    tag.title='Click → '+f.hint;
-    tag.textContent=f.icon+' '+v;
-    tag.style.transitionDelay=d+'ms';
-    tag.addEventListener('click',()=>{
-      f.fn(v);tag.classList.add('done');
-      showToast('✓ '+f.hint+' aplicado');
-    });
-    c.appendChild(tag);
-    requestAnimationFrame(()=>tag.classList.add('show'));
-    d+=70;
+    const chip=document.createElement('div');
+    chip.style.cssText='display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:var(--c2);border:1px solid var(--gb2);font-family:var(--m);font-size:11px;color:var(--t1);white-space:nowrap;';
+    chip.innerHTML='<span>'+f.icon+'</span><span>'+v+'</span>';
+    c.appendChild(chip);
   });
 }
 
@@ -2364,14 +2356,8 @@ const POBuilder = (() => {
 
   function _showPanel(){
     if(!_visible){_visible=true;
-      const empty=document.getElementById('pb-empty');
-      if(empty)empty.style.display='none';
-      const body=document.getElementById('pb-body');
-      if(body){body.style.display='flex';body.style.flexDirection='column';}
-      const meta=document.getElementById('pb-meta-row');
-      if(meta)meta.style.display='flex';
-      const notes=document.querySelector('.po-notes');
-      if(notes)notes.classList.add('visible');
+      // pb-body es un elemento oculto de compatibilidad — no mostrarlo
+      // El layout visual es el de Dayana (col-l con fld[data-key])
     }
   }
   function addField(key,value,_forceNew){
