@@ -1306,6 +1306,78 @@ nav{
   transition:background .15s;
 }
 .kai-wizard-btn:hover { background:#c42020; }
+
+/* ── KAI Checklist ── */
+.kai-checklist { display:flex;flex-direction:column;gap:4px;padding:0 2px; }
+
+.kai-check-item {
+  display:flex;align-items:flex-start;gap:9px;
+  padding:7px 10px;border-radius:8px;
+  background:var(--c2);
+  border:1px solid transparent;
+  transition:all .2s;cursor:pointer;
+  user-select:none;
+}
+.kai-check-item:hover { background:var(--c3); }
+.kai-check-item.done {
+  opacity:.45;
+  text-decoration:line-through;
+}
+.kai-check-item.done .kai-check-box {
+  background:var(--g);border-color:var(--g);color:#fff;
+}
+.kai-check-item.alert {
+  background:rgba(232,64,64,.06);
+  border-color:rgba(232,64,64,.2);
+}
+.kai-check-item.alert .kai-check-box {
+  background:rgba(232,64,64,.1);
+  border-color:rgba(232,64,64,.3);
+  color:var(--r);
+}
+
+.kai-check-box {
+  width:18px;height:18px;border-radius:5px;
+  border:1.5px solid var(--gb2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;flex-shrink:0;margin-top:1px;
+  transition:all .15s;background:var(--c1);
+}
+.kai-check-txt {
+  font-size:11.5px;color:var(--t0);
+  font-family:var(--f);font-weight:500;line-height:1.4;flex:1;
+}
+.kai-check-sub {
+  font-size:10px;color:var(--t2);margin-top:2px;
+  font-family:var(--f);font-weight:400;
+}
+
+/* KAI insight card */
+.kai-insight {
+  margin:8px 0 4px;
+  padding:9px 12px;
+  border-radius:8px;
+  background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(224,69,0,.06));
+  border:1px solid rgba(99,102,241,.15);
+  display:none;
+}
+.kai-insight.show { display:block; }
+.kai-insight-lbl {
+  font-size:9px;font-weight:700;letter-spacing:.08em;
+  color:var(--v);text-transform:uppercase;margin-bottom:4px;
+  font-family:var(--f);
+}
+.kai-insight-txt {
+  font-size:11.5px;color:var(--t0);line-height:1.5;
+  font-family:var(--f);font-weight:400;
+}
+
+/* Rec stack mejorado */
+.rec-toast {
+  border-radius:8px !important;
+  padding:8px 10px !important;
+  border:1px solid var(--gb2) !important;
+}
 </style>
 </head>
 <body>
@@ -1623,11 +1695,23 @@ nav{
           <span class="ctx-head-ico">🧠</span>
           <span class="ctx-head-lbl">KAI · Recomendaciones</span>
         </div>
-        <div class="kai-pill">
+        <!-- KAI insight desde LLM -->
+        <div class="kai-insight" id="kai-insight-card">
+          <div class="kai-insight-lbl">✦ KAI sugiere</div>
+          <div class="kai-insight-txt" id="kai-guidance-txt">—</div>
+        </div>
+        <!-- Checklist de protocolo -->
+        <div class="kai-checklist" id="kai-checklist">
+          <div style="font-size:10px;color:var(--t2);padding:8px 4px;font-family:var(--f);">
+            Protocolo cargará al detectar el tipo de servicio
+          </div>
+        </div>
+        <div id="rec-stack"></div>
+        <div class="kai-pill" style="display:none">
           <div class="kai-pill-ico">K</div>
           <div class="kai-pill-body">
             <div class="kai-pill-lbl">Sugerencia activa</div>
-            <div class="kai-pill-txt" id="kai-guidance-txt">—</div>
+            <div class="kai-pill-txt" id="kai-guidance-txt-legacy">—</div>
           </div>
         </div>
       </div>
@@ -2826,13 +2910,22 @@ const Recs=(()=>{
   function dismiss(id){_dismiss(id);}
   function showInsightText(text){
     if(!text)return;
-    const id='ins_'+Date.now();
-    const s=document.getElementById('rec-stack');if(!s)return;
-    const t=document.createElement('div');t.className='rec-toast';t.id='rec_'+id;
-    t.innerHTML=`<div class="rec-ico">✦</div><div class="rec-body"><div class="rec-lbl">Recomendación IA</div><div class="rec-txt">${text}</div></div><button class="rec-done-btn" onclick="Recs.dismiss('${id}')" title="Entendido">✓</button>`;
-    s.appendChild(t);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
-    setTimeout(()=>_dismiss(id),14000);
+    // Mostrar en el card de insight de KAI
+    var card = document.getElementById('kai-insight-card');
+    var txt = document.getElementById('kai-guidance-txt');
+    if (card && txt) {
+      txt.textContent = text;
+      card.classList.add('show');
+      // Auto-cerrar después de 20s
+      clearTimeout(card._t);
+      card._t = setTimeout(function() { card.classList.remove('show'); }, 20000);
+    }
+    // También auto-check ítems del checklist si menciona palabras clave
+    if (typeof autoCheckItem === 'function') {
+      ['ubicación','nombre','placa','destino','marchamo','cédula'].forEach(function(kw) {
+        if (text.toLowerCase().includes(kw)) autoCheckItem(kw);
+      });
+    }
   }
   function reset(){_a.clear();const s=document.getElementById('rec-stack');if(s)s.innerHTML='';}
   return{check,dismiss,showInsightText,reset};
@@ -3951,12 +4044,40 @@ function _dismissKBPill(itemId){
   setTimeout(()=>el.remove(), 850);
 }
 
-function renderKBSugs(sugs){
-  // Legacy — kept for compatibility
-  const el = document.getElementById('kb-sugs');
-  if(!el) return;
-  el.innerHTML = sugs.map(s=>'<div class="kb-sug"><span class="kb-sug-dot"></span><span class="kb-sug-txt">'+s+'</span></div>').join('');
-  document.getElementById('kb-card').style.display='block';
+function renderKBSugs(sugs) {
+  var cl = document.getElementById('kai-checklist');
+  if (!cl) return;
+  if (!sugs || sugs.length === 0) {
+    cl.innerHTML = '<div style="font-size:10px;color:var(--t2);padding:8px 4px;font-family:var(--f);">Sin protocolo definido para este servicio</div>';
+    return;
+  }
+  cl.innerHTML = sugs.map(function(s, i) {
+    return '<div class="kai-check-item" id="kc-' + i + '" onclick="toggleCheckItem(this)">' +
+      '<div class="kai-check-box" id="kcb-' + i + '"></div>' +
+      '<div><div class="kai-check-txt">' + s + '</div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleCheckItem(el) {
+  el.classList.toggle('done');
+  var box = el.querySelector('.kai-check-box');
+  if (box) box.textContent = el.classList.contains('done') ? '✓' : '';
+}
+
+// Marcar automáticamente un ítem del checklist desde la transcripción
+function autoCheckItem(keyword) {
+  var items = document.querySelectorAll('.kai-check-item');
+  items.forEach(function(item) {
+    var txt = item.querySelector('.kai-check-txt');
+    if (txt && txt.textContent.toLowerCase().includes(keyword.toLowerCase())) {
+      if (!item.classList.contains('done')) {
+        item.classList.add('done');
+        var box = item.querySelector('.kai-check-box');
+        if (box) box.textContent = '✓';
+      }
+    }
+  });
 }IG={
   NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
   FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
@@ -4276,6 +4397,14 @@ function fillVisiblePOField(kaiKey, value) {
   setTimeout(function() { inp.style.background = ''; }, 800);
   // Actualizar contadores de sección
   _updatePOProgress();
+  // Auto-marcar checklist si el campo corresponde a un ítem de protocolo
+  if (typeof autoCheckItem === 'function') {
+    var checkMap = {
+      'ubicacion_origen': 'ubicación', 'placa': 'placa', 'nombre': 'nombre',
+      'ubicacion_destino': 'destino', 'tipo_svc': 'servicio'
+    };
+    if (checkMap[dataKey]) autoCheckItem(checkMap[dataKey]);
+  }
 }
 
 function _updatePOProgress() {
