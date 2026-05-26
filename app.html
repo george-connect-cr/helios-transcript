@@ -1763,13 +1763,14 @@ function appendTranscript(speaker,text){
     grp.appendChild(row);grp.appendChild(bbl2);
     body.appendChild(grp);
   }
-  // Smart scroll: only auto-scroll if user is near the bottom
-  const isNearBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
-  if(isNearBottom){
-    body.scrollTop=body.scrollHeight;
-    _hideScrollArrow();
-  } else {
+  // Auto-scroll: siempre baja al último mensaje
+  // Si el usuario subió manualmente (>200px del fondo), mostrar flecha
+  const distFromBottom = body.scrollHeight - body.scrollTop - body.clientHeight;
+  if(distFromBottom > 200){
     _showScrollArrow();
+  } else {
+    body.scrollTo({top: body.scrollHeight, behavior: 'smooth'});
+    _hideScrollArrow();
   }
   if(typeof CallTimer!=='undefined') CallTimer.start();
   if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
@@ -2032,9 +2033,9 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 
 function _clearSession() {
-  // Limpiar transcripción
+  // Limpiar transcripción y reset scroll
   var tbody = document.getElementById('t-body');
-  if (tbody) tbody.innerHTML = '';
+  if (tbody) { tbody.innerHTML = ''; tbody.scrollTop = 0; }
   // Limpiar chips de inferencia
   var tinf = document.getElementById('t-inferred');
   if (tinf) { tinf.innerHTML = ''; tinf.style.display = 'none'; }
