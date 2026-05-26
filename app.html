@@ -1121,6 +1121,11 @@ nav{
 
 /* ── Toast notification ── */
 #toast.show { opacity: 1 !important; }
+
+/* KAI Academy — campo completado */
+.fld.filled { border-color: var(--g) !important; }
+.fld.filled .fld-lbl { color: var(--g); }
+.fld.filled .fld-in { color: var(--t0); font-weight: 500; }
 </style>
 </head>
 <body>
@@ -1624,7 +1629,8 @@ async function triggerSimulatedCall() {
   var destination = _nextUC();
   showToast('📞 Conectando llamada de entrenamiento...');
 
-  // Mostrar botón Finalizar llamada
+  // Deshabilitar Demo y mostrar botón Finalizar en el nav
+  _setDemoState(false);
   _showEndCallButton();
 
   try {
@@ -1646,12 +1652,14 @@ async function triggerSimulatedCall() {
       showToast('⚠ Error al conectar (' + res.status + ')');
       _callInProgress = false;
       _hideEndCallButton();
+      _setDemoState(true);
       setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     }
   } catch(err) {
     showToast('⚠ Error de red al disparar llamada');
     _callInProgress = false;
     _hideEndCallButton();
+    _setDemoState(true);
     setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     console.error('triggerSimulatedCall:', err);
   }
@@ -1660,6 +1668,7 @@ async function triggerSimulatedCall() {
 function endCall() {
   _callInProgress = false;
   _hideEndCallButton();
+  _setDemoState(true);
   // Volver a Coaching
   setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
   // Mostrar popup de resultados
@@ -1668,25 +1677,38 @@ function endCall() {
   }, 400);
 }
 
+function _setDemoState(enabled) {
+  var btn = document.querySelector('.n-demo');
+  if (!btn) return;
+  btn.disabled = !enabled;
+  btn.style.opacity = enabled ? '1' : '0.35';
+  btn.style.pointerEvents = enabled ? '' : 'none';
+  btn.title = enabled ? 'Demo' : 'No disponible durante llamada real';
+}
+
 function _showEndCallButton() {
-  var existing = document.getElementById('btn-end-call');
-  if (existing) return;
+  // Reemplazar el botón Demo en el nav con el botón Finalizar
+  var demoBtn = document.querySelector('.n-demo');
+  if (!demoBtn) return;
+  if (document.getElementById('btn-end-call')) return;
   var btn = document.createElement('button');
   btn.id = 'btn-end-call';
-  btn.innerHTML = '📵 Finalizar llamada';
-  btn.style.cssText = 'position:fixed;bottom:80px;right:24px;z-index:300;' +
-    'background:#e84040;color:#fff;border:none;border-radius:8px;' +
-    'padding:10px 18px;font-family:var(--f);font-size:13px;font-weight:600;' +
-    'cursor:pointer;box-shadow:0 4px 16px rgba(232,64,64,.4);' +
-    'display:flex;align-items:center;gap:7px;' +
-    'animation:fi .2s ease;';
+  btn.textContent = '📵 Finalizar';
+  btn.style.cssText = demoBtn.style.cssText;
+  btn.className = demoBtn.className;
+  btn.style.background = '#e84040';
+  btn.style.color = '#fff';
+  btn.style.borderColor = '#e84040';
   btn.onclick = endCall;
-  document.body.appendChild(btn);
+  demoBtn.style.display = 'none';
+  demoBtn.parentNode.insertBefore(btn, demoBtn);
 }
 
 function _hideEndCallButton() {
   var btn = document.getElementById('btn-end-call');
   if (btn) btn.remove();
+  var demoBtn = document.querySelector('.n-demo');
+  if (demoBtn) demoBtn.style.display = '';
 }
 // ───────────────────────────────────────────────────────
 
@@ -1763,17 +1785,43 @@ function appendTranscript(speaker,text){
   checkKBTranscript(document.getElementById('t-body')?.innerText||'');
   const body=document.getElementById('t-body');
   if(body.querySelector('span[style]'))body.innerHTML='';
-  const line=document.createElement('div');
-  line.className='tline';
   const isAg=(speaker||'').toLowerCase().includes('agent')||(speaker||'').toLowerCase()==='agente';
-  const spk=document.createElement('span');
-  spk.className='spk '+(isAg?'ag':'cl');
-  spk.textContent=isAg?'Agente':'Cliente';
-  const txt=document.createElement('span');
-  txt.className='stxt';
-  txt.textContent=text;
-  line.appendChild(spk);line.appendChild(txt);
-  body.appendChild(line);
+  const now=new Date();
+  const ts=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+
+  // Reusar el último grupo si es el mismo speaker
+  var lastGroup=body.lastElementChild;
+  if(lastGroup && lastGroup.classList.contains('msg-group') &&
+     lastGroup.classList.contains(isAg?'':'client') &&
+     !lastGroup.classList.contains(isAg?'client':'')) {
+    // Agregar burbuja al grupo existente
+    var bbl=document.createElement('div');
+    bbl.className='bubble '+(isAg?'ag':'cl');
+    bbl.textContent=text;
+    lastGroup.appendChild(bbl);
+  } else {
+    // Crear nuevo grupo
+    var grp=document.createElement('div');
+    grp.className='msg-group'+(isAg?'':' client');
+    var row=document.createElement('div');
+    row.className='spk-row';
+    if(isAg){
+      var av=document.createElement('div');av.className='spk-av';av.textContent='AG';
+      var nm=document.createElement('span');nm.className='spk-name';nm.textContent='Agente';
+      var t=document.createElement('span');t.className='spk-time';t.textContent=ts;
+      row.appendChild(av);row.appendChild(nm);row.appendChild(t);
+    } else {
+      var t2=document.createElement('span');t2.className='spk-time';t2.textContent=ts;
+      var nm2=document.createElement('span');nm2.className='spk-name';nm2.textContent='Cliente';
+      var av2=document.createElement('div');av2.className='spk-av';av2.textContent='CL';
+      row.appendChild(t2);row.appendChild(nm2);row.appendChild(av2);
+    }
+    var bbl2=document.createElement('div');
+    bbl2.className='bubble '+(isAg?'ag':'cl');
+    bbl2.textContent=text;
+    grp.appendChild(row);grp.appendChild(bbl2);
+    body.appendChild(grp);
+  }
   // Smart scroll: only auto-scroll if user is near the bottom
   const isNearBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
   if(isNearBottom){
@@ -2637,6 +2685,11 @@ function _autoFillPO(data){
 
   // Add all fields synchronously so _data is complete
   toAdd.forEach(([key,val]) => POBuilder.addField(key, val, true));
+
+  // También rellenar el nuevo layout visual de Dayana
+  toAdd.forEach(([key,val]) => {
+    if(typeof fillVisiblePOField === 'function') fillVisiblePOField(key, val);
+  });
 
   if(data.tipo_asistencia) ServiceDetector.analyze(data.tipo_asistencia);
 
@@ -3638,6 +3691,64 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 300);
 });
+
+
+// ── KAI Academy — bridge entre análisis KAI y campos visuales del PO ──
+// Mapeo: clave de análisis → data-key del layout de Dayana
+var KAI_FIELD_MAP = {
+  'nombre_cliente': 'nombre',
+  'placa':          'placa',
+  'tablilla':       'placa',
+  'marca':          'marca',
+  'modelo':         'modelo',
+  'año':            'anio',
+  'color':          'color',
+  'tipo_asistencia':'tipo_svc',
+  'ubicación':      null,  // no hay campo ubicación en el nuevo layout de PO
+  'ubicacion_destino': null,
+};
+
+function fillVisiblePOField(kaiKey, value) {
+  if (!value || value === 'N/A') return;
+  var dataKey = KAI_FIELD_MAP[kaiKey];
+  if (!dataKey) return;
+  var fld = document.querySelector('.fld[data-key="' + dataKey + '"]');
+  if (!fld) return;
+  var inp = fld.querySelector('.fld-in');
+  if (!inp) return;
+  inp.value = value;
+  inp.classList.remove('empty');
+  // Marcar el campo como completado
+  fld.classList.remove('pending');
+  fld.classList.add('filled');
+  // Flash verde
+  inp.style.transition = 'background .3s';
+  inp.style.background = 'rgba(14,168,116,.12)';
+  setTimeout(function() { inp.style.background = ''; }, 800);
+  // Actualizar contadores de sección
+  _updatePOProgress();
+}
+
+function _updatePOProgress() {
+  // Contar campos completados por sección
+  var sections = document.querySelectorAll('.ps');
+  sections.forEach(function(sec) {
+    var total = sec.querySelectorAll('.fld[data-key]').length;
+    var filled = sec.querySelectorAll('.fld.filled').length;
+    var ratio = sec.querySelector('[id^="r-"]');
+    if (ratio) ratio.textContent = filled + ' / ' + total;
+  });
+  // Actualizar barra de progreso global
+  var allFields = document.querySelectorAll('.fld[data-key]').length;
+  var allFilled = document.querySelectorAll('.fld.filled').length;
+  var pct = allFields > 0 ? Math.round(allFilled / allFields * 100) : 0;
+  var bar = document.getElementById('po-progress-fill');
+  var pctEl = document.getElementById('po-progress-pct');
+  var statsEl = document.getElementById('po-progress-stats');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (statsEl) statsEl.textContent = allFilled + ' / ' + allFields;
+}
 
 // ── Aliases para compatibilidad HTML de Dayana ──
 function openDash(){ if(typeof openDashboard==='function') openDashboard(); }
