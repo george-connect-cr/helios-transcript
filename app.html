@@ -2028,6 +2028,66 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 </div>
 
 <script>
+// ── AUTH — objeto global para acciones de sesión ──────────────────────────
+var AUTH = {
+  logout: function() {
+    localStorage.removeItem('helios_session');
+    window.location.href = 'index.html';
+  }
+};
+
+// ── Supabase — infraestructura de persistencia de métricas ────────────────
+// Completar url y anonKey cuando esté disponible la base de datos.
+// Mientras estén en blanco, savePOToSupabase() no hace nada.
+var SUPABASE_CONFIG = {
+  url:     '',                  // ej: 'https://xxxxxxxxxxxx.supabase.co'
+  anonKey: '',                  // ej: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  table:   'call_metrics'       // nombre de la tabla destino
+};
+
+function savePOToSupabase(entry) {
+  if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) return;
+  try {
+    var _sess = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    var _usr  = (_sess && _sess.user) || {};
+    var sc    = (entry.meta && entry.meta.scores) || {};
+    var payload = {
+      po_number:          entry.num,
+      created_at:         new Date().toISOString(),
+      agent_name:         _usr.name  || '',
+      agent_email:        _usr.email || '',
+      agent_role:         _usr.role  || '',
+      service_type:       (entry.data && entry.data.tipo_asistencia) || '',
+      customer_name:      (entry.data && entry.data.nombre_cliente)  || '',
+      plate:              (entry.data && entry.data.placa)           || '',
+      location_origin:    (entry.data && (entry.data['ubicación'] || entry.data.ubicacion)) || '',
+      location_dest:      (entry.data && entry.data.ubicacion_destino) || '',
+      call_duration:      (entry.meta && entry.meta.callDuration) || '',
+      sentiment_val:      (entry.meta && entry.meta.sentVal)      || 0,
+      wait_time:          (entry.meta && entry.meta.waitTime)     || 0,
+      score_satisfaction: sc.satisfaction || 0,
+      score_aht:          sc.ahtScore     || 0,
+      score_completeness: sc.completeness || 0,
+      score_speech:       sc.speechScore  || 0,
+      raw_data:           JSON.stringify(entry)
+    };
+    fetch(SUPABASE_CONFIG.url + '/rest/v1/' + SUPABASE_CONFIG.table, {
+      method: 'POST',
+      headers: {
+        'apikey':        SUPABASE_CONFIG.anonKey,
+        'Authorization': 'Bearer ' + SUPABASE_CONFIG.anonKey,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    }).catch(function(err) {
+      console.warn('[Supabase] No se pudo guardar la métrica:', err.message);
+    });
+  } catch(e) {
+    console.warn('[Supabase] Error preparando payload:', e.message);
+  }
+}
+
 // ── KAI Academy — llamadas simuladas ──────────────────
 var SEND_CALL_URL = "https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/sendCall?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==";
 // UCs activos — agregar/descomentar cuando estén configurados en Audara
@@ -3646,6 +3706,7 @@ function confirmPO(){
       meta:{callDuration, sentVal:sent?Number(sent.valor):0,
             waitTime:WAIT[svcId]||15, scores}};
     _poList.push(poEntry);
+    savePOToSupabase(poEntry); // persiste métricas en Supabase cuando esté configurado
     _poCount = _poList.length;
 
     // Update counter pill

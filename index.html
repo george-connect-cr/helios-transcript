@@ -497,7 +497,9 @@ function saveAndRedirect(user, role, extension){
       ts:Date.now()
     };
     localStorage.setItem('helios_session', JSON.stringify(session));
-    window.location.href = 'app.html';
+    // Routing por rol: supervisor y formador van directo a reportes
+    var _dest = (role==='supervisor'||role==='formador') ? 'reportes.html' : 'app.html';
+    window.location.href = _dest;
   }, 900);
 }
 </script>
