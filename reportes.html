@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CONNECT · Reportes</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#f8f9fc;--c1:#fff;--c2:#f8f9fc;--c3:#f1f3f9;--c4:#e8ebf4;
@@ -32,12 +33,12 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
   padding:0 20px;display:flex;align-items:center;gap:10px;
   position:sticky;top:0;z-index:10;flex-shrink:0;
 }
-.hd-brand{font-size:16px;font-weight:800;letter-spacing:-.4px;color:var(--t0);}
+.hd-brand{font-size:15px;font-weight:800;letter-spacing:-.5px;color:var(--t0);}
 .hd-brand em{color:var(--a);font-style:normal;}
 .hd-brand sup{font-size:8px;color:var(--a);opacity:.5;}
 .hd-sep{width:0.5px;height:18px;background:rgba(0,0,0,.06);margin:0 10px;}
-.hd-title{font-size:13px;font-weight:700;color:var(--t0);}
-.hd-role{font-size:9px;font-weight:700;padding:3px 9px;border-radius:3px;background:#fff8f5;color:var(--a);}
+.hd-title{font-size:14px;font-weight:700;letter-spacing:-.3px;color:var(--t0);}
+.hd-role{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#fff8f5;color:var(--a);letter-spacing:.01em;}
 
 
 /* ── FILTER BAR ── */
@@ -78,13 +79,13 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 
 /* ── BUTTONS ── */
 .btn{
-  height:30px;padding:0 14px;border-radius:4px;border:none;
+  height:30px;padding:0 14px;border-radius:8px;border:none;
   background:var(--c2);font-family:var(--f);font-size:11px;
   font-weight:600;color:var(--t1);cursor:pointer;
   box-shadow:var(--sh-sm);transition:all .12s;
 }
 .btn:hover{background:var(--c3);}
-.btn-primary{background:var(--a);color:#fff;box-shadow:0 2px 8px rgba(224,69,0,.2);}
+.btn-primary{background:var(--a);color:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(224,69,0,.2);}
 .btn-primary:hover{background:#c93d00;}
 .btn-danger{background:var(--re2);color:var(--r);}
 .btn-danger:hover{background:#ffeaea;}
@@ -121,7 +122,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 
 /* ── CARDS — no borders, shadow only ── */
 .card{
-  background:var(--c1);border-radius:6px;
+  background:var(--c1);border-radius:10px;
   padding:18px 20px;margin-bottom:12px;
   box-shadow:var(--sh-sm);
 }
@@ -132,15 +133,15 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 .g6{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px;}
 
 /* ── KPI TINT CARDS ── */
-.kc{border-radius:6px;padding:14px 16px;box-shadow:var(--sh-sm);}
+.kc{border-radius:10px;padding:14px 16px;box-shadow:var(--sh-sm);}
 .kc.bl{background:var(--bl2);}
 .kc.gr{background:var(--gr2);}
 .kc.am{background:var(--am2);}
 .kc.re{background:var(--re2);}
 .kc.pu{background:var(--pu2);}
 .kc-ico{font-size:16px;margin-bottom:6px;}
-.kc-val{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1;}
-.kc-lbl{font-size:9px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.kc-val{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1;}
+.kc-lbl{font-size:9px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-top:5px;}
 
 /* ── AVATAR ── */
 .av{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-weight:800;color:#fff;flex-shrink:0;}
@@ -154,7 +155,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 .bar6f{height:100%;border-radius:3px;transition:width .5s;}
 
 /* ── TABLE ── */
-.tbl-wrap{background:var(--c1);border-radius:6px;overflow:hidden;box-shadow:var(--sh-sm);margin-bottom:12px;}
+.tbl-wrap{background:var(--c1);border-radius:10px;overflow:hidden;box-shadow:var(--sh-sm);margin-bottom:12px;}
 table{width:100%;border-collapse:collapse;font-size:11px;}
 th{
   background:var(--c2);padding:9px 12px;text-align:left;
