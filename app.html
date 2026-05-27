@@ -2593,6 +2593,11 @@ window.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('btn-logout')&&document.getElementById('btn-logout').addEventListener('click',function(){
       localStorage.removeItem('helios_session');window.location.href='index.html';
     });
+    // Cerrar sesión desde el menú de perfil — listener directo como refuerzo al onclick="AUTH.logout()"
+    var _pmLogout=document.querySelector('#profile-menu .pm-item.danger');
+    if(_pmLogout)_pmLogout.addEventListener('click',function(){
+      localStorage.removeItem('helios_session');window.location.href='index.html';
+    });
     ['click','keydown','touchstart'].forEach(function(ev){
       document.addEventListener(ev,function(){
         try{var s=JSON.parse(localStorage.getItem('helios_session')||'null');
