@@ -236,8 +236,9 @@ tr:hover td{background:var(--c2);}
       <div class="fdrop-item" onclick="setF('pais','',event)">Todos</div>
       <div class="fdrop-item" onclick="setF('pais','Costa Rica',event)">🇨🇷 Costa Rica</div>
       <div class="fdrop-item" onclick="setF('pais','Panamá',event)">🇵🇦 Panamá</div>
-      <div class="fdrop-item" onclick="setF('pais','Guatemala',event)">🇬🇹 Guatemala</div>
-      <div class="fdrop-item" onclick="setF('pais','Honduras',event)">🇭🇳 Honduras</div>
+      <div class="fdrop-item" onclick="setF('pais','México',event)">🇲🇽 México</div>
+      <div class="fdrop-item" onclick="setF('pais','Colombia',event)">🇨🇴 Colombia</div>
+      <div class="fdrop-item" onclick="setF('pais','Puerto Rico',event)">🇵🇷 Puerto Rico</div>
     </div>
   </div>
   <div class="fp" id="f-grade" onclick="toggleDrop(this,event)">Rendimiento ▾ <div class="fdrop">
@@ -308,7 +309,7 @@ var RA=[
      {id:'PO-2034',f:'27 abr',svc:'Batería',dur:295,score:74,sat:4,sent:'n',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:'ETA no comunicado'},
      {id:'PO-2028',f:'26 abr',svc:'Grúa',dur:360,score:65,sat:2,sent:'g',sp:{sal:false,id:false,ub:true,eta:false,ci:false},obs:'Cliente molesto. Múltiples omisiones.'}
    ]},
-  {id:5,name:'Sofía Ramírez',lt:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',calls:178,pos:134,aht:245,ahtS:'4:05',sat:88,speech:91,score:87,grade:'B',
+  {id:5,name:'Sofía Ramírez',lt:'S',color:'#bf9455',carril:'Road',pais:'México',calls:178,pos:134,aht:245,ahtS:'4:05',sat:88,speech:91,score:87,grade:'B',
    sent:{p:70,n:22,g:8},durs:[240,255,235,260,245,250,240,265,248,255,242,258,245,252,240],
    poscores:[86,88,84,89,87,85,88,86,87,84],
    mejoras:['ETA en el 100% de llamadas','Confirmación de referencia'],
@@ -323,7 +324,7 @@ var RA=[
    polist:[
      {id:'PO-2043b',f:'28 abr',svc:'Concierge',dur:265,score:81,sat:4,sent:'p',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:'ETA omitido'}
    ]},
-  {id:7,name:'María Solano',lt:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',calls:132,pos:89,aht:344,ahtS:'5:44',sat:68,speech:74,score:68,grade:'C',
+  {id:7,name:'María Solano',lt:'M',color:'#8b5cf6',carril:'Home',pais:'Colombia',calls:132,pos:89,aht:344,ahtS:'5:44',sat:68,speech:74,score:68,grade:'C',
    sent:{p:42,n:30,g:28},durs:[350,320,370,340,380,330,355,345,365,335,350,325,360,340,375],
    poscores:[65,68,63,67,70,64,68,66,69,63],
    mejoras:['Saludo en 100% llamadas','Reducir AHT','Manejo clientes molestos','Validación datos','Cierre con ETA'],
@@ -388,7 +389,7 @@ function setF(key,val,e){
   document.querySelectorAll('.fp[id]').forEach(function(el){el.classList.remove('open');});
   var btn=document.getElementById('f-'+key);
   var lbl={carril:{'':"Carril",Home:"🏠 Home",Road:"🚗 Road",Concierge:"💎 Concierge"},
-            pais:{'':"País","Costa Rica":"🇨🇷 CR","Panamá":"🇵🇦 PA","Guatemala":"🇬🇹 GT","Honduras":"🇭🇳 HN"},
+            pais:{'':"País","Costa Rica":"🇨🇷 CR","Panamá":"🇵🇦 PA","México":"🇲🇽 MX","Colombia":"🇨🇴 CO","Puerto Rico":"🇵🇷 PR"},
             grade:{'':"Rendimiento",A:"⭐ A",B:"👍 B",C:"⚠️ C"},
             agente:{'':"Agente"}};
   if(btn){
