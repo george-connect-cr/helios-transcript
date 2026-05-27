@@ -59,6 +59,19 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 }
 .fp:hover{background:var(--c3);color:var(--t0);}
 .fp.active{background:#fff8f5;color:var(--a);}
+.fp.filtered{background:var(--am2);color:var(--a);border:1.5px solid rgba(224,69,0,.25);}
+.fp.filtered:hover{background:#ffe8d6;}
+.fp-check{font-size:9px;font-weight:800;margin-right:2px;opacity:.8;}
+.fp-clear{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--a);color:#fff;
+  font-size:9px;font-weight:800;
+  margin-left:4px;cursor:pointer;
+  border:none;padding:0;vertical-align:middle;line-height:1;
+  transition:background .12s;flex-shrink:0;
+}
+.fp-clear:hover{background:#c93d00;}
 
 /* Dropdown — hidden by default, shown via .open class on parent .fp */
 .fdrop{
@@ -248,7 +261,7 @@ tr:hover td{background:var(--c2);}
       <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ Atención (C)</div>
     </div>
   </div>
-  <div id="ftags" style="display:flex;gap:4px;margin-left:4px;"></div>
+  <div id="ftags" style="display:none;"></div>
 </div>
 <div class="body-wrap">
   <div class="sb">
@@ -393,22 +406,19 @@ function setF(key,val,e){
             grade:{'':"Rendimiento",A:"⭐ A",B:"👍 B",C:"⚠️ C"},
             agente:{'':"Agente"}};
   if(btn){
-    btn.childNodes[0].nodeValue=(lbl[key][val]||key)+' ▾';
-    btn.className='fp'+(val?' filtered':'');
-    btn.innerHTML=(lbl[key][val]||key)+' ▾<div class="fdrop">'+btn.querySelector('.fdrop').innerHTML+'</div>';
+    var _fdropHtml=btn.querySelector('.fdrop').innerHTML;
+    var _defaults={carril:'Carril',pais:'País',grade:'Rendimiento',agente:'Agente'};
+    if(val){
+      btn.className='fp filtered';
+      btn.innerHTML='<span class="fp-check">✓</span>'+(lbl[key][val]||val)
+        +'<button class="fp-clear" onclick="event.stopPropagation();setF(\''+key+'\',\'\',{stopPropagation:function(){}});" title="Limpiar filtro">×</button>'
+        +' ▾<div class="fdrop">'+_fdropHtml+'</div>';
+    } else {
+      btn.className='fp';
+      btn.innerHTML=(_defaults[key]||key)+' ▾<div class="fdrop">'+_fdropHtml+'</div>';
+    }
   }
-  var tags=document.getElementById('ftags');
-  if(tags){
-    tags.innerHTML='';
-    Object.keys(_filters).forEach(function(k){
-      if(!_filters[k])return;
-      var t=document.createElement('div');t.className='ftag';
-      t.innerHTML=_filters[k];
-      var b=document.createElement('button');b.textContent='×';
-      b.onclick=(function(kk){return function(ev){ev.stopPropagation();setF(kk,'',ev);go(_cur);};})(k);
-      t.appendChild(b);tags.appendChild(t);
-    });
-  }
+  /* ftags eliminados — el estado activo vive dentro del pill */
   if(key==='agente'&&val){
     _selAg=RA.find(function(a){return a.name===val;})||_selAg;
     go('agente_v');
