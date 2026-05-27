@@ -332,7 +332,7 @@ body.dark .n-th-thumb {
 .dash-ov.show{display:flex;}
 .dash-modal{
   width:min(100%,920px);max-height:90vh;
-  background:var(--c1);border-radius:8px;
+  background:var(--c1);border-radius:12px;
   box-shadow:0 1px 3px rgba(0,0,0,.1),0 24px 80px rgba(0,0,0,.28);
   display:flex;flex-direction:column;overflow:hidden;
   animation:dashIn .28s cubic-bezier(.34,1.56,.64,1);
@@ -362,7 +362,7 @@ body.dark .n-th-thumb {
 .dash-hero{
   display:flex;align-items:center;gap:22px;
   padding:18px 22px;
-  background:var(--c2);border-radius:6px;
+  background:var(--c2);border-radius:8px;
 }
 .dash-ring-wrap{position:relative;width:104px;height:104px;flex-shrink:0;}
 .dash-ring{transform:rotate(-90deg);}
@@ -391,7 +391,7 @@ body.dark .n-th-thumb {
 }
 .dash-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
 .dash-kpi{
-  padding:12px 14px;background:var(--c2);border-radius:6px;
+  padding:12px 14px;background:var(--c2);border-radius:8px;
   display:flex;flex-direction:column;gap:3px;
 }
 .dash-kpi-val{font-family:var(--f);font-size:18px;font-weight:700;color:var(--t0);line-height:1.1;}
@@ -402,7 +402,7 @@ body.dark .n-th-thumb {
 .dash-call-list{display:flex;flex-direction:column;gap:4px;}
 .dash-call{
   display:flex;align-items:center;gap:12px;
-  padding:9px 14px;background:var(--c2);border-radius:4px;
+  padding:9px 14px;background:var(--c2);border-radius:6px;
   transition:background .12s;cursor:pointer;
 }
 .dash-call:hover{background:var(--c3);}
@@ -424,12 +424,12 @@ body.dark .n-th-thumb {
 .dash-foot-note{font-family:var(--f);font-size:9.5px;color:var(--t2);}
 .dash-foot-btn{
   display:inline-flex;align-items:center;gap:7px;
-  padding:9px 16px;border-radius:4px;border:none;
-  background:var(--t0);color:#fff;
+  padding:9px 18px;border-radius:20px;border:none;
+  background:var(--a);color:#fff;
   font-family:var(--f);font-size:12px;font-weight:600;
   cursor:pointer;transition:background .15s;
 }
-.dash-foot-btn:hover{background:#1a1f30;}
+.dash-foot-btn:hover{background:var(--a2);}
 
 /* ═══ BODY — 3 COLUMNS ═════════════════════════════ */
 .body{flex:1;display:flex;overflow:hidden;background:var(--bg);}
@@ -1556,7 +1556,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.1.2-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.1.3-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -4698,8 +4698,8 @@ function showCallRating(){
     '<div style="margin-bottom:16px;"><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:6px;">Observaciones</div><textarea placeholder="Agrega una observación..." style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--gb2);background:var(--c2);color:var(--t0);font-family:var(--f);font-size:12px;resize:none;height:60px;outline:none;box-sizing:border-box;"></textarea></div>'+
     '<div style="display:flex;gap:8px;" id="cr-btns"></div>';
   var row=card.querySelector('#cr-btns')||card;
-  var bd=document.createElement('button');bd.style.cssText='flex:1;padding:10px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:12px;cursor:pointer;';bd.textContent='Descartar';bd.onclick=function(){ov.remove();_lastTranscriptText='';};
-  var bs=document.createElement('button');bs.style.cssText='flex:2;padding:10px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;';bs.textContent='Guardar calificación';bs.onclick=function(){ov.remove();_lastTranscriptText='';showToast('✓ Calificación guardada');};
+  var bd=document.createElement('button');bd.style.cssText='flex:1;padding:10px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:12px;cursor:pointer;';bd.textContent='Descartar';bd.onclick=function(){ov.remove();_lastTranscriptText='';setTimeout(function(){if(typeof openDashboard==='function')openDashboard();},300);};
+  var bs=document.createElement('button');bs.style.cssText='flex:2;padding:10px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;';bs.textContent='Guardar calificación';bs.onclick=function(){ov.remove();_lastTranscriptText='';showToast('✓ Calificación guardada');setTimeout(function(){if(typeof openDashboard==='function')openDashboard();},500);};
   row.appendChild(bd);row.appendChild(bs);
   ov.appendChild(card);document.body.appendChild(ov);
   ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
