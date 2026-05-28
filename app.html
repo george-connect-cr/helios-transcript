@@ -1768,7 +1768,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.2-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.3-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2285,6 +2285,12 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 // ── AUTH — objeto global para acciones de sesión ──────────────────────────
 var AUTH = {
   logout: function() {
+    try {
+      var _s3=JSON.parse(localStorage.getItem('helios_session')||'{}');
+      var _e3=(_s3.user||{}).email||'anon';
+      var _k3='helios_po_'+_e3+'_'+new Date().toISOString().slice(0,10);
+      localStorage.removeItem(_k3);
+    } catch(e){}
     localStorage.removeItem('helios_session');
     window.location.href = 'index.html';
   }
@@ -2875,6 +2881,21 @@ window.addEventListener('DOMContentLoaded', ()=>{
     if(_u.role==='supervisor'||_u.role==='admin'){window.location.href='reportes.html';return;}
     // Rol Demo: arranca el motor de simulación automáticamente
     if(_u.role==='demo'){setTimeout(_startDemoMode, 1500);}
+
+    // ── Restaurar _poList del turno actual desde localStorage ──────────
+    var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + new Date().toISOString().slice(0,10);
+    try {
+      var _savedPOs = localStorage.getItem(_poKey);
+      if (_savedPOs) {
+        _poList = JSON.parse(_savedPOs);
+        _poCount = _poList.length;
+        var _cnum = document.getElementById('po-count-num');
+        var _ctr  = document.getElementById('po-counter');
+        if (_cnum) _cnum.textContent = _poCount;
+        if (_poCount > 0 && _ctr) _ctr.classList.add('show');
+        AgentBar.init();
+      }
+    } catch(e) { _poList = []; }
     var _ne=document.getElementById('ag-name');
     if(_ne&&_u.name)_ne.textContent=_u.name.split(' ')[0];
     document.getElementById('btn-logout')&&document.getElementById('btn-logout').addEventListener('click',function(){
@@ -4270,7 +4291,14 @@ function confirmPO(){
             waitTime:WAIT[svcId]||15, scores}};
     _poList.push(poEntry);
     savePOToSupabase(poEntry);
-    if (_demoActive) _demoPOsaved++; // contador para saber cuándo mostrar el modal de continuar
+    if (_demoActive) _demoPOsaved++;
+    // Persistir en localStorage para sobrevivir navegación
+    try {
+      var _sess2 = JSON.parse(localStorage.getItem('helios_session')||'{}');
+      var _email2 = (_sess2.user||{}).email||'anon';
+      var _poKey2 = 'helios_po_' + _email2 + '_' + new Date().toISOString().slice(0,10);
+      localStorage.setItem(_poKey2, JSON.stringify(_poList));
+    } catch(e) {}
     _poCount = _poList.length;
 
     // Update counter pill

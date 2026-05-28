@@ -1024,9 +1024,92 @@ try{
       return;
     }
   }catch(e){}
-  go('resumen');
+  // Cargar datos reales de Supabase, luego renderizar
+  loadSupabaseData(function(){ go('resumen'); });
 })();
 
+
+// ── Supabase — cargar datos reales ───────────────────────────────
+var _SB_URL = 'https://dednkgonnirybnpktbzp.supabase.co';
+var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
+
+function loadSupabaseData(callback){
+  fetch(_SB_URL+'/rest/v1/call_sessions?select=*&order=created_at.desc&limit=1000',{
+    headers:{'apikey':_SB_KEY,'Authorization':'Bearer '+_SB_KEY}
+  })
+  .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
+  .then(function(sessions){
+    if(!sessions||!sessions.length){callback();return;}
+    var map={};
+    sessions.forEach(function(s){
+      var k=s.agent_email; if(!k)return;
+      if(!map[k]){
+        map[k]={
+          name:s.agent_name||k,email:s.agent_email,
+          country:s.country||'Costa Rica',
+          carril:(s.lane||'Home'),ss:[]
+        };
+      }
+      map[k].ss.push(s);
+    });
+    var avg=function(arr,fn){
+      var v=arr.map(fn).filter(function(x){return x>0;});
+      return v.length?Math.round(v.reduce(function(a,b){return a+b;},0)/v.length):0;
+    };
+    var colors=['#E8440A','#7048E8','#3B6EF8','#0EA874','#F0900A','#e84040'];
+    var newRA=Object.values(map).map(function(a,i){
+      var ss=a.ss; var n=ss.length;
+      var score=avg(ss,function(s){return s.score_total;});
+      var dur=avg(ss,function(s){return s.call_duration_secs;});
+      var pos=ss.filter(function(s){return s.sentiment_label==='positivo';}).length;
+      var neu=ss.filter(function(s){return s.sentiment_label==='neutro';}).length;
+      var neg=ss.filter(function(s){return s.sentiment_label==='negativo';}).length;
+      var minsec=Math.floor(dur/60)+':'+(dur%60<10?'0':'')+(dur%60);
+      return{
+        id:i+1,
+        name:a.name, email:a.email,
+        lt:(a.name||'?')[0].toUpperCase(), color:colors[i%colors.length],
+        carril:a.carril, pais:a.country||'Costa Rica',
+        calls:n, pos:Math.round(pos/Math.max(n,1)*n),
+        aht:dur, ahtS:minsec,
+        sat:avg(ss,function(s){return s.score_satisfaction;}),
+        speech:avg(ss,function(s){return s.score_speech;}),
+        score:score,
+        grade:score>=88?'A+':score>=73?'A':score>=55?'B':'C',
+        sent:{
+          p:Math.round(pos/Math.max(n,1)*100),
+          n:Math.round(neu/Math.max(n,1)*100),
+          g:Math.round(neg/Math.max(n,1)*100)
+        },
+        durs:ss.map(function(s){return s.call_duration_secs||0;}),
+        poscores:ss.map(function(s){return s.score_total||0;}),
+        mejoras:[],
+        polist:ss.slice(0,15).map(function(s){
+          return{
+            id:s.po_number||'—',
+            f:(s.session_date||'').slice(5).replace('-','/'),
+            svc:s.service_type||'—',
+            dur:s.call_duration_secs||0,
+            score:s.score_total||0,
+            sat:Math.max(1,Math.round((s.score_satisfaction||50)/20)),
+            sent:s.sentiment_label==='positivo'?'p':s.sentiment_label==='negativo'?'g':'n',
+            sp:{sal:true,id:!!s.customer_name,ub:!!s.location_origin,eta:false,ci:true},
+            obs:''
+          };
+        })
+      };
+    });
+    if(newRA.length>0){
+      RA=newRA;
+      console.log('[Reportes] '+newRA.length+' agente(s) cargados desde Supabase');
+    }
+    callback();
+  })
+  .catch(function(e){
+    console.warn('[Reportes] Supabase no disponible, usando datos de demostración',e);
+    callback();
+  });
+}
 
 // ── Dropdown toggle ──
 function toggleDrop(fpEl, e){
