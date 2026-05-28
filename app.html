@@ -1768,7 +1768,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.1-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.2-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3490,7 +3490,6 @@ function _startDemoMode() {
   _demoScene   = 0;
   _demoPOsaved = 0;
   _demoTimers  = [];
-  // Guardar estado actual para restaurar al salir
   var dotEl = document.getElementById('status-dot-btn');
   var lblEl = document.getElementById('status-label');
   _demoPrevStatus = {
@@ -3499,8 +3498,29 @@ function _startDemoMode() {
     label: lblEl ? lblEl.textContent : 'Coaching'
   };
   setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
-  _setDemoState(false);  // deshabilitar botón Demo durante el demo
-  setTimeout(function() { _runDemoScenario(1); }, 800);
+  _setDemoState(false);
+  _showDemoReadyScreen();
+}
+
+// Pantalla de inicio del demo — el agente elige cuándo arrancar
+function _showDemoReadyScreen() {
+  var tbody = document.getElementById('t-body');
+  if (!tbody) { setTimeout(function(){ _runDemoScenario(1); }, 400); return; }
+  tbody.innerHTML = '';
+  var sc1 = DEMO_SCENARIOS[0], sc2 = DEMO_SCENARIOS[1];
+  tbody.innerHTML =
+    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:32px 24px;text-align:center;gap:20px;">' +
+    '<div style="font-size:36px;">🎬</div>' +
+    '<div style="font-family:var(--f);font-size:18px;font-weight:700;color:var(--t0);">Modo Demo</div>' +
+    '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:360px;line-height:1.6;">Simulación de llamadas con transcripción en tiempo real. Podés editar el PO durante la llamada y generar métricas reales.</div>' +
+    '<div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;">' +
+    '<button onclick="_runDemoScenario(1)" style="width:100%;padding:14px;border-radius:10px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">' +
+    '<span>▶</span><span>' + sc1.toast.replace(/^[^·]+· /,'') + '</span></button>' +
+    '<button onclick="_runDemoScenario(2)" style="width:100%;padding:14px;border-radius:10px;border:1.5px solid var(--a);background:transparent;color:var(--a);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">' +
+    '<span>▶</span><span>' + sc2.toast.replace(/^[^·]+· /,'') + '</span></button>' +
+    '</div>' +
+    '<button onclick="_exitDemo()" style="background:none;border:none;font-family:var(--f);font-size:12px;color:var(--t2);cursor:pointer;margin-top:4px;">Cancelar Demo</button>' +
+    '</div>';
 }
 
 // ── Ejecutar escenario N ─────────────────────────────────────────
@@ -3508,7 +3528,7 @@ function _runDemoScenario(n) {
   var sc = DEMO_SCENARIOS[n - 1];
   if (!sc) { _exitDemo(); return; }
   _demoScene = n;
-  _clearSession();
+  _clearSession(); // limpia también la pantalla de inicio del demo
 
   // Reset ServiceDetector para que _det no persista entre escenarios
   if (typeof ServiceDetector !== 'undefined') ServiceDetector.reset();
@@ -5203,7 +5223,7 @@ function setStatus(id,color,label,icon){
   if(dot && color) dot.style.background=color;
   if(lbl && label !== undefined && label !== null) lbl.textContent=label;
   document.getElementById("status-menu").style.display="none";
-  if(typeof showToast==="function")showToast(icon+" "+label);
+  if(typeof showToast==="function" && icon && label)showToast(icon+" "+label);
 
   // KAI Academy: lógica de estados
   if (id === 'disponible' && typeof triggerSimulatedCall === 'function') {
