@@ -1674,7 +1674,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.7-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.8-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3293,8 +3293,15 @@ var DEMO_SCENARIOS = [
   {
     num: 1,
     toast: '🔋 Demo · Escenario 1 — Batería descargada',
+    serviceId: 'bat', serviceName: 'Batería descargada',
     sentVal: 1, sentLabel: 'Positivo',
     serviceHint: 'batería no arranca no prende',
+    // Sentimiento progresivo: neutro al inicio, positivo al cierre
+    sentSteps: [
+      {ms:1000,  val:'0',  desc:'Sin tensión detectada'},
+      {ms:15000, val:'0',  desc:'Tono tranquilo y colaborativo'},
+      {ms:23000, val:'1',  desc:'Cliente satisfecho con la respuesta'},
+    ],
     script: [
       {sp:'agente',  txt:'KAI Academy, le habla Andrea. Buenos días, ¿en qué le puedo ayudar?', ms:0},
       {sp:'cliente', txt:'Hola, buenos días. Soy María Solano y mi carro no arranca, creo que es la batería.', ms:2800},
@@ -3304,25 +3311,33 @@ var DEMO_SCENARIOS = [
       {sp:'cliente', txt:'Sí, mi número es 8823-4512.', ms:14200},
       {sp:'agente',  txt:'¿Y dónde se encuentra ahora?', ms:16800},
       {sp:'cliente', txt:'Estoy en el parqueo de Plaza Mayor en Cartago.', ms:19300},
-      {sp:'agente',  txt:'Listo. Le despacho un técnico con batería de reemplazo. Llega en 15 minutos. ¿Hay algo más en que pueda ayudarle?', ms:22000},
+      {sp:'agente',  txt:'Listo, le confirmo el servicio: batería de reemplazo en Plaza Mayor, Cartago. Llega en 15 minutos. ¿Hay algo más?', ms:22000},
       {sp:'cliente', txt:'No, muchísimas gracias. Qué bueno que fue tan rápido.', ms:25000},
     ]
   },
   {
     num: 2,
     toast: '🚛 Demo · Escenario 2 — Grúa por accidente',
+    serviceId: 'grua', serviceName: 'Grúa / Remolque',
     sentVal: -1, sentLabel: 'Negativo',
     serviceHint: 'grúa accidente varado remolque',
+    // Sentimiento progresivo: negativo al inicio, mejora al cierre
+    sentSteps: [
+      {ms:1000,  val:'-1', desc:'Cliente molesto y frustrado'},
+      {ms:8000,  val:'-1', desc:'Tensión — cliente esperó mucho tiempo'},
+      {ms:17000, val:'0',  desc:'Tensión disminuye tras confirmar asistencia'},
+      {ms:23000, val:'0',  desc:'Cliente se tranquiliza con la confirmación'},
+    ],
     script: [
       {sp:'agente',  txt:'KAI Academy, le habla Andrea. Buenas tardes, ¿en qué le puedo asistir?', ms:0},
       {sp:'cliente', txt:'Miren, llevo 25 minutos esperando respuesta. Tuve un accidente en la Ruta 1, kilómetro 32, y mi carro está sobre la vía.', ms:2800},
       {sp:'agente',  txt:'Entiendo su molestia y le pido disculpas por la espera. Le atiendo de inmediato. ¿Su nombre y la placa del vehículo?', ms:6200},
       {sp:'cliente', txt:'Roberto Vargas. La placa es CRE-789. Es un Hyundai Tucson gris.', ms:9500},
-      {sp:'agente',  txt:'Gracias Roberto. Veo que tiene cobertura activa. Estamos despachando la grúa ahora mismo. ¿Está usted en un lugar seguro?', ms:12500},
+      {sp:'agente',  txt:'Gracias Roberto. Veo que tiene cobertura activa. Despacho la grúa ahora mismo. ¿Está usted en un lugar seguro?', ms:12500},
       {sp:'cliente', txt:'Sí, ya me salí del carro. Mi número es 6241-7890.', ms:15500},
-      {sp:'agente',  txt:'Perfecto. Confirmo: Ruta 1 kilómetro 32, Hyundai Tucson gris, placa CRE-789. La grúa llega en 20 minutos y le llamamos cuando esté cerca.', ms:18500},
+      {sp:'agente',  txt:'Confirmando el servicio de grúa: Ruta 1 kilómetro 32, Hyundai Tucson gris, placa CRE-789. La grúa llega en 20 minutos.', ms:18500},
       {sp:'cliente', txt:'Bien, gracias. Al menos ya me atendieron.', ms:22000},
-      {sp:'agente',  txt:'Por supuesto Roberto. Cuídese y quédese alejado de la vía hasta que llegue el asistente.', ms:24500},
+      {sp:'agente',  txt:'Por supuesto Roberto. Le llamamos cuando esté cerca la grúa. Cuídese.', ms:24500},
     ]
   }
 ];
@@ -3402,20 +3417,44 @@ function _runDemoScenario(n) {
     _demoTimers.push(t);
     if (line.ms > maxMs) maxMs = line.ms;
   });
-  // Mostrar botón Finalizar tras 2 s y activar callInProgress
+
+  // Setear servicio explícitamente a los 3s (no depender solo de detección)
+  var t_svc = setTimeout(function() {
+    if (!_demoActive) return;
+    if (typeof POBuilder !== 'undefined') POBuilder.setService(sc.serviceId, sc.serviceName);
+    ServiceDetector.analyze(sc.serviceHint);
+  }, 3000);
+  _demoTimers.push(t_svc);
+
+  // Sentimiento progresivo — animar según los pasos del escenario
+  (sc.sentSteps || []).forEach(function(step) {
+    var ts = setTimeout(function() {
+      if (!_demoActive) return;
+      var sentObj = {valor: step.val, etiqueta: step.val==='1'?'Positivo':step.val==='-1'?'Negativo':'Neutro', descripcion: step.desc};
+      if (typeof renderSentiment === 'function') renderSentiment(sentObj);
+      if (!lastAnalysis) lastAnalysis = {};
+      lastAnalysis.sentimiento_cliente = sentObj;
+    }, step.ms + 500);
+    _demoTimers.push(ts);
+  });
+
+  // Mostrar botón Finalizar tras 2s y activar callInProgress
   var t1 = setTimeout(function() {
     if (!_demoActive) return;
     _callInProgress = true;
     _showEndCallButton();
-    ServiceDetector.analyze(sc.serviceHint);
   }, 2000);
   _demoTimers.push(t1);
-  // Inyectar sentimiento simulado al terminar la transcripción
+
+  // Inyectar sentimiento final al terminar la transcripción
   var t2 = setTimeout(function() {
     if (!_demoActive) return;
     lastAnalysis = lastAnalysis || {};
     lastAnalysis.sentimiento_cliente = { valor: String(sc.sentVal), etiqueta: sc.sentLabel };
     lastAnalysis.protocolo_agente    = { cumple: true, descripcion: 'Protocolo de atención completado' };
+    if (typeof renderSentiment === 'function') {
+      renderSentiment(lastAnalysis.sentimiento_cliente);
+    }
   }, maxMs + 1500);
   _demoTimers.push(t2);
 }
@@ -3559,30 +3598,25 @@ const ServiceDetector=(()=>{
     });
     if(best&&bs>0&&best.id!==_det){_det=best.id;_show(best);}
   }
-  let _dismissTimer=null, _shownOnce=false;
   function _show(s){
-    const pop=document.getElementById('svc-popup');
-    if(!pop)return;
-    // fill popup
-    document.getElementById('svc-ico').textContent=s.i;
-    document.getElementById('svc-name').textContent=s.n;
-    document.getElementById('svc-hint').textContent=s.h;
-    const conf=document.getElementById('svc-conf');
-    conf.textContent={hi:'Alta confianza',md:'Confianza media',lo:'Baja confianza'}[s.c];
-    conf.className='svc-pop-badge '+s.c;
-    // Only show popup if not already shown for this service
-    if(!_shownOnce){
-      _shownOnce=true;
-      clearTimeout(_dismissTimer);
-      pop.classList.add('show');
-      _dismissTimer=setTimeout(()=>{ pop.classList.remove('show'); }, 3000);
-    }
+    // Actualizar card persistente "Servicio detectado" en col-r
+    var ico=document.getElementById('svc-ico');
+    var nm=document.getElementById('svc-name');
+    var ht=document.getElementById('svc-hint');
+    var conf=document.getElementById('svc-conf');
+    var confFill=document.getElementById('svc-conf-fill');
+    var caEmpty=document.getElementById('ca-empty');
+    if(ico)ico.textContent=s.i;
+    if(nm)nm.textContent=s.n;
+    if(ht)ht.textContent=s.h;
+    if(conf)conf.textContent={hi:'Alta',md:'Media',lo:'Baja'}[s.c];
+    if(confFill)confFill.style.width={hi:'90%',md:'60%',lo:'35%'}[s.c];
+    if(caEmpty)caEmpty.style.display='none';
     if(window.lastAnalysis)window.lastAnalysis.tipo_asistencia=s.n;
     else window._detectedService=s.n;
-    document.getElementById('ca-empty').style.display='none';
-    POBuilder.setService(s.id, s.n);
+    POBuilder.setService(s.id,s.n);
   }
-  function reset(){_det=null;_sc={};_shownOnce=false;clearTimeout(_dismissTimer);const p=document.getElementById('svc-popup');if(p)p.classList.remove('show');}
+  function reset(){_det=null;_sc={};}
   return{analyze,reset};
 })();
 
@@ -4638,7 +4672,27 @@ function openPOValidation(){
     _pvpRefreshStatus();
     return;
   }
-  const data = POBuilder.getData();
+  const rawData = POBuilder.getData();
+  // Merge: _data + inputs visuales (quickExtract llena inputs pero no _data)
+  const data = Object.assign({}, rawData);
+  var _fldMerge={
+    'tipo_asistencia':'tipo_svc','placa':'placa','marca':'marca',
+    'modelo':'modelo','año':'anio','color':'color',
+    'ubicación':'ubicacion_origen','ubicacion_destino':'ubicacion_destino'
+  };
+  Object.keys(_fldMerge).forEach(function(k){
+    if(!data[k]||data[k]==='N/A'){
+      var el=document.querySelector('.fld[data-key="'+_fldMerge[k]+'"] .fld-in');
+      if(el&&el.value.trim())data[k]=el.value.trim();
+    }
+  });
+  if(!data['nombre_cliente']||data['nombre_cliente']==='N/A'){
+    var _nEl=document.querySelector('.fld[data-key="nombre"] .fld-in');
+    var _aEl=document.querySelector('.fld[data-key="apellido"] .fld-in');
+    var _nm=(_nEl&&_nEl.value.trim())||'';
+    var _ap=(_aEl&&_aEl.value.trim())||'';
+    if(_nm)data['nombre_cliente']=_nm+(_ap?' '+_ap:'');
+  }
   const DEF=[
     {k:'tipo_asistencia',i:'🔧',l:'Servicio',req:true},
     {k:'nombre_cliente', i:'👤',l:'Cliente', req:true},
