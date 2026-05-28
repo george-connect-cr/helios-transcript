@@ -1041,8 +1041,19 @@ var _SB_URL = 'https://dednkgonnirybnpktbzp.supabase.co';
 var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
 
 function loadSupabaseData(callback){
-  fetch(_SB_URL+'/rest/v1/call_sessions?select=*&order=created_at.desc&limit=1000',{
-    headers:{'apikey':_SB_KEY,'Authorization':'Bearer '+_SB_KEY}
+  // Leer rol del usuario para scoping (admin/supervisor/formador ven todo, agente ve solo el suyo)
+  var _sess = {}; try { _sess = JSON.parse(localStorage.getItem('helios_session')||'{}'); } catch(e){}
+  var _usr = _sess.user || {};
+  var _roleFilter = '';
+  if (_usr.role === 'agente' && _usr.email) {
+    _roleFilter = '&agent_email=eq.' + encodeURIComponent(_usr.email);
+  }
+  fetch(_SB_URL+'/rest/v1/call_sessions?select=*&order=created_at.desc&limit=1000'+_roleFilter,{
+    headers:{
+      'apikey': _SB_KEY,
+      'Authorization': 'Bearer ' + _SB_KEY,
+      'Prefer': 'return=representation'
+    }
   })
   .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
   .then(function(sessions){
