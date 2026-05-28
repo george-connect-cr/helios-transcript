@@ -795,7 +795,68 @@ body.dark .n-th-thumb {
 .geo-btn-ico{font-size:13px;}
 
 /* ── Llamadas del turno (dashboard) ─────────────────── */
-.dpo-row{
+.dpo-detail{
+  display:none;padding:14px 16px 12px;
+  background:var(--c1);
+  border-radius:0 0 10px 10px;
+  margin-top:-5px;margin-bottom:5px;
+  border-top:1px solid var(--c3);
+}
+.dpo-detail.show{display:block;}
+
+/* KPIs del PO — 4 columnas */
+.dpo-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;margin-bottom:12px;
+}
+.dpo-metric{
+  background:var(--c2);border-radius:8px;
+  padding:9px 11px;
+}
+.dpo-metric-lbl{
+  font-family:var(--f);font-size:9px;font-weight:600;
+  color:var(--t2);letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:4px;
+}
+.dpo-metric-val{
+  font-family:var(--f);font-size:15px;font-weight:700;
+  color:var(--t0);line-height:1;
+}
+
+/* Barras de desglose — triángulo cromático */
+.dpo-bars{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
+.dpo-bar-row{display:flex;align-items:center;gap:10px;}
+.dpo-bar-lbl{
+  font-family:var(--f);font-size:11px;font-weight:500;
+  color:var(--t1);min-width:90px;
+}
+.dpo-bar-bg{
+  flex:1;height:5px;background:var(--c3);
+  border-radius:999px;overflow:hidden;
+}
+.dpo-bar-fill{
+  height:100%;border-radius:999px;
+  transition:width .55s cubic-bezier(.22,1,.36,1);
+}
+.dpo-bar-fill.violet{background:var(--v);}
+.dpo-bar-fill.blue{background:var(--blue);}
+.dpo-bar-fill.green{background:var(--g);}
+.dpo-bar-fill.amber{background:var(--y);}
+.dpo-bar-num{
+  font-family:var(--f);font-size:11px;font-weight:700;
+  min-width:36px;text-align:right;
+}
+
+/* Speech — chips de protocolo */
+.dpo-speech{display:flex;flex-wrap:wrap;gap:5px;}
+.dpo-speech-chip{
+  font-family:var(--f);font-size:10.5px;font-weight:600;
+  padding:3px 9px;border-radius:20px;
+}
+.dpo-speech-chip.ok{background:var(--gr2);color:var(--g);}
+.dpo-speech-chip.fail{background:var(--re2);color:var(--r);}
+
+
   display:flex;align-items:center;gap:10px;
   padding:9px 12px;border-radius:8px;
   background:var(--c2);margin-bottom:5px;
@@ -1770,7 +1831,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.4-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.5-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -4737,13 +4798,21 @@ function _toggleDPO(idx){
   const gc=v=>v>=80?'var(--g)':v>=65?'var(--y)':'var(--r)';
   const sentLbl=m.sentVal===1?'😊 Satisfecho':m.sentVal===0?'😐 Neutro':'😠 Molesto';
   let html=`<div class="dpo-grid">
-    <div class="dpo-metric"><div class="dpo-metric-lbl">Score</div><div class="dpo-metric-val" style="color:${gc(tot)}">${tot}%</div></div>
-    <div class="dpo-metric"><div class="dpo-metric-lbl">Satisfacción</div><div class="dpo-metric-val" style="color:${gc(sc.satisfaction)}">${sc.satisfaction}%</div></div>
-    <div class="dpo-metric"><div class="dpo-metric-lbl">Duración</div><div class="dpo-metric-val">${m.callDuration||'—'}</div></div>
-    <div class="dpo-metric"><div class="dpo-metric-lbl">Sentimiento</div><div class="dpo-metric-val" style="font-size:18px">${m.sentVal===1?'😊':m.sentVal===0?'😐':'😠'}</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Nota</div><div class="dpo-metric-val" style="color:${gc(tot)}">${tot}%</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Satisfacción</div><div class="dpo-metric-val" style="color:var(--v)">${sc.satisfaction}%</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Duración</div><div class="dpo-metric-val" style="color:var(--blue)">${m.callDuration||'—'}</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Sentimiento</div><div class="dpo-metric-val" style="font-size:20px;line-height:1.3">${m.sentVal===1?'😊':m.sentVal===0?'😐':'😠'}</div></div>
   </div>
   <div class="dpo-bars">
-    ${[{l:'Satisfacción',v:sc.satisfaction},{l:'AHT',v:sc.ahtScore},{l:'Completitud',v:sc.completeness},{l:'Speech',v:sc.speechScore}].map(b=>{const c=b.v>=80?'g':b.v>=65?'y':'r';return '<div class="dpo-bar-row"><span class="dpo-bar-lbl">'+b.l+'</span><div class="dpo-bar-bg"><div class="dpo-bar-fill '+c+'" style="width:0%" data-w="'+b.v+'%"></div></div><span class="dpo-bar-num">'+b.v+'%</span></div>';}).join('')}
+    ${[
+      {l:'Satisfacción', v:sc.satisfaction, c:'violet'},
+      {l:'Eficiencia',   v:sc.ahtScore,     c:'blue'},
+      {l:'Captura PO',  v:sc.completeness,  c:'green'},
+      {l:'Protocolo',   v:sc.speechScore,   c:'amber'},
+    ].map(b=>{
+      const numCol=b.v>=80?'var(--g)':b.v>=65?'var(--y)':'var(--r)';
+      return '<div class="dpo-bar-row"><span class="dpo-bar-lbl">'+b.l+'</span><div class="dpo-bar-bg"><div class="dpo-bar-fill '+b.c+'" style="width:0%" data-w="'+b.v+'%"></div></div><span class="dpo-bar-num" style="color:'+numCol+'">'+b.v+'%</span></div>';
+    }).join('')}
   </div>`;
   if(sc.speechItems?.length){
     html+=`<div class="dpo-speech">${sc.speechItems.map(i=>'<div class="dpo-speech-chip '+(i.ok?'ok':'fail')+'">'+(i.ok?'✓':'✗')+' '+i.label+'</div>').join('')}</div>`;
