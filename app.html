@@ -1832,7 +1832,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.4.3-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.4.4-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2526,19 +2526,19 @@ async function triggerSimulatedCall() {
       _sessionCallCount++;
       showToast('🎯 Llamada entrante — ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
     } else {
-      showToast('⚠ Error al conectar (' + res.status + ')');
+      showToast('⚠ PBX no disponible (' + res.status + ') — permanecés en Disponible');
       _callInProgress = false;
       _hideEndCallButton();
       _setDemoState(true);
-      setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+      setStatus('disponible', '#6aaa90', 'Disponible', '🟢');
     }
   } catch(err) {
-    showToast('⚠ Error de red al disparar llamada');
+    showToast('⚠ Sin conexión al PBX — permanecés en Disponible');
     _callInProgress = false;
     _hideEndCallButton();
     _setDemoState(true);
-    setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
-    console.error('triggerSimulatedCall:', err);
+    setStatus('disponible', '#6aaa90', 'Disponible', '🟢');
+    console.warn('triggerSimulatedCall:', err);
   }
 }
 
@@ -5341,9 +5341,10 @@ function setStatus(id,color,label,icon){
   document.getElementById("status-menu").style.display="none";
   if(typeof showToast==="function" && icon && label)showToast(icon+" "+label);
 
-  // KAI Academy: lógica de estados
+  // KAI Academy: solo dispara llamada simulada si WebPubSub está conectado
   if (id === 'disponible' && typeof triggerSimulatedCall === 'function') {
-    setTimeout(triggerSimulatedCall, 800);
+    var _wsUp = typeof wpsClient !== 'undefined' && wpsClient && wpsClient.state === 'Connected';
+    if (_wsUp) setTimeout(triggerSimulatedCall, 800);
   }
   if (id === 'coaching_p' || id === 'coaching') {
     // Solo ocultar el botón — el popup lo maneja exclusivamente endCall()
