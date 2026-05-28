@@ -1832,7 +1832,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.4.0-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.4.1-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2392,13 +2392,12 @@ function savePOToSupabase(entry) {
       po_number:          entry.num,
       created_at:         now.toISOString(),
       session_date:       now.toISOString().slice(0,10),
-      session_time:       now.toTimeString().slice(0,5),
+      session_time:       now.toTimeString().slice(0,8),
       agent_email:        _usr.email   || '',
       agent_name:         _usr.name    || '',
       agent_role:         _usr.role    || '',
       country:            _usr.country || '',
       lane:               _usr.lane    || '',
-      call_duration:      durStr,
       call_duration_secs: durSecs,
       wait_time_min:      (entry.meta && entry.meta.waitTime) || 0,
       service_type:       (entry.data && entry.data.tipo_asistencia) || '',
@@ -2407,7 +2406,7 @@ function savePOToSupabase(entry) {
       plate:              (entry.data && entry.data.placa)           || '',
       vehicle_brand:      (entry.data && entry.data.marca)           || '',
       vehicle_model:      (entry.data && entry.data.modelo)          || '',
-      vehicle_year:       (entry.data && entry.data['año'])          || '',
+      vehicle_year:       parseInt(entry.data && entry.data['año']) || null,
       vehicle_color:      (entry.data && entry.data.color)           || '',
       location_origin:    (entry.data && (entry.data['ubicación'] || entry.data.ubicacion)) || '',
       location_dest:      (entry.data && entry.data.ubicacion_destino) || '',
@@ -2424,6 +2423,23 @@ function savePOToSupabase(entry) {
       speech_items:       sc.speechItems || [],
       raw_data:           entry
     };
+    // Upsert agente en tabla agents (sincroniza nombre/carril/país)
+    fetch(SUPABASE_CONFIG.url + '/rest/v1/agents', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': 'Bearer ' + SUPABASE_CONFIG.anonKey,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({
+        email:   _usr.email   || '',
+        name:    _usr.name    || '',
+        role:    _usr.role    || 'agente',
+        country: _usr.country || '',
+        lane:    _usr.lane    || ''
+      })
+    }).catch(function(){});
     fetch(SUPABASE_CONFIG.url + '/rest/v1/' + SUPABASE_CONFIG.table, {
       method: 'POST',
       headers: {
