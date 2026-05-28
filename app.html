@@ -796,9 +796,10 @@ body.dark .n-th-thumb {
 
 /* ── PO Validation Popup ────────────────────────────────── */
 #po-validate-popup{
-  display:none;position:fixed;inset:0;
+  display:none;position:fixed;
+  top:0;right:0;bottom:0;left:0;
   background:rgba(0,0,0,.52);
-  z-index:900;align-items:center;justify-content:center;
+  z-index:2500;align-items:center;justify-content:center;
 }
 #po-validate-popup.show{display:flex;}
 .pvp-modal{
@@ -1673,7 +1674,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.5-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.6-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -1971,28 +1972,6 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div class="as-kpi"><div class="as-kv" id="ag-fcr">87%</div><div class="as-kl">Protocolo</div></div>
     </div>
   </main>
-
-  <!-- PO Validation Popup -->
-  <div id="po-validate-popup">
-    <div class="pvp-modal">
-      <div class="pvp-head">
-        <span class="pvp-head-title">Revisar y confirmar PO</span>
-        <button class="pvp-close" onclick="closePOValidation(true)" title="Cerrar">✕</button>
-      </div>
-      <div class="pvp-body">
-        <div id="pvp-warn" class="pvp-warn">⚠ Completá los campos requeridos antes de confirmar</div>
-        <div id="pvp-fields"></div>
-        <div id="pvp-nota-wrap" class="pvp-nota-wrap">
-          <span class="pvp-nota-lbl">Notas adicionales (opcional)</span>
-          <textarea id="pvp-nota" placeholder="Observaciones del servicio..."></textarea>
-        </div>
-      </div>
-      <div class="pvp-foot">
-        <button class="pvp-btn-sec" onclick="closePOValidation(true)">Cancelar</button>
-        <button class="pvp-btn-pri" onclick="confirmPO()">✓ Confirmar PO</button>
-      </div>
-    </div>
-  </div>
 
   <!-- RIGHT — Context / KAI / Recs -->
   <aside class="col-r">
@@ -3286,6 +3265,9 @@ function _clearSession() {
   // Limpiar recs
   if (typeof Recs !== 'undefined') Recs.reset();
   if (typeof POBuilder !== 'undefined' && POBuilder.reset) POBuilder.reset();
+  // Resetear estado del popup de validación para cada nueva llamada
+  _pvpDismissed = false;
+  _pvpClosedByUser = false;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -5402,5 +5384,27 @@ function closeDash(){ if(typeof closeDashboard==='function') closeDashboard(); }
 </div>
 
 <div class="flash-stage" id="flash-stage"></div>
+
+<!-- PO Validation Popup — al final del body, fuera de todo flex/overflow container -->
+<div id="po-validate-popup">
+  <div class="pvp-modal">
+    <div class="pvp-head">
+      <span class="pvp-head-title">Revisar y confirmar PO</span>
+      <button class="pvp-close" onclick="closePOValidation(true)" title="Cerrar">✕</button>
+    </div>
+    <div class="pvp-body">
+      <div id="pvp-warn" class="pvp-warn">⚠ Completá los campos requeridos antes de confirmar</div>
+      <div id="pvp-fields"></div>
+      <div id="pvp-nota-wrap" class="pvp-nota-wrap">
+        <span class="pvp-nota-lbl">Notas adicionales (opcional)</span>
+        <textarea id="pvp-nota" placeholder="Observaciones del servicio..."></textarea>
+      </div>
+    </div>
+    <div class="pvp-foot">
+      <button class="pvp-btn-sec" onclick="closePOValidation(true)">Cancelar</button>
+      <button class="pvp-btn-pri" onclick="confirmPO()">✓ Confirmar PO</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
