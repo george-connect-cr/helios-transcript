@@ -1592,7 +1592,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.3-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.4-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2697,6 +2697,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
     var _u=_s.user||{};
     // Admin y Supervisor no tienen acceso a la pantalla de transcripción
     if(_u.role==='supervisor'||_u.role==='admin'){window.location.href='reportes.html';return;}
+    // Rol Demo: arranca el motor de simulación automáticamente
+    if(_u.role==='demo'){setTimeout(_startDemoMode, 1500);}
     var _ne=document.getElementById('ag-name');
     if(_ne&&_u.name)_ne.textContent=_u.name.split(' ')[0];
     document.getElementById('btn-logout')&&document.getElementById('btn-logout').addEventListener('click',function(){
@@ -3183,21 +3185,176 @@ function _clearSession() {
   if (typeof POBuilder !== 'undefined' && POBuilder.reset) POBuilder.reset();
 }
 
-function triggerDemo(){
-  // Limpiar transcripción, PO y estado previo antes de iniciar demo
-  _clearSession();
-  AgentBar.setDemo();
-  var dd={nombre_cliente:'Carlos Rodríguez',placa:'CRC-1234',marca:'Toyota',
-    modelo:'Corolla',año:'2019',color:'Blanco',
-    ubicación:'Av. Central frente al Banco Nacional, San José',
-    tipo_asistencia:'Grúa / Remolque'};
-  var d=0;
-  Object.keys(dd).forEach(function(k){
-    setTimeout(function(){POBuilder.addField(k,dd[k],true);},d);d+=150;
-  });
-  setTimeout(function(){ServiceDetector.analyze('grúa varado no arranca');},300);
-  showToast('🎬 Demo · Datos de ejemplo cargados');
+// ══════════════════════════════════════════════════════════════
+// DEMO MODE — motor de simulación de llamadas
+// ══════════════════════════════════════════════════════════════
+var _demoActive       = false;
+var _demoScene        = 0;      // 1 = escenario 1, 2 = escenario 2
+var _demoPOsaved      = 0;      // POs guardados durante el demo
+var _demoEnterPending = false;  // true = entrar a demo cuando cierre el dash
+var _demoPrevStatus   = null;   // {id, color, label} para restaurar
+var _demoTimers       = [];     // setTimeout ids activos (para cancelar)
+
+var DEMO_SCENARIOS = [
+  {
+    num: 1,
+    toast: '🔋 Demo · Escenario 1 — Batería descargada',
+    sentVal: 1, sentLabel: 'Positivo',
+    serviceHint: 'batería no arranca no prende',
+    script: [
+      {sp:'agente',  txt:'KAI Academy, le habla Andrea. Buenos días, ¿en qué le puedo ayudar?', ms:0},
+      {sp:'cliente', txt:'Hola, buenos días. Soy María Solano y mi carro no arranca, creo que es la batería.', ms:2800},
+      {sp:'agente',  txt:'Lamento escuchar eso, María. ¿Me puede confirmar la placa del vehículo?', ms:5800},
+      {sp:'cliente', txt:'Claro, la placa es ABQ-345. Es un Toyota Corolla blanco del 2019.', ms:8800},
+      {sp:'agente',  txt:'Perfecto. ¿Un teléfono de contacto?', ms:11800},
+      {sp:'cliente', txt:'Sí, mi número es 8823-4512.', ms:14200},
+      {sp:'agente',  txt:'¿Y dónde se encuentra ahora?', ms:16800},
+      {sp:'cliente', txt:'Estoy en el parqueo de Plaza Mayor en Cartago.', ms:19300},
+      {sp:'agente',  txt:'Listo. Le despacho un técnico con batería de reemplazo. Llega en 15 minutos. ¿Hay algo más en que pueda ayudarle?', ms:22000},
+      {sp:'cliente', txt:'No, muchísimas gracias. Qué bueno que fue tan rápido.', ms:25000},
+    ]
+  },
+  {
+    num: 2,
+    toast: '🚛 Demo · Escenario 2 — Grúa por accidente',
+    sentVal: -1, sentLabel: 'Negativo',
+    serviceHint: 'grúa accidente varado remolque',
+    script: [
+      {sp:'agente',  txt:'KAI Academy, le habla Andrea. Buenas tardes, ¿en qué le puedo asistir?', ms:0},
+      {sp:'cliente', txt:'Miren, llevo 25 minutos esperando respuesta. Tuve un accidente en la Ruta 1, kilómetro 32, y mi carro está sobre la vía.', ms:2800},
+      {sp:'agente',  txt:'Entiendo su molestia y le pido disculpas por la espera. Le atiendo de inmediato. ¿Su nombre y la placa del vehículo?', ms:6200},
+      {sp:'cliente', txt:'Roberto Vargas. La placa es CRE-789. Es un Hyundai Tucson gris.', ms:9500},
+      {sp:'agente',  txt:'Gracias Roberto. Veo que tiene cobertura activa. Estamos despachando la grúa ahora mismo. ¿Está usted en un lugar seguro?', ms:12500},
+      {sp:'cliente', txt:'Sí, ya me salí del carro. Mi número es 6241-7890.', ms:15500},
+      {sp:'agente',  txt:'Perfecto. Confirmo: Ruta 1 kilómetro 32, Hyundai Tucson gris, placa CRE-789. La grúa llega en 20 minutos y le llamamos cuando esté cerca.', ms:18500},
+      {sp:'cliente', txt:'Bien, gracias. Al menos ya me atendieron.', ms:22000},
+      {sp:'agente',  txt:'Por supuesto Roberto. Cuídese y quédese alejado de la vía hasta que llegue el asistente.', ms:24500},
+    ]
+  }
+];
+
+// ── Punto de entrada: botón Demo ─────────────────────────────────
+function triggerDemo() {
+  if (_demoActive) { showToast('⚠ Ya hay un Demo activo'); return; }
+  if (_callInProgress) {
+    _showDemoSavePOModal();
+  } else {
+    _startDemoMode();
+  }
 }
+
+// ── Modal: guardar PO actual antes de entrar a Demo ──────────────
+function _showDemoSavePOModal() {
+  var ov = document.createElement('div');
+  ov.id = 'demo-save-modal';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:3000;animation:fi .15s ease;';
+  ov.innerHTML = '<div style="background:var(--c1);border-radius:12px;padding:28px 24px;max-width:380px;width:90%;font-family:var(--f);">'
+    + '<div style="font-size:16px;font-weight:700;color:var(--t0);margin-bottom:8px;">Hay una llamada en curso</div>'
+    + '<div style="font-size:13px;color:var(--t1);margin-bottom:22px;line-height:1.55;">¿Guardás el PO actual antes de entrar a Demo?</div>'
+    + '<div style="display:flex;flex-direction:column;gap:8px;">'
+    + '<button style="padding:11px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;" onclick="_demoSaveAndEnter()">Guardar PO y entrar a Demo</button>'
+    + '<button style="padding:11px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:13px;cursor:pointer;" onclick="_demoDiscardAndEnter()">Descartar y entrar a Demo</button>'
+    + '<button style="padding:8px;border-radius:8px;border:none;background:transparent;color:var(--t2);font-family:var(--f);font-size:12px;cursor:pointer;" onclick="document.getElementById(\'demo-save-modal\').remove()">Cancelar</button>'
+    + '</div></div>';
+  document.body.appendChild(ov);
+}
+
+function _demoSaveAndEnter() {
+  var m = document.getElementById('demo-save-modal');
+  if (m) m.remove();
+  _demoEnterPending = true;  // flag: entrar a demo cuando cierre el dashboard
+  endCall();                 // → showCallRating → confirmPO → openDashboard → closeDashboard (donde chequeamos el flag)
+}
+
+function _demoDiscardAndEnter() {
+  var m = document.getElementById('demo-save-modal');
+  if (m) m.remove();
+  if (_callInProgress) { _callInProgress = false; _hideEndCallButton(); CallTimer.reset(); }
+  _startDemoMode();
+}
+
+// ── Arranque del modo demo ───────────────────────────────────────
+function _startDemoMode() {
+  _demoActive  = true;
+  _demoScene   = 0;
+  _demoPOsaved = 0;
+  _demoTimers  = [];
+  // Guardar estado actual para restaurar al salir
+  var dotEl = document.getElementById('status-dot-btn');
+  var lblEl = document.getElementById('status-label');
+  _demoPrevStatus = {
+    id:    _currentStatus || 'coaching_p',
+    color: dotEl ? dotEl.style.background : '#6366f1',
+    label: lblEl ? lblEl.textContent : 'Coaching'
+  };
+  setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+  _setDemoState(false);  // deshabilitar botón Demo durante el demo
+  setTimeout(function() { _runDemoScenario(1); }, 800);
+}
+
+// ── Ejecutar escenario N ─────────────────────────────────────────
+function _runDemoScenario(n) {
+  var sc = DEMO_SCENARIOS[n - 1];
+  if (!sc) { _exitDemo(); return; }
+  _demoScene = n;
+  _clearSession();
+  showToast(sc.toast);
+  var maxMs = 0;
+  sc.script.forEach(function(line) {
+    var t = setTimeout(function() {
+      if (!_demoActive) return;
+      appendTranscript(line.sp === 'agente' ? 'agente' : 'cliente', line.txt);
+    }, line.ms + 500);
+    _demoTimers.push(t);
+    if (line.ms > maxMs) maxMs = line.ms;
+  });
+  // Mostrar botón Finalizar tras 2 s y activar callInProgress
+  var t1 = setTimeout(function() {
+    if (!_demoActive) return;
+    _callInProgress = true;
+    _showEndCallButton();
+    ServiceDetector.analyze(sc.serviceHint);
+  }, 2000);
+  _demoTimers.push(t1);
+  // Inyectar sentimiento simulado al terminar la transcripción
+  var t2 = setTimeout(function() {
+    if (!_demoActive) return;
+    lastAnalysis = lastAnalysis || {};
+    lastAnalysis.sentimiento_cliente = { valor: String(sc.sentVal), etiqueta: sc.sentLabel };
+    lastAnalysis.protocolo_agente    = { cumple: true, descripcion: 'Protocolo de atención completado' };
+  }, maxMs + 1500);
+  _demoTimers.push(t2);
+}
+
+// ── Modal: continuar con escenario 2 ────────────────────────────
+function _showDemoContinueModal() {
+  var ov = document.createElement('div');
+  ov.id = 'demo-continue-modal';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:3000;animation:fi .15s ease;';
+  ov.innerHTML = '<div style="background:var(--c1);border-radius:12px;padding:28px 24px;max-width:400px;width:90%;font-family:var(--f);">'
+    + '<div style="font-size:15px;font-weight:700;color:var(--t0);margin-bottom:8px;">¿Continuás con el Demo?</div>'
+    + '<div style="font-size:13px;color:var(--t1);margin-bottom:6px;line-height:1.55;">Primer escenario completado ✓</div>'
+    + '<div style="font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.55;">El escenario 2 simula un cliente con grúa por accidente, más frustrado e impaciente. Podés practicar manejo de emociones y captura completa del PO.</div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button style="flex:1;padding:11px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;" onclick="var m=document.getElementById(\'demo-continue-modal\');if(m)m.remove();setTimeout(function(){_runDemoScenario(2);},400);">Ver escenario 2 →</button>'
+    + '<button style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:13px;cursor:pointer;" onclick="var m=document.getElementById(\'demo-continue-modal\');if(m)m.remove();_exitDemo();">Salir del Demo</button>'
+    + '</div></div>';
+  document.body.appendChild(ov);
+}
+
+// ── Salir del modo demo y restaurar estado ───────────────────────
+function _exitDemo() {
+  _demoActive = false;
+  _demoTimers.forEach(function(t) { clearTimeout(t); });
+  _demoTimers = [];
+  if (_callInProgress) { _callInProgress = false; _hideEndCallButton(); CallTimer.reset(); }
+  if (_demoPrevStatus) {
+    setStatus(_demoPrevStatus.id, _demoPrevStatus.color, _demoPrevStatus.label);
+  }
+  _setDemoState(true);
+  showToast('✓ Demo finalizado · Revisá las métricas en 📊');
+}
+
 let _poList = [];
 let _activeDetail = -1;
 let _poCount = 0;
@@ -3820,7 +3977,8 @@ function confirmPO(){
       meta:{callDuration, sentVal:sent?Number(sent.valor):0,
             waitTime:WAIT[svcId]||15, scores}};
     _poList.push(poEntry);
-    savePOToSupabase(poEntry); // persiste métricas en Supabase cuando esté configurado
+    savePOToSupabase(poEntry);
+    if (_demoActive) _demoPOsaved++; // contador para saber cuándo mostrar el modal de continuar
     _poCount = _poList.length;
 
     // Update counter pill
@@ -4037,7 +4195,26 @@ function openMapFromDetail(){
 
 function openDashboard(){_buildDashboard();document.getElementById('dash-ov').classList.add('show');document.getElementById('dash-date').textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});}
 
-function closeDashboard(){document.getElementById('dash-ov').classList.remove('show');}
+function closeDashboard(){
+  document.getElementById('dash-ov').classList.remove('show');
+  // Caso: el usuario guardó el PO antes de entrar a Demo — arrancar ahora
+  if (_demoEnterPending) {
+    _demoEnterPending = false;
+    setTimeout(_startDemoMode, 400);
+    return;
+  }
+  // Caso: demo activo — decidir qué sigue según el escenario completado
+  if (_demoActive) {
+    if (_demoScene === 1 && _demoPOsaved >= 1) {
+      setTimeout(_showDemoContinueModal, 400);
+    } else if (_demoScene === 2 && _demoPOsaved >= 2) {
+      setTimeout(function() {
+        showToast('🎬 Demo completo · Dos escenarios guardados en métricas');
+        _exitDemo();
+      }, 300);
+    }
+  }
+}
 
 function _buildDashboard(){
   const pos=_poList, n=pos.length;
