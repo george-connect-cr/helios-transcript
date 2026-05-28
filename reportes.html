@@ -178,6 +178,8 @@ th{
 td{padding:9px 12px;color:var(--t1);border-bottom:0.5px solid rgba(0,0,0,.04);}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:var(--c2);}
+tr[data-po]{cursor:pointer;}
+tr[data-po]:hover td{background:var(--bl2);}
 
 /* ── SCORE BADGE ── */
 .sbadge{
@@ -826,7 +828,7 @@ function agDet(a){
       var spB=Object.keys(p.sp).map(function(k){
         return'<span title="'+spLbls[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-size:9px;font-weight:700;background:'+(p.sp[k]?'var(--gr2)':'var(--re2)')+';color:'+(p.sp[k]?'var(--g)':'var(--r)');+'">'+(p.sp[k]?'✓':'✗')+'</span>';
       }).join('');
-      return'<tr>'+
+      return'<tr data-po="'+p.id+'" onclick="showPODetail('+JSON.stringify(p).replace(/"/g,'&quot;')+','+JSON.stringify(a.name).replace(/"/g,'&quot;')+')" title="Ver detalle del PO">'+
         '<td style="font-family:var(--m);font-size:10px;color:var(--t2);">'+p.id+'</td>'+
         '<td style="font-size:10px;color:var(--t2);">'+p.f+'</td>'+
         '<td><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:var(--bl2);color:var(--blue);">'+p.svc+'</span></td>'+
@@ -1109,6 +1111,123 @@ function loadSupabaseData(callback){
     console.warn('[Reportes] Supabase no disponible, usando datos de demostración',e);
     callback();
   });
+}
+
+// ── PO Detail Modal ──────────────────────────────────────────────
+function showPODetail(p, agentName) {
+  var existing = document.getElementById('po-detail-modal');
+  if (existing) existing.remove();
+
+  var sc = p.score || 0;
+  var scColor = sc>=85?'var(--g)':sc>=70?'var(--y)':'var(--r)';
+  var sentEmoji = p.sent==='p'?'😊':p.sent==='g'?'😞':'😐';
+  var sentTxt   = p.sent==='p'?'Positivo':p.sent==='g'?'Negativo':'Neutro';
+  var sentColor = p.sent==='p'?'var(--g)':p.sent==='g'?'var(--r)':'var(--y)';
+
+  // Stars
+  var stars='';
+  for(var si=0;si<5;si++) stars+='<span style="color:'+(si<(p.sat||0)?'#f59e0b':'var(--c3)')+';font-size:16px;">★</span>';
+
+  // Estimate sub-scores from available data (or use if present)
+  var satScore = typeof p.satisfaction !== 'undefined' ? p.satisfaction : (p.sat>=4?92:p.sat>=3?70:38);
+  var effScore = typeof p.efficiency   !== 'undefined' ? p.efficiency   : Math.min(100,Math.max(20,80-Math.abs((p.dur||240)/60-5)*8));
+  var compScore= typeof p.completeness !== 'undefined' ? p.completeness : Math.round(sc*0.9);
+  var spkScore = typeof p.speechScore  !== 'undefined' ? p.speechScore  :
+    (p.sp ? Math.round(Object.values(p.sp).filter(Boolean).length/Object.values(p.sp).length*100) : 80);
+
+  var bars = [
+    {l:'Satisfacción', v:satScore,  c:'var(--v)',    cb:'var(--pu2)'},
+    {l:'Eficiencia',   v:effScore,  c:'var(--blue)', cb:'var(--bl2)'},
+    {l:'Captura PO',   v:compScore, c:'var(--g)',    cb:'var(--gr2)'},
+    {l:'Protocolo',    v:spkScore,  c:'var(--y)',    cb:'var(--am2)'},
+  ];
+
+  var spLbls={sal:'Saludo de bienvenida',id:'Identificación del cliente',ub:'Validación de ubicación',eta:'ETA comunicado',ci:'Confirmación del servicio'};
+  var spHtml='';
+  if(p.sp){
+    spHtml=Object.keys(p.sp).map(function(k){
+      var ok=p.sp[k];
+      return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--c3);">'+
+        '<span style="width:18px;height:18px;border-radius:50%;background:'+(ok?'var(--gr2)':'var(--re2)')+';color:'+(ok?'var(--g)':'var(--r)')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+(ok?'✓':'✗')+'</span>'+
+        '<span style="font-family:var(--f);font-size:12px;color:var(--t1);">'+spLbls[k]+'</span>'+
+      '</div>';
+    }).join('');
+  }
+
+  var ov = document.createElement('div');
+  ov.id = 'po-detail-modal';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center;animation:fi .2s ease;';
+  ov.innerHTML=
+    '<div style="background:var(--c1);border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);font-family:var(--f);">'+
+
+    // Header
+    '<div style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--c3);position:sticky;top:0;background:var(--c1);z-index:1;">'+
+      '<button onclick="document.getElementById(\'po-detail-modal\').remove()" style="width:30px;height:30px;border-radius:8px;border:none;background:var(--c2);color:var(--t2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">←</button>'+
+      '<div style="flex:1;">'+
+        '<div style="font-size:14px;font-weight:700;color:var(--t0);">'+p.id+'</div>'+
+        '<div style="font-size:11px;color:var(--t2);">'+agentName+' · '+p.f+' · '+
+          '<span style="padding:1px 7px;border-radius:20px;background:var(--bl2);color:var(--blue);font-weight:600;">'+p.svc+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div style="text-align:right;">'+
+        '<div style="font-size:22px;font-weight:800;color:'+scColor+';">'+sc+'</div>'+
+        '<div style="font-size:9px;color:var(--t2);letter-spacing:.05em;">SCORE</div>'+
+      '</div>'+
+    '</div>'+
+
+    // KPIs
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 20px;">'+
+      '<div style="background:var(--c2);border-radius:8px;padding:10px 12px;">'+
+        '<div style="font-size:9px;color:var(--t2);letter-spacing:.08em;margin-bottom:4px;">DURACIÓN</div>'+
+        '<div style="font-size:16px;font-weight:700;color:var(--blue);">'+fs(p.dur||0)+'</div>'+
+      '</div>'+
+      '<div style="background:var(--c2);border-radius:8px;padding:10px 12px;">'+
+        '<div style="font-size:9px;color:var(--t2);letter-spacing:.08em;margin-bottom:4px;">SATISFACCIÓN</div>'+
+        '<div>'+stars+'</div>'+
+      '</div>'+
+      '<div style="background:var(--c2);border-radius:8px;padding:10px 12px;">'+
+        '<div style="font-size:9px;color:var(--t2);letter-spacing:.08em;margin-bottom:4px;">SENTIMIENTO</div>'+
+        '<div style="display:flex;align-items:center;gap:6px;">'+
+          '<span style="font-size:20px;">'+sentEmoji+'</span>'+
+          '<span style="font-size:11px;font-weight:600;color:'+sentColor+';">'+sentTxt+'</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    // Barras
+    '<div style="padding:0 20px 16px;">'+
+      '<div style="font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.1em;margin-bottom:10px;">DESGLOSE DE MÉTRICAS</div>'+
+      bars.map(function(b){
+        var nc=b.v>=80?'var(--g)':b.v>=65?'var(--y)':'var(--r)';
+        return'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'+
+          '<span style="font-size:11px;font-weight:500;color:var(--t1);min-width:88px;">'+b.l+'</span>'+
+          '<div style="flex:1;height:5px;background:var(--c3);border-radius:999px;overflow:hidden;">'+
+            '<div style="height:100%;width:'+b.v+'%;background:'+b.c+';border-radius:999px;transition:width .5s;"></div>'+
+          '</div>'+
+          '<span style="font-size:11px;font-weight:700;min-width:34px;text-align:right;color:'+nc+';">'+b.v+'%</span>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+
+    // Protocolo
+    (spHtml?'<div style="padding:0 20px 16px;">'+
+      '<div style="font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.1em;margin-bottom:10px;">CUMPLIMIENTO DE PROTOCOLO</div>'+
+      spHtml+
+    '</div>':'')+
+
+    // Observaciones
+    '<div style="padding:0 20px 20px;">'+
+      '<div style="font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.1em;margin-bottom:6px;">OBSERVACIONES</div>'+
+      '<div style="font-size:12px;color:var(--t1);background:var(--c2);border-radius:8px;padding:10px 12px;">'+
+        (p.obs||'Sin observaciones registradas.')+
+      '</div>'+
+    '</div>'+
+
+    '</div>';
+
+  // Cerrar al click fuera
+  ov.addEventListener('click', function(e){ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
 }
 
 // ── Dropdown toggle ──
