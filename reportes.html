@@ -224,7 +224,7 @@ tr:hover td{background:var(--c2);}
   <span class="hd-title">Reportes & Analytics</span>
   <span class="hd-role" id="hd-role">Formador</span>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-    <a href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:30px;font-size:12px;">← App</a>
+    <a id="btn-back-app" href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:30px;font-size:12px;">← App</a>
     <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html'" class="btn btn-danger" style="height:30px;font-size:12px;">Salir</button>
   </div>
 </div></div>
@@ -964,6 +964,9 @@ try{
       document.getElementById('adm-div').style.display='';
       document.getElementById('adm-sec').style.display='';
       document.getElementById('nav-supervisor').style.display='';
+      // Admin y Supervisor no tienen acceso a la pantalla de transcripción
+      var _appBtn=document.getElementById('btn-back-app');
+      if(_appBtn)_appBtn.style.display='none';
     }
   }
 }catch(e){}
@@ -996,6 +999,7 @@ try{
     if(_role==='admin'||_role==='supervisor'){
       ['adm-div','adm-sec'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='';});
       var suv=document.getElementById('nav-supervisor');if(suv)suv.style.display='';
+      var _ab=document.getElementById('btn-back-app');if(_ab)_ab.style.display='none';
     }
     if(_role==='agente'){
       // Lock agent to own data only
