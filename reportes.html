@@ -216,6 +216,7 @@ tr[data-po]:hover td{background:var(--bl2);}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:2px;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -1013,28 +1014,33 @@ try{
     if(_role==='agente'){
       // Lock agent to own data only
       _filters.agente=_uname;
-      // Hide team navigation
       ['nav-agentes','nav-coaching','nav-feedback','sb-sec-formador'].forEach(function(id){
         var el=document.getElementById(id);if(el)el.style.display='none';
       });
-      // Also hide Agente filter pill (agent can't change agent filter)
       var fAg=document.getElementById('f-agente');
       if(fAg)fAg.style.display='none';
-      // Hide period filters row (not relevant for single agent)
-      // Pre-select this agent's profile
-      var matchAg=RA.find(function(a){return a.name===_uname;});
-      if(!matchAg){
-        // Agent not in demo data - show empty state
-        go('agente_v');
-        return;
-      }
-      _selAg=matchAg;
-      go('agente_v');
-      return;
     }
   }catch(e){}
-  // Cargar datos reales de Supabase, luego renderizar
-  loadSupabaseData(function(){ go('resumen'); });
+  // Siempre cargar datos reales de Supabase primero, luego navegar
+  var _uemail2='';
+  try{_uemail2=(JSON.parse(localStorage.getItem('helios_session')||'{}').user||{}).email||'';}catch(e){}
+  loadSupabaseData(function(){
+    if(_role==='agente'){
+      // Buscar por email (más confiable que por nombre)
+      var _matchAg=RA.find(function(a){
+        return a.email===_uemail2 || a.name===_uname;
+      });
+      if(_matchAg){
+        _selAg=_matchAg;
+        go('agente_v');
+      } else {
+        // Sin datos todavía — mostrar resumen vacío con mensaje
+        go('resumen');
+      }
+    } else {
+      go('resumen');
+    }
+  });
 })();
 
 
@@ -1043,6 +1049,11 @@ var _SB_URL = 'https://dednkgonnirybnpktbzp.supabase.co';
 var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
 
 function loadSupabaseData(callback){
+  // Mostrar indicador de carga en el área principal
+  var main = document.getElementById('main-content');
+  if (main) main.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:300px;gap:12px;font-family:var(--f);color:var(--t2);font-size:13px;">'+
+    '<div style="width:18px;height:18px;border:2px solid var(--c3);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite;"></div>'+
+    'Cargando datos…</div>';
   // Leer rol del usuario para scoping (admin/supervisor/formador ven todo, agente ve solo el suyo)
   var _sess = {}; try { _sess = JSON.parse(localStorage.getItem('helios_session')||'{}'); } catch(e){}
   var _usr = _sess.user || {};
