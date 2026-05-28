@@ -833,16 +833,18 @@ function agDet(a){
       var spB=p.sp?Object.keys(p.sp).map(function(k){
         return'<span title="'+spLbls[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-size:9px;font-weight:700;background:'+(p.sp[k]?'var(--gr2)':'var(--re2)')+';color:'+(p.sp[k]?'var(--g)':'var(--r)')+'">'+(p.sp[k]?'✓':'✗')+'</span>';
       }).join(''):'';
-      return'<tr data-po="'+p.id+'" style="cursor:pointer" onclick="showPODetail(\'' +_rk+ '\')" title="Ver detalle · '+p.id+'">'+
-        '<td style="font-family:var(--m);font-size:10px;color:var(--t2);">'+p.id+'</td>'+
+      var _durFmt=p.dur>0?fs(p.dur):'—';
+      var _durCol=p.dur>0&&p.dur<180?'var(--r)':p.dur>480?'var(--y)':'var(--t0)';
+      return'<tr data-po="'+p.id+'" style="cursor:pointer" onclick="showPODetail(\''+_rk+'\')" title="Ver detalle '+p.id+'">'+
+        '<td style="font-family:var(--m);font-size:10px;font-weight:700;color:var(--a);">'+p.id+'</td>'+
         '<td style="font-size:10px;color:var(--t2);">'+p.f+'</td>'+
-        '<td><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:var(--bl2);color:var(--blue);">'+p.svc+'</span></td>'+
-        '<td style="font-size:11px;font-weight:600;color:'+(p.dur>280?'var(--r)':'var(--t0)');+';font-family:var(--m);">'+fs(p.dur)+'</td>'+
+        '<td><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bl2);color:var(--blue);">'+p.svc+'</span></td>'+
+        '<td style="font-size:11px;font-weight:600;font-family:var(--m);color:'+_durCol+';">'+_durFmt+'</td>'+
         '<td><span class="sbadge" style="color:'+sc2+';background:'+sc2bg+'">'+p.score+'</span></td>'+
         '<td>'+stars+'</td>'+
-        '<td style="font-size:16px;">'+sico+'</td>'+
+        '<td style="font-size:15px;">'+sico+'</td>'+
         '<td><div style="display:flex;gap:2px;">'+spB+'</div></td>'+
-        '<td style="font-size:10px;color:var(--t2);max-width:140px;">'+(p.obs||'—')+'</td>'+
+        '<td style="font-size:10px;color:var(--t2);max-width:120px;">'+(p.obs||'—')+'</td>'+
       '</tr>';
     }).join('');
     poTbl='<div class="stitle">Análisis por PO</div>'+
