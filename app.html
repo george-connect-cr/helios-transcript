@@ -1590,7 +1590,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.0-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.1-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2112,13 +2112,11 @@ var AUTH = {
   }
 };
 
-// ── Supabase — infraestructura de persistencia de métricas ────────────────
-// Completar url y anonKey cuando esté disponible la base de datos.
-// Mientras estén en blanco, savePOToSupabase() no hace nada.
+// ── Supabase — persistencia de métricas ──────────────────────────────────
 var SUPABASE_CONFIG = {
-  url:     '',                  // ej: 'https://xxxxxxxxxxxx.supabase.co'
-  anonKey: '',                  // ej: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-  table:   'call_metrics'       // nombre de la tabla destino
+  url:     'https://dednkgonnirybnpktbzp.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ',
+  table:   'call_sessions'
 };
 
 function savePOToSupabase(entry) {
@@ -2127,25 +2125,56 @@ function savePOToSupabase(entry) {
     var _sess = JSON.parse(localStorage.getItem('helios_session') || '{}');
     var _usr  = (_sess && _sess.user) || {};
     var sc    = (entry.meta && entry.meta.scores) || {};
+    var sat   = sc.satisfaction || 0;
+    var eff   = sc.ahtScore     || 0;
+    var comp  = sc.completeness || 0;
+    var spch  = sc.speechScore  || 0;
+    var total = Math.round(sat*0.35 + eff*0.20 + comp*0.25 + spch*0.20);
+    var grade = total>=88?'A+':total>=73?'A':total>=55?'B':'C';
+    var sentVal = (entry.meta && entry.meta.sentVal) || 0;
+    var sentLbl = sentVal===1?'positivo':sentVal===-1?'negativo':'neutro';
+    var durStr  = (entry.meta && entry.meta.callDuration) || '';
+    var durSecs = 0;
+    if (durStr && durStr.indexOf(':')>-1) {
+      var dp = durStr.split(':');
+      durSecs = parseInt(dp[0]||0)*60 + parseInt(dp[1]||0);
+    }
+    var now = new Date();
     var payload = {
       po_number:          entry.num,
-      created_at:         new Date().toISOString(),
-      agent_name:         _usr.name  || '',
-      agent_email:        _usr.email || '',
-      agent_role:         _usr.role  || '',
+      created_at:         now.toISOString(),
+      session_date:       now.toISOString().slice(0,10),
+      session_time:       now.toTimeString().slice(0,5),
+      agent_email:        _usr.email   || '',
+      agent_name:         _usr.name    || '',
+      agent_role:         _usr.role    || '',
+      country:            _usr.country || '',
+      lane:               _usr.lane    || '',
+      call_duration:      durStr,
+      call_duration_secs: durSecs,
+      wait_time_min:      (entry.meta && entry.meta.waitTime) || 0,
       service_type:       (entry.data && entry.data.tipo_asistencia) || '',
       customer_name:      (entry.data && entry.data.nombre_cliente)  || '',
+      customer_phone:     (entry.data && entry.data.telefono)        || '',
       plate:              (entry.data && entry.data.placa)           || '',
+      vehicle_brand:      (entry.data && entry.data.marca)           || '',
+      vehicle_model:      (entry.data && entry.data.modelo)          || '',
+      vehicle_year:       (entry.data && entry.data['año'])          || '',
+      vehicle_color:      (entry.data && entry.data.color)           || '',
       location_origin:    (entry.data && (entry.data['ubicación'] || entry.data.ubicacion)) || '',
       location_dest:      (entry.data && entry.data.ubicacion_destino) || '',
-      call_duration:      (entry.meta && entry.meta.callDuration) || '',
-      sentiment_val:      (entry.meta && entry.meta.sentVal)      || 0,
-      wait_time:          (entry.meta && entry.meta.waitTime)     || 0,
-      score_satisfaction: sc.satisfaction || 0,
-      score_aht:          sc.ahtScore     || 0,
-      score_completeness: sc.completeness || 0,
-      score_speech:       sc.speechScore  || 0,
-      raw_data:           JSON.stringify(entry)
+      contact_name:       (entry.data && entry.data.contacto_nm)    || '',
+      contact_phone:      (entry.data && entry.data.contacto_tel)   || '',
+      sentiment_val:      sentVal,
+      sentiment_label:    sentLbl,
+      score_satisfaction: sat,
+      score_efficiency:   eff,
+      score_completeness: comp,
+      score_speech:       spch,
+      score_total:        total,
+      score_grade:        grade,
+      speech_items:       sc.speechItems || [],
+      raw_data:           entry
     };
     fetch(SUPABASE_CONFIG.url + '/rest/v1/' + SUPABASE_CONFIG.table, {
       method: 'POST',
@@ -2157,7 +2186,7 @@ function savePOToSupabase(entry) {
       },
       body: JSON.stringify(payload)
     }).catch(function(err) {
-      console.warn('[Supabase] No se pudo guardar la métrica:', err.message);
+      console.warn('[Supabase] Error al guardar sesión:', err.message);
     });
   } catch(e) {
     console.warn('[Supabase] Error preparando payload:', e.message);
