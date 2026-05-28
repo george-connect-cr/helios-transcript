@@ -389,7 +389,7 @@ body.dark .n-th-thumb {
   color:var(--t2);letter-spacing:.1px;
   margin-bottom:8px;
 }
-.dash-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.dash-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
 .dash-kpi{
   padding:12px 14px;background:var(--c2);border-radius:8px;
   display:flex;flex-direction:column;gap:3px;
@@ -397,7 +397,41 @@ body.dark .n-th-thumb {
 .dash-kpi-val{font-family:var(--f);font-size:18px;font-weight:700;color:var(--t0);line-height:1.1;}
 .dash-kpi-val.g{color:var(--g);}
 .dash-kpi-val.y{color:var(--y);}
+.dash-kpi-val.r{color:var(--r);}
+.dash-kpi-val.violet{color:var(--v);}
+.dash-kpi-val.blue{color:var(--blue);}
 .dash-kpi-lbl{font-family:var(--f);font-size:9px;color:var(--t2);letter-spacing:.1px;margin-top:3px;}
+
+/* Triángulo cromático — KPI accent backgrounds
+   Violeta (emocional) · Azul (tiempo) · Verde (proceso) · Ámbar (cumplimiento) */
+.kpi-violet{background:var(--pu2)!important;}
+.kpi-blue{background:var(--bl2)!important;}
+.kpi-green{background:var(--gr2)!important;}
+.kpi-amber{background:var(--am2)!important;}
+
+/* Score bars — dsb — sin CSS previo, se añade aquí */
+.dsb-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.dsb-lbl{font-family:var(--f);font-size:11px;font-weight:500;color:var(--t1);min-width:100px;}
+.dsb-bar{flex:1;height:6px;background:var(--c3);border-radius:999px;overflow:hidden;}
+.dsb-fill{height:100%;border-radius:999px;transition:width .65s cubic-bezier(.22,1,.36,1);}
+/* Identidad por métrica — el ancho indica valor, el color indica QUÉ métrica es */
+.dsb-fill.violet{background:var(--v);}     /* Satisfacción */
+.dsb-fill.blue{background:var(--blue);}   /* Duración / Eficiencia */
+.dsb-fill.green{background:var(--g);}     /* Completitud */
+.dsb-fill.amber{background:var(--y);}     /* Protocolo */
+.dsb-fill.brand{background:var(--a);}     /* Score total */
+.dsb-num{font-family:var(--f);font-size:11px;font-weight:700;min-width:38px;text-align:right;}
+
+/* Sentiment breakdown bars */
+.dash-sent-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.dash-sent-ico{font-size:13px;min-width:20px;text-align:center;}
+.dash-sent-lbl{font-family:var(--f);font-size:11px;color:var(--t1);min-width:60px;}
+.dash-sent-bar{flex:1;height:6px;background:var(--c3);border-radius:999px;overflow:hidden;}
+.dash-sent-fill{height:100%;border-radius:999px;transition:width .65s cubic-bezier(.22,1,.36,1);}
+.dash-sent-fill.pos{background:var(--g);}
+.dash-sent-fill.neu{background:var(--y);}
+.dash-sent-fill.neg{background:var(--r);}
+.dash-sent-pct{font-family:var(--f);font-size:11px;font-weight:700;min-width:34px;text-align:right;}
 
 .dash-call-list{display:flex;flex-direction:column;gap:4px;}
 .dash-call{
@@ -1556,7 +1590,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.1.8-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.1.9-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -1954,52 +1988,94 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
     <div class="dash-head">
       <div class="dash-head-ico">📊</div>
       <div style="flex:1;min-width:0;">
-        <div class="dash-head-title">Análisis del día</div>
-        <div class="dash-head-sub">Lunes, 25 de mayo · turno 08:00–16:00</div>
+        <div class="dash-head-title">Análisis del turno</div>
+        <div class="dash-head-sub" id="dash-date">—</div>
       </div>
       <button class="dash-head-close" onclick="closeDash()" title="Cerrar">✕</button>
     </div>
     <div class="dash-body">
+
+      <!-- Hero: ring + info del agente -->
       <div class="dash-hero">
         <div class="dash-ring-wrap">
           <svg class="dash-ring" width="104" height="104" viewBox="0 0 104 104">
             <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c3)" stroke-width="6"/>
-            <circle cx="52" cy="52" r="44" fill="none" stroke="var(--g)" stroke-width="6" stroke-linecap="round" stroke-dasharray="276" stroke-dashoffset="36"/>
+            <circle id="dash-ring-fill" cx="52" cy="52" r="44" fill="none" stroke="var(--g)" stroke-width="6" stroke-linecap="round" stroke-dasharray="276" stroke-dashoffset="276"/>
           </svg>
           <div class="dash-ring-inner">
-            <div class="dash-ring-val">87</div>
-            <div class="dash-ring-lbl">score</div>
+            <div class="dash-ring-val" id="dash-total-score">—</div>
+            <div class="dash-ring-lbl">nota</div>
           </div>
         </div>
         <div class="dash-hero-info">
-          <div class="dash-agent-nm">Jorge Mora</div>
-          <div class="dash-agent-shift">T. 08:00–16:00 · 6h 24m activo</div>
-          <span class="dash-grade">Sobresaliente</span>
-          <div class="dash-grade-desc">Por encima del promedio del equipo (74%) — buen ritmo. Mantené el speech compliance arriba del 90%.</div>
+          <div class="dash-agent-nm" id="dash-agent-nm">—</div>
+          <div class="dash-agent-shift" id="dash-agent-shift">Turno en curso</div>
+          <span class="dash-grade" id="dash-grade">—</span>
+          <div class="dash-grade-desc" id="dash-grade-desc">Sin POs registrados todavía.</div>
         </div>
       </div>
 
+      <!-- KPIs del turno — 6 columnas, triángulo cromático -->
       <div>
-        <div class="dash-section-lbl">KPIs del día</div>
+        <div class="dash-section-lbl">KPIs del turno</div>
         <div class="dash-kpi-row">
-          <div class="dash-kpi"><div class="dash-kpi-val">12</div><div class="dash-kpi-lbl">POs creados</div></div>
-          <div class="dash-kpi"><div class="dash-kpi-val g">4.8</div><div class="dash-kpi-lbl">Satisfacción</div></div>
-          <div class="dash-kpi"><div class="dash-kpi-val y">4:32</div><div class="dash-kpi-lbl">AHT promedio</div></div>
-          <div class="dash-kpi"><div class="dash-kpi-val">87%</div><div class="dash-kpi-lbl">Resolución 1ra</div></div>
-          <div class="dash-kpi"><div class="dash-kpi-val">92%</div><div class="dash-kpi-lbl">Speech compl.</div></div>
+          <div class="dash-kpi">
+            <div class="dash-kpi-val" id="dk-pos">—</div>
+            <div class="dash-kpi-lbl">Llamadas</div>
+          </div>
+          <div class="dash-kpi kpi-violet">
+            <div class="dash-kpi-val violet" id="dk-sat">—</div>
+            <div class="dash-kpi-lbl">Satisfacción</div>
+          </div>
+          <div class="dash-kpi kpi-blue">
+            <div class="dash-kpi-val blue" id="dk-dur">—</div>
+            <div class="dash-kpi-lbl">Duración prom.</div>
+          </div>
+          <div class="dash-kpi kpi-violet">
+            <div class="dash-kpi-val" id="dk-sent">—</div>
+            <div class="dash-kpi-lbl">Sentimiento</div>
+          </div>
+          <div class="dash-kpi kpi-green">
+            <div class="dash-kpi-val g" id="dk-fcr">—</div>
+            <div class="dash-kpi-lbl">Captura PO</div>
+          </div>
+          <div class="dash-kpi kpi-amber">
+            <div class="dash-kpi-val y" id="dk-speech">—</div>
+            <div class="dash-kpi-lbl">Protocolo</div>
+          </div>
         </div>
       </div>
 
+      <!-- Desglose de métricas — score bars con identidad cromática -->
       <div>
-        <div class="dash-section-lbl">Llamadas del día</div>
-        <div class="dash-call-list">
-          <div class="dash-call"><div class="dash-call-no">12</div><div class="dash-call-id">PO-2026-05-1834 <span class="nm">· María González</span></div><div class="dash-call-score g">94</div></div>
-          <div class="dash-call"><div class="dash-call-no">11</div><div class="dash-call-id">PO-2026-05-1833 <span class="nm">· Carlos Méndez</span></div><div class="dash-call-score g">89</div></div>
-          <div class="dash-call"><div class="dash-call-no">10</div><div class="dash-call-id">PO-2026-05-1832 <span class="nm">· Lucía Brenes</span></div><div class="dash-call-score y">76</div></div>
-          <div class="dash-call"><div class="dash-call-no">9</div><div class="dash-call-id">PO-2026-05-1831 <span class="nm">· José Soto</span></div><div class="dash-call-score g">92</div></div>
-          <div class="dash-call"><div class="dash-call-no">8</div><div class="dash-call-id">PO-2026-05-1830 <span class="nm">· Ana Rojas</span></div><div class="dash-call-score y">81</div></div>
-        </div>
+        <div class="dash-section-lbl">Desglose de métricas</div>
+        <div id="dash-score-bars"></div>
       </div>
+
+      <!-- Análisis de sentimiento — breakdown positivo/neutro/negativo -->
+      <div>
+        <div class="dash-section-lbl">Análisis de sentimiento</div>
+        <div id="dash-sentiment"></div>
+      </div>
+
+      <!-- Llamadas del turno -->
+      <div>
+        <div class="dash-section-lbl">Llamadas del turno</div>
+        <div id="dash-calls"></div>
+      </div>
+
+      <!-- Cumplimiento de protocolo por ítem -->
+      <div>
+        <div class="dash-section-lbl">Cumplimiento de protocolo</div>
+        <div id="dash-speech-detail"></div>
+      </div>
+
+      <!-- Recomendaciones KAI -->
+      <div>
+        <div class="dash-section-lbl">Recomendaciones</div>
+        <div id="dash-recs"></div>
+      </div>
+
     </div>
     <div class="dash-foot">
       <span class="dash-foot-note">Datos del turno · actualización en vivo</span>
@@ -3933,83 +4009,139 @@ function closeDashboard(){document.getElementById('dash-ov').classList.remove('s
 function _buildDashboard(){
   const pos=_poList, n=pos.length;
   const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
-  const satAvg=avg(pos.map(p=>p.meta?.scores?.satisfaction||0))||72;
-  const ahtAvg=avg(pos.map(p=>p.meta?.scores?.ahtScore||0))||80;
-  const compAvg=avg(pos.map(p=>p.meta?.scores?.completeness||0))||75;
-  const speechAvg=avg(pos.map(p=>p.meta?.scores?.speechScore||0))||78;
-  const overall=Math.round(satAvg*.35+ahtAvg*.2+compAvg*.25+speechAvg*.2);
 
-  // Date
-  const dd=document.getElementById('dash-date');
-  if(dd) dd.textContent=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});
-  const dd2=document.getElementById('dash-date2');
-  if(dd2) dd2.textContent=new Date().toLocaleDateString('es-CR',{day:'2-digit',month:'short'});
+  // Scores acumulados
+  const satAvg  = avg(pos.map(p=>p.meta?.scores?.satisfaction||0))||72;
+  const ahtAvg  = avg(pos.map(p=>p.meta?.scores?.ahtScore||0))||80;
+  const compAvg = avg(pos.map(p=>p.meta?.scores?.completeness||0))||75;
+  const speechAvg= avg(pos.map(p=>p.meta?.scores?.speechScore||0))||78;
+  const overall = Math.round(satAvg*.35+ahtAvg*.2+compAvg*.25+speechAvg*.2);
+
+  // Duración real promedio (de callDuration MM:SS)
+  function parseDur(s){if(!s||s==='—')return 0;const p=s.split(':');return(parseInt(p[0]||0)*60)+parseInt(p[1]||0);}
+  const durList=pos.map(p=>parseDur(p.meta?.callDuration)).filter(d=>d>0);
+  const durAvgSec=durList.length?Math.round(durList.reduce((a,b)=>a+b,0)/durList.length):0;
+  const durFmt=durAvgSec>0?Math.floor(durAvgSec/60)+':'+(durAvgSec%60).toString().padStart(2,'0'):'—';
+
+  // Sentimiento
+  const posN=pos.filter(p=>p.meta?.sentVal===1).length;
+  const neuN=pos.filter(p=>p.meta?.sentVal===0).length;
+  const negN=pos.filter(p=>p.meta?.sentVal===-1).length;
+  const posPct=n>0?Math.round(posN/n*100):0;
+  const neuPct=n>0?Math.round(neuN/n*100):0;
+  const negPct=n>0?Math.round(negN/n*100):0;
+  const sentEmoji=posPct>=neuPct&&posPct>=negPct?'😊':neuPct>=negPct?'😐':'😠';
+
+  // Fecha y agente
+  const sess=JSON.parse(localStorage.getItem('helios_session')||'{}');
+  const agName=(sess.user&&sess.user.name)||'Agente';
+  const dateStr=new Date().toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long'});
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+
+  setEl('dash-date', dateStr);
+  setEl('dash-agent-nm', agName);
+  setEl('dash-total-score', overall);
 
   // Ring
-  const ring=document.getElementById('dash-ring-fill');
-  const scoreEl=document.getElementById('dash-total-score');
-  if(scoreEl) scoreEl.textContent=overall;
   setTimeout(()=>{
+    const ring=document.getElementById('dash-ring-fill');
     if(ring){
       const c=overall>=80?'var(--g)':overall>=60?'var(--y)':'var(--r)';
-      ring.style.strokeDashoffset=402-(402*overall/100);
       ring.style.stroke=c;
+      ring.style.strokeDashoffset=String(276-(276*overall/100));
     }
-  },100);
+  },120);
 
   // Grade
-  const R=[{min:88,lbl:'A+',sub:'Rendimiento excepcional. Superaste todos los estándares.'},{min:73,lbl:'A',sub:'Buen desempeño. Cumpliste la mayoría de estándares.'},{min:55,lbl:'B',sub:'Desempeño aceptable con oportunidades de mejora.'},{min:0,lbl:'C',sub:'Varios indicadores por debajo del estándar.'}];
-  const r=R.find(x=>overall>=x.min);
-  const gradeEl=document.getElementById('dash-grade');
-  const descEl=document.getElementById('dash-grade-desc');
-  if(gradeEl){ gradeEl.textContent=r.lbl; gradeEl.style.color=overall>=73?'var(--g)':overall>=55?'var(--y)':'var(--r)'; }
-  if(descEl) descEl.textContent=r.sub;
+  const grades=[
+    {min:88,lbl:'Sobresaliente',bg:'var(--gr2)',col:'var(--g)'},
+    {min:73,lbl:'Buen desempeño',bg:'var(--bl2)',col:'var(--blue)'},
+    {min:55,lbl:'En desarrollo',bg:'var(--am2)',col:'var(--y)'},
+    {min:0, lbl:'Requiere apoyo',bg:'var(--re2)',col:'var(--r)'},
+  ];
+  const gr=grades.find(x=>overall>=x.min);
+  const grEl=document.getElementById('dash-grade');
+  if(grEl){grEl.textContent=gr.lbl;grEl.style.background=gr.bg;grEl.style.color=gr.col;}
+  setEl('dash-grade-desc',
+    n===0?'Sin llamadas registradas aún. Completá POs durante las llamadas.':
+    overall>=88?'Rendimiento excepcional. Superás todos los estándares del turno.':
+    overall>=73?'Buen desempeño. Cumplís la mayoría de los estándares.':
+    overall>=55?'Desempeño en desarrollo. Hay oportunidades de mejora claras.':
+    'Varios indicadores por debajo del estándar. Revisá el desglose.');
 
   // KPIs
-  const fcr=n>0?Math.round(pos.filter(p=>(p.meta?.scores?.completeness||0)>=75).length/n*100):87;
-  const kpis={
-    'dk-pos': n,
-    'dk-sat': satAvg+'%',
-    'dk-aht': ahtAvg+'%',
-    'dk-fcr': fcr+'%',
-    'dk-speech': speechAvg+'%',
-  };
-  Object.entries(kpis).forEach(([id,val])=>{
-    const el=document.getElementById(id);
-    if(el) el.textContent=val;
-  });
-  const satEl=document.getElementById('dk-sat');
-  if(satEl) satEl.className='dash-kpi-val '+(satAvg>=80?'g':satAvg>=65?'y':'r');
+  const fcr=n>0?Math.round(pos.filter(p=>(p.meta?.scores?.completeness||0)>=75).length/n*100):0;
+  setEl('dk-pos', n);
+  setEl('dk-sat', satAvg+'%');
+  setEl('dk-dur', durFmt);
+  setEl('dk-sent', sentEmoji);
+  setEl('dk-fcr', fcr+'%');
+  setEl('dk-speech', speechAvg+'%');
 
-  // Score bars
+  // Score bars — triángulo cromático: identidad por color, performance en el número
   const sb=document.getElementById('dash-score-bars');
   if(sb){
-    sb.innerHTML=[
-      {l:'Satisfacción',v:satAvg},{l:'AHT',v:ahtAvg},
-      {l:'Completitud',v:compAvg},{l:'Speech',v:speechAvg},{l:'Total',v:overall}
-    ].map(s=>{
-      const c=s.v>=80?'g':s.v>=60?'y':'r';
-      const col=s.v>=80?'var(--g)':s.v>=60?'var(--y)':'var(--r)';
-      return`<div class="dsb-row"><span class="dsb-lbl">${s.l}</span><div class="dsb-bar"><div class="dsb-fill ${c}" style="width:0%" data-w="${s.v}%"></div></div><span class="dsb-num" style="color:${col}">${s.v}%</span></div>`;
+    const bars=[
+      {l:'Satisfacción', v:satAvg,   identity:'violet'},
+      {l:'Eficiencia',   v:ahtAvg,   identity:'blue'},
+      {l:'Captura PO',   v:compAvg,  identity:'green'},
+      {l:'Protocolo',    v:speechAvg,identity:'amber'},
+      {l:'Nota total',   v:overall,  identity:'brand'},
+    ];
+    sb.innerHTML=bars.map(s=>{
+      const numCol=s.v>=80?'var(--g)':s.v>=60?'var(--y)':'var(--r)';
+      return`<div class="dsb-row">
+        <span class="dsb-lbl">${s.l}</span>
+        <div class="dsb-bar"><div class="dsb-fill ${s.identity}" style="width:0%" data-w="${s.v}%"></div></div>
+        <span class="dsb-num" style="color:${numCol}">${s.v}%</span>
+      </div>`;
     }).join('');
     setTimeout(()=>sb.querySelectorAll('.dsb-fill').forEach(f=>f.style.width=f.dataset.w),160);
   }
 
-  // Calls list
+  // Sentimiento breakdown
+  const sentEl=document.getElementById('dash-sentiment');
+  if(sentEl){
+    if(n===0){
+      sentEl.innerHTML='<div style="font-size:12px;color:var(--t2);padding:4px 0;">Sin datos de sentimiento aún.</div>';
+    } else {
+      sentEl.innerHTML=[
+        {ico:'😊',lbl:'Positivo',pct:posPct,cls:'pos'},
+        {ico:'😐',lbl:'Neutro',  pct:neuPct,cls:'neu'},
+        {ico:'😠',lbl:'Negativo',pct:negPct,cls:'neg'},
+      ].map(s=>`<div class="dash-sent-row">
+        <span class="dash-sent-ico">${s.ico}</span>
+        <span class="dash-sent-lbl">${s.lbl}</span>
+        <div class="dash-sent-bar"><div class="dash-sent-fill ${s.cls}" style="width:0%" data-w="${s.pct}%"></div></div>
+        <span class="dash-sent-pct" style="color:${s.cls==='pos'?'var(--g)':s.cls==='neg'?'var(--r)':'var(--y)'}">${s.pct}%</span>
+      </div>`).join('');
+      setTimeout(()=>sentEl.querySelectorAll('.dash-sent-fill').forEach(f=>f.style.width=f.dataset.w),160);
+    }
+  }
+
+  // Llamadas
   const ce=document.getElementById('dash-calls');
   if(ce){
     if(n===0){
-      ce.innerHTML='<div class="dash-empty-calls">Sin POs registrados aún. Usa ✦ Demo para ver un ejemplo.</div>';
+      ce.innerHTML='<div class="dash-empty-calls">Sin POs registrados aún. Completá el formulario durante las llamadas.</div>';
     } else {
       ce.innerHTML=pos.map((po,idx)=>{
-        const tot=po.meta?.scores?Math.round((po.meta.scores.satisfaction*.3+po.meta.scores.ahtScore*.2+po.meta.scores.completeness*.2+po.meta.scores.speechScore*.3)):72;
+        const sc=po.meta?.scores||{};
+        const tot=Math.round((sc.satisfaction||0)*.3+(sc.ahtScore||0)*.2+(sc.completeness||0)*.2+(sc.speechScore||0)*.3);
         const c=tot>=80?'g':tot>=65?'y':'r';
-        return`<div class="dpo-row" id="dpo_${idx}" onclick="_toggleDPO(${idx})"><span class="dash-call-num">${po.num}</span><span class="dash-call-svc">${po.data.tipo_asistencia||'—'} · ${po.data.nombre_cliente||'—'}</span><span class="dash-call-score ${c}">${tot}%</span><span class="dash-call-ts">${po.ts}</span><span class="dpo-chevron">›</span></div><div class="dpo-detail" id="dpod_${idx}"></div>`;
+        return`<div class="dpo-row" id="dpo_${idx}" onclick="_toggleDPO(${idx})">
+          <span class="dash-call-no">${n-idx}</span>
+          <span class="dash-call-id">${po.num}<span class="nm"> · ${po.data.nombre_cliente||'—'}</span></span>
+          <span class="dash-call-score ${c}">${tot}%</span>
+          <span class="dash-call-ts">${po.ts}</span>
+          <span class="dpo-chevron">›</span>
+        </div>
+        <div class="dpo-detail" id="dpod_${idx}"></div>`;
       }).join('');
     }
   }
 
-  // Speech compliance
+  // Protocolo por ítem
   const defP=['Saludo de bienvenida','Identificación del cliente','Validación de ubicación','Confirmación de servicio','ETA comunicado al cliente'];
   const allI={};
   pos.forEach(po=>(po.meta?.scores?.speechItems||[]).forEach(it=>{
@@ -4024,7 +4156,7 @@ function _buildDashboard(){
     return`<div class="dsd-row"><div class="dsd-dot ${ok?'ok':'fail'}"></div><span class="dsd-lbl">${k}</span><span class="dsd-rate" style="color:var(--${ok?'g':'r'})">${n>0?pct+'%':'—'}</span></div>`;
   }).join('');
 
-  // Recommendations
+  // Recomendaciones
   const recsEl=document.getElementById('dash-recs');
   if(recsEl) recsEl.innerHTML=_genRecs(overall,satAvg,ahtAvg,compAvg,speechAvg,n,0).map(r=>{
     const cl=r.p==='alta'?'r':r.p==='media'?'y':'g';
