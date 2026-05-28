@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>KAI Academy</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client/dist/index.browser.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/web-pubsub-client@1.0.2/dist/index.browser.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&display=swap"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -5341,10 +5341,9 @@ function setStatus(id,color,label,icon){
   document.getElementById("status-menu").style.display="none";
   if(typeof showToast==="function" && icon && label)showToast(icon+" "+label);
 
-  // KAI Academy: solo dispara llamada simulada si WebPubSub está conectado
+  // KAI Academy: dispara llamada simulada al ponerse Disponible
   if (id === 'disponible' && typeof triggerSimulatedCall === 'function') {
-    var _wsUp = typeof wpsClient !== 'undefined' && wpsClient && wpsClient.state === 'Connected';
-    if (_wsUp) setTimeout(triggerSimulatedCall, 800);
+    setTimeout(triggerSimulatedCall, 800);
   }
   if (id === 'coaching_p' || id === 'coaching') {
     // Solo ocultar el botón — el popup lo maneja exclusivamente endCall()
