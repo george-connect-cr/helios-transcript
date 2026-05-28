@@ -1768,7 +1768,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.9-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.0-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3389,24 +3389,28 @@ var DEMO_SCENARIOS = [
     toast: '🔋 Demo · Escenario 1 — Batería descargada',
     serviceId: 'bat', serviceName: 'Batería descargada',
     sentVal: 1, sentLabel: 'Positivo',
-    serviceHint: 'batería no arranca no prende',
-    // Sentimiento progresivo: neutro al inicio, positivo al cierre
+    serviceHint: 'batería no arranca no prende descargada',
+    mapCoords: {lat: 9.8603, lng: -83.9189, label: 'Plaza Mayor, Cartago'},
+    mapMs: 20500,
     sentSteps: [
-      {ms:1000,  val:'0',  desc:'Sin tensión detectada'},
-      {ms:15000, val:'0',  desc:'Tono tranquilo y colaborativo'},
-      {ms:23000, val:'1',  desc:'Cliente satisfecho con la respuesta'},
+      {ms:1000,  val:'0',  desc:'Tono tranquilo, situación controlable'},
+      {ms:18000, val:'0',  desc:'Cliente paciente, colabora bien'},
+      {ms:38000, val:'1',  desc:'Cliente satisfecho con la atención recibida'},
     ],
     script: [
-      {sp:'agente',  txt:'KAI Academy, le habla Andrea. Buenos días, ¿en qué le puedo ayudar?', ms:0},
-      {sp:'cliente', txt:'Hola, buenos días. Soy María Solano y mi carro no arranca, creo que es la batería.', ms:2800},
-      {sp:'agente',  txt:'Lamento escuchar eso, María. ¿Me puede confirmar la placa del vehículo?', ms:5800},
-      {sp:'cliente', txt:'Claro, la placa es ABQ-345. Es un Toyota Corolla blanco del 2019.', ms:8800},
-      {sp:'agente',  txt:'Perfecto. ¿Un teléfono de contacto?', ms:11800},
-      {sp:'cliente', txt:'Sí, mi número es 8823-4512.', ms:14200},
-      {sp:'agente',  txt:'¿Y dónde se encuentra ahora?', ms:16800},
-      {sp:'cliente', txt:'Estoy en el parqueo de Plaza Mayor en Cartago.', ms:19300},
-      {sp:'agente',  txt:'Listo, le confirmo el servicio: batería de reemplazo en Plaza Mayor, Cartago. Llega en 15 minutos. ¿Hay algo más?', ms:22000},
-      {sp:'cliente', txt:'No, muchísimas gracias. Qué bueno que fue tan rápido.', ms:25000},
+      {sp:'agente',  txt:'KAI Academy, buenos días, le atiende Andrea. ¿Con quién tengo el gusto y en qué le puedo ayudar hoy?', ms:0},
+      {sp:'cliente', txt:'Hola Andrea, buenos días. Mi nombre es María Solano. Mire, mi carro no arranca, creo que es la batería porque ayer lo dejé con las luces encendidas.', ms:3000},
+      {sp:'agente',  txt:'Entiendo perfectamente María, no se preocupe que le ayudo de inmediato. ¿Me podría confirmar la placa del vehículo por favor?', ms:6500},
+      {sp:'cliente', txt:'Claro que sí. La placa es ABQ-345. Es un Toyota Corolla blanco del 2019.', ms:10000},
+      {sp:'agente',  txt:'Perfecto, Toyota Corolla blanco 2019, placa ABQ-345. ¿Y cuál es su número de teléfono de contacto?', ms:13500},
+      {sp:'cliente', txt:'Mi número es 8823-4512. Ah, y si necesitan contactar a alguien en el sitio, pueden llamar a mi esposo Carlos al 8765-1234.', ms:17000},
+      {sp:'agente',  txt:'Muy bien, anoto también el contacto de Carlos al 8765-1234. ¿Dónde se encuentra ubicada en este momento?', ms:21500},
+      {sp:'cliente', txt:'Estoy en el parqueo de Plaza Mayor en Cartago, en el nivel 2, cerca de la entrada principal.', ms:25000},
+      {sp:'agente',  txt:'Excelente. Le confirmo el servicio: vamos a enviarle un técnico con equipo de arranque de batería al Parqueo Plaza Mayor, nivel 2, Cartago. El tiempo estimado de llegada es de 15 a 20 minutos. ¿Le parece bien?', ms:29000},
+      {sp:'cliente', txt:'Sí, perfecto. ¿Me puede decir el nombre del técnico que viene?', ms:34000},
+      {sp:'agente',  txt:'Claro, en cuanto despachemos al técnico le enviamos un mensaje con su nombre y número de unidad. ¿Tiene alguna consulta adicional antes de cerrar el servicio?', ms:37000},
+      {sp:'cliente', txt:'No, está todo claro. Muchas gracias Andrea, muy buena atención.', ms:41000},
+      {sp:'agente',  txt:'Con mucho gusto María. Recuerde que estaremos en contacto. Que tenga un excelente día.', ms:44000},
     ]
   },
   {
@@ -3415,23 +3419,25 @@ var DEMO_SCENARIOS = [
     serviceId: 'grua', serviceName: 'Grúa / Remolque',
     sentVal: -1, sentLabel: 'Negativo',
     serviceHint: 'grúa accidente varado remolque',
-    // Sentimiento progresivo: negativo al inicio, mejora al cierre
+    mapCoords: {lat: 9.9831, lng: -84.1520, label: 'Ruta 1, km 32'},
+    mapMs: 14000,
     sentSteps: [
-      {ms:1000,  val:'-1', desc:'Cliente molesto y frustrado'},
-      {ms:8000,  val:'-1', desc:'Tensión — cliente esperó mucho tiempo'},
-      {ms:17000, val:'0',  desc:'Tensión disminuye tras confirmar asistencia'},
-      {ms:23000, val:'0',  desc:'Cliente se tranquiliza con la confirmación'},
+      {ms:1000,  val:'-1', desc:'Cliente molesto — lleva 25 min esperando'},
+      {ms:10000, val:'-1', desc:'Tensión alta — accidente en vía pública'},
+      {ms:20000, val:'0',  desc:'Tensión baja al confirmar despacho de grúa'},
+      {ms:26000, val:'0',  desc:'Cliente se tranquiliza con la confirmación completa'},
     ],
     script: [
-      {sp:'agente',  txt:'KAI Academy, le habla Andrea. Buenas tardes, ¿en qué le puedo asistir?', ms:0},
-      {sp:'cliente', txt:'Miren, llevo 25 minutos esperando respuesta. Tuve un accidente en la Ruta 1, kilómetro 32, y mi carro está sobre la vía.', ms:2800},
-      {sp:'agente',  txt:'Entiendo su molestia y le pido disculpas por la espera. Le atiendo de inmediato. ¿Su nombre y la placa del vehículo?', ms:6200},
-      {sp:'cliente', txt:'Roberto Vargas. La placa es CRE-789. Es un Hyundai Tucson gris.', ms:9500},
-      {sp:'agente',  txt:'Gracias Roberto. Veo que tiene cobertura activa. Despacho la grúa ahora mismo. ¿Está usted en un lugar seguro?', ms:12500},
-      {sp:'cliente', txt:'Sí, ya me salí del carro. Mi número es 6241-7890.', ms:15500},
-      {sp:'agente',  txt:'Confirmando el servicio de grúa: Ruta 1 kilómetro 32, Hyundai Tucson gris, placa CRE-789. La grúa llega en 20 minutos.', ms:18500},
-      {sp:'cliente', txt:'Bien, gracias. Al menos ya me atendieron.', ms:22000},
-      {sp:'agente',  txt:'Por supuesto Roberto. Le llamamos cuando esté cerca la grúa. Cuídese.', ms:24500},
+      {sp:'agente',  txt:'KAI Academy, buenas tardes, le atiende Andrea. ¿En qué le puedo asistir?', ms:0},
+      {sp:'cliente', txt:'Miren, llevo casi 25 minutos esperando que alguien me atienda. Tuve un accidente en la Ruta 1, kilómetro 32, y mi carro está en mitad de la vía. Esto es urgente.', ms:2800},
+      {sp:'agente',  txt:'Entiendo perfectamente su situación y le pido disculpas por la espera. Esto es urgente y lo atiende como prioridad. ¿Me dice su nombre y la placa del vehículo?', ms:6500},
+      {sp:'cliente', txt:'Me llamo Roberto Vargas. La placa es CRE-789. Es un Hyundai Tucson gris del 2021.', ms:9800},
+      {sp:'agente',  txt:'Muchas gracias Roberto. Confirmo que tiene cobertura activa. Estamos despachando una grúa ahora mismo a la Ruta 1 km 32. ¿Usted está en un lugar seguro, alejado del vehículo?', ms:13000},
+      {sp:'cliente', txt:'Sí, ya me bajé del carro. Mi número es 6241-7890.', ms:16500},
+      {sp:'agente',  txt:'Perfecto. Le confirmo el resumen del servicio: grúa a Ruta 1 km 32, Hyundai Tucson gris placa CRE-789, contacto Roberto Vargas al 6241-7890. El tiempo estimado es de 20 a 25 minutos.', ms:19500},
+      {sp:'cliente', txt:'Está bien, gracias. Al menos ya me atendieron.', ms:24000},
+      {sp:'agente',  txt:'Claro que sí Roberto. Le vamos a llamar cuando la grúa esté a 5 minutos. Por favor permanezca alejado de la vía y en un lugar visible para el conductor.', ms:26500},
+      {sp:'cliente', txt:'Entendido, muchas gracias.', ms:30500},
     ]
   }
 ];
@@ -3501,6 +3507,10 @@ function _runDemoScenario(n) {
   if (!sc) { _exitDemo(); return; }
   _demoScene = n;
   _clearSession();
+
+  // Reset ServiceDetector para que _det no persista entre escenarios
+  if (typeof ServiceDetector !== 'undefined') ServiceDetector.reset();
+
   showToast(sc.toast);
   var maxMs = 0;
   sc.script.forEach(function(line) {
@@ -3512,15 +3522,40 @@ function _runDemoScenario(n) {
     if (line.ms > maxMs) maxMs = line.ms;
   });
 
-  // Setear servicio explícitamente a los 3s (no depender solo de detección)
+  // Setear servicio a los 3s — también actualizar card directamente como seguro
   var t_svc = setTimeout(function() {
     if (!_demoActive) return;
-    if (typeof POBuilder !== 'undefined') POBuilder.setService(sc.serviceId, sc.serviceName);
+    ServiceDetector.reset(); // asegurar _det limpio antes de la primera detección
     ServiceDetector.analyze(sc.serviceHint);
+    if (typeof POBuilder !== 'undefined') POBuilder.setService(sc.serviceId, sc.serviceName);
+    // Actualizar card "Servicio detectado" directamente como respaldo
+    var svcIco = document.getElementById('svc-ico');
+    var svcNm  = document.getElementById('svc-name');
+    var svcHt  = document.getElementById('svc-hint');
+    var svcFill= document.getElementById('svc-conf-fill');
+    var svcLbl = document.getElementById('svc-conf');
+    if(svcIco) svcIco.textContent = sc.serviceId==='bat'?'🔋':'🚛';
+    if(svcNm)  svcNm.textContent  = sc.serviceName;
+    if(svcHt)  svcHt.textContent  = sc.serviceId==='bat'?'Arranque o cambio de batería':'Grúa y remolque';
+    if(svcFill)svcFill.style.width='90%';
+    if(svcLbl) svcLbl.textContent ='Alta';
+    var caEmpty=document.getElementById('ca-empty');
+    if(caEmpty)caEmpty.style.display='none';
   }, 3000);
   _demoTimers.push(t_svc);
 
-  // Sentimiento progresivo — animar según los pasos del escenario
+  // Mapa con coordenadas hardcodeadas (no depende de Nominatim)
+  if (sc.mapCoords) {
+    var t_map = setTimeout(function() {
+      if (!_demoActive) return;
+      if (typeof initMap === 'function') {
+        initMap('map-origen', sc.mapCoords.lat, sc.mapCoords.lng, sc.mapCoords.label);
+      }
+    }, sc.mapMs + 500);
+    _demoTimers.push(t_map);
+  }
+
+  // Sentimiento progresivo
   (sc.sentSteps || []).forEach(function(step) {
     var ts = setTimeout(function() {
       if (!_demoActive) return;
@@ -3532,7 +3567,7 @@ function _runDemoScenario(n) {
     _demoTimers.push(ts);
   });
 
-  // Mostrar botón Finalizar tras 2s y activar callInProgress
+  // Mostrar Finalizar a los 2s
   var t1 = setTimeout(function() {
     if (!_demoActive) return;
     _callInProgress = true;
@@ -3540,15 +3575,13 @@ function _runDemoScenario(n) {
   }, 2000);
   _demoTimers.push(t1);
 
-  // Inyectar sentimiento final al terminar la transcripción
+  // Inyectar sentimiento y protocolo al finalizar
   var t2 = setTimeout(function() {
     if (!_demoActive) return;
     lastAnalysis = lastAnalysis || {};
     lastAnalysis.sentimiento_cliente = { valor: String(sc.sentVal), etiqueta: sc.sentLabel };
-    lastAnalysis.protocolo_agente    = { cumple: true, descripcion: 'Protocolo de atención completado' };
-    if (typeof renderSentiment === 'function') {
-      renderSentiment(lastAnalysis.sentimiento_cliente);
-    }
+    lastAnalysis.protocolo_agente    = { cumple: true, descripcion: 'Protocolo completado' };
+    if (typeof renderSentiment === 'function') renderSentiment(lastAnalysis.sentimiento_cliente);
   }, maxMs + 1500);
   _demoTimers.push(t2);
 }
