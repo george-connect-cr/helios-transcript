@@ -211,6 +211,8 @@ body.dark .n-th-thumb {
 #status-label {
   font-size:12px;font-weight:600;
   color:var(--t0);font-family:var(--f);
+  display:inline !important;
+  white-space:nowrap;
 }
 #status-dot-btn{
   width:8px;height:8px;border-radius:50%;
@@ -1590,7 +1592,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.1-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.2-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -4716,8 +4718,8 @@ function setStatus(id,color,label,icon){
   _currentStatus=id;
   var dot=document.getElementById("status-dot-btn");
   var lbl=document.getElementById("status-label");
-  if(dot)dot.style.background=color;
-  if(lbl)lbl.textContent=label;
+  if(dot && color) dot.style.background=color;
+  if(lbl && label !== undefined && label !== null) lbl.textContent=label;
   document.getElementById("status-menu").style.display="none";
   if(typeof showToast==="function")showToast(icon+" "+label);
 

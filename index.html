@@ -205,7 +205,7 @@ html,body{height:100%;font-family:var(--f);background:var(--s1);color:var(--t0);
     <div class="brand">
       <img src="assets/connect-logo.png" alt="Connect" style="height:44px;width:auto;display:block;margin:0 auto 8px;border-radius:6px;"/>
       <div class="brand-sub" style="letter-spacing:3px;font-size:10px;">KAI ACADEMY</div>
-      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.2.1-beta</div>
+      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.2.2-beta</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -264,7 +264,7 @@ var _pendingUser = null;
 
 window.addEventListener('DOMContentLoaded', function(){
   var s = localStorage.getItem('helios_session');
-  if(s){try{var p=JSON.parse(s);if(p&&(Date.now()-p.ts<3600000)){window.location.href='app.html';return;}}catch(e){}}
+  if(s){try{var p=JSON.parse(s);if(p&&(Date.now()-p.ts<3600000)){var _r=p.user&&p.user.role;window.location.href=(_r==='supervisor'||_r==='admin'||_r==='formador')?'reportes.html':'app.html';return;}}catch(e){}}
   var params = new URLSearchParams(window.location.search);
   if(params.get('reason')==='timeout'){
     var msg = document.createElement('div');
@@ -493,8 +493,8 @@ function saveAndRedirect(user, role, extension){
       ts:Date.now()
     };
     localStorage.setItem('helios_session', JSON.stringify(session));
-    // Routing por rol: supervisor y formador van directo a reportes
-    var _dest = (role==='supervisor'||role==='formador') ? 'reportes.html' : 'app.html';
+    // Routing por rol: supervisor, admin y formador van directo a reportes
+    var _dest = (role==='supervisor'||role==='formador'||role==='admin') ? 'reportes.html' : 'app.html';
     window.location.href = _dest;
   }, 900);
 }
