@@ -856,13 +856,14 @@ body.dark .n-th-thumb {
 .dpo-speech-chip.ok{background:var(--gr2);color:var(--g);}
 .dpo-speech-chip.fail{background:var(--re2);color:var(--r);}
 
-
+.dpo-row{
   display:flex;align-items:center;gap:10px;
   padding:9px 12px;border-radius:8px;
   background:var(--c2);margin-bottom:5px;
   cursor:pointer;transition:background .12s;
 }
 .dpo-row:hover{background:var(--c3);}
+.dpo-row.open{border-radius:8px 8px 0 0;margin-bottom:0;}
 .dpo-chevron{
   font-size:14px;color:var(--t2);
   transition:transform .2s;flex-shrink:0;
@@ -872,7 +873,7 @@ body.dark .n-th-thumb {
 .dpo-detail{
   display:none;margin-bottom:5px;
   background:var(--c2);border-radius:0 0 8px 8px;
-  padding:10px 12px;margin-top:-5px;
+  padding:14px 16px 12px;border-top:1px solid var(--c3);
 }
 .dpo-detail.show{display:block;}
 
@@ -1831,7 +1832,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.5-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.6-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
