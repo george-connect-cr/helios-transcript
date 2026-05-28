@@ -1674,7 +1674,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.6-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.2.7-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2922,6 +2922,12 @@ function setUbicacion(tipo, address) {
   _setFldValue(dataKey, address);
   _updatePOProgress();
 
+  // Sincronizar con datos internos de POBuilder (para openPOValidation)
+  if (typeof POBuilder !== 'undefined') {
+    var _poKey = tipo === 'origen' ? 'ubicación' : 'ubicacion_destino';
+    POBuilder.addField(_poKey, address);
+  }
+
   // Geocodificar y mostrar mapa
   geocodeAndShowMap(mapId, address);
 }
@@ -3175,6 +3181,9 @@ function quickExtractFromTranscript(text) {
   var ubicPatterns = [
     /(?:estoy en|me encuentro en|estoy aquí en|estoy ubicad[oa] en|mi ubicación es|estoy parad[oa] en)\s+(.{8,80}?)(?:[.,]|$)/i,
     /(?:aquí en|aquí frente a|frente a|cerca de)\s+(.{8,60}?)(?:[.,]|$)/i,
+    /(?:accidente en|varado en|parado en|chocaron en|quedé en|quedamos en)\s+(.{8,80}?)(?:[.,]|$)/i,
+    /(?:en la\s+(?:Ruta|Calle|Av\.|Avenida|Autopista|Carretera)\s+.{2,60}?)(?:[.,]|$)/i,
+    /(?:salida de|entrada de|parqueo de|frente al?|detrás del?|costado del?)\s+(.{6,60}?)(?:[.,]|$)/i,
   ];
   for (var up = 0; up < ubicPatterns.length; up++) {
     var ubicMatch = text.match(ubicPatterns[up]);
@@ -3699,6 +3708,7 @@ const POBuilder = (() => {
     if(typeof initKBChecklist !== 'undefined') initKBChecklist(svcId);
     const isNew = _currentService !== svcId;
     _currentService=svcId; _data.tipo_asistencia=svcName;
+    _setFldValue('tipo_svc', svcName); // sincronizar campo visible del formulario
     _showPanel(); _upsertRow('tipo_asistencia',svcName,isNew);
     _updateSugs(); _updateWait(); _updateStatus();
     // FlashPill for service only on first detection
