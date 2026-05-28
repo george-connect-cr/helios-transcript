@@ -389,6 +389,9 @@ function ag(){
 function rc(v){return v>=85?'var(--g)':v>=70?'var(--y)':'var(--r)';}
 function bar(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rc(v)+'"></div></div>';}
 function badge(a){var c=a.grade==='A'?'var(--g)':a.grade==='B'?'var(--y)':'var(--r)';var bg=a.grade==='A'?'rgba(74,138,114,.12)':a.grade==='B'?'rgba(166,124,69,.12)':'rgba(184,92,107,.12)';return'<span class="sbadge" style="color:'+c+';background:'+bg+'">'+a.score+'</span>';}
+// Registry global de POs para el modal de detalle
+var _PORegistry = {};
+
 function fs(s){return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
 function sc(v){return v>=70?'var(--g)':v>=50?'var(--y)':'var(--r)';}
 
@@ -820,15 +823,17 @@ function agDet(a){
   var poTbl='';
   if(a.polist&&a.polist.length){
     var spLbls={sal:'Saludo',id:'ID cliente',ub:'Ubicación',eta:'ETA',ci:'Cierre'};
-    var rows=a.polist.map(function(p){
+    var rows=a.polist.map(function(p, pi){
+      var _rk=(a.email||a.name||'ag').replace(/[^a-z0-9]/gi,'_')+'_'+pi;
+      _PORegistry[_rk]={po:p, agentName:a.name||'—'};
       var sc2=p.score>=85?'var(--g)':p.score>=70?'var(--y)':'var(--r)';
       var sc2bg=p.score>=85?'var(--gr2)':p.score>=70?'var(--am2)':'var(--re2)';
       var sico=p.sent==='p'?'😊':p.sent==='g'?'😞':'😐';
       var stars='';for(var si=0;si<5;si++)stars+='<span style="color:'+(si<p.sat?'#f59e0b':'var(--c3)')+';font-size:11px;">★</span>';
-      var spB=Object.keys(p.sp).map(function(k){
-        return'<span title="'+spLbls[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-size:9px;font-weight:700;background:'+(p.sp[k]?'var(--gr2)':'var(--re2)')+';color:'+(p.sp[k]?'var(--g)':'var(--r)');+'">'+(p.sp[k]?'✓':'✗')+'</span>';
-      }).join('');
-      return'<tr data-po="'+p.id+'" onclick="showPODetail('+JSON.stringify(p).replace(/"/g,'&quot;')+','+JSON.stringify(a.name).replace(/"/g,'&quot;')+')" title="Ver detalle del PO">'+
+      var spB=p.sp?Object.keys(p.sp).map(function(k){
+        return'<span title="'+spLbls[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-size:9px;font-weight:700;background:'+(p.sp[k]?'var(--gr2)':'var(--re2)')+';color:'+(p.sp[k]?'var(--g)':'var(--r)')+'">'+(p.sp[k]?'✓':'✗')+'</span>';
+      }).join(''):'';
+      return'<tr data-po="'+p.id+'" style="cursor:pointer" onclick="showPODetail(\'' +_rk+ '\')" title="Ver detalle · '+p.id+'">'+
         '<td style="font-family:var(--m);font-size:10px;color:var(--t2);">'+p.id+'</td>'+
         '<td style="font-size:10px;color:var(--t2);">'+p.f+'</td>'+
         '<td><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:var(--bl2);color:var(--blue);">'+p.svc+'</span></td>'+
@@ -1114,7 +1119,11 @@ function loadSupabaseData(callback){
 }
 
 // ── PO Detail Modal ──────────────────────────────────────────────
-function showPODetail(p, agentName) {
+function showPODetail(regKey) {
+  var entry = _PORegistry[regKey];
+  if (!entry) { console.warn('PO no encontrado en registro:', regKey); return; }
+  var p = entry.po;
+  var agentName = entry.agentName;
   var existing = document.getElementById('po-detail-modal');
   if (existing) existing.remove();
 
