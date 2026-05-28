@@ -289,7 +289,7 @@ tr[data-po]:hover td{background:var(--bl2);}
 <script>
 
 // DATA
-var RA=[
+var RA_MOCK=[
   {id:1,name:'Dayana García',lt:'D',color:'#E8440A',carril:'Home',pais:'Costa Rica',calls:187,pos:142,aht:232,ahtS:'3:52',sat:92,speech:96,score:91,grade:'A',
    sent:{p:78,n:14,g:8},durs:[210,185,265,190,245,178,220,195,240,200,185,230,195,210,188],
    poscores:[88,92,85,94,90,87,93,89,91,86],
@@ -376,6 +376,8 @@ var RF=[
 
 // HELPERS
 var _filters={carril:'',pais:'',grade:'',agente:''};
+var RA = RA_MOCK.slice(); // inicializar con mock como fallback
+var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 var _selAg=null;
 var _role='formador';
 
@@ -454,6 +456,19 @@ function go(v){
 
 // RESUMEN
 function vResumen(){
+  // Agente sin sesiones reales todavía — pantalla de bienvenida
+  if(_role==='agente' && !_hasRealData){
+    return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;">'+
+      '<div style="font-size:48px;">📊</div>'+
+      '<div style="font-family:var(--f);font-size:18px;font-weight:700;color:var(--t0);">Tus métricas aparecerán aquí</div>'+
+      '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:380px;line-height:1.65;">'+
+        'Cuando confirmes POs en una llamada, tus resultados — score, satisfacción, duración, protocolo — se registran automáticamente y se reflejan en este panel.'+
+      '</div>'+
+      '<a href="app.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;background:var(--a);color:#fff;font-family:var(--f);font-size:13px;font-weight:700;text-decoration:none;margin-top:8px;">'+
+        '← Ir a la pantalla de llamadas'+
+      '</a>'+
+    '</div>';
+  }
   var data=ag(),n=data.length||1;
   var t={calls:0,pos:0,sat:0,sp:0,sc:0,aht:0};
   data.forEach(function(a){t.calls+=a.calls;t.pos+=a.pos;t.sat+=a.sat;t.sp+=a.speech;t.sc+=a.score;t.aht+=a.aht;});
@@ -1030,11 +1045,14 @@ try{
       var _matchAg=RA.find(function(a){
         return a.email===_uemail2 || a.name===_uname;
       });
-      if(_matchAg){
+      if(_matchAg && _hasRealData){
+        // Datos reales encontrados
         _selAg=_matchAg;
         go('agente_v');
+      } else if(_matchAg && !_hasRealData){
+        // Solo mock — mostrar pantalla de bienvenida
+        go('resumen');
       } else {
-        // Sin datos todavía — mostrar resumen vacío con mensaje
         go('resumen');
       }
     } else {
@@ -1131,7 +1149,7 @@ function loadSupabaseData(callback){
       };
     });
     if(newRA.length>0){
-      RA=newRA;
+      RA=newRA; _hasRealData=true;
       console.log('[Reportes] '+newRA.length+' agente(s) cargados desde Supabase');
     }
     callback();
