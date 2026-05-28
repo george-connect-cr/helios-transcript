@@ -40,10 +40,10 @@ body.dark{
 }
 body.dark nav{background:rgba(26,26,26,.92);}
 body.dark .tp-hd{background:rgba(26,26,26,.6);}
-body.dark .bubble.ag{background:rgba(255,255,255,.05);box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.2);}
-body.dark .bubble.ag:hover{background:rgba(255,255,255,.1);}
-body.dark .bubble.cl{background:rgba(255,255,255,.035);}
-body.dark .bubble.cl:hover{background:rgba(255,255,255,.07);}
+body.dark .bubble.ag{background:rgba(59,110,248,.12);box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.2);border-left:2.5px solid rgba(59,110,248,.5);}
+body.dark .bubble.ag:hover{background:rgba(59,110,248,.18);}
+body.dark .bubble.cl{background:rgba(240,144,10,.1);border-right:2.5px solid rgba(240,144,10,.4);}
+body.dark .bubble.cl:hover{background:rgba(240,144,10,.15);}
 body.dark .typing-bubble{background:rgba(255,255,255,.06);box-shadow:0 1px 2px rgba(0,0,0,.3);}
 body.dark .t-scroll-arrow{background:rgba(26,26,26,.95);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);}
 
@@ -1071,18 +1071,20 @@ body.dark .n-th-thumb {
   transition:box-shadow .15s,background .15s;
 }
 .bubble.ag{
-  background:rgba(255,255,255,.85);
-  box-shadow:0 1px 2px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.03);
+  background:var(--bl2);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.02);
+  border-left:2.5px solid var(--blue);
 }
 .bubble.ag:hover{
-  background:rgba(255,255,255,1);
+  background:rgba(59,110,248,.1);
   box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
 }
 .bubble.cl{
-  background:rgba(255,255,255,.5);
+  background:var(--am2);
   align-self:flex-end;
+  border-right:2.5px solid var(--y);
 }
-.bubble.cl:hover{background:rgba(255,255,255,.75);}
+.bubble.cl:hover{background:rgba(240,144,10,.12);}
 
 .bubble.streaming{border-right:2px solid rgba(14,168,116,.7);animation:blink .8s step-end infinite;}
 @keyframes blink{0%,100%{border-color:rgba(14,168,116,.7);}50%{border-color:transparent;}}
@@ -1768,7 +1770,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.3-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.3.4-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
