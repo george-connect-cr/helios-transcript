@@ -1822,6 +1822,9 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 /* Wrap para posicionamiento relativo */
 .n-profile-wrap { position:relative; }
 </style>
+<!-- Firebase SDK — RBAC auth guard -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -1832,7 +1835,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.4.5-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.4.6-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2346,6 +2349,95 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 </div>
 
 <script>
+// ── RBAC centralizado — matriz de permisos por rol ────────────────
+var RBAC = {
+  agente:     { pages:['app'],          canViewTeam:false, canCoach:false, autoDemo:false },
+  demo:       { pages:['app'],          canViewTeam:false, canCoach:false, autoDemo:true  },
+  formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
+  supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
+  admin:      { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false }
+};
+
+// Guard: verifica Firebase auth + rol autorizado para esta página
+// pageName: 'app' | 'reportes'
+function requireAuth(pageName) {
+  var _FB_CFG = {
+    apiKey:"AIzaSyBTmyIHAAee68KRiMmthNUue5ayVvWU-3s",
+    authDomain:"kai-academy-connect.firebaseapp.com",
+    projectId:"kai-academy-connect",
+    storageBucket:"kai-academy-connect.firebasestorage.app",
+    messagingSenderId:"863425225087",
+    appId:"1:863425225087:web:d5b81e1443cb3411087a4a"
+  };
+  if (typeof firebase === 'undefined') return; // SDK no cargado aún
+  if (!firebase.apps.length) firebase.initializeApp(_FB_CFG);
+
+  firebase.auth().onAuthStateChanged(function(fbUser) {
+    // Sin sesión Firebase → login
+    if (!fbUser) {
+      localStorage.removeItem('helios_session');
+      window.location.href = 'index.html';
+      return;
+    }
+    // Verificar sesión local
+    var sess = null;
+    try { sess = JSON.parse(localStorage.getItem('helios_session') || 'null'); } catch(e){}
+    if (!sess || !sess.user || (Date.now() - sess.ts > 28800000)) { // 8 horas
+      firebase.auth().signOut();
+      localStorage.removeItem('helios_session');
+      window.location.href = 'index.html';
+      return;
+    }
+    // Verificar que el email de Firebase coincide con la sesión
+    if (fbUser.email !== sess.user.email) {
+      firebase.auth().signOut();
+      localStorage.removeItem('helios_session');
+      window.location.href = 'index.html';
+      return;
+    }
+    // Verificar rol autorizado para esta página
+    var role = sess.user.role || 'agente';
+    var perms = RBAC[role];
+    if (!perms || !perms.pages.includes(pageName)) {
+      var fallback = (role==='agente'||role==='demo') ? 'app.html' : 'reportes.html';
+      window.location.href = fallback;
+      return;
+    }
+    // Re-validar rol contra Supabase (anti-tampering de localStorage)
+    _revalidateRole(fbUser.email, role, sess);
+  });
+}
+
+function _revalidateRole(email, localRole, sess) {
+  var _SB = 'https://dednkgonnirybnpktbzp.supabase.co';
+  var _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
+  fetch(_SB+'/rest/v1/agents?email=eq.'+encodeURIComponent(email)+'&select=role,country,lane', {
+    headers:{'apikey':_KEY,'Authorization':'Bearer '+_KEY}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if (!data || !data.length) return; // sin datos, usar local
+    var dbRole = data[0].role;
+    if (dbRole !== localRole) {
+      // Rol cambió en Supabase — actualizar sesión y redirigir
+      sess.user.role    = dbRole;
+      sess.user.country = data[0].country || sess.user.country;
+      sess.user.lane    = data[0].lane    || sess.user.lane;
+      localStorage.setItem('helios_session', JSON.stringify(sess));
+      var perms = RBAC[dbRole];
+      if (perms && !perms.pages.includes(window._currentPage)) {
+        var fallback = (dbRole==='agente'||dbRole==='demo') ? 'app.html' : 'reportes.html';
+        window.location.href = fallback;
+      }
+    }
+  })
+  .catch(function(){}); // silencioso — no bloquear la app si Supabase falla
+}
+
+
+window._currentPage = "app";
+requireAuth("app");
+
 // ── AUTH — objeto global para acciones de sesión ──────────────────────────
 var AUTH = {
   logout: function() {
