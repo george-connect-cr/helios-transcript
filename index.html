@@ -196,6 +196,9 @@ html,body{height:100%;font-family:var(--f);background:var(--s1);color:var(--t0);
 .btn-cta:hover{background:#c93d00;}
 .btn-cta:disabled{opacity:.5;cursor:not-allowed;}
 </style>
+<!-- Firebase CDN (compat — vanilla JS, sin bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -205,7 +208,7 @@ html,body{height:100%;font-family:var(--f);background:var(--s1);color:var(--t0);
     <div class="brand">
       <img src="assets/connect-logo.png" alt="Connect" style="height:44px;width:auto;display:block;margin:0 auto 8px;border-radius:6px;"/>
       <div class="brand-sub" style="letter-spacing:3px;font-size:10px;">KAI ACADEMY</div>
-      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.4.4-beta</div>
+      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.4.5-beta</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -301,12 +304,100 @@ function doEmailLogin(){
   showRoleSelector(found);
 }
 
-function doGoogleSSO(){
-  // Demo SSO — show role selector immediately
-  var demoUser = {name:'Usuario Demo',email:'demo@connect.inc',color:'#8892b0',letter:'D'};
-  _pendingUser = demoUser;
-  showRoleSelector(demoUser);
+// ── Firebase SSO ─────────────────────────────────────────────────
+var _FB_CONFIG = {
+  apiKey:            "AIzaSyBTmyIHAAee68KRiMmthNUue5ayVvWU-3s",
+  authDomain:        "kai-academy-connect.firebaseapp.com",
+  projectId:         "kai-academy-connect",
+  storageBucket:     "kai-academy-connect.firebasestorage.app",
+  messagingSenderId: "863425225087",
+  appId:             "1:863425225087:web:d5b81e1443cb3411087a4a"
+};
+var _SB_URL2 = 'https://dednkgonnirybnpktbzp.supabase.co';
+var _SB_KEY2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
+
+firebase.initializeApp(_FB_CONFIG);
+
+function doGoogleSSO() {
+  var provider = new firebase.auth.GoogleAuthProvider();
+  // Restricción: solo cuentas @connect.inc
+  provider.setCustomParameters({ hd: 'connect.inc' });
+
+  firebase.auth().signInWithPopup(provider)
+    .then(function(result) {
+      var fbUser = result.user;
+      _lookupAgentInSupabase(fbUser.email, fbUser.displayName);
+    })
+    .catch(function(err) {
+      var msg = err.code === 'auth/popup-closed-by-user'
+        ? 'Ventana cerrada antes de completar el ingreso.'
+        : err.code === 'auth/unauthorized-domain'
+        ? 'Dominio no autorizado. Contactá al administrador.'
+        : 'Error al ingresar con Google: ' + err.message;
+      _showLoginErr(msg);
+    });
 }
+
+function _lookupAgentInSupabase(email, displayName) {
+  document.getElementById('loading').classList.add('show');
+  var name   = displayName || email.split('@')[0].replace(/\./g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();});
+  var letter = name[0].toUpperCase();
+  var sbHdrs = { 'apikey': _SB_KEY2, 'Authorization': 'Bearer ' + _SB_KEY2 };
+
+  fetch(_SB_URL2 + '/rest/v1/agents?email=eq.' + encodeURIComponent(email) + '&select=*', {
+    headers: sbHdrs
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var agent = data && data.length ? data[0] : null;
+    if (!agent) {
+      // Primer login — crear agente con rol 'agente' por defecto
+      return fetch(_SB_URL2 + '/rest/v1/agents', {
+        method: 'POST',
+        headers: Object.assign({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=representation'}, sbHdrs),
+        body: JSON.stringify({ email: email, name: name, role: 'agente' })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ return Array.isArray(d) ? d[0] : d; });
+    }
+    return agent;
+  })
+  .then(function(agent){
+    document.getElementById('loading').classList.remove('show');
+    var userObj = {
+      name:    agent.name    || name,
+      email:   agent.email   || email,
+      color:   '#e04500',
+      letter:  (agent.name || name)[0].toUpperCase(),
+      role:    agent.role    || 'agente',
+      country: agent.country || 'Costa Rica',
+      lane:    agent.lane    || 'Home'
+    };
+    if (agent.role === 'agente' || agent.role === 'demo') {
+      showExtensionPopup(userObj, agent.role);
+    } else {
+      saveAndRedirect(userObj, agent.role, null);
+    }
+  })
+  .catch(function(err){
+    document.getElementById('loading').classList.remove('show');
+    _showLoginErr('No se pudo verificar tu cuenta. Intentá de nuevo.');
+    console.error('[SSO Supabase]', err);
+  });
+}
+
+function _showLoginErr(msg) {
+  var existing = document.getElementById('login-err');
+  if (existing) existing.remove();
+  var el = document.createElement('div');
+  el.id = 'login-err';
+  el.style.cssText = 'background:#fff3f3;color:#e84040;padding:9px 14px;border-radius:6px;font-size:12px;font-weight:600;margin-top:8px;text-align:center;';
+  el.textContent = msg;
+  var form = document.querySelector('.form');
+  if (form) form.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 5000);
+}
+
 
 /* ── STEP 2: Role selector popup ── */
 function showRoleSelector(user){

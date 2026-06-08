@@ -228,7 +228,12 @@ tr[data-po]:hover td{background:var(--bl2);}
   <span class="hd-role" id="hd-role">Formador</span>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
     <a id="btn-back-app" href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:30px;font-size:12px;">← App</a>
-    <button onclick="localStorage.removeItem('helios_session');window.location.href='index.html'" class="btn btn-danger" style="height:30px;font-size:12px;">Salir</button>
+    <button onclick="
+      localStorage.removeItem('helios_session');
+      if(typeof firebase!=='undefined'&&firebase.auth){
+        firebase.auth().signOut().catch(function(){}).finally(function(){window.location.href='index.html';});
+      } else { window.location.href='index.html'; }
+    " class="btn btn-danger" style="height:30px;font-size:12px;">Salir</button>
   </div>
 </div></div>
 
