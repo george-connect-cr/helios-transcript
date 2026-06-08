@@ -208,7 +208,7 @@ html,body{height:100%;font-family:var(--f);background:var(--s1);color:var(--t0);
     <div class="brand">
       <img src="assets/connect-logo.png" alt="Connect" style="height:44px;width:auto;display:block;margin:0 auto 8px;border-radius:6px;"/>
       <div class="brand-sub" style="letter-spacing:3px;font-size:10px;">KAI ACADEMY</div>
-      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.4.6-beta</div>
+      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.4.7-beta</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -326,7 +326,7 @@ function doGoogleSSO() {
   firebase.auth().signInWithPopup(provider)
     .then(function(result) {
       var fbUser = result.user;
-      _lookupAgentInSupabase(fbUser.email, fbUser.displayName);
+      _lookupAgentInSupabase(fbUser.email, fbUser.displayName, fbUser.uid);
     })
     .catch(function(err) {
       var msg = err.code === 'auth/popup-closed-by-user'
@@ -338,7 +338,7 @@ function doGoogleSSO() {
     });
 }
 
-function _lookupAgentInSupabase(email, displayName) {
+function _lookupAgentInSupabase(email, displayName, firebaseUid) {
   document.getElementById('loading').classList.add('show');
   var name   = displayName || email.split('@')[0].replace(/\./g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();});
   var letter = name[0].toUpperCase();
@@ -355,23 +355,32 @@ function _lookupAgentInSupabase(email, displayName) {
       return fetch(_SB_URL2 + '/rest/v1/agents', {
         method: 'POST',
         headers: Object.assign({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=representation'}, sbHdrs),
-        body: JSON.stringify({ email: email, name: name, role: 'agente' })
+        body: JSON.stringify({ email: email, name: name, role: 'agente', firebase_uid: firebaseUid })
       })
       .then(function(r){ return r.json(); })
       .then(function(d){ return Array.isArray(d) ? d[0] : d; });
+    }
+    // Sincronizar firebase_uid si cambió o no estaba
+    if (firebaseUid && agent.firebase_uid !== firebaseUid) {
+      fetch(_SB_URL2 + '/rest/v1/agents?email=eq.' + encodeURIComponent(email), {
+        method: 'PATCH',
+        headers: Object.assign({'Content-Type':'application/json','Prefer':'return=minimal'}, sbHdrs),
+        body: JSON.stringify({ firebase_uid: firebaseUid, updated_at: new Date().toISOString() })
+      }).catch(function(){});
     }
     return agent;
   })
   .then(function(agent){
     document.getElementById('loading').classList.remove('show');
     var userObj = {
-      name:    agent.name    || name,
-      email:   agent.email   || email,
-      color:   '#e04500',
-      letter:  (agent.name || name)[0].toUpperCase(),
-      role:    agent.role    || 'agente',
-      country: agent.country || 'Costa Rica',
-      lane:    agent.lane    || 'Home'
+      name:         agent.name        || name,
+      email:        agent.email       || email,
+      firebase_uid: firebaseUid       || agent.firebase_uid || '',
+      color:        '#e04500',
+      letter:       (agent.name || name)[0].toUpperCase(),
+      role:         agent.role        || 'agente',
+      country:      agent.country     || 'Costa Rica',
+      lane:         agent.lane        || 'Home'
     };
     if (agent.role === 'agente' || agent.role === 'demo') {
       showExtensionPopup(userObj, agent.role);
