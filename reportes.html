@@ -566,7 +566,7 @@ function vResumen(){
   if(_role==='agente' && !_hasRealData){
     return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;">'+
       '<div style="font-size:48px;">📊</div>'+
-      '<div style="font-family:var(--f);font-size:18px;font-weight:700;color:var(--t0);">Tus métricas aparecerán aquí</div>'+
+      '<div style="font-family:var(--f);font-size:18px;font-weight:400;color:var(--t0);">Tus métricas aparecerán aquí</div>'+
       '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:380px;line-height:1.65;">'+
         'Cuando confirmes POs en una llamada, tus resultados — score, satisfacción, duración, protocolo — se registran automáticamente y se reflejan en este panel.'+
       '</div>'+
@@ -619,11 +619,11 @@ function vResumen(){
   ].forEach(function(g){
     var pct=Math.round(g[4]/n*100);
     h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid rgba(0,0,0,.04);">'+
-      '<div style="width:28px;height:28px;border-radius:4px;background:'+g[3]+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:'+g[2]+';flex-shrink:0;">'+g[0]+'</div>'+
+      '<div style="width:28px;height:28px;border-radius:4px;background:'+g[3]+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:'+g[2]+';flex-shrink:0;">'+g[0]+'</div>'+
       '<div style="flex:1;">'+
         '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">'+
           '<span style="font-size:12px;font-weight:400;color:var(--t1);">'+g[1]+'</span>'+
-          '<span style="font-size:12px;font-weight:600;color:'+g[2]+';font-family:var(--m);">'+g[4]+'</span>'+
+          '<span style="font-size:12px;font-weight:400;color:'+g[2]+';font-family:var(--m);">'+g[4]+'</span>'+
         '</div>'+
         '<div class="bar6"><div class="bar6f" style="width:'+pct+'%;background:'+g[2]+';"></div></div>'+
       '</div>'+
@@ -657,7 +657,7 @@ function vResumen(){
   var scCol=avgSc>=85?'var(--g)':avgSc>=70?'var(--y)':'var(--r)';
   h+='<div style="padding:10px 12px;background:var(--c2);border-radius:4px;display:flex;align-items:center;justify-content:space-between;">'+
     '<div style="font-size:12px;font-weight:400;color:var(--t1);">Score QA promedio</div>'+
-    '<div style="font-size:18px;font-weight:600;color:'+scCol+';font-family:var(--m);">'+avgSc+'<span style="font-size:11px;color:var(--t2);font-weight:500;font-family:var(--f);">/100</span></div>'+
+    '<div style="font-size:18px;font-weight:400;color:'+scCol+';font-family:var(--m);">'+avgSc+'<span style="font-size:11px;color:var(--t2);font-weight:500;font-family:var(--f);">/100</span></div>'+
   '</div>';
 
   h+='</div></div></div>';
@@ -677,12 +677,12 @@ function tblAgentes(data){
     tr+='<td><div style="display:flex;align-items:center;gap:9px;">'+
       '<div><div style="font-weight:500;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t3);">'+a.pais+'</div></div></div></td>'+
       '<td><span class="tag" style="color:#3B6EF8;border-color:rgba(59,110,248,.3);background:rgba(59,110,248,.06);">'+a.carril+'</span></td>'+
-      '<td style="font-weight:600;">'+a.calls+'</td>'+
+      '<td>'+a.calls+'</td>'+
       '<td style="color:'+(a.aht>280?'var(--r)':'var(--t1)')+';">'+a.ahtS+'</td>'+
       '<td><div style="font-weight:500;color:'+rc(a.sat)+';">'+a.sat+'%</div>'+bar(a.sat,56)+'</td>'+
       '<td><div style="font-weight:500;color:'+rc(a.speech)+';">'+a.speech+'%</div>'+bar(a.speech,56)+'</td>'+
       '<td><div style="display:flex;align-items:center;gap:5px;"><div class="sdot" style="background:'+sc(a.sent.p)+'"></div>'+
-      '<span style="font-size:11px;font-weight:500;color:'+rc(a.sent.p)+';">'+a.sent.p+'%</span></div></td>'+
+      '<span style="font-size:11px;font-weight:400;color:'+rc(a.sent.p)+';">'+a.sent.p+'%</span></div></td>'+
       '<td>'+badge(a)+'</td></tr>';
     return tr;
   }).join('');
@@ -756,12 +756,12 @@ function agDet(a){
   var hdr='<div class="card" style="display:flex;align-items:center;gap:18px;padding:20px 24px;margin-bottom:0;">'+
     ''+
     '<div style="flex:1;">'+
-      '<div style="font-size:20px;font-weight:500;color:var(--t0);letter-spacing:-.3px;">'+a.name+'</div>'+
+      '<div style="font-size:18px;font-weight:400;color:var(--t0);">'+a.name+'</div>'+
       '<div style="font-size:12px;color:var(--t2);margin-top:3px;">'+a.carril+' · '+a.pais+'</div>'+
     '</div>'+
     '<div style="display:flex;align-items:center;gap:20px;">'+
       '<div style="text-align:center;">'+
-        '<div style="font-size:44px;font-weight:500;color:var(--t0);letter-spacing:-.04em;line-height:1;font-family:var(--m);">'+a.score+'</div>'+
+        '<div style="font-size:36px;font-weight:400;color:var(--t0);letter-spacing:-.03em;line-height:1;font-family:var(--m);">'+a.score+'</div>'+
         '<div style="font-size:9px;font-weight:700;color:var(--t2);margin-top:4px;">Score</div>'+
       '</div>'+
       '<div style="width:0.5px;height:48px;background:rgba(0,0,0,.06);"></div>'+
