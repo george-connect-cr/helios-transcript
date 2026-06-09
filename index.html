@@ -39,17 +39,17 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
   flex:1;background:#fdfaf7;position:relative;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
 }
-@keyframes talk{0%,100%{d:path("M168 288 Q178 291 188 288")}50%{d:path("M168 288 Q178 297 188 288")}}
-@keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes blink2{0%,100%{opacity:1}50%{opacity:.1}}
+
+
+
 .mc2{position:absolute;background:#fff;border:0.5px solid rgba(0,0,0,.07);
   border-radius:10px;padding:8px 14px;
   box-shadow:0 2px 8px rgba(0,0,0,.06);
-  animation:floatCard 3s ease-in-out infinite;}
+}
 .mc2-l{font-size:9px;color:#9ca3af;display:block;margin-bottom:2px;}
 .mc2-v{font-size:14px;font-weight:500;color:#1a1a2e;}
 .live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;
-  background:#4ade80;animation:blink2 1.8s ease-in-out infinite;
+  background:#4ade80;
   vertical-align:middle;margin-right:3px;}
 @media(max-width:640px){.card-right{display:none;}.card-left{width:100%;}}
 
@@ -239,6 +239,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
     <div class="brand">
       <img src="assets/connect-logo.png" alt="Connect" style="height:62px;width:auto;display:block;margin:0 auto 10px;border-radius:6px;"/>
       <div class="brand-sub" style="letter-spacing:3px;font-size:9px;">KAI ACADEMY</div>
+      <div style="font-family:var(--f);font-size:11px;font-weight:500;color:var(--acc);margin-top:4px;">v0.6.0-beta</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -315,12 +316,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
         <path d="M156 288 Q158 292 160 288" stroke="rgba(55,65,81,.3)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
 
         <!-- BOCA ANIMADA (talking) -->
-        <path stroke="rgba(55,65,81,.5)" stroke-width="1.8" fill="none" stroke-linecap="round">
-          <animate attributeName="d"
-            values="M148 298 Q158 301 168 298;M148 298 Q158 307 168 298;M148 298 Q158 301 168 298"
-            dur="0.55s" repeatCount="indefinite"
-            calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
-        </path>
+        <path d="M148 298 Q158 302 168 298" stroke="rgba(55,65,81,.45)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
 
         <!-- HEADSET arc -->
         <path d="M130 282 Q158 242 186 282" stroke="rgba(55,65,81,.65)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
@@ -337,21 +333,21 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
 
         <!-- Dot verde "en llamada" (único color) -->
         <circle cx="186" cy="278" r="5" fill="#22c55e">
-          <animate attributeName="opacity" values="1;0.15;1" dur="1.8s" repeatCount="indefinite"/>
+          
         </circle>
 
       </svg>
 
       <!-- Metric cards flotantes -->
-      <div class="mc2" style="top:44px;right:28px;animation-delay:0s;">
+      <div class="mc2" style="top:44px;right:28px;">
         <span class="mc2-l">Score</span>
         <div class="mc2-v">91</div>
       </div>
-      <div class="mc2" style="top:138px;right:24px;animation-delay:1.2s;">
+      <div class="mc2" style="top:138px;right:24px;">
         <span class="mc2-l"><span class="live-dot"></span>En llamada</span>
         <div class="mc2-v" style="font-size:12px;font-weight:400">3:42</div>
       </div>
-      <div class="mc2" style="bottom:60px;right:28px;animation-delay:.6s;">
+      <div class="mc2" style="bottom:60px;right:28px;">
         <span class="mc2-l">Satisfacción</span>
         <div class="mc2-v">92%</div>
       </div>
