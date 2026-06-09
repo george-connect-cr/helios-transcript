@@ -173,7 +173,7 @@ th{
 }
 td{padding:9px 12px;color:var(--t1);border-bottom:0.5px solid rgba(0,0,0,.04);}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--c2);}
+tr:hover td{background:rgba(0,0,0,.015);}
 tr[data-po]{cursor:pointer;}
 tr[data-po]:hover td{background:var(--bl2);}
 
@@ -574,7 +574,7 @@ function vResumen(){
 
   // ── Page header ──
   var h='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px;">'+
-    '<div style="font-size:18px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">Resumen del equipo</div>'+
+    '<div style="font-size:18px;font-weight:500;color:var(--t0);letter-spacing:-.3px;">Resumen del equipo</div>'+
     '<div style="font-size:12px;color:var(--t2);">'+data.length+' agentes'+(_filters.carril||_filters.pais||_filters.grade?' · filtrado':'')+'</div>'+
   '</div>';
 
@@ -590,7 +590,7 @@ function vResumen(){
   kpiDefs.forEach(function(k){
     h+='<div class="kc '+k.cls+'" style="padding:14px 16px;">'+
       '<div style="font-size:14px;margin-bottom:6px;">'+k.ico+'</div>'+
-      '<div style="font-size:22px;font-weight:500;letter-spacing:-.3px;color:'+k.col+';font-family:var(--m);line-height:1;">'+k.val+'</div>'+
+      '<div style="font-size:20px;font-weight:500;letter-spacing:-.2px;color:'+k.col+';font-family:var(--m);line-height:1;">'+k.val+'</div>'+
       '<div style="font-size:10px;font-weight:400;color:var(--t2);margin-top:4px;">'+k.lbl+'</div>'+
       '<div style="font-size:10px;font-weight:400;color:'+(k.delta.startsWith('▲')?'#3B6EF8':'var(--t3)')+';margin-top:3px;">'+k.delta+'</div>'+
     '</div>';
@@ -668,7 +668,7 @@ function tblAgentes(data){
   var trs=data.map(function(a){
     var tr='<tr class="clickable" onclick="_rowClick('+a.id+')">';
     tr+='<td><div style="display:flex;align-items:center;gap:9px;">'+
-      '<div><div style="font-weight:600;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t3);">'+a.pais+'</div></div></div></td>'+
+      '<div><div style="font-weight:500;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t3);">'+a.pais+'</div></div></div></td>'+
       '<td><span class="tag" style="color:#3B6EF8;border-color:rgba(59,110,248,.3);background:rgba(59,110,248,.06);">'+a.carril+'</span></td>'+
       '<td style="font-weight:600;">'+a.calls+'</td>'+
       '<td style="color:'+(a.aht>280?'var(--r)':'var(--t1)')+';">'+a.ahtS+'</td>'+
@@ -701,14 +701,13 @@ function vPorAgente(){
   // Other roles: show agent list sidebar + detail panel
   var listItems=data.map(function(a){
     var isActive=_selAg&&_selAg.id===a.id;
-    var gc=a.grade==='A'?'var(--g)':a.grade==='B'?'var(--y)':'var(--r)';
-    return'<div onclick="selAg('+a.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,0,0,.04);transition:background .1s;background:'+(isActive?'rgba(232,68,10,.04)':'#fff')+';border-left:2px solid '+(isActive?'var(--a)':'transparent')+';">'+
-      ''+
+    
+    return'<div onclick="selAg('+a.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,0,0,.04);transition:background .1s;background:'+(isActive?'rgba(91,134,245,.05)':'#fff')+';border-left:2px solid '+(isActive?'#5b86f5':'transparent')+';">'+
       '<div style="flex:1;min-width:0;">'+
-        '<div style="font-size:12px;font-weight:'+(isActive?'700':'500')+';color:'+(isActive?'var(--a)':'var(--t0)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.name+'</div>'+
+        '<div style="font-size:12px;font-weight:'+(isActive?'500':'400')+';color:'+(isActive?'#5b86f5':'var(--t0)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.name+'</div>'+
         '<div style="font-size:10px;color:var(--t3);">'+a.carril+'</div>'+
       '</div>'+
-      '<span style="font-size:11px;font-weight:500;color:'+gc+';">'+a.score+'</span>'+
+      '<span style="font-size:11px;font-weight:400;color:var(--t2);">'+a.score+'</span>'+
     '</div>';
   }).join('');
 
@@ -750,12 +749,12 @@ function agDet(a){
   var hdr='<div class="card" style="display:flex;align-items:center;gap:18px;padding:20px 24px;margin-bottom:0;">'+
     ''+
     '<div style="flex:1;">'+
-      '<div style="font-size:20px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">'+a.name+'</div>'+
+      '<div style="font-size:20px;font-weight:500;color:var(--t0);letter-spacing:-.3px;">'+a.name+'</div>'+
       '<div style="font-size:12px;color:var(--t2);margin-top:3px;">'+a.carril+' · '+a.pais+'</div>'+
     '</div>'+
     '<div style="display:flex;align-items:center;gap:20px;">'+
       '<div style="text-align:center;">'+
-        '<div style="font-size:44px;font-weight:600;color:var(--t0);letter-spacing:-.04em;line-height:1;font-family:var(--m);">'+a.score+'</div>'+
+        '<div style="font-size:44px;font-weight:500;color:var(--t0);letter-spacing:-.04em;line-height:1;font-family:var(--m);">'+a.score+'</div>'+
         '<div style="font-size:9px;font-weight:700;color:var(--t2);margin-top:4px;">Score</div>'+
       '</div>'+
       '<div style="width:0.5px;height:48px;background:rgba(0,0,0,.06);"></div>'+
@@ -789,7 +788,7 @@ function agDet(a){
   var poCard='<div class="stitle">Calificación recibida por PO</div><div class="card">'+
     '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">'+
       '<div>'+
-        '<div style="font-size:32px;font-weight:600;color:var(--t0);font-family:var(--m);letter-spacing:-.04em;line-height:1;">'+avgPO+'<span style="font-size:14px;color:var(--t2);font-weight:500;font-family:var(--f);">/100</span></div>'+
+        '<div style="font-size:32px;font-weight:500;color:var(--t0);font-family:var(--m);letter-spacing:-.04em;line-height:1;">'+avgPO+'<span style="font-size:14px;color:var(--t2);font-weight:500;font-family:var(--f);">/100</span></div>'+
         '<div style="font-size:11px;color:var(--t2);margin-top:5px;">Promedio últimos '+a.poscores.length+' POs</div>'+
       '</div>'+
       '<div style="display:flex;align-items:flex-end;gap:3px;height:48px;">'+
@@ -827,7 +826,7 @@ function agDet(a){
   var durCard='<div class="stitle">Duración de llamadas</div><div class="card">'+
     '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">'+
       '<div>'+
-        '<div style="font-size:28px;font-weight:600;color:var(--t0);font-family:var(--m);letter-spacing:-.03em;line-height:1;">'+fs(avgD)+'</div>'+
+        '<div style="font-size:28px;font-weight:500;color:var(--t0);font-family:var(--m);letter-spacing:-.03em;line-height:1;">'+fs(avgD)+'</div>'+
         '<div style="font-size:11px;color:var(--t2);margin-top:4px;">AHT · Meta: 4:00</div>'+
       '</div>'+
       '<div style="font-size:11px;font-weight:600;color:'+(avgD<=240?'var(--g)':'var(--r)')+';">'+
@@ -867,7 +866,7 @@ function agDet(a){
       '</div>'+
     '</div>'+
     '<div style="padding:10px 12px;background:var(--c2);border-radius:4px;">'+
-      '<div style="font-size:11px;font-weight:600;color:var(--t0);margin-bottom:3px;">Interpretación</div>'+
+      '<div style="font-size:11px;font-weight:500;color:var(--t0);margin-bottom:3px;">Interpretación</div>'+
       '<div style="font-size:11px;color:var(--t2);line-height:1.6;">'+(a.sent.p>=75?'Excelente relación con el cliente. Tono positivo dominante.':a.sent.p>=60?'Buen manejo emocional. Oportunidad en cierre con mayor empatía.':'Requiere atención. Alto porcentaje negativo indica dificultad con clientes.')+'</div>'+
     '</div>'+
   '</div>';
@@ -998,7 +997,7 @@ function vCoaching(){
         '<div style="font-size:11px;color:var(--t2);">Coach: '+p.coach+' · '+p.sessions+' sesiones · Próxima: '+p.next+'</div></div>'+
         '<div style="font-size:24px;font-weight:500;color:'+col+';">'+p.pct+'%</div>'+
       '</div>'+
-      '<div style="font-size:13px;font-weight:600;color:var(--t0);margin-bottom:10px;">🎯 '+p.obj+'</div>'+
+      '<div style="font-size:13px;font-weight:500;color:var(--t0);margin-bottom:10px;">🎯 '+p.obj+'</div>'+
       '<div class="bar6" style="margin-bottom:12px;"><div class="bar6f" style="width:'+p.pct+'%;background:'+col+'"></div></div>'+
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">'+
         [['Sesiones',p.sessions],['Próxima',p.next],['Plazo',p.dl]].map(function(m){
@@ -1063,7 +1062,7 @@ function vSupervisor(){
     h+='<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,.04);">'+
       '<span style="width:28px;text-align:center;">'+(medal||'<span style="font-size:12px;font-weight:600;color:var(--t3);">'+(i+1)+'</span>')+'</span>'+
       ''+
-      '<div style="flex:1;"><div style="font-size:12px;font-weight:600;color:var(--t0);">'+a.name+'</div>'+
+      '<div style="flex:1;"><div style="font-size:12px;font-weight:500;color:var(--t0);">'+a.name+'</div>'+
       '<div style="font-size:10px;color:var(--t2);">'+a.carril+' · '+a.sat+'% sat.</div></div>'+
       badge(a)+bar(a.score,80)+
     '</div>';
@@ -1169,7 +1168,7 @@ function loadSupabaseData(callback){
   // Mostrar indicador de carga en el área principal
   var main = document.getElementById('main-content');
   if (main) main.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:300px;gap:12px;font-family:var(--f);color:var(--t2);font-size:13px;">'+
-    '<div style="width:18px;height:18px;border:2px solid var(--c3);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite;"></div>'+
+    '<div style="width:18px;height:18px;border:2px solid var(--c3);border-top-color:#5b86f5;border-radius:50%;animation:spin .8s linear infinite;"></div>'+
     'Cargando datos…</div>';
   // Leer rol del usuario para scoping (admin/supervisor/formador ven todo, agente ve solo el suyo)
   var _sess = {}; try { _sess = JSON.parse(localStorage.getItem('helios_session')||'{}'); } catch(e){}
