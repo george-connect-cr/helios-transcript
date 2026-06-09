@@ -387,7 +387,7 @@ var RBAC = {
   demo:       { pages:['app'],          canViewTeam:false, canCoach:false, autoDemo:true  },
   formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
   supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
-  admin:      { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false }
+  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false }
 };
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
