@@ -38,7 +38,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 .hd-brand sup{font-size:8px;color:var(--a);opacity:.5;}
 .hd-sep{width:0.5px;height:18px;background:rgba(0,0,0,.06);margin:0 10px;}
 .hd-title{font-size:14px;font-weight:500;letter-spacing:-.3px;color:var(--t0);}
-.hd-role{font-size:10px;font-weight:400;padding:2px 8px;border-radius:20px;background:rgba(91,134,245,.08);color:#5b86f5;letter-spacing:.01em;}
+.hd-role{font-size:10px;font-weight:400;padding:2px 8px;border-radius:20px;background:var(--c2);color:var(--t2);letter-spacing:.01em;}
 
 
 /* ── FILTER BAR ── */
@@ -58,8 +58,8 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
   user-select:none;
 }
 .fp:hover{background:var(--c3);color:var(--t0);}
-.fp.active{color:#5b86f5;border-bottom:2px solid #5b86f5;border-radius:0;}
-.fp.filtered{color:#5b86f5;}
+.fp.active{color:var(--t0);font-weight:500;border-bottom:2px solid var(--t0);}
+.fp.filtered{color:var(--t0);font-weight:500;}
 .fp.filtered:hover{background:#ffe8d6;}
 .fp-check{font-size:9px;font-weight:500;margin-right:2px;opacity:.8;}
 .fp-clear{
@@ -122,7 +122,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
   border-left:2px solid transparent;transition:all .1s;
 }
 .sb-item:hover{background:var(--c2);color:var(--t0);}
-.sb-item.active{color:#5b86f5;border-left-color:#5b86f5;background:rgba(91,134,245,.05);}
+.sb-item.active{color:var(--t0);border-left-color:var(--t0);font-weight:500;}
 .sb-icon{font-size:13px;opacity:.7;}
 
 /* ── MAIN CONTENT ── */
@@ -173,9 +173,9 @@ th{
 }
 td{padding:9px 12px;color:var(--t1);border-bottom:0.5px solid rgba(0,0,0,.04);}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(0,0,0,.015);}
+tr:hover td{background:rgba(0,0,0,.012);}
 tr[data-po]{cursor:pointer;}
-tr[data-po]:hover td{background:var(--bl2);}
+tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 
 /* ── SCORE BADGE ── */
 .sbadge{
@@ -483,7 +483,7 @@ function ag(){
 }
 // ── Sistema de color ─────────────────────────────────────────────
 // Azul Connect degradando — métricas de rendimiento y cantidad
-function rc(v){return v>=85?'#5b86f5':v>=65?'#8badfa':'#bccffc';}
+function rc(v){return '#5b86f5';}
 // Semáforo — solo para sentimiento y alertas explícitas de calidad
 function rcSent(v){return v>=70?'var(--g)':v>=45?'var(--y)':'var(--r)';}
 function rcBg(v){return v>=85?'rgba(59,110,248,.09)':v>=65?'rgba(59,110,248,.05)':'rgba(59,110,248,.03)';}
@@ -563,7 +563,7 @@ function vResumen(){
       '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:380px;line-height:1.65;">'+
         'Cuando confirmes POs en una llamada, tus resultados — score, satisfacción, duración, protocolo — se registran automáticamente y se reflejan en este panel.'+
       '</div>'+
-      '<a href="app.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;background:var(--a);color:#fff;font-family:var(--f);font-size:13px;font-weight:500;text-decoration:none;margin-top:8px;">'+
+      '<a href="app.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;background:var(--t0);color:#fff;font-family:var(--f);font-size:13px;font-weight:400;text-decoration:none;margin-top:8px;">'+
         '← Ir a la pantalla de llamadas'+
       '</a>'+
     '</div>';
@@ -702,9 +702,9 @@ function vPorAgente(){
   var listItems=data.map(function(a){
     var isActive=_selAg&&_selAg.id===a.id;
     
-    return'<div onclick="selAg('+a.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,0,0,.04);transition:background .1s;background:'+(isActive?'rgba(91,134,245,.05)':'#fff')+';border-left:2px solid '+(isActive?'#5b86f5':'transparent')+';">'+
+    return'<div onclick="selAg('+a.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,0,0,.04);transition:background .1s;background:'+(isActive?'rgba(0,0,0,.03)':'#fff')+';border-left:2px solid '+(isActive?'var(--t1)':'transparent')+';">'+
       '<div style="flex:1;min-width:0;">'+
-        '<div style="font-size:12px;font-weight:'+(isActive?'500':'400')+';color:'+(isActive?'#5b86f5':'var(--t0)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.name+'</div>'+
+        '<div style="font-size:12px;font-weight:'+(isActive?'500':'400')+';color:'+(isActive?'var(--t0)':'var(--t1)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.name+'</div>'+
         '<div style="font-size:10px;color:var(--t3);">'+a.carril+'</div>'+
       '</div>'+
       '<span style="font-size:11px;font-weight:400;color:var(--t2);">'+a.score+'</span>'+
@@ -1168,7 +1168,7 @@ function loadSupabaseData(callback){
   // Mostrar indicador de carga en el área principal
   var main = document.getElementById('main-content');
   if (main) main.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:300px;gap:12px;font-family:var(--f);color:var(--t2);font-size:13px;">'+
-    '<div style="width:18px;height:18px;border:2px solid var(--c3);border-top-color:#5b86f5;border-radius:50%;animation:spin .8s linear infinite;"></div>'+
+    '<div style="width:18px;height:18px;border:2px solid var(--c3);border-top-color:var(--t1);border-radius:50%;animation:spin .8s linear infinite;"></div>'+
     'Cargando datos…</div>';
   // Leer rol del usuario para scoping (admin/supervisor/formador ven todo, agente ve solo el suyo)
   var _sess = {}; try { _sess = JSON.parse(localStorage.getItem('helios_session')||'{}'); } catch(e){}
