@@ -210,7 +210,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
     <div class="brand">
       <img src="assets/connect-logo.png" alt="Connect" style="height:44px;width:auto;display:block;margin:0 auto 8px;border-radius:6px;"/>
       <div class="brand-sub" style="letter-spacing:3px;font-size:10px;">KAI ACADEMY</div>
-      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.5.4-beta</div>
+      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.5.5-beta</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -225,7 +225,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
       </button>
     </div>
     <div class="footer-txt">
-      <a href="#">¿Necesitás ayuda?</a>
+      <a href="#" onclick="event.preventDefault();_showLoginErr('Comunicate con tu administrador para obtener acceso.');" style="color:var(--t3);text-decoration:none;font-weight:400;">¿Necesitás ayuda?</a>
     </div>
   </div>
 </div>
@@ -325,7 +325,7 @@ function doGoogleSSO() {
       // hd es solo un hint — la verificación debe hacerse aquí
       if (domain !== 'connect.inc') {
         firebase.auth().signOut();
-        _showLoginErr('Esta cuenta no tiene acceso a KAI Academy. Verificá que estés usando tu cuenta corporativa.');
+        _showLoginErr('Esta cuenta no tiene acceso. Comunicate con el administrador del sitio para solicitar acceso.');
         return;
       }
 

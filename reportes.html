@@ -15,7 +15,7 @@
   --sh-sm:0 1px 3px rgba(0,0,0,.05);
   --t0:#0d0f1a;--t1:#3a4060;--t2:#8892b0;--t3:#c4c8dc;
   --a:#e04500;--a2:#ff6535;
-  --g:#0ea874;--y:#f0900a;--r:#e84040;
+  --g:#52a676;--y:#e8a020;--r:#d86060;
   --f:'Geist','Inter',system-ui,sans-serif;
   --m:'JetBrains Mono',monospace;
   --blue:#3b6ef8;--bl2:#eff3ff;--bl3:rgba(59,110,248,.1);
@@ -33,12 +33,12 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
   padding:0 20px;display:flex;align-items:center;gap:10px;
   position:sticky;top:0;z-index:10;flex-shrink:0;
 }
-.hd-brand{font-size:15px;font-weight:800;letter-spacing:-.5px;color:var(--t0);}
+.hd-brand{font-size:15px;font-weight:500;letter-spacing:-.3px;color:var(--t0);}
 .hd-brand em{color:var(--a);font-style:normal;}
 .hd-brand sup{font-size:8px;color:var(--a);opacity:.5;}
 .hd-sep{width:0.5px;height:18px;background:rgba(0,0,0,.06);margin:0 10px;}
-.hd-title{font-size:14px;font-weight:700;letter-spacing:-.3px;color:var(--t0);}
-.hd-role{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#fff8f5;color:var(--a);letter-spacing:.01em;}
+.hd-title{font-size:14px;font-weight:500;letter-spacing:-.3px;color:var(--t0);}
+.hd-role{font-size:10px;font-weight:400;padding:2px 8px;border-radius:20px;background:rgba(91,134,245,.08);color:#5b86f5;letter-spacing:.01em;}
 
 
 /* ── FILTER BAR ── */
@@ -52,16 +52,16 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 .fp{
   height:27px;padding:0 12px;border-radius:20px;border:none;
   background:var(--c2);font-family:var(--f);font-size:11px;
-  font-weight:600;color:var(--t2);cursor:pointer;
+  font-weight:400;color:var(--t2);cursor:pointer;
   display:inline-flex;align-items:center;gap:4px;
   transition:all .12s;position:relative;white-space:nowrap;
   user-select:none;
 }
 .fp:hover{background:var(--c3);color:var(--t0);}
-.fp.active{background:#fff8f5;color:var(--a);}
-.fp.filtered{background:var(--am2);color:var(--a);border:1.5px solid rgba(224,69,0,.25);}
+.fp.active{background:rgba(91,134,245,.07);color:#5b86f5;}
+.fp.filtered{background:rgba(91,134,245,.06);color:#5b86f5;border:1.5px solid rgba(91,134,245,.2);}
 .fp.filtered:hover{background:#ffe8d6;}
-.fp-check{font-size:9px;font-weight:800;margin-right:2px;opacity:.8;}
+.fp-check{font-size:9px;font-weight:500;margin-right:2px;opacity:.8;}
 .fp-clear{
   display:inline-flex;align-items:center;justify-content:center;
   width:14px;height:14px;border-radius:50%;
@@ -88,7 +88,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
   white-space:nowrap;
 }
 .fdrop-item:hover{background:var(--c2);color:var(--t0);}
-.fdrop-item.sel{color:var(--a);font-weight:700;}
+.fdrop-item.sel{color:var(--a);font-weight:500;}
 
 /* ── BUTTONS ── */
 .btn{
@@ -98,7 +98,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
   box-shadow:var(--sh-sm);transition:all .12s;
 }
 .btn:hover{background:var(--c3);}
-.btn-primary{background:var(--a);color:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(224,69,0,.2);}
+.btn-primary{background:#5b86f5;color:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(91,134,245,.2);}
 .btn-primary:hover{background:#c93d00;}
 .btn-danger{background:var(--re2);color:var(--r);}
 .btn-danger:hover{background:#ffeaea;}
@@ -118,11 +118,11 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 }
 .sb-item{
   display:flex;align-items:center;gap:7px;padding:8px 16px;
-  font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;
+  font-size:11px;font-weight:400;color:var(--t2);cursor:pointer;
   border-left:2px solid transparent;transition:all .1s;
 }
 .sb-item:hover{background:var(--c2);color:var(--t0);}
-.sb-item.active{color:var(--a);border-left-color:var(--a);background:#fff8f5;}
+.sb-item.active{color:#5b86f5;border-left-color:#5b86f5;background:rgba(91,134,245,.05);}
 .sb-icon{font-size:13px;opacity:.7;}
 
 /* ── MAIN CONTENT ── */
@@ -149,11 +149,11 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 .kc{border-radius:10px;padding:14px 16px;box-shadow:var(--sh-sm);}
 .kc.bl,.kc.gr,.kc.am,.kc.re,.kc.pu{background:var(--c1);}
 .kc-ico{font-size:16px;margin-bottom:6px;}
-.kc-val{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1;}
+.kc-val{font-size:22px;font-weight:600;letter-spacing:-.5px;line-height:1;}
 .kc-lbl{font-size:10px;font-weight:400;color:var(--t2);letter-spacing:.01em;margin-top:5px;}
 
 /* ── AVATAR ── */
-.av{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-weight:800;color:#fff;flex-shrink:0;}
+.av{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-weight:600;color:#fff;flex-shrink:0;}
 .av40{width:40px;height:40px;font-size:16px;}
 .av48{width:48px;height:48px;font-size:18px;}
 
@@ -181,7 +181,7 @@ tr[data-po]:hover td{background:var(--bl2);}
 .sbadge{
   display:inline-flex;align-items:center;justify-content:center;
   width:34px;height:22px;border-radius:3px;
-  font-size:11px;font-weight:600;
+  font-size:11px;font-weight:500;
 }
 
 /* ── TAGS ── */
@@ -204,7 +204,7 @@ tr[data-po]:hover td{background:var(--bl2);}
 .ag-sel-wrap select{
   height:30px;padding:0 10px;border:none;border-radius:4px;
   background:var(--c2);font-family:var(--f);font-size:12px;
-  font-weight:600;color:var(--t0);box-shadow:var(--sh-sm);cursor:pointer;
+  font-weight:400;color:var(--t0);box-shadow:var(--sh-sm);cursor:pointer;
 }
 
 /* ── SCROLLBAR ── */
@@ -253,11 +253,11 @@ tr[data-po]:hover td{background:var(--bl2);}
   </div>
   <div class="fp" id="f-pais" onclick="toggleDrop(this,event)">País ▾ <div class="fdrop">
       <div class="fdrop-item" onclick="setF('pais','',event)">Todos</div>
-      <div class="fdrop-item" onclick="setF('pais','Costa Rica',event)">🇨🇷 Costa Rica</div>
-      <div class="fdrop-item" onclick="setF('pais','Panamá',event)">🇵🇦 Panamá</div>
-      <div class="fdrop-item" onclick="setF('pais','México',event)">🇲🇽 México</div>
-      <div class="fdrop-item" onclick="setF('pais','Colombia',event)">🇨🇴 Colombia</div>
-      <div class="fdrop-item" onclick="setF('pais','Puerto Rico',event)">🇵🇷 Puerto Rico</div>
+      <div class="fdrop-item" onclick="setF('pais','Costa Rica',event)">Costa Rica</div>
+      <div class="fdrop-item" onclick="setF('pais','Panamá',event)">Panamá</div>
+      <div class="fdrop-item" onclick="setF('pais','México',event)">México</div>
+      <div class="fdrop-item" onclick="setF('pais','Colombia',event)">Colombia</div>
+      <div class="fdrop-item" onclick="setF('pais','Puerto Rico',event)">Puerto Rico</div>
     </div>
   </div>
   <div class="fp" id="f-grade" onclick="toggleDrop(this,event)">Rendimiento ▾ <div class="fdrop">
@@ -483,7 +483,7 @@ function ag(){
 }
 // ── Sistema de color ─────────────────────────────────────────────
 // Azul Connect degradando — métricas de rendimiento y cantidad
-function rc(v){return v>=85?'#3B6EF8':v>=65?'#7BA4FB':'#B8CFFD';}
+function rc(v){return v>=85?'#5b86f5':v>=65?'#8badfa':'#bccffc';}
 // Semáforo — solo para sentimiento y alertas explícitas de calidad
 function rcSent(v){return v>=70?'var(--g)':v>=45?'var(--y)':'var(--r)';}
 function rcBg(v){return v>=85?'rgba(59,110,248,.09)':v>=65?'rgba(59,110,248,.05)':'rgba(59,110,248,.03)';}
@@ -590,7 +590,7 @@ function vResumen(){
   kpiDefs.forEach(function(k){
     h+='<div class="kc '+k.cls+'" style="padding:14px 16px;">'+
       '<div style="font-size:14px;margin-bottom:6px;">'+k.ico+'</div>'+
-      '<div style="font-size:24px;font-weight:600;letter-spacing:-.5px;color:'+k.col+';font-family:var(--m);line-height:1;">'+k.val+'</div>'+
+      '<div style="font-size:22px;font-weight:500;letter-spacing:-.3px;color:'+k.col+';font-family:var(--m);line-height:1;">'+k.val+'</div>'+
       '<div style="font-size:10px;font-weight:400;color:var(--t2);margin-top:4px;">'+k.lbl+'</div>'+
       '<div style="font-size:10px;font-weight:400;color:'+(k.delta.startsWith('▲')?'#3B6EF8':'var(--t3)')+';margin-top:3px;">'+k.delta+'</div>'+
     '</div>';
