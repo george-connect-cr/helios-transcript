@@ -94,7 +94,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 .btn{
   height:30px;padding:0 14px;border-radius:8px;border:none;
   background:var(--c2);font-family:var(--f);font-size:11px;
-  font-weight:600;color:var(--t1);cursor:pointer;
+  font-weight:400;color:var(--t1);cursor:pointer;
   box-shadow:var(--sh-sm);transition:all .12s;
 }
 .btn:hover{background:var(--c3);}
@@ -488,18 +488,11 @@ function rc(v){return '#5b86f5';}
 function rcSent(v){return v>=70?'var(--g)':v>=45?'var(--y)':'var(--r)';}
 function rcBg(v){return v>=85?'rgba(59,110,248,.09)':v>=65?'rgba(59,110,248,.05)':'rgba(59,110,248,.03)';}
 
-// Gradiente cálido: amarillo→naranja→terracota según el valor (como referencia)
+// Un solo color azul Connect que degrada: más claro izquierda → más intenso derecha
 function rcWarm(v) {
-  var t = Math.max(0, Math.min(100, v)) / 100;
-  // Color izquierda: amarillo brillante (alto) → salmón (bajo)
-  var lr = Math.round(240 + (245-240)*t);
-  var lg = Math.round(140 + (224-140)*t);
-  var lb = Math.round(100 + (40-100)*t);
-  // Color derecha: dorado (alto) → terracota oscura (bajo)
-  var rr = Math.round(185 + (232-185)*t);
-  var rg = Math.round(72  + (175-72)*t);
-  var rb = Math.round(40  + (24-40)*t);
-  return 'linear-gradient(to right,rgb('+lr+','+lg+','+lb+'),rgb('+rr+','+rg+','+rb+'))';
+  // El mismo azul en toda la barra: light→full según intensidad proporcional al valor
+  var alpha = 0.35 + (v / 100) * 0.65; // más valor = más opaco
+  return 'linear-gradient(to right, rgba(91,134,245,0.4), rgba(71,110,225,'+alpha+'))';
 }
 function bar(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rcWarm(v)+'"></div></div>';}
 function barSent(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rcSent(v)+'"></div></div>';}
@@ -629,7 +622,7 @@ function vResumen(){
       '<div style="width:28px;height:28px;border-radius:4px;background:'+g[3]+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:'+g[2]+';flex-shrink:0;">'+g[0]+'</div>'+
       '<div style="flex:1;">'+
         '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">'+
-          '<span style="font-size:12px;font-weight:600;color:var(--t1);">'+g[1]+'</span>'+
+          '<span style="font-size:12px;font-weight:400;color:var(--t1);">'+g[1]+'</span>'+
           '<span style="font-size:12px;font-weight:600;color:'+g[2]+';font-family:var(--m);">'+g[4]+'</span>'+
         '</div>'+
         '<div class="bar6"><div class="bar6f" style="width:'+pct+'%;background:'+g[2]+';"></div></div>'+
@@ -663,7 +656,7 @@ function vResumen(){
   var avgSc=Math.round(t.sc/n);
   var scCol=avgSc>=85?'var(--g)':avgSc>=70?'var(--y)':'var(--r)';
   h+='<div style="padding:10px 12px;background:var(--c2);border-radius:4px;display:flex;align-items:center;justify-content:space-between;">'+
-    '<div style="font-size:12px;font-weight:600;color:var(--t1);">Score QA promedio</div>'+
+    '<div style="font-size:12px;font-weight:400;color:var(--t1);">Score QA promedio</div>'+
     '<div style="font-size:18px;font-weight:600;color:'+scCol+';font-family:var(--m);">'+avgSc+'<span style="font-size:11px;color:var(--t2);font-weight:500;font-family:var(--f);">/100</span></div>'+
   '</div>';
 
@@ -816,7 +809,7 @@ function agDet(a){
     '<div class="bar6"><div class="bar6f" style="width:'+avgPO+'%;background:'+(avgPO>=85?'var(--g)':avgPO>=70?'var(--y)':'var(--r)')+';"></div></div>'+
     '<div style="display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:0.5px solid rgba(0,0,0,.05);">'+
       [['Mín',Math.min.apply(null,a.poscores)],['Máx',Math.max.apply(null,a.poscores)],['Tendencia',a.poscores[a.poscores.length-1]>a.poscores[0]?'↑ Subiendo':'↓ Bajando']].map(function(m){
-        return'<div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:var(--t0);font-family:var(--m);">'+m[1]+'</div><div style="font-size:9px;font-weight:600;color:var(--t2);margin-top:2px;">'+m[0]+'</div></div>';
+        return'<div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:var(--t0);font-family:var(--m);">'+m[1]+'</div><div style="font-size:9px;font-weight:400;color:var(--t2);margin-top:2px;">'+m[0]+'</div></div>';
       }).join('')+
     '</div>'+
   '</div>';
@@ -1074,7 +1067,7 @@ function vSupervisor(){
   sorted.forEach(function(a,i){
     var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
     h+='<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,.04);">'+
-      '<span style="width:28px;text-align:center;">'+(medal||'<span style="font-size:12px;font-weight:600;color:var(--t3);">'+(i+1)+'</span>')+'</span>'+
+      '<span style="width:28px;text-align:center;">'+(medal||'<span style="font-size:12px;font-weight:400;color:var(--t3);">'+(i+1)+'</span>')+'</span>'+
       ''+
       '<div style="flex:1;"><div style="font-size:12px;font-weight:500;color:var(--t0);">'+a.name+'</div>'+
       '<div style="font-size:10px;color:var(--t2);">'+a.carril+' · '+a.sat+'% sat.</div></div>'+
