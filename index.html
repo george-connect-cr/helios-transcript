@@ -342,6 +342,30 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
   }
 
 
+
+/* ── Popup ayuda KAI ── */
+.help-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1000;align-items:center;justify-content:center;}
+.help-overlay.open{display:flex;}
+.help-popup{
+  background:#fff;border-radius:20px;padding:32px 28px;max-width:340px;width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center;position:relative;
+  animation:popIn .2s ease;
+}
+@keyframes popIn{from{transform:scale(.92);opacity:0;}to{transform:scale(1);opacity:1;}}
+.help-kai-icon{
+  width:52px;height:52px;border-radius:50%;background:#e8522a;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+}
+.help-kai-icon svg{width:28px;height:28px;fill:#fff;}
+.help-bulb{font-size:28px;margin-bottom:8px;}
+.help-title{font-size:14px;font-weight:500;color:var(--t0);margin-bottom:8px;}
+.help-msg{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px;}
+.help-close{
+  width:100%;height:40px;border-radius:100px;border:1.5px solid rgba(0,0,0,.12);
+  background:#fff;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;
+  font-family:var(--f);transition:all .12s;
+}
+.help-close:hover{background:#f4f4f4;}
 </style>
 <!-- Firebase CDN (compat — vanilla JS, sin bundler) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -372,7 +396,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
       </button>
     </div>
     <div class="footer-txt">
-      <a href="#" onclick="event.preventDefault();_showLoginErr('Comunicate con tu administrador para obtener acceso.');" style="color:var(--t3);text-decoration:none;font-weight:400;">¿Necesitás ayuda?</a>
+      <a href="#" onclick="event.preventDefault();openHelp();" style="color:var(--t3);text-decoration:none;font-weight:400;">¿Necesitás ayuda?</a>
     </div>
     </div><!-- /card-left -->
 
@@ -761,5 +785,26 @@ function saveAndRedirect(user, role, extension){
   }, 900);
 }
 </script>
+
+<!-- Popup ayuda KAI -->
+<div class="help-overlay" id="helpOverlay" onclick="if(event.target===this)closeHelp()">
+  <div class="help-popup">
+    <div class="help-bulb">💡</div>
+    <div class="help-kai-icon">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="10" r="5" fill="#fff"/>
+        <path d="M6 28c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="help-title">¿Necesitás acceso?</div>
+    <div class="help-msg">Para poder obtener acceso, creá un ticket por <strong style="color:#e8522a;">KAI</strong> y con gusto te atenderemos.</div>
+    <button class="help-close" onclick="closeHelp()">Entendido</button>
+  </div>
+</div>
+<script>
+function openHelp(){document.getElementById('helpOverlay').classList.add('open');}
+function closeHelp(){document.getElementById('helpOverlay').classList.remove('open');}
+</script>
+
 </body>
 </html>
