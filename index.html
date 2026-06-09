@@ -24,10 +24,37 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
 
 /* ── LAYOUT ── */
 .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 20px;}
-.card{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-radius:20px;padding:48px 44px;width:100%;max-width:420px;box-shadow:var(--sh);border:1px solid rgba(255,255,255,.6);}
+.card{
+  display:flex;background:#fff;border-radius:20px;
+  width:100%;max-width:860px;min-height:480px;
+  box-shadow:0 20px 60px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.06);
+  overflow:hidden;border:none;padding:0;
+}
+.card-left{
+  width:320px;min-width:320px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:52px 40px;background:#fff;
+}
+.card-right{
+  flex:1;background:#fdfaf7;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+@keyframes talk{0%,100%{d:path("M168 288 Q178 291 188 288")}50%{d:path("M168 288 Q178 297 188 288")}}
+@keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:.1}}
+.mc2{position:absolute;background:#fff;border:0.5px solid rgba(0,0,0,.07);
+  border-radius:10px;padding:8px 14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+  animation:floatCard 3s ease-in-out infinite;}
+.mc2-l{font-size:9px;color:#9ca3af;display:block;margin-bottom:2px;}
+.mc2-v{font-size:14px;font-weight:500;color:#1a1a2e;}
+.live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:#4ade80;animation:blink2 1.8s ease-in-out infinite;
+  vertical-align:middle;margin-right:3px;}
+@media(max-width:640px){.card-right{display:none;}.card-left{width:100%;}}
 
 /* ── BRAND ── */
-.brand{text-align:center;margin-bottom:36px;}
+.brand{text-align:center;margin-bottom:28px;}
 .brand-name{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--t0);}
 .brand-name em{color:var(--acc);font-style:normal;}
 .brand-name sup{font-size:10px;color:var(--acc);opacity:.5;}
@@ -207,10 +234,11 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
 <!-- Login principal -->
 <div class="wrap">
   <div class="card">
+    <!-- Panel izquierdo: login -->
+    <div class="card-left">
     <div class="brand">
-      <img src="assets/connect-logo.png" alt="Connect" style="height:44px;width:auto;display:block;margin:0 auto 8px;border-radius:6px;"/>
-      <div class="brand-sub" style="letter-spacing:3px;font-size:10px;">KAI ACADEMY</div>
-      <div style="font-family:var(--f);font-size:11px;font-weight:600;color:var(--acc);margin-top:4px;">v0.5.8-beta</div>
+      <img src="assets/connect-logo.png" alt="Connect" style="height:62px;width:auto;display:block;margin:0 auto 10px;border-radius:6px;"/>
+      <div class="brand-sub" style="letter-spacing:3px;font-size:9px;">KAI ACADEMY</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -227,6 +255,107 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
     <div class="footer-txt">
       <a href="#" onclick="event.preventDefault();_showLoginErr('Comunicate con tu administrador para obtener acceso.');" style="color:var(--t3);text-decoration:none;font-weight:400;">¿Necesitás ayuda?</a>
     </div>
+    </div><!-- /card-left -->
+
+    <!-- Panel derecho: ilustración line art -->
+    <div class="card-right">
+      <svg width="100%" height="100%" viewBox="0 0 540 480" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;">
+        <!-- Círculos decorativos de fondo -->
+        <circle cx="320" cy="250" r="200" stroke="rgba(55,65,81,.04)" stroke-width="1"/>
+        <circle cx="320" cy="250" r="145" stroke="rgba(55,65,81,.03)" stroke-width="1"/>
+
+        <!-- ESCRITORIO -->
+        <line x1="80" y1="370" x2="500" y2="370" stroke="rgba(55,65,81,.45)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="140" y1="370" x2="140" y2="415" stroke="rgba(55,65,81,.3)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="430" y1="370" x2="430" y2="415" stroke="rgba(55,65,81,.3)" stroke-width="2" stroke-linecap="round"/>
+
+        <!-- MONITOR marco -->
+        <rect x="270" y="175" width="200" height="160" rx="10" stroke="rgba(55,65,81,.5)" stroke-width="2" fill="none"/>
+        <!-- Pantalla interior -->
+        <rect x="282" y="187" width="176" height="128" rx="5" stroke="rgba(55,65,81,.18)" stroke-width="1" fill="none"/>
+        <!-- Soporte -->
+        <line x1="370" y1="335" x2="370" y2="370" stroke="rgba(55,65,81,.35)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="346" y1="370" x2="394" y2="370" stroke="rgba(55,65,81,.35)" stroke-width="2" stroke-linecap="round"/>
+        <!-- Contenido pantalla: barras esquemáticas -->
+        <line x1="296" y1="218" x2="444" y2="218" stroke="rgba(55,65,81,.1)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="296" y1="218" x2="406" y2="218" stroke="rgba(55,65,81,.3)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="296" y1="234" x2="444" y2="234" stroke="rgba(55,65,81,.08)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="296" y1="234" x2="430" y2="234" stroke="rgba(55,65,81,.22)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="296" y1="250" x2="444" y2="250" stroke="rgba(55,65,81,.08)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="296" y1="250" x2="360" y2="250" stroke="rgba(55,65,81,.18)" stroke-width="5" stroke-linecap="round"/>
+        <!-- Etiquetas esquemáticas -->
+        <line x1="296" y1="276" x2="328" y2="276" stroke="rgba(55,65,81,.12)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="334" y1="276" x2="366" y2="276" stroke="rgba(55,65,81,.09)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="372" y1="276" x2="396" y2="276" stroke="rgba(55,65,81,.09)" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Score pill en pantalla -->
+        <rect x="400" y="267" width="44" height="20" rx="10" stroke="rgba(200,86,42,.4)" stroke-width="1.5" fill="none"/>
+        <text x="422" y="281" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="rgba(200,86,42,.7)" font-weight="500">91</text>
+
+        <!-- TECLADO -->
+        <rect x="244" y="354" width="82" height="12" rx="5" stroke="rgba(55,65,81,.25)" stroke-width="1.5" fill="none"/>
+
+        <!-- PERSONA — line art profesional -->
+        <!-- Hombros / torso (líneas simples) -->
+        <path d="M108 370 Q108 330 124 318 Q138 308 158 314 Q178 322 178 370" stroke="rgba(55,65,81,.45)" stroke-width="2" fill="none" stroke-linejoin="round"/>
+
+        <!-- Cuello -->
+        <line x1="158" y1="308" x2="158" y2="320" stroke="rgba(55,65,81,.4)" stroke-width="1.8" stroke-linecap="round"/>
+
+        <!-- Cabeza — óvalo proporcional -->
+        <ellipse cx="158" cy="285" rx="30" ry="34" stroke="rgba(55,65,81,.5)" stroke-width="2" fill="none"/>
+
+        <!-- Cabello — línea superior de la cabeza -->
+        <path d="M132 278 Q134 256 158 253 Q182 256 184 278" stroke="rgba(55,65,81,.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+        <!-- Ojos — discretos -->
+        <ellipse cx="149" cy="280" rx="3" ry="2.5" fill="rgba(55,65,81,.55)"/>
+        <ellipse cx="167" cy="280" rx="3" ry="2.5" fill="rgba(55,65,81,.55)"/>
+
+        <!-- Nariz — línea mínima -->
+        <path d="M156 288 Q158 292 160 288" stroke="rgba(55,65,81,.3)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+
+        <!-- BOCA ANIMADA (talking) -->
+        <path stroke="rgba(55,65,81,.5)" stroke-width="1.8" fill="none" stroke-linecap="round">
+          <animate attributeName="d"
+            values="M148 298 Q158 301 168 298;M148 298 Q158 307 168 298;M148 298 Q158 301 168 298"
+            dur="0.55s" repeatCount="indefinite"
+            calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+        </path>
+
+        <!-- HEADSET arc -->
+        <path d="M130 282 Q158 242 186 282" stroke="rgba(55,65,81,.65)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Auricular izquierdo -->
+        <circle cx="130" cy="287" r="11" stroke="rgba(55,65,81,.65)" stroke-width="2.5" fill="none"/>
+
+        <!-- Auricular derecho -->
+        <circle cx="186" cy="287" r="11" stroke="rgba(55,65,81,.65)" stroke-width="2.5" fill="none"/>
+
+        <!-- Boom mic -->
+        <path d="M130 294 Q118 306 114 320" stroke="rgba(55,65,81,.65)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="112" cy="324" r="7" stroke="rgba(55,65,81,.65)" stroke-width="2.5" fill="none"/>
+
+        <!-- Dot verde "en llamada" (único color) -->
+        <circle cx="186" cy="278" r="5" fill="#22c55e">
+          <animate attributeName="opacity" values="1;0.15;1" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+
+      </svg>
+
+      <!-- Metric cards flotantes -->
+      <div class="mc2" style="top:44px;right:28px;animation-delay:0s;">
+        <span class="mc2-l">Score</span>
+        <div class="mc2-v">91</div>
+      </div>
+      <div class="mc2" style="top:138px;right:24px;animation-delay:1.2s;">
+        <span class="mc2-l"><span class="live-dot"></span>En llamada</span>
+        <div class="mc2-v" style="font-size:12px;font-weight:400">3:42</div>
+      </div>
+      <div class="mc2" style="bottom:60px;right:28px;animation-delay:.6s;">
+        <span class="mc2-l">Satisfacción</span>
+        <div class="mc2-v">92%</div>
+      </div>
+    </div><!-- /card-right -->
   </div>
 </div>
 
