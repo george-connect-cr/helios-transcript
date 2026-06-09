@@ -491,6 +491,10 @@ function bar(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div cl
 function barSent(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rcSent(v)+'"></div></div>';}
 function badge(a){var v=a.score||0;return'<span class="sbadge" style="color:'+rc(v)+';background:'+rcBg(v)+'">'+v+'</span>';}
 
+// Registry global de POs para el modal de detalle
+var _PORegistry = {};
+
+function fs(s){return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
 function sc(v){return v>=70?'var(--g)':v>=50?'var(--y)':'var(--r)';}
 
 // FILTERS
