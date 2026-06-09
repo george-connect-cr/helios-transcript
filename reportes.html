@@ -489,7 +489,7 @@ function rcSent(v){return v>=70?'var(--g)':v>=45?'var(--y)':'var(--r)';}
 function rcBg(v){return v>=85?'rgba(59,110,248,.09)':v>=65?'rgba(59,110,248,.05)':'rgba(59,110,248,.03)';}
 function bar(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rc(v)+'"></div></div>';}
 function barSent(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rcSent(v)+'"></div></div>';}
-function badge(a){var v=a.score||0;return'<span class="sbadge" style="color:'+rc(v)+';background:'+rcBg(v)+'">'+v+'</span>';}
+function badge(a){var v=a.score||0;return'<span class="sbadge" style="color:'+rcSent(v)+';background:rgba(0,0,0,.04)">'+v+'</span>';}
 
 // Registry global de POs para el modal de detalle
 var _PORegistry = {};
@@ -574,25 +574,25 @@ function vResumen(){
 
   // ── Page header ──
   var h='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px;">'+
-    '<div style="font-size:18px;font-weight:800;color:var(--t0);letter-spacing:-.3px;">Resumen del equipo</div>'+
+    '<div style="font-size:18px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">Resumen del equipo</div>'+
     '<div style="font-size:12px;color:var(--t2);">'+data.length+' agentes'+(_filters.carril||_filters.pais||_filters.grade?' · filtrado':'')+'</div>'+
   '</div>';
 
   // ── KPI strip — tint cards ──
   var kpiDefs=[
-    {ico:'📞',lbl:'Llamadas',val:t.calls,     delta:'▲ 12%',cls:'bl',col:'var(--blue)'},
-    {ico:'📋',lbl:'POs',     val:t.pos,       delta:'▲ 8%', cls:'gr',col:'var(--g)'},
-    {ico:'⭐',lbl:'Satisf.', val:Math.round(t.sat/n)+'%',delta:'▲ 2%',cls:'am',col:'var(--y)'},
-    {ico:'🎙',lbl:'Speech',  val:Math.round(t.sp/n)+'%', delta:'▲ 5%',cls:'pu',col:'var(--v)'},
-    {ico:'⏱',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),delta:'▼ 3%',cls:'bl',col:'var(--blue)'}
+    {ico:'📞',lbl:'Llamadas', val:t.calls,                   delta:'▲ 12%',cls:'bl',col:'#3B6EF8'},
+    {ico:'📋',lbl:'POs',      val:t.pos,                     delta:'▲ 8%', cls:'bl',col:'#3B6EF8'},
+    {ico:'⭐',lbl:'Satisf.',  val:Math.round(t.sat/n)+'%',   delta:'▲ 2%', cls:'bl',col:rcSent(Math.round(t.sat/n))},
+    {ico:'🎙',lbl:'Speech',   val:Math.round(t.sp/n)+'%',    delta:'▲ 5%', cls:'bl',col:'#3B6EF8'},
+    {ico:'⏱',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),   delta:'▼ 3%', cls:'bl',col:'#3B6EF8'}
   ];
   h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';
   kpiDefs.forEach(function(k){
     h+='<div class="kc '+k.cls+'" style="padding:14px 16px;">'+
       '<div style="font-size:14px;margin-bottom:6px;">'+k.ico+'</div>'+
-      '<div style="font-size:24px;font-weight:800;letter-spacing:-.5px;color:'+k.col+';font-family:var(--m);line-height:1;">'+k.val+'</div>'+
+      '<div style="font-size:24px;font-weight:600;letter-spacing:-.5px;color:'+k.col+';font-family:var(--m);line-height:1;">'+k.val+'</div>'+
       '<div style="font-size:10px;font-weight:400;color:var(--t2);margin-top:4px;">'+k.lbl+'</div>'+
-      '<div style="font-size:10px;font-weight:600;color:var(--g);margin-top:3px;">'+k.delta+'</div>'+
+      '<div style="font-size:10px;font-weight:400;color:'+(k.delta.startsWith('▲')?'#3B6EF8':'var(--t3)')+';margin-top:3px;">'+k.delta+'</div>'+
     '</div>';
   });
   h+='</div>';
@@ -663,19 +663,19 @@ function vResumen(){
 
 function tblAgentes(data){
   data=data||ag();
-  var cC={Home:'#6366f1',Road:'var(--g)',Concierge:'var(--y)'};
+  var cC={}; // todos los carriles en azul neutro
   var ths=['Agente','Carril','Llamadas','AHT','Satisfacción','Speech','Sentimiento','Score'].map(function(x){return'<th>'+x+'</th>';}).join('');
   var trs=data.map(function(a){
     var tr='<tr class="clickable" onclick="_rowClick('+a.id+')">';
     tr+='<td><div style="display:flex;align-items:center;gap:9px;"><div class="av av28" style="background:'+a.color+'">'+a.lt+'</div>'+
       '<div><div style="font-weight:600;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t3);">'+a.pais+'</div></div></div></td>'+
-      '<td><span class="tag" style="color:'+(cC[a.carril]||'#374151')+';border-color:currentColor;background:rgba(0,0,0,.03);">'+a.carril+'</span></td>'+
+      '<td><span class="tag" style="color:#3B6EF8;border-color:rgba(59,110,248,.3);background:rgba(59,110,248,.06);">'+a.carril+'</span></td>'+
       '<td style="font-weight:600;">'+a.calls+'</td>'+
       '<td style="color:'+(a.aht>280?'var(--r)':'var(--t1)')+';">'+a.ahtS+'</td>'+
       '<td><div style="font-weight:700;color:'+rc(a.sat)+';">'+a.sat+'%</div>'+bar(a.sat,56)+'</td>'+
       '<td><div style="font-weight:700;color:'+rc(a.speech)+';">'+a.speech+'%</div>'+bar(a.speech,56)+'</td>'+
       '<td><div style="display:flex;align-items:center;gap:5px;"><div class="sdot" style="background:'+sc(a.sent.p)+'"></div>'+
-      '<span style="font-size:11px;font-weight:600;color:'+sc(a.sent.p)+';">'+a.sent.p+'%</span></div></td>'+
+      '<span style="font-size:11px;font-weight:500;color:'+rc(a.sent.p)+';">'+a.sent.p+'%</span></div></td>'+
       '<td>'+badge(a)+'</td></tr>';
     return tr;
   }).join('');
