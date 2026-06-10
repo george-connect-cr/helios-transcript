@@ -3059,7 +3059,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     if(!_s||(Date.now()-_s.ts>3600000)){window.location.href='index.html?reason=noauth';return;}
     var _u=_s.user||{};
     // Admin y Supervisor no tienen acceso a la pantalla de transcripción
-    if(_u.role==='supervisor'||_u.role==='admin'){window.location.href='reportes.html';return;}
+    if(_u.role==='supervisor'){window.location.href='reportes.html';return;}
     // Rol Demo: arranca el motor de simulación automáticamente
     if(_u.role==='demo'){setTimeout(_startDemoMode, 1500);}
 
