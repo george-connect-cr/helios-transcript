@@ -3099,7 +3099,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
       if(_sub)_sub.style.display='inline';
     }
     // Roles that auto-open the reports dashboard
-    var _dashRoles=['formador','supervisor','admin'];
+    var _dashRoles=['supervisor'];
     if(_dashRoles.indexOf(_u.role)>=0){
       // Only redirect if not coming from reportes.html
       if(document.referrer.indexOf('reportes.html')<0&&!sessionStorage.getItem('from_reportes')){
