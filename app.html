@@ -2353,11 +2353,11 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 <script>
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
 var RBAC = {
-  agente:     { pages:['app'],          canViewTeam:false, canCoach:false, autoDemo:false },
-  demo:       { pages:['app'],          canViewTeam:false, canCoach:false, autoDemo:true  },
+  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
+  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
   formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
   supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
-  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false }
+  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false, selfOnly:false }
 };
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
@@ -2401,7 +2401,7 @@ function requireAuth(pageName) {
     var role = sess.user.role || 'agente';
     var perms = RBAC[role];
     if (!perms || !perms.pages.includes(pageName)) {
-      var fallback = (role==='agente'||role==='demo') ? 'app.html' : 'reportes.html';
+      var fallback = (role==='supervisor') ? 'reportes.html' : 'app.html';
       window.location.href = fallback;
       return;
     }
@@ -2428,7 +2428,7 @@ function _revalidateRole(email, localRole, sess) {
       localStorage.setItem('helios_session', JSON.stringify(sess));
       var perms = RBAC[dbRole];
       if (perms && !perms.pages.includes(window._currentPage)) {
-        var fallback = (dbRole==='agente'||dbRole==='demo') ? 'app.html' : 'reportes.html';
+        var fallback = (dbRole==='supervisor') ? 'reportes.html' : 'app.html';
         window.location.href = fallback;
       }
     }

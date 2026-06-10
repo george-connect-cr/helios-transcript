@@ -383,11 +383,11 @@ var RA = RA_MOCK.slice(); // inicializar con mock como fallback
 var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
 var RBAC = {
-  agente:     { pages:['app'],          canViewTeam:false, canCoach:false, autoDemo:false },
-  demo:       { pages:['app'],          canViewTeam:false, canCoach:false, autoDemo:true  },
+  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
+  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
   formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
   supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
-  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false }
+  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false, selfOnly:false }
 };
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
@@ -698,7 +698,7 @@ function vAgentes(){
 function vPorAgente(){
   var data=ag();
   // If role is agente: show own profile only, no sidebar list
-  if(_role==='agente'){
+  if(_role==='agente'||_role==='demo'){
     if(!_selAg&&data.length>0)_selAg=data[0];
     if(_selAg){
       return'<div style="padding:20px;">'+agDet(_selAg)+'</div>';
@@ -1131,7 +1131,7 @@ try{
       var suv=document.getElementById('nav-supervisor');if(suv)suv.style.display='';
       var _ab=document.getElementById('btn-back-app');if(_ab)_ab.style.display='none';
     }
-    if(_role==='agente'){
+    if(_role==='agente'||_role==='demo'){
       // Lock agent to own data only
       _filters.agente=_uname;
       ['nav-agentes','nav-coaching','nav-feedback','sb-sec-formador'].forEach(function(id){
@@ -1145,7 +1145,7 @@ try{
   var _uemail2='';
   try{_uemail2=(JSON.parse(localStorage.getItem('helios_session')||'{}').user||{}).email||'';}catch(e){}
   loadSupabaseData(function(){
-    if(_role==='agente'){
+    if(_role==='agente'||_role==='demo'){
       // Buscar por email (más confiable que por nombre)
       var _matchAg=RA.find(function(a){
         return a.email===_uemail2 || a.name===_uname;
