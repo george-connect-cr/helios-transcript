@@ -1094,9 +1094,9 @@ try{
       document.getElementById('adm-div').style.display='';
       document.getElementById('adm-sec').style.display='';
       document.getElementById('nav-supervisor').style.display='';
-      // Admin y Supervisor no tienen acceso a la pantalla de transcripción
+      // Supervisor no tiene acceso a dispatch — admin sí
       var _appBtn=document.getElementById('btn-back-app');
-      if(_appBtn)_appBtn.style.display='none';
+      if(_appBtn)_appBtn.style.display='';
     }
   }
 }catch(e){}
@@ -1129,7 +1129,9 @@ try{
     if(_role==='admin'||_role==='supervisor'){
       ['adm-div','adm-sec'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='';});
       var suv=document.getElementById('nav-supervisor');if(suv)suv.style.display='';
-      var _ab=document.getElementById('btn-back-app');if(_ab)_ab.style.display='none';
+      // Admin puede volver a dispatch — solo Supervisor queda en reportes
+      var _ab=document.getElementById('btn-back-app');
+      if(_ab)_ab.style.display=(_role==='supervisor')?'none':'';
     }
     if(_role==='agente'||_role==='demo'){
       // Lock agent to own data only
