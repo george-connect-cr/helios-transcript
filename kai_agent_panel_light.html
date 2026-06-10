@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KAI Academy · Panel Agente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#f7f7f6;
+  --c1:#ffffff;
+  --c2:#f4f4f3;
+  --c3:#ebebea;
+  --t0:#111110;
+  --t1:#3d3d38;
+  --t2:#9a9a95;
+  --t3:#c8c8c4;
+  --bd:rgba(0,0,0,.07);
+  --bd2:rgba(0,0,0,.11);
+  --a:#e04500;
+  --ic:var(--t3);   /* color único de todos los íconos */
+  --r:8px;
+}
+
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  font-size:12px;
+  color:var(--t0);
+  line-height:1.4;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── NAV ─────────────────────────────────────────── */
+nav{
+  height:48px;background:var(--c1);
+  border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 16px;gap:12px;
+  flex-shrink:0;
+}
+.nav-logo{
+  height:24px;background:var(--a);border-radius:4px;
+  padding:0 8px;display:flex;align-items:center;
+  font-weight:700;font-size:11px;letter-spacing:.3px;color:#fff;
+  flex-shrink:0;
+}
+.nav-brand-txt{flex-shrink:0;line-height:1.3;}
+.nav-brand-title{font-size:12px;font-weight:500;color:var(--t0);}
+.nav-brand-sub{font-size:10px;color:var(--t2);}
+.nav-sep{flex:1;}
+.nctrl{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;height:28px;border-radius:5px;
+  border:1px solid var(--bd);background:transparent;
+  cursor:pointer;font-size:11px;color:var(--t1);white-space:nowrap;
+  font-family:inherit;
+}
+.nctrl i{font-size:12px;color:var(--ic);}
+.nctrl:hover{background:var(--c2);}
+.nctrl.primary{background:var(--a);color:#fff;border-color:var(--a);}
+.nctrl.primary i{color:#fff;}
+.nctrl.primary:hover{background:#c83e00;}
+.nav-av{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--c2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;flex-shrink:0;
+}
+
+/* ── LAYOUT ──────────────────────────────────────── */
+.body{display:flex;height:calc(100vh - 48px);min-height:520px;}
+
+/* ── COL L — Formulario PO ───────────────────────── */
+.col-l{
+  width:292px;min-width:292px;flex-shrink:0;
+  background:var(--c1);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* Header PO */
+.po-hd{
+  padding:12px 14px 10px;border-bottom:1px solid var(--bd);flex-shrink:0;
+}
+.po-hd-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.po-hd-ico{font-size:14px;color:var(--ic);}
+.po-hd-info{flex:1;}
+.po-hd-title{font-size:12px;font-weight:500;color:var(--t0);}
+.po-hd-sub{font-size:10px;color:var(--t2);margin-top:1px;}
+.po-status{font-size:10px;color:var(--t2);}
+.po-bar{display:flex;align-items:center;gap:8px;}
+.po-track{flex:1;height:1.5px;background:var(--c3);border-radius:2px;overflow:hidden;}
+.po-fill{height:100%;background:var(--t3);border-radius:2px;width:0;}
+.po-pct{font-size:10px;color:var(--t3);}
+
+/* Secciones PO */
+.po-scroll{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:4px;}
+.po-scroll::-webkit-scrollbar{width:0;}
+
+.ps{border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;}
+.ps-hd{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 11px 6px;border-bottom:1px solid var(--bd);
+}
+.ps-hd i{font-size:12px;color:var(--ic);}
+.ps-hd-lbl{font-size:10px;font-weight:500;color:var(--t1);flex:1;}
+.ps-hd-ratio{font-size:10px;color:var(--t3);}
+.ps-body{padding:8px 11px 10px;display:flex;flex-direction:column;gap:6px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.fld-lbl{font-size:9px;color:var(--t3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;}
+.fld-val{font-size:11px;color:var(--t3);}
+.fld-val.filled{color:var(--t0);font-weight:400;}
+
+/* Prioridad */
+.prio-row{display:flex;gap:3px;margin-top:2px;}
+.prio-btn{
+  flex:1;padding:4px 3px;text-align:center;
+  border:1px solid var(--bd);border-radius:4px;
+  font-size:9px;color:var(--t2);cursor:pointer;
+  background:transparent;font-family:inherit;
+}
+.prio-btn:hover{background:var(--c2);}
+
+/* CTA bar */
+.cta-bar{
+  display:flex;gap:6px;padding:10px 11px;
+  border-top:1px solid var(--bd);flex-shrink:0;background:var(--c1);
+}
+.btn-s{
+  flex:1;padding:7px;border-radius:6px;
+  border:1px solid var(--bd);background:transparent;
+  font-size:11px;color:var(--t1);cursor:pointer;font-family:inherit;
+}
+.btn-s:hover{background:var(--c2);}
+.btn-p{
+  flex:2;padding:7px;border-radius:6px;border:none;
+  background:var(--a);font-size:11px;font-weight:500;color:#fff;
+  cursor:pointer;font-family:inherit;
+}
+.btn-p:hover{background:#c83e00;}
+
+/* ── COL C — Transcripción ───────────────────────── */
+.col-c{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--bd);background:var(--bg);}
+.tp-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;border-bottom:1px solid var(--bd);
+  background:var(--c1);flex-shrink:0;
+}
+.tp-hd-lbl{font-size:11px;font-weight:500;color:var(--t0);}
+.tp-live{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2);}
+.ldot{width:5px;height:5px;border-radius:50%;background:#34c759;}
+.tp-body{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:5px;
+}
+.tp-empty-ico{font-size:22px;color:var(--t3);}
+.tp-empty-txt{font-size:11px;color:var(--t2);}
+
+/* Barra agente */
+.ag-bar{
+  border-top:1px solid var(--bd);padding:8px 14px;
+  display:flex;align-items:center;gap:10px;
+  background:var(--c1);flex-shrink:0;
+}
+.ag-av{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--c2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:500;color:var(--t2);flex-shrink:0;
+}
+.ag-name{font-size:11px;font-weight:500;color:var(--t0);}
+.ag-shift{font-size:9px;color:var(--t2);}
+.ag-kpis{display:flex;gap:16px;margin-left:auto;}
+.ag-kpi{text-align:right;}
+.ag-kv{font-size:12px;font-weight:500;color:var(--t0);}
+.ag-kv.g{color:#16a34a;}
+.ag-kv.y{color:#b45309;}
+.ag-kl{font-size:9px;color:var(--t2);margin-top:1px;}
+
+/* ── COL R — Contexto ────────────────────────────── */
+.col-r{
+  width:232px;min-width:232px;flex-shrink:0;
+  background:var(--c1);overflow-y:auto;padding:8px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.col-r::-webkit-scrollbar{width:0;}
+
+.ctx{border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;}
+.ctx-hd{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 11px 6px;border-bottom:1px solid var(--bd);
+}
+.ctx-hd i{font-size:12px;color:var(--ic);}
+.ctx-hd-lbl{font-size:10px;font-weight:500;color:var(--t1);flex:1;}
+.ctx-hd-meta{font-size:10px;color:var(--t3);}
+.ctx-body{padding:9px 11px 11px;}
+
+/* Servicio detectado */
+.svc-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.svc-ico-wrap{
+  width:26px;height:26px;border-radius:5px;
+  background:var(--c2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.svc-ico-wrap i{font-size:13px;color:var(--ic);}
+.svc-nm{font-size:11px;font-weight:500;color:var(--t0);margin-bottom:2px;}
+.svc-sub{font-size:10px;color:var(--t2);}
+.conf-row{display:flex;align-items:center;gap:7px;}
+.conf-lbl{font-size:9px;color:var(--t3);}
+.conf-track{flex:1;height:1.5px;background:var(--c3);border-radius:2px;overflow:hidden;}
+.conf-fill{width:82%;height:100%;background:var(--t3);border-radius:2px;}
+.conf-pct{font-size:9px;color:var(--t2);}
+
+/* Sentimiento — sin emoji */
+.sent-main{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.sent-ico{width:28px;height:28px;border-radius:5px;background:var(--c2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sent-ico i{font-size:14px;color:var(--ic);}
+.sent-state{font-size:11px;font-weight:500;color:var(--t0);}
+.sent-sub{font-size:9px;color:var(--t2);margin-top:1px;}
+.sent-track{height:1.5px;background:var(--c3);border-radius:2px;overflow:hidden;margin-bottom:4px;}
+.sent-fill{width:52%;height:100%;background:var(--t3);border-radius:2px;}
+.sent-scale{display:flex;justify-content:space-between;}
+.sent-scale span{font-size:9px;color:var(--t3);}
+
+/* KAI insight — sin pill, sin color, solo borde izquierdo sutil */
+.kai-ins{
+  border-left:2px solid var(--c3);
+  padding:6px 9px;margin-bottom:8px;
+}
+.kai-ins-hd{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.kai-ins-hd i{font-size:11px;color:var(--ic);}
+.kai-ins-lbl{font-size:9px;color:var(--t2);}
+.kai-ins-txt{font-size:10px;color:var(--t1);line-height:1.5;}
+
+/* Checklist */
+.chk-list{display:flex;flex-direction:column;}
+.chk-item{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 0;border-bottom:1px solid var(--bd);cursor:pointer;
+}
+.chk-item:last-child{border-bottom:none;}
+.chk-box{
+  width:13px;height:13px;border-radius:3px;flex-shrink:0;
+  border:1px solid var(--bd2);background:var(--c1);
+  display:flex;align-items:center;justify-content:center;
+}
+.chk-box i{font-size:8px;color:transparent;}
+.chk-item.done .chk-box{background:var(--c2);border-color:var(--c3);}
+.chk-item.done .chk-box i{color:var(--t2);}
+.chk-item.done .chk-txt{text-decoration:line-through;color:var(--t3);}
+.chk-txt{font-size:10px;color:var(--t1);flex:1;line-height:1.4;}
+.chk-num{font-size:9px;color:var(--t3);}
+.chk-prog{display:flex;align-items:center;gap:6px;padding-top:6px;border-top:1px solid var(--bd);margin-top:3px;}
+.chk-prog-track{flex:1;height:1.5px;background:var(--c3);border-radius:2px;overflow:hidden;}
+.chk-prog-fill{width:20%;height:100%;background:var(--t2);border-radius:2px;}
+.chk-prog-lbl{font-size:9px;color:var(--t2);}
+</style>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Panel agente KAI Academy</h2>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">CONNECT</div>
+  <div class="nav-brand-txt">
+    <div class="nav-brand-title">KAI Academy <span style="font-size:10px;font-weight:400;color:var(--t2);">v0.6.3-beta</span></div>
+    <div class="nav-brand-sub">Portal de entrenamiento</div>
+  </div>
+  <div class="nav-sep"></div>
+  <button class="nctrl"><i class="ti ti-list"></i> Cola <span style="font-weight:500;color:var(--t0);">4</span></button>
+  <button class="nctrl"><i class="ti ti-chart-bar"></i></button>
+  <button class="nctrl">Demo</button>
+  <button class="nctrl"><i class="ti ti-stars"></i> Coaching</button>
+  <div class="nav-av">J</div>
+</nav>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- COL L — PO -->
+  <div class="col-l">
+    <div class="po-hd">
+      <div class="po-hd-top">
+        <i class="ti ti-file-text po-hd-ico"></i>
+        <div class="po-hd-info">
+          <div class="po-hd-title">Helios · Documentación PO</div>
+          <div class="po-hd-sub">PO-2026-05-1834 · 02:47</div>
+        </div>
+        <span class="po-status">En curso</span>
+      </div>
+      <div class="po-bar">
+        <div class="po-track"><div class="po-fill"></div></div>
+        <span class="po-pct">0 / 16</span>
+      </div>
+    </div>
+
+    <div class="po-scroll">
+
+      <div class="ps">
+        <div class="ps-hd">
+          <i class="ti ti-user"></i>
+          <span class="ps-hd-lbl">Cliente</span>
+          <span class="ps-hd-ratio">0 / 5</span>
+        </div>
+        <div class="ps-body">
+          <div class="g2">
+            <div><div class="fld-lbl">Nombre</div><div class="fld-val">—</div></div>
+            <div><div class="fld-lbl">Apellido</div><div class="fld-val">—</div></div>
+          </div>
+          <div><div class="fld-lbl">Teléfono</div><div class="fld-val">+506 —</div></div>
+          <div><div class="fld-lbl">Contacto de emergencia</div><div class="fld-val">—</div></div>
+          <div><div class="fld-lbl">Teléfono de contacto</div><div class="fld-val">+506 —</div></div>
+        </div>
+      </div>
+
+      <div class="ps">
+        <div class="ps-hd">
+          <i class="ti ti-car"></i>
+          <span class="ps-hd-lbl">Vehículo</span>
+          <span class="ps-hd-ratio">0 / 7</span>
+        </div>
+        <div class="ps-body">
+          <div class="g3">
+            <div><div class="fld-lbl">Año</div><div class="fld-val">—</div></div>
+            <div><div class="fld-lbl">Marca</div><div class="fld-val">—</div></div>
+            <div><div class="fld-lbl">Modelo</div><div class="fld-val">—</div></div>
+          </div>
+          <div class="g3">
+            <div><div class="fld-lbl">Color</div><div class="fld-val">—</div></div>
+            <div><div class="fld-lbl">Placa</div><div class="fld-val">—</div></div>
+            <div><div class="fld-lbl">VIN</div><div class="fld-val">—</div></div>
+          </div>
+          <div><div class="fld-lbl">Campaña</div><div class="fld-val">—</div></div>
+        </div>
+      </div>
+
+      <div class="ps">
+        <div class="ps-hd">
+          <i class="ti ti-map-pin"></i>
+          <span class="ps-hd-lbl">Ubicación</span>
+          <span class="ps-hd-ratio">0 / 1</span>
+        </div>
+        <div class="ps-body">
+          <div><div class="fld-lbl">Origen</div><div class="fld-val">—</div></div>
+        </div>
+      </div>
+
+      <div class="ps">
+        <div class="ps-hd">
+          <i class="ti ti-tool"></i>
+          <span class="ps-hd-lbl">Servicio</span>
+          <span class="ps-hd-ratio">0 / 4</span>
+        </div>
+        <div class="ps-body">
+          <div><div class="fld-lbl">Tipo</div><div class="fld-val">—</div></div>
+          <div>
+            <div class="fld-lbl">Prioridad</div>
+            <div class="prio-row">
+              <button class="prio-btn">Emergency</button>
+              <button class="prio-btn">VIP</button>
+              <button class="prio-btn">EV</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cta-bar">
+      <button class="btn-s">Revisar</button>
+      <button class="btn-p">Crear servicio</button>
+    </div>
+  </div>
+
+  <!-- COL C — Transcripción -->
+  <div class="col-c">
+    <div class="tp-hd">
+      <span class="tp-hd-lbl">Transcripción en tiempo real</span>
+      <div class="tp-live"><div class="ldot"></div> En vivo</div>
+    </div>
+    <div class="tp-body">
+      <i class="ti ti-microphone-off tp-empty-ico"></i>
+      <p class="tp-empty-txt">La transcripción aparecerá durante la llamada</p>
+    </div>
+    <div class="ag-bar">
+      <div class="ag-av">J</div>
+      <div>
+        <div class="ag-name">Jorge</div>
+        <div class="ag-shift">08:00 – 16:00</div>
+      </div>
+      <div class="ag-kpis">
+        <div class="ag-kpi">
+          <div class="ag-kv">0<span style="font-size:9px;font-weight:400;color:var(--t2);">/20</span></div>
+          <div class="ag-kl">Meta</div>
+        </div>
+        <div class="ag-kpi"><div class="ag-kv g">4.8</div><div class="ag-kl">Satisfac.</div></div>
+        <div class="ag-kpi"><div class="ag-kv y">4:32</div><div class="ag-kl">Duración</div></div>
+        <div class="ag-kpi"><div class="ag-kv">87%</div><div class="ag-kl">Protocolo</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL R — Contexto AI -->
+  <div class="col-r">
+
+    <!-- Servicio detectado -->
+    <div class="ctx">
+      <div class="ctx-hd">
+        <i class="ti ti-tool"></i>
+        <span class="ctx-hd-lbl">Servicio detectado</span>
+        <span class="ctx-hd-meta">Alta</span>
+      </div>
+      <div class="ctx-body">
+        <div class="svc-row">
+          <div class="svc-ico-wrap"><i class="ti ti-truck"></i></div>
+          <div>
+            <div class="svc-nm">Grúa — vehículo apagado</div>
+            <div class="svc-sub">Posible sobrecalentamiento</div>
+          </div>
+        </div>
+        <div class="conf-row">
+          <span class="conf-lbl">Confianza</span>
+          <div class="conf-track"><div class="conf-fill"></div></div>
+          <span class="conf-pct">82%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sentimiento — ícono en lugar de emoji -->
+    <div class="ctx">
+      <div class="ctx-hd">
+        <i class="ti ti-chart-line"></i>
+        <span class="ctx-hd-lbl">Sentimiento</span>
+      </div>
+      <div class="ctx-body">
+        <div class="sent-main">
+          <div class="sent-ico"><i class="ti ti-minus"></i></div>
+          <div>
+            <div class="sent-state">Neutro</div>
+            <div class="sent-sub">Sin tensión detectada</div>
+          </div>
+        </div>
+        <div class="sent-track"><div class="sent-fill"></div></div>
+        <div class="sent-scale"><span>Negativo</span><span>Positivo</span></div>
+      </div>
+    </div>
+
+    <!-- Recomendaciones KAI — sin pill, sin color -->
+    <div class="ctx">
+      <div class="ctx-hd">
+        <i class="ti ti-list-check"></i>
+        <span class="ctx-hd-lbl">Recomendaciones</span>
+        <span class="ctx-hd-meta">1 / 5</span>
+      </div>
+      <div class="ctx-body">
+        <div class="kai-ins">
+          <div class="kai-ins-hd">
+            <i class="ti ti-sparkles"></i>
+            <span class="kai-ins-lbl">KAI sugiere</span>
+          </div>
+          <div class="kai-ins-txt">Cliente viaja con menor. Confirmar seguridad antes de continuar.</div>
+        </div>
+        <div class="chk-list">
+          <div class="chk-item done">
+            <div class="chk-box"><i class="ti ti-check"></i></div>
+            <span class="chk-txt">Confirmar ubicación exacta</span>
+            <span class="chk-num">1</span>
+          </div>
+          <div class="chk-item">
+            <div class="chk-box"><i class="ti ti-check"></i></div>
+            <span class="chk-txt">¿Puede viajar en la grúa?</span>
+            <span class="chk-num">2</span>
+          </div>
+          <div class="chk-item">
+            <div class="chk-box"><i class="ti ti-check"></i></div>
+            <span class="chk-txt">Verificar marchamo vigente</span>
+            <span class="chk-num">3</span>
+          </div>
+          <div class="chk-item">
+            <div class="chk-box"><i class="ti ti-check"></i></div>
+            <span class="chk-txt">Confirmar destino del remolque</span>
+            <span class="chk-num">4</span>
+          </div>
+          <div class="chk-item">
+            <div class="chk-box"><i class="ti ti-check"></i></div>
+            <span class="chk-txt">Vehículo vacío verificado</span>
+            <span class="chk-num">5</span>
+          </div>
+        </div>
+        <div class="chk-prog">
+          <div class="chk-prog-track"><div class="chk-prog-fill"></div></div>
+          <span class="chk-prog-lbl">1 / 5</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</html>
