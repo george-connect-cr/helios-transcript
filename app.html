@@ -2078,18 +2078,26 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   position:relative;width:32px;height:32px;border-radius:8px;
   background:var(--c2);border:0.5px solid var(--gb2);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  animation:sentGlow 2s ease-in-out infinite;
+  transition:border-color .4s;
 }
 .sent-ico-new i{font-size:18px;color:#8a8a85;transition:color .4s;}
+/* Punto de pulso interior — esquina inferior derecha, no recortado */
 .sent-pulse-dot{
-  position:absolute;top:-3px;right:-3px;
-  width:8px;height:8px;border-radius:50%;
+  position:absolute;bottom:2px;right:2px;
+  width:6px;height:6px;border-radius:50%;
   background:var(--y);
   animation:sentDotPulse 2s ease-in-out infinite;
   transition:background .4s;
+  border:1px solid var(--c1);
 }
 @keyframes sentDotPulse{
   0%,100%{opacity:1;transform:scale(1);}
-  50%{opacity:.25;transform:scale(.6);}
+  50%{opacity:.2;transform:scale(.5);}
+}
+@keyframes sentGlow{
+  0%,100%{box-shadow:0 0 0 0 transparent;}
+  50%{box-shadow:0 0 0 3px rgba(232,160,32,.18);}
 }
 
 </style>
