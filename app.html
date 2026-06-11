@@ -2081,42 +2081,39 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   animation:sentGlow 2s ease-in-out infinite;
   transition:border-color .4s;
 }
-/* CSS-only face icon */
+/* Cara sentimiento — hijos reales, sin pseudo-elementos */
 .sent-face{
   width:18px;height:18px;border-radius:50%;
   border:1.8px solid #8a8a85;
   position:relative;flex-shrink:0;
   transition:border-color .4s;
 }
-.sent-face::before{
-  content:'';position:absolute;
-  top:4px;left:3px;
+.sf-eyes{
+  position:absolute;top:4px;left:3px;
   width:2.5px;height:2.5px;border-radius:50%;
   background:#8a8a85;
   box-shadow:5px 0 0 #8a8a85;
   transition:background .4s,box-shadow .4s;
 }
-/* Boca — neutral por defecto */
-.sent-face::after{
-  content:'';position:absolute;
-  bottom:3.5px;left:50%;transform:translateX(-50%);
+/* Boca neutral */
+.sf-mouth{
+  position:absolute;bottom:3.5px;left:50%;
+  transform:translateX(-50%);
   width:7px;height:1.8px;
   background:#8a8a85;border-radius:2px;
-  transition:all .4s;
+  transition:all .3s;
 }
-.sent-face.happy::after{
-  height:0;width:7px;
+.sent-face.happy .sf-mouth{
+  height:0;width:8px;
   border:1.8px solid #8a8a85;border-top:none;
   border-radius:0 0 6px 6px;
   background:transparent;bottom:3px;
-  transition:all .4s;
 }
-.sent-face.sad::after{
-  height:0;width:7px;
+.sent-face.sad .sf-mouth{
+  height:0;width:8px;
   border:1.8px solid #8a8a85;border-bottom:none;
   border-radius:6px 6px 0 0;
-  background:transparent;bottom:3px;
-  transition:all .4s;
+  background:transparent;bottom:4px;
 }
 /* Punto de pulso interior — esquina inferior derecha, no recortado */
 .sent-pulse-dot{
@@ -2514,7 +2511,10 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         <div class="sent-body">
           <div class="sent-row">
             <div class="sent-ico-new" id="sent-ico-new">
-              <div class="sent-face" id="sent-icon-new"></div>
+              <div class="sent-face" id="sent-icon-new">
+                <div class="sf-eyes" id="sf-eyes"></div>
+                <div class="sf-mouth" id="sf-mouth"></div>
+              </div>
               <div class="sent-pulse-dot" id="sent-pulse-dot"></div>
             </div>
             <div class="sent-info">
@@ -3236,7 +3236,10 @@ function renderSentiment(sent){
     var sc = c.color || '#8a8a85';
     sentIco.className = v===1?'sent-face happy':v===-1?'sent-face sad':'sent-face';
     sentIco.style.borderColor = sc;
-    sentIco.style.setProperty('--fc', sc);
+    var eyes = document.getElementById('sf-eyes');
+    var mouth = document.getElementById('sf-mouth');
+    if(eyes){ eyes.style.background=sc; eyes.style.boxShadow='5px 0 0 '+sc; }
+    if(mouth){ mouth.style.background=sc; mouth.style.borderColor=sc; }
   }
   if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
   var wrap = document.getElementById('sent-emo-wrap');
