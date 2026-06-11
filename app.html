@@ -1620,7 +1620,7 @@ body.dark .n-th-thumb {
   cursor:pointer;flex-shrink:0;
   transition:background .15s;
 }
-.kai-wizard-btn:hover { background:var(--a2); }
+.kai-wizard-btn:hover { background:rgba(224,69,0,.06); }
 
 /* ── KAI Checklist ── */
 .kai-checklist { display:flex;flex-direction:column;gap:4px;padding:0 2px; }
@@ -3942,15 +3942,18 @@ function _clearSession() {
   var label = document.getElementById('sentiment-label');
   var sub = document.getElementById('sentiment-sub');
   var fill = document.getElementById('sentiment-fill');
-  // Actualizar nuevo ícono con pulso
+  // Reset ícono sentimiento a neutro
   var sentIco = document.getElementById('sent-icon-new');
   var sentPulse = document.getElementById('sent-pulse-dot');
   if(sentIco){
-    var sc = c.color || '#8a8a85';
-    sentIco.className = v===1?'sent-face happy':v===-1?'sent-face sad':'sent-face';
-    sentIco.style.borderColor = sc;
+    var els=sentIco.querySelectorAll('circle');
+    els[0]&&els[0].setAttribute('stroke','#555');
+    els[1]&&els[1].setAttribute('fill','#555');
+    els[2]&&els[2].setAttribute('fill','#555');
+    var m=sentIco.querySelector('line');
+    if(m){m.setAttribute('stroke','#555');m.setAttribute('x1','8');m.setAttribute('y1','14');m.setAttribute('x2','14');m.setAttribute('y2','14');}
   }
-  if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
+  if(sentPulse){ sentPulse.style.background = '#e8a020'; }
   var wrap = document.getElementById('sent-emo-wrap');
   var base = document.getElementById('sent-emoji-base');
   var colored = document.getElementById('sent-emoji-color');
@@ -6311,35 +6314,35 @@ setInterval(_syncAgentMini, 3000);
           <div class="kai-wizard-feat-ico"><i class="ti ti-phone-call" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Llamadas de entrenamiento</div>
-            <div class="kai-wizard-feat-desc">Recibís llamadas simuladas de clientes virtuales con IA. Cada llamada es un escenario diferente — cliente feliz, molesto o con consultas de gestión.</div>
+            <div class="kai-wizard-feat-desc">Llamadas simuladas con IA — clientes felices, molestos o con consultas reales.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
           <div class="kai-wizard-feat-ico"><i class="ti ti-file-text" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Helios · Documentación de PO</div>
-            <div class="kai-wizard-feat-desc">Durante la llamada, KAI infiere automáticamente los datos del cliente y los llena en el formulario. Podés editar y completar manualmente lo que falte.</div>
+            <div class="kai-wizard-feat-desc">KAI llena el formulario automáticamente durante la llamada.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
           <div class="kai-wizard-feat-ico"><i class="ti ti-mood-smile" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Análisis de sentimiento</div>
-            <div class="kai-wizard-feat-desc">KAI analiza el tono del cliente en tiempo real y te muestra si está satisfecho, neutro o molesto para que ajustes tu comunicación.</div>
+            <div class="kai-wizard-feat-desc">Análisis de tono en tiempo real: satisfecho, neutro o molesto.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
           <div class="kai-wizard-feat-ico"><i class="ti ti-sparkles" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">KAI · Recomendaciones</div>
-            <div class="kai-wizard-feat-desc">Recibís sugerencias en tiempo real basadas en la transcripción y el protocolo de atención, para guiarte durante la llamada.</div>
+            <div class="kai-wizard-feat-desc">Sugerencias en tiempo real basadas en el protocolo de atención.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
           <div class="kai-wizard-feat-ico"><i class="ti ti-award" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Evaluación y feedback</div>
-            <div class="kai-wizard-feat-desc">Al finalizar cada llamada, recibís tu nota de calidad, análisis de sentimiento, tiempo promedio y oportunidades de mejora personalizadas.</div>
+            <div class="kai-wizard-feat-desc">Nota de calidad, métricas y oportunidades de mejora al finalizar.</div>
           </div>
         </div>
       </div>
@@ -6349,7 +6352,7 @@ setInterval(_syncAgentMini, 3000);
         <input type="checkbox" id="wizard-no-show" onchange="wizardToggle(this)"/>
         No volver a mostrar
       </label>
-      <button class="kai-wizard-btn" onclick="closeWizard()">¡Comenzar entrenamiento! →</button>
+      <button class="kai-wizard-btn" onclick="closeWizard()">Comenzar →</button>
     </div>
   </div>
 </div>
