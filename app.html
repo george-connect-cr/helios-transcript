@@ -2081,7 +2081,43 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   animation:sentGlow 2s ease-in-out infinite;
   transition:border-color .4s;
 }
-.sent-ico-new i{font-size:18px;color:#8a8a85;transition:color .4s;}
+/* CSS-only face icon */
+.sent-face{
+  width:18px;height:18px;border-radius:50%;
+  border:1.8px solid #8a8a85;
+  position:relative;flex-shrink:0;
+  transition:border-color .4s;
+}
+.sent-face::before{
+  content:'';position:absolute;
+  top:4px;left:3px;
+  width:2.5px;height:2.5px;border-radius:50%;
+  background:#8a8a85;
+  box-shadow:5px 0 0 #8a8a85;
+  transition:background .4s,box-shadow .4s;
+}
+/* Boca — neutral por defecto */
+.sent-face::after{
+  content:'';position:absolute;
+  bottom:3.5px;left:50%;transform:translateX(-50%);
+  width:7px;height:1.8px;
+  background:#8a8a85;border-radius:2px;
+  transition:all .4s;
+}
+.sent-face.happy::after{
+  height:0;width:7px;
+  border:1.8px solid #8a8a85;border-top:none;
+  border-radius:0 0 6px 6px;
+  background:transparent;bottom:3px;
+  transition:all .4s;
+}
+.sent-face.sad::after{
+  height:0;width:7px;
+  border:1.8px solid #8a8a85;border-bottom:none;
+  border-radius:6px 6px 0 0;
+  background:transparent;bottom:3px;
+  transition:all .4s;
+}
 /* Punto de pulso interior — esquina inferior derecha, no recortado */
 .sent-pulse-dot{
   position:absolute;bottom:2px;right:2px;
@@ -2478,12 +2514,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         <div class="sent-body">
           <div class="sent-row">
             <div class="sent-ico-new" id="sent-ico-new">
-              <svg id="sent-icon-new" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8a8a85" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"/>
-                <circle cx="9" cy="10" r=".5" fill="#8a8a85"/>
-                <circle cx="15" cy="10" r=".5" fill="#8a8a85"/>
-                <line x1="9" y1="15" x2="15" y2="15"/>
-              </svg>
+              <div class="sent-face" id="sent-icon-new"></div>
               <div class="sent-pulse-dot" id="sent-pulse-dot"></div>
             </div>
             <div class="sent-info">
@@ -3203,9 +3234,9 @@ function renderSentiment(sent){
   var sentPulse = document.getElementById('sent-pulse-dot');
   if(sentIco){
     var sc = c.color || '#8a8a85';
-    var mouth = v===1 ? '<path d="M9 15 Q12 18 15 15"/>' : v===-1 ? '<path d="M9 16 Q12 13 15 16"/>' : '<line x1="9" y1="15" x2="15" y2="15"/>';
-    sentIco.innerHTML = '<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r=".5" fill="'+sc+'"/><circle cx="15" cy="10" r=".5" fill="'+sc+'"/>'+mouth;
-    sentIco.setAttribute('stroke', sc);
+    sentIco.className = v===1?'sent-face happy':v===-1?'sent-face sad':'sent-face';
+    sentIco.style.borderColor = sc;
+    sentIco.style.setProperty('--fc', sc);
   }
   if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
   var wrap = document.getElementById('sent-emo-wrap');
@@ -3905,9 +3936,8 @@ function _clearSession() {
   var sentPulse = document.getElementById('sent-pulse-dot');
   if(sentIco){
     var sc = c.color || '#8a8a85';
-    var mouth = v===1 ? '<path d="M9 15 Q12 18 15 15"/>' : v===-1 ? '<path d="M9 16 Q12 13 15 16"/>' : '<line x1="9" y1="15" x2="15" y2="15"/>';
-    sentIco.innerHTML = '<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r=".5" fill="'+sc+'"/><circle cx="15" cy="10" r=".5" fill="'+sc+'"/>'+mouth;
-    sentIco.setAttribute('stroke', sc);
+    sentIco.className = v===1?'sent-face happy':v===-1?'sent-face sad':'sent-face';
+    sentIco.style.borderColor = sc;
   }
   if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
   var wrap = document.getElementById('sent-emo-wrap');
