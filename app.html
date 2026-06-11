@@ -1561,21 +1561,22 @@ body.dark .n-th-thumb {
   box-shadow:0 24px 80px rgba(0,0,0,.25);
 }
 .kai-wizard-hero {
-  background:linear-gradient(135deg,#e04500,#ff8c44);
-  padding:28px 28px 20px;
+  background:var(--c1);
+  padding:24px 28px 20px;
   position:relative;
+  border-bottom:1px solid var(--gb2);
 }
 .kai-wizard-logo {
-  height:28px;width:auto;display:block;
-  border-radius:3px;margin-bottom:14px;
+  height:24px;width:auto;display:block;
+  border-radius:3px;margin-bottom:12px;
 }
 .kai-wizard-title {
-  font-size:22px;font-weight:600;color:#fff;
+  font-size:20px;font-weight:600;color:var(--t0);
   line-height:1.2;margin-bottom:6px;
   font-family:var(--f);
 }
 .kai-wizard-sub {
-  font-size:13px;color:rgba(255,255,255,.85);
+  font-size:12.5px;color:var(--t2);
   font-family:var(--f);font-weight:400;line-height:1.5;
 }
 .kai-wizard-body { padding:24px 28px; }
@@ -1594,7 +1595,7 @@ body.dark .n-th-thumb {
 }
 .kai-wizard-feat-info {}
 .kai-wizard-feat-title {
-  font-size:13px;font-weight:700;color:var(--t0);
+  font-size:12.5px;font-weight:500;color:var(--t0);
   font-family:var(--f);margin-bottom:2px;
 }
 .kai-wizard-feat-desc {
@@ -1615,7 +1616,7 @@ body.dark .n-th-thumb {
 .kai-wizard-btn {
   padding:10px 24px;border-radius:8px;
   background:var(--a);color:#fff;border:none;
-  font-family:var(--f);font-size:13px;font-weight:700;
+  font-family:var(--f);font-size:13px;font-weight:500;
   cursor:pointer;flex-shrink:0;
   transition:background .15s;
 }
@@ -6292,35 +6293,35 @@ setInterval(_syncAgentMini, 3000);
     <div class="kai-wizard-body">
       <div class="kai-wizard-features">
         <div class="kai-wizard-feat">
-          <div class="kai-wizard-feat-ico">📞</div>
+          <div class="kai-wizard-feat-ico"><i class="ti ti-phone-call" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Llamadas de entrenamiento</div>
             <div class="kai-wizard-feat-desc">Recibís llamadas simuladas de clientes virtuales con IA. Cada llamada es un escenario diferente — cliente feliz, molesto o con consultas de gestión.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
-          <div class="kai-wizard-feat-ico">📝</div>
+          <div class="kai-wizard-feat-ico"><i class="ti ti-file-text" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Helios · Documentación de PO</div>
             <div class="kai-wizard-feat-desc">Durante la llamada, KAI infiere automáticamente los datos del cliente y los llena en el formulario. Podés editar y completar manualmente lo que falte.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
-          <div class="kai-wizard-feat-ico">😊</div>
+          <div class="kai-wizard-feat-ico"><i class="ti ti-mood-smile" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Análisis de sentimiento</div>
             <div class="kai-wizard-feat-desc">KAI analiza el tono del cliente en tiempo real y te muestra si está satisfecho, neutro o molesto para que ajustes tu comunicación.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
-          <div class="kai-wizard-feat-ico">🧠</div>
+          <div class="kai-wizard-feat-ico"><i class="ti ti-sparkles" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">KAI · Recomendaciones</div>
             <div class="kai-wizard-feat-desc">Recibís sugerencias en tiempo real basadas en la transcripción y el protocolo de atención, para guiarte durante la llamada.</div>
           </div>
         </div>
         <div class="kai-wizard-feat">
-          <div class="kai-wizard-feat-ico">🏆</div>
+          <div class="kai-wizard-feat-ico"><i class="ti ti-award" style="font-size:16px;color:var(--t2);"></i></div>
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Evaluación y feedback</div>
             <div class="kai-wizard-feat-desc">Al finalizar cada llamada, recibís tu nota de calidad, análisis de sentimiento, tiempo promedio y oportunidades de mejora personalizadas.</div>
