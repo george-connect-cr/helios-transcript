@@ -3026,24 +3026,28 @@ function _showEndCallButton() {
   if (document.getElementById('btn-end-call')) return;
   var btn = document.createElement('button');
   btn.id = 'btn-end-call';
-  btn.textContent = '📵 Finalizar';
+  btn.title = _demoActive ? 'Finalizar demo' : 'Finalizar llamada';
+  // Ícono teléfono colgando — SVG circular rojo
+  btn.innerHTML = '<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">'
+    + '<circle cx="18" cy="18" r="17" stroke="#e84040" stroke-width="2"/>'
+    + '<path d="M11 20.5c0-.8.4-1.5 1-2l2.2-1.4c.4-.3.9-.2 1.2.1l1.3 1.4c.2.2.5.3.8.2 1.2-.5 2.2-1.3 3-2.3.2-.3.2-.6 0-.8l-1.2-1.4c-.3-.3-.3-.8 0-1.2l1.5-2.1c.3-.4 1-.5 1.4-.2l2 1.5c.5.4.8 1 .8 1.7 0 4.2-3.4 7.5-7.5 7.5-3.6 0-6.5-2.7-6.5-5.5z" fill="#e84040"/>'
+    + '</svg>';
   btn.style.cssText = [
-    'height:32px','padding:0 14px','border-radius:20px',
-    'border:none','background:#e84040','color:#fff',
-    'font-family:var(--f)','font-size:12px','font-weight:600',
+    'width:36px','height:36px','padding:0','border-radius:50%',
+    'border:none','background:transparent',
     'cursor:pointer','display:inline-flex','align-items:center',
-    'gap:5px','transition:background .15s','white-space:nowrap',
+    'justify-content:center','transition:transform .15s','flex-shrink:0',
   ].join(';');
-  btn.onmouseover = function(){ btn.style.background='#c42020'; };
-  btn.onmouseout  = function(){ btn.style.background='#e84040'; };
-  btn.onclick = endCall;
+  btn.onmouseover = function(){ btn.style.transform='scale(1.1)'; };
+  btn.onmouseout  = function(){ btn.style.transform='scale(1)'; };
+  // Si hay demo activo, finaliza el demo; si no, finaliza la llamada real
+  btn.onclick = function(){ if(_demoActive){ _exitDemo(); } else { endCall(); } };
   // Ocultar Demo e insertar Finalizar en su lugar
   var demoBtn = document.querySelector('.n-demo');
   if (demoBtn) {
     demoBtn.style.display = 'none';
     demoBtn.parentNode.insertBefore(btn, demoBtn);
   } else {
-    // Fallback: insertar en el nav
     var navR = document.querySelector('.n-r');
     if (navR) navR.insertBefore(btn, navR.firstChild);
   }
@@ -4249,12 +4253,15 @@ function _exitDemo() {
   _demoActive = false;
   _demoTimers.forEach(function(t) { clearTimeout(t); });
   _demoTimers = [];
-  if (_callInProgress) { _callInProgress = false; _hideEndCallButton(); CallTimer.reset(); }
+  // Siempre limpiar el botón de finalizar y restaurar Demo
+  _hideEndCallButton();
+  if (_callInProgress) { _callInProgress = false; CallTimer.reset(); }
   if (_demoPrevStatus) {
     setStatus(_demoPrevStatus.id, _demoPrevStatus.color, _demoPrevStatus.label);
   }
+  _clearSession();
   _setDemoState(true);
-  showToast('✓ Demo finalizado · Revisá las métricas en 📊');
+  showToast('Demo finalizado — podés iniciar uno nuevo cuando quieras');
 }
 
 let _poList = [];
