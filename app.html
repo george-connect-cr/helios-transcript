@@ -14,10 +14,11 @@
 <style>
 /* ═══ DS v6 TOKENS ═══════════════════════════════════ */
 :root{
-  --bg:#f8f9fc; --c1:#ffffff; --c2:#f8f9fc; --c3:#f1f3f9; --c4:#e8ebf4;
-  --sh:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);
+  --bg:#f5f5f4; --c1:#ffffff; --c2:#f5f5f4; --c3:#e8e8e6; --c4:#d8d8d5;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
   --sh-sm:0 1px 3px rgba(0,0,0,.05);
-  --t0:#0d0f1a; --t1:#3a4060; --t2:#8892b0; --t3:#c4c8dc;
+  --gb:rgba(0,0,0,.10); --gb2:rgba(0,0,0,.08);
+  --t0:#111110; --t1:#44443f; --t2:#8a8a85; --t3:#c4c4c0;
   --a:#e04500; --a2:#ff6535;
   --g:#52a676; --y:#e8a020; --r:#d86060; --v:#7048e8;
   --blue:#3b6ef8; --bl2:#eff3ff; --bl3:rgba(59,110,248,.1);
@@ -63,12 +64,12 @@ input,textarea,select{font-family:inherit;}
 /* ═══ NAV ════════════════════════════════════════════ */
 /* ═══ NAV (ported from app.html, DS v6 light) ═══════ */
 nav{
-  height:52px;flex-shrink:0;
-  display:flex;align-items:center;gap:0;
-  padding:0 20px;
-  background:rgba(255,255,255,.85);backdrop-filter:blur(28px);
+  height:50px;flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;
+  background:var(--c1);
+  border-bottom:1px solid var(--gb2);
   position:relative;z-index:20;
-  box-shadow:var(--sh-sm);
 }
 
 /* Brand */
@@ -156,25 +157,25 @@ body.dark .n-th-thumb {
 
 /* Dashboard button */
 .n-dash{
-  width:36px;height:36px;
+  width:30px;height:30px;
   display:flex;align-items:center;justify-content:center;
-  border:none;background:var(--c2);box-shadow:var(--sh-sm);
-  border-radius:8px;color:var(--t1);
-  cursor:pointer;font-size:15px;
-  transition:background .15s,color .15s;
+  border:1px solid var(--gb2);background:transparent;
+  border-radius:6px;color:var(--t2);
+  cursor:pointer;font-size:14px;
+  transition:background .12s,color .12s;
 }
-.n-dash:hover{background:var(--c3);color:var(--t0);}
+.n-dash:hover{background:var(--c2);color:var(--t0);}
 
 /* Queue button */
 .qbtn{
-  height:36px;padding:0 14px;
-  border:none;background:var(--c2);box-shadow:var(--sh-sm);
-  border-radius:20px;
-  font-family:var(--f);font-size:12px;font-weight:600;color:var(--t1);
-  cursor:pointer;display:flex;align-items:center;gap:6px;
-  transition:background .15s;
+  height:30px;padding:0 12px;
+  border:1px solid var(--gb2);background:transparent;
+  border-radius:6px;
+  font-family:var(--f);font-size:12px;font-weight:400;color:var(--t1);
+  cursor:pointer;display:flex;align-items:center;gap:5px;
+  transition:background .12s;
 }
-.qbtn:hover{background:var(--c3);}
+.qbtn:hover{background:var(--c2);}
 .qbtn .qn{
   color:var(--a);font-weight:600;
   font-family:var(--f);font-size:12px;
@@ -182,41 +183,34 @@ body.dark .n-th-thumb {
 
 /* Demo button */
 .n-demo{
-  height:36px;padding:0 18px;
-  border:none;background:var(--a);color:#fff;
-  border-radius:8px;
-  font-family:var(--f);font-size:12px;font-weight:600;letter-spacing:.2px;
-  cursor:pointer;transition:background .15s;
+  height:30px;padding:0 14px;
+  border:1px solid var(--gb2);background:transparent;
+  border-radius:6px;
+  font-family:var(--f);font-size:12px;font-weight:400;color:var(--t0);
+  cursor:pointer;transition:background .12s;
 }
-.n-demo:hover{background:var(--a2);}
+.n-demo:hover{background:var(--c2);}
 
 /* Status (agent state) */
 #status-wrap{position:relative;}
 #status-wrap > button{
   display:flex;align-items:center;gap:6px;
-  height:32px;padding:0 12px 0 9px;
-  border:none;background:var(--c2);box-shadow:var(--sh-sm);
-  border-radius:20px;
-  font-family:var(--f);font-size:11px;font-weight:600;
-  color:var(--t1);cursor:pointer;white-space:nowrap;
-  transition:background .15s;
+  height:30px;padding:0 12px;
+  border:1px solid var(--gb2);background:transparent;
+  border-radius:6px;
+  font-family:var(--f);font-size:12px;font-weight:400;
+  color:var(--t0);cursor:pointer;white-space:nowrap;
+  transition:background .12s;
 }
-#status-wrap > button:hover{background:var(--c3);}
-#status-wrap > button {
-  display:flex;align-items:center;gap:7px;
-  padding:5px 10px;border-radius:20px;
-  border:1px solid var(--gb2);background:var(--c2);
-  cursor:pointer;
-}
-#status-wrap > button:hover { background:var(--c3); }
+#status-wrap > button:hover{background:var(--c2);}
 #status-label {
-  font-size:12px;font-weight:600;
+  font-size:12px;font-weight:400;
   color:var(--t0);font-family:var(--f);
   display:inline !important;
   white-space:nowrap;
 }
 #status-dot-btn{
-  width:8px;height:8px;border-radius:50%;
+  width:6px;height:6px;border-radius:50%;
   background:var(--g);flex-shrink:0;transition:background .3s;
 }
 #status-menu{
@@ -473,18 +467,19 @@ body.dark .n-th-thumb {
 
 /* ══ LEFT — PO Console (PRIMARY workspace) ══════════ */
 .col-l{
-  width:420px;min-width:420px;
+  width:300px;min-width:300px;
   display:flex;flex-direction:column;
-  background:var(--bg);
+  background:var(--c1);
+  border-right:1px solid var(--gb2);
   overflow:hidden;
 }
 .col-l::-webkit-scrollbar{width:0;}
 
 .po-scroll{
   flex:1;overflow-y:auto;
-  padding:14px 14px 0;
+  padding:10px 12px;
   display:flex;flex-direction:column;
-  gap:10px;
+  gap:6px;
 }
 .po-scroll::-webkit-scrollbar{width:5px;}
 .po-scroll::-webkit-scrollbar-track{background:transparent;}
@@ -493,9 +488,8 @@ body.dark .n-th-thumb {
 /* PO header card */
 .po-top{
   background:var(--c1);
-  border-radius:6px;
-  padding:12px 14px 11px;
-  box-shadow:var(--sh-sm);
+  padding:12px 14px 10px;
+  border-bottom:1px solid var(--gb2);
   flex-shrink:0;
 }
 .po-top-row{
@@ -509,29 +503,28 @@ body.dark .n-th-thumb {
   font-size:14px;
 }
 .po-top-title{
-  font-family:var(--f);font-size:13px;font-weight:600;color:var(--t0);
+  font-family:var(--f);font-size:12px;font-weight:500;color:var(--t0);
   flex:1;line-height:1.2;
 }
 .po-top-sub{font-size:10.5px;color:var(--t2);margin-top:1px;font-family:var(--f);font-weight:500;}
 .po-top-badge{
-  font-family:var(--f);font-size:8.5px;font-weight:700;
-  padding:4px 10px;border-radius:20px;
-  background:var(--c3);color:var(--t2);
-  letter-spacing:.1px;
+  font-family:var(--f);font-size:10px;font-weight:400;
+  padding:2px 7px;border-radius:4px;
+  border:1px solid var(--gb2);background:var(--c2);color:var(--t2);
 }
 .po-top-badge.ready{background:transparent;color:var(--g);}
 .po-progress{
   display:flex;align-items:center;gap:10px;
 }
 .po-progress-bar{
-  flex:1;height:4px;background:var(--c3);border-radius:4px;overflow:hidden;
+  flex:1;height:2px;background:var(--c3);border-radius:2px;overflow:hidden;
 }
 .po-progress-fill{
-  height:100%;background:linear-gradient(90deg,var(--g),#1ec38a);
-  border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1);
+  height:100%;background:var(--t2);
+  border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);
 }
 .po-progress-pct{
-  font-family:var(--f);font-size:11px;font-weight:700;color:var(--t0);
+  font-family:var(--f);font-size:10px;font-weight:400;color:var(--t2);
   min-width:34px;text-align:right;
 }
 .po-progress-stats{
@@ -571,8 +564,8 @@ body.dark .n-th-thumb {
 /* Section card */
 .ps{
   background:var(--c1);
-  border-radius:6px;
-  box-shadow:var(--sh-sm);
+  border-radius:8px;
+  border:1px solid var(--gb2);
   overflow:hidden;
   flex-shrink:0;
 }
@@ -606,8 +599,8 @@ body.dark .n-th-thumb {
 .ps-head-ratio.partial{color:var(--t1);}
 
 .ps-body{
-  padding:6px 12px 12px;
-  display:flex;flex-direction:column;gap:7px;
+  padding:8px 12px 10px;
+  display:flex;flex-direction:column;gap:8px;
 }
 
 .ps-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
@@ -617,27 +610,15 @@ body.dark .n-th-thumb {
 /* Field */
 .fld{
   position:relative;
-  background:var(--c2);
-  border-radius:6px;
-  padding:7px 11px 8px;
-  transition:box-shadow .15s,background .15s;
+  background:transparent;
+  padding:0;
   cursor:text;
 }
-.ps.tint-bl .fld{background:rgba(255,255,255,.6);}
-.ps.tint-gr .fld{background:rgba(255,255,255,.6);}
-.fld:hover{background:var(--c3);}
-.ps.tint-bl .fld:hover{background:rgba(255,255,255,.85);}
-.ps.tint-gr .fld:hover{background:rgba(255,255,255,.85);}
-.fld:focus-within{
-  background:var(--c1);
-  box-shadow:0 0 0 2px rgba(59,110,248,.18);
-}
-.fld.pending{ /* visual cue is the placeholder + .empty input, no colored stripe */ }
-.fld.filled-ai{ /* visual cue is the green check at the label, no colored stripe */ }
+.fld:focus-within .fld-lbl{color:var(--t1);}
 .fld-lbl{
   display:block;
-  font-family:var(--f);font-size:8.5px;font-weight:600;
-  color:var(--t2);letter-spacing:.1px;
+  font-family:var(--f);font-size:9px;font-weight:400;
+  color:var(--t2);letter-spacing:.02em;
   margin-bottom:2px;
   user-select:none;
 }
@@ -646,7 +627,7 @@ body.dark .n-th-thumb {
 .fld-in{
   display:block;width:100%;
   background:transparent;border:none;outline:none;
-  font-family:var(--f);font-size:12.5px;font-weight:500;
+  font-family:var(--f);font-size:12px;font-weight:400;
   color:var(--t0);padding:0;
 }
 .fld-in::placeholder{color:var(--t3);font-weight:400;}
@@ -688,8 +669,8 @@ body.dark .n-th-thumb {
 /* Phone field with country code */
 .fld-phone{display:flex;align-items:center;gap:7px;}
 .fld-phone-cc{
-  display:flex;align-items:center;gap:5px;
-  font-family:var(--f);font-size:11.5px;font-weight:600;color:var(--t1);
+  display:flex;align-items:center;gap:4px;
+  font-family:var(--f);font-size:11px;font-weight:400;color:var(--t2);
   white-space:nowrap;
 }
 .fld-phone-flag{font-size:11px;line-height:1;}
@@ -699,17 +680,17 @@ body.dark .n-th-thumb {
 .tpills{display:flex;gap:5px;}
 .tp-pill{
   flex:1;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-  padding:7px 6px;
-  border-radius:6px;
-  background:var(--c2);
-  font-family:var(--f);font-size:9.5px;font-weight:700;
-  color:var(--t1);letter-spacing:.1px;
-  cursor:pointer;border:none;
-  transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+  padding:5px 4px;
+  border-radius:5px;
+  background:transparent;
+  border:1px solid var(--gb2);
+  font-family:var(--f);font-size:9.5px;font-weight:400;
+  color:var(--t2);
+  cursor:pointer;
+  transition:all .12s;
 }
-.tp-pill:hover{background:var(--c3);}
-.tp-pill .tp-pill-ico{font-size:10px;}
+.tp-pill:hover{background:var(--c2);}
 .tp-pill.active{background:var(--c1);box-shadow:var(--sh-sm),inset 0 0 0 1.5px var(--t3);color:var(--t0);}
 .tp-pill.active.r{box-shadow:0 1px 3px rgba(232,64,64,.15),inset 0 0 0 1.5px var(--r);color:var(--r);background:var(--re2);}
 .tp-pill.active.v{box-shadow:0 1px 3px rgba(112,72,232,.15),inset 0 0 0 1.5px var(--v);color:var(--v);background:var(--pu2);}
@@ -718,13 +699,10 @@ body.dark .n-th-thumb {
 /* Inline toggle (WhatsApp etc) */
 .fld-tog{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:8px 11px;
-  background:var(--c2);
-  border-radius:6px;
+  padding:2px 0;
+  background:transparent;
   cursor:pointer;
-  transition:background .12s;
 }
-.fld-tog:hover{background:var(--c3);}
 .fld-tog-lbl{
   font-family:var(--f);font-size:9.5px;font-weight:600;
   color:var(--t1);letter-spacing:.1px;
@@ -1291,8 +1269,8 @@ body.dark .n-th-thumb {
   padding:10px 13px 8px;
 }
 .svc-ico{
-  width:32px;height:32px;border-radius:8px;flex-shrink:0;
-  background:var(--am2);
+  width:26px;height:26px;border-radius:5px;flex-shrink:0;
+  background:var(--c2);border:1px solid var(--gb2);
   display:flex;align-items:center;justify-content:center;
   font-size:16px;margin-top:1px;
 }
@@ -1837,7 +1815,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.6.0-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.6.4-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -1848,9 +1826,9 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
     <div class="po-counter show" id="po-counter" onclick="openDrawer()" title="Historial de POs">
       <span id="po-count-num">0</span><span class="po-counter-lbl"> POs</span>
     </div>
-    <button class="n-dash" onclick="openDash()" title="Reportes & Analytics">📊</button>
+    <button class="n-dash" onclick="openDash()" title="Reportes & Analytics"><i class="ti ti-chart-bar" style="font-size:14px;" aria-hidden="true"></i></button>
     <div class="q-wrap">
-      <button class="qbtn" onclick="toggleQueue()" title="Cola">📋 Cola <span class="qn" id="q-cnt">4</span></button>
+      <button class="qbtn" onclick="toggleQueue()" title="Cola">Cola <span class="qn" id="q-cnt">4</span></button>
       <div id="q-menu" class="q-menu"></div>
     </div>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
@@ -1912,7 +1890,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- PO Top header with progress -->
       <div class="po-top">
         <div class="po-top-row">
-          <div class="po-top-ico">📝</div>
+          <div class="po-top-ico"><i class="ti ti-file-text" style="font-size:16px;color:var(--t2);"></i></div>
           <div style="flex:1;min-width:0;">
             <div class="po-top-title">Helios · Documentación de PO</div>
             <div class="po-top-sub">PO-2026-05-1834 · 02:47</div>
@@ -1929,7 +1907,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- Cliente section -->
       <div class="ps">
         <div class="ps-head">
-          <div class="ps-head-ico">👤</div>
+          <div class="ps-head-ico"><i class="ti ti-user" aria-hidden="true"></i></div>
           <div class="ps-head-lbl">Cliente</div>
           <div class="ps-head-ratio" id="r-cliente">0 / 5</div>
         </div>
@@ -1953,7 +1931,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
               </div>
             </div>
             <div class="fld-tog" onclick="togWa(this)" data-key="whatsapp">
-              <span class="fld-tog-lbl"><span class="fld-tog-ico">💬</span>WhatsApp</span>
+              <span class="fld-tog-lbl">WhatsApp</span>
               <div class="tog-switch"></div>
             </div>
           </div>
@@ -1974,7 +1952,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- Vehículo section -->
       <div class="ps">
         <div class="ps-head">
-          <div class="ps-head-ico">🚗</div>
+          <div class="ps-head-ico"><i class="ti ti-car" aria-hidden="true"></i></div>
           <div class="ps-head-lbl">Vehículo</div>
           <div class="ps-head-ratio" id="r-vehiculo">0 / 7</div>
         </div>
@@ -2017,7 +1995,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- Ubicación section -->
       <div class="ps" id="ps-ubicacion">
         <div class="ps-head">
-          <div class="ps-head-ico">📍</div>
+          <div class="ps-head-ico"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
           <div class="ps-head-lbl">Ubicación</div>
           <div class="ps-head-ratio" id="r-ubicacion">0 / 1</div>
         </div>
@@ -2048,7 +2026,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- Servicio section -->
       <div class="ps">
         <div class="ps-head">
-          <div class="ps-head-ico">🔧</div>
+          <div class="ps-head-ico"><i class="ti ti-tool" aria-hidden="true"></i></div>
           <div class="ps-head-lbl">Servicio</div>
           <div class="ps-head-ratio" id="r-servicio">0 / 4</div>
         </div>
@@ -2060,9 +2038,9 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
           <div>
             <div class="fld-lbl" style="margin-bottom:6px;padding:0 2px;">Prioridad</div>
             <div class="tpills">
-              <button class="tp-pill r" onclick="togPill(this)"><span class="tp-pill-ico">🚨</span>Emergency</button>
-              <button class="tp-pill v" onclick="togPill(this)"><span class="tp-pill-ico">⭐</span>VIP</button>
-              <button class="tp-pill g" onclick="togPill(this)"><span class="tp-pill-ico">⚡</span>EV</button>
+              <button class="tp-pill r" onclick="togPill(this)">Emergency</button>
+              <button class="tp-pill v" onclick="togPill(this)">VIP</button>
+              <button class="tp-pill g" onclick="togPill(this)">EV</button>
             </div>
           </div>
           <div class="ps-grid-2">
@@ -2093,7 +2071,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   <!-- CENTER — Transcript -->
   <main class="col-c">
     <div class="tp-hd">
-      <span class="tp-lbl">🎙 Transcripción en tiempo real</span>
+      <span class="tp-lbl">Transcripción en tiempo real</span>
       <div style="display:flex;align-items:center;gap:10px;">
         <div id="timer-row" style="display:none;align-items:center;gap:5px;">
           <div class="td-dot" id="t-dot"></div>
@@ -2112,7 +2090,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
     </div>
 
     <div class="agent-strip">
-      <div class="as-av">👤</div>
+      <div class="as-av" id="ag-av-ico" style="font-size:12px;font-weight:500;color:var(--t2);">—</div>
       <div class="as-info">
         <div class="as-name" id="ag-name">Agente Activo</div>
         <div class="as-shift">T. 08:00–16:00</div>
@@ -2121,7 +2099,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div class="as-goal">
         <span class="as-gn" id="ag-done">0</span>
         <span class="as-gd">/<span id="ag-goal">20</span></span>
-        <span id="ag-star" class="as-star">⭐</span>
+        <span id="ag-star" class="as-star" style="display:none;"></span>
         <div class="as-bar-wrap">
           <div class="as-bar-lbl">Meta del día</div>
           <div class="as-bar-bg"><div class="as-bar-fill" id="ag-bar" style="width:0%"></div></div>
@@ -2147,12 +2125,12 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- Service detected -->
       <div class="ctx-card">
         <div class="ctx-head">
-          <span class="ctx-head-ico" style="background:var(--am2);">🔧</span>
+          <i class="ti ti-tool ctx-head-ico" aria-hidden="true"></i>
           <span class="ctx-head-lbl">Servicio detectado</span>
           <span class="ctx-head-conf">Alta</span>
         </div>
         <div class="svc-detected" id="svc-detected">
-          <div class="svc-ico"><span id="svc-ico">🔧</span></div>
+          <div class="svc-ico"><i class="ti ti-tool" id="svc-ico" aria-hidden="true"></i></div>
           <div style="flex:1;min-width:0;">
             <div class="svc-nm" id="svc-name">—</div>
             <div class="svc-ht" id="svc-hint">—</div>
@@ -2169,7 +2147,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- Sentiment -->
       <div class="ctx-card">
         <div class="ctx-head">
-          <span class="ctx-head-ico">💭</span>
+          <i class="ti ti-mood-smile ctx-head-ico" aria-hidden="true"></i>
           <span class="ctx-head-lbl">Análisis de sentimiento</span>
         </div>
         <div class="sent-body">
@@ -2192,7 +2170,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <!-- KAI guidance -->
       <div class="ctx-card">
         <div class="ctx-head">
-          <span class="ctx-head-ico" style="background:var(--pu2);">🧠</span>
+          <i class="ti ti-list-check ctx-head-ico" aria-hidden="true"></i>
           <span class="ctx-head-lbl">KAI · Recomendaciones</span>
         </div>
         <!-- KAI insight desde LLM -->
@@ -2335,14 +2313,14 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 <div id="po-drawer-ov" onclick="if(event.target===this)closeDrawer()">
   <div id="po-drawer">
     <div class="pdh">
-      <span style="font-size:14px">📋</span>
+      <i class="ti ti-history" style="font-size:15px;color:var(--t2);" aria-hidden="true"></i>
       <span class="pdh-title">Historial de POs</span>
       <span class="pdh-count" id="pdh-count">0 POs</span>
       <button class="pdh-close" onclick="closeDrawer()" title="Cerrar">✕</button>
     </div>
     <div class="pd-list" id="pd-list">
       <div class="pd-empty">
-        <div class="pd-empty-o">📋</div>
+        <div class="pd-empty-o"><i class="ti ti-clipboard-list" style="font-size:26px;color:var(--t3);" aria-hidden="true"></i></div>
         <div class="pd-empty-t">No hay POs aún</div>
         <div class="pd-empty-h">Los POs que creés durante el turno aparecerán aquí con su detalle completo.</div>
       </div>
