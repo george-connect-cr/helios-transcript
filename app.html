@@ -1837,6 +1837,140 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   0%,100%{ height:3px; opacity:.5; }
   50%{     height:14px; opacity:1; }
 }
+
+/* Confidence dots */
+.conf-dots { display:flex;align-items:center;gap:3px; }
+.conf-dot-item {
+  width:6px;height:6px;border-radius:50%;
+  background:var(--c3);transition:background .3s;
+}
+.conf-dots.hi .conf-dot-item { background:var(--g); }
+.conf-dots.md .conf-dot-item:nth-child(-n+2) { background:var(--y); }
+.conf-dots.lo .conf-dot-item:nth-child(1) { background:var(--r); }
+
+/* Emoji de sentimiento con fill de color */
+.sent-emo-wrap {
+  position:relative;width:28px;height:28px;flex-shrink:0;
+}
+.sent-emo-base {
+  position:absolute;inset:0;
+  font-size:22px;line-height:28px;text-align:center;
+  filter:grayscale(1);opacity:.4;
+}
+.sent-emo-color {
+  position:absolute;inset:0;
+  font-size:22px;line-height:28px;text-align:center;
+  clip-path:inset(100% 0 0 0);
+  transition:clip-path .8s cubic-bezier(.4,0,.2,1);
+}
+.sent-emo-wrap.fill-0  .sent-emo-color { clip-path:inset(100% 0 0 0); }
+.sent-emo-wrap.fill-25 .sent-emo-color { clip-path:inset(75% 0 0 0); }
+.sent-emo-wrap.fill-50 .sent-emo-color { clip-path:inset(50% 0 0 0); }
+.sent-emo-wrap.fill-75 .sent-emo-color { clip-path:inset(25% 0 0 0); }
+.sent-emo-wrap.fill-100 .sent-emo-color { clip-path:inset(0% 0 0 0); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE MOBILE — breakpoint 768px
+   Estrategia: col-l arriba (PO), col-c centro (transcript),
+   col-r abajo (KAI cards). Nav colapsa. Sin pérdida de funcionalidad.
+   ══════════════════════════════════════════ */
+@media (max-width:768px) {
+
+  /* Nav — compacto */
+  nav { height:46px; padding:0 12px; gap:6px; }
+  .n-brand { margin-right:8px; }
+  .n-brand > div > span:first-child { font-size:13px; }
+  .n-brand > div > div { display:none; } /* ocultar subtítulo */
+  .n-r { gap:4px; }
+  .n-dash, .qbtn, .n-demo { height:28px; }
+  .qbtn { padding:0 8px; }
+  .n-demo { display:none; } /* ocultar Demo en mobile */
+  #status-wrap > button { padding:0 8px; height:28px; }
+  #status-label { display:none !important; } /* solo el dot en mobile */
+
+  /* Layout — vertical en lugar de 3 columnas */
+  .body {
+    flex-direction:column;
+    height:auto;
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+
+  /* Col-l — ancho completo, altura fija con scroll */
+  .col-l {
+    width:100% !important;
+    min-width:100% !important;
+    border-right:none;
+    border-bottom:1px solid var(--gb2);
+    max-height:50vh;
+    overflow-y:auto;
+    flex-shrink:0;
+  }
+
+  /* Col-c — ancho completo, transcript más compacto */
+  .col-c {
+    width:100% !important;
+    min-height:40vh;
+    flex-shrink:0;
+    border-right:none;
+    border-bottom:1px solid var(--gb2);
+  }
+  .tp-body { padding:12px 16px 8px; }
+  .tp-hd { padding:0 12px; height:38px; }
+
+  /* Agent bar — más compacto */
+  .as-bar { padding:6px 12px; height:auto; flex-wrap:wrap; gap:6px; }
+  .as-kpis { gap:10px; }
+  .as-kv { font-size:11px; }
+
+  /* Col-r — ancho completo, cards en grid 2 columnas */
+  .col-r {
+    width:100% !important;
+    min-width:100% !important;
+    flex-direction:column;
+    padding:10px 12px;
+    gap:8px;
+  }
+  .ctx-scroll {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  /* Análisis de calidad ocupa el ancho completo */
+  #calidad-card { grid-column:1 / -1; }
+
+  /* PO — campos más compactos */
+  .ps-body { padding:6px 10px 8px; gap:6px; }
+  .fld-in { font-size:11px; }
+  .po-scroll { padding:8px 10px; gap:5px; }
+  .po-cta-bar { padding:8px 10px; }
+
+  /* Ocultar po-tools en mobile */
+  .po-tools { display:none !important; }
+
+  /* Burbujas transcript — más compactas */
+  .bubble { padding:7px 10px; font-size:12px; max-width:90%; }
+
+  /* Status menu — posición fija */
+  #status-menu { right:auto; left:0; }
+
+  /* Profile menu */
+  .profile-menu { right:0; width:240px; }
+
+  /* Mapas — más pequeños */
+  .map-mini { height:100px !important; }
+
+  /* Wizard — fullscreen en mobile */
+  .kai-wizard { width:96vw; margin:0 auto; }
+}
+
+/* Breakpoint muy pequeño — 480px */
+@media (max-width:480px) {
+  .ctx-scroll { grid-template-columns:1fr; }
+  #calidad-card { grid-column:1; }
+  .as-kpis { display:none; } /* ocultar KPIs en pantallas muy pequeñas */
+  nav { padding:0 8px; }
+}
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -2169,7 +2303,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         <div class="ctx-head">
           <i class="ti ti-tool ctx-head-ico" aria-hidden="true"></i>
           <span class="ctx-head-lbl">Servicio detectado</span>
-          <span class="ctx-head-conf">Alta</span>
+          <div class="conf-dots hi" id="conf-dots"><div class="conf-dot-item"></div><div class="conf-dot-item"></div><div class="conf-dot-item"></div></div>
         </div>
         <div class="svc-detected" id="svc-detected">
           <div class="svc-ico"><i class="ti ti-tool" id="svc-ico" aria-hidden="true"></i></div>
@@ -2179,41 +2313,17 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
           </div>
         </div>
         <div class="svc-conf-row">
-          <div class="svc-conf-dot"></div>
           <span class="svc-conf-lbl">Confianza</span>
           <div class="svc-conf-bar"><div class="svc-conf-fill" id="svc-conf-fill" style="width:80%"></div></div>
-          <span class="svc-conf-pct" id="svc-conf">Alta</span>
         </div>
       </div>
 
-      <!-- Sentiment -->
-      <div class="ctx-card">
+      <!-- Análisis de calidad — checklist de protocolo -->
+      <div class="ctx-card" id="calidad-card">
         <div class="ctx-head">
-          <i class="ti ti-mood-smile ctx-head-ico" aria-hidden="true"></i>
-          <span class="ctx-head-lbl">Análisis de sentimiento</span>
-        </div>
-        <div class="sent-body">
-          <div class="sent-row">
-            <span class="sent-emo" id="sent-emoji">😐</span>
-            <div class="sent-info">
-              <div class="sent-lbl" id="sentiment-label">Neutro</div>
-              <div class="sent-sub" id="sentiment-sub">Sin tensión detectada</div>
-            </div>
-            <span class="sent-pct" id="sent-pct"></span>
-          </div>
-          <div class="sent-track"><div class="sent-fill" id="sentiment-fill" style="width:50%"></div></div>
-          <div class="sent-scale">
-            <span>😠 Negativo</span>
-            <span>Positivo 😄</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- KAI guidance -->
-      <div class="ctx-card">
-        <div class="ctx-head">
-          <i class="ti ti-list-check ctx-head-ico" aria-hidden="true"></i>
-          <span class="ctx-head-lbl">KAI · Recomendaciones</span>
+          <i class="ti ti-clipboard-check ctx-head-ico" aria-hidden="true"></i>
+          <span class="ctx-head-lbl">Análisis de calidad</span>
+          <div id="kai-chk-progress-bar-badge" style="display:none;font-size:10px;color:var(--t2);"></div>
         </div>
         <!-- KAI insight desde LLM -->
         <div class="kai-insight" id="kai-insight-card">
@@ -2222,8 +2332,8 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         </div>
         <!-- Checklist de protocolo -->
         <div class="kai-checklist" id="kai-checklist">
-          <div style="font-size:10px;color:var(--t2);padding:8px 4px;font-family:var(--f);">
-            Protocolo cargará al detectar el tipo de servicio
+          <div style="font-size:10px;color:var(--t2);padding:10px 11px;font-family:var(--f);">
+            El checklist cargará al detectar el tipo de servicio
           </div>
         </div>
         <div id="kai-chk-progress-bar" class="kai-chk-progress" style="display:none">
@@ -2240,9 +2350,30 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         </div>
       </div>
 
-      <!-- Checklist & inline recs removed:
-           - Speech compliance now runs silently and surfaces as a suggestion popup if a step is missing
-           - Recommendations are emergent popups (see .rec-popup-stack below body) -->
+      <!-- Análisis de sentimiento -->
+      <div class="ctx-card">
+        <div class="ctx-head">
+          <i class="ti ti-mood-smile ctx-head-ico" aria-hidden="true"></i>
+          <span class="ctx-head-lbl">Análisis de sentimiento</span>
+        </div>
+        <div class="sent-body">
+          <div class="sent-row">
+            <div class="sent-emo-wrap fill-0" id="sent-emo-wrap">
+              <span class="sent-emo-base" id="sent-emoji-base">😐</span>
+              <span class="sent-emo-color" id="sent-emoji-color">😐</span>
+            </div>
+            <div class="sent-info">
+              <div class="sent-lbl" id="sentiment-label">Neutro</div>
+              <div class="sent-sub" id="sentiment-sub">Sin tensión detectada</div>
+            </div>
+          </div>
+          <div class="sent-track"><div class="sent-fill" id="sentiment-fill" style="width:0%"></div></div>
+          <div class="sent-scale">
+            <span>Negativo</span>
+            <span>Positivo</span>
+          </div>
+        </div>
+      </div>
 
     </div>
   </aside>
@@ -2902,10 +3033,14 @@ function renderSentiment(sent){
      '1':{ emoji:'😊', label:'Satisfecho', color:'#22c55e', pct:88, gradient:'linear-gradient(90deg,#22c55e,#4ade80)' },
   };
   const c = cfg[String(v)] || cfg['0'];
-  const emoji = document.getElementById('sent-emoji');
-  emoji.textContent = c.emoji;
-  emoji.style.animation = 'none';
-  requestAnimationFrame(()=>{ emoji.style.animation=''; });
+  var wrap = document.getElementById('sent-emo-wrap');
+  var base = document.getElementById('sent-emoji-base');
+  var colored = document.getElementById('sent-emoji-color');
+  if(base) base.textContent = c.emoji;
+  if(colored) colored.textContent = c.emoji;
+  // Fill de abajo hacia arriba según el nivel
+  var fillMap = {'-1':'fill-25', '0':'fill-50', '1':'fill-100'};
+  if(wrap) wrap.className = 'sent-emo-wrap ' + (fillMap[String(v)]||'fill-50');
   const lbl = document.getElementById('sentiment-label');
   lbl.textContent = c.label;
   lbl.style.color = c.color;
@@ -3581,11 +3716,15 @@ function _clearSession() {
   _isGrua = false;
   if (typeof clearMaps === 'function') clearMaps();
   // Reset sentimiento
-  var emoji = document.getElementById('sent-emoji');
   var label = document.getElementById('sentiment-label');
   var sub = document.getElementById('sentiment-sub');
   var fill = document.getElementById('sentiment-fill');
-  if (emoji) emoji.textContent = '😐';
+  var wrap = document.getElementById('sent-emo-wrap');
+  var base = document.getElementById('sent-emoji-base');
+  var colored = document.getElementById('sent-emoji-color');
+  if(wrap) wrap.className = 'sent-emo-wrap fill-0';
+  if(base) base.textContent = '😐';
+  if(colored) colored.textContent = '😐';
   if (label) { label.textContent = 'Neutro'; label.style.color = ''; }
   if (sub) sub.textContent = 'Sin tensión detectada';
   if (fill) { fill.style.width = '50%'; fill.style.background = 'var(--y)'; }
@@ -3785,11 +3924,14 @@ function _runDemoScenario(n) {
     var svcHt  = document.getElementById('svc-hint');
     var svcFill= document.getElementById('svc-conf-fill');
     var svcLbl = document.getElementById('svc-conf');
-    if(svcIco) svcIco.textContent = sc.serviceId==='bat'?'🔋':'🚛';
+    if(svcIco){
+      svcIco.className=sc.serviceId==='bat'?'ti ti-bolt':'ti ti-truck';
+      svcIco.textContent='';
+    }
     if(svcNm)  svcNm.textContent  = sc.serviceName;
     if(svcHt)  svcHt.textContent  = sc.serviceId==='bat'?'Arranque o cambio de batería':'Grúa y remolque';
     if(svcFill)svcFill.style.width='90%';
-    if(svcLbl) svcLbl.textContent ='Alta';
+    var dots=document.getElementById('conf-dots'); if(dots) dots.className='conf-dots hi';
     var caEmpty=document.getElementById('ca-empty');
     if(caEmpty)caEmpty.style.display='none';
   }, 3000);
@@ -3972,13 +4114,13 @@ const FlashPill = (() => {
 
 const ServiceDetector=(()=>{
   const S=[
-    {id:'grua',n:'Grúa / Remolque',i:'🚛',h:'Vehículo varado — necesita remolque',c:'hi',kw:[/grú[a]?/i,/remolque/i,/varad[oa]/i,/no arranca/i,/no enciende/i,/accidente/i,/choc[oó]/i,/atascad[oa]/i]},
-    {id:'bat',n:'Batería descargada',i:'🔋',h:'Arranque o cambio de batería',c:'hi',kw:[/bater[íi]a/i,/no prende/i,/descargada/i,/jump/i,/cables/i]},
-    {id:'llanta',n:'Llanta ponchada',i:'🛞',h:'Cambio de neumático',c:'hi',kw:[/llanta/i,/ponch[ae]/i,/neum[aá]tico/i,/desinflad[oa]/i,/reventó/i]},
-    {id:'gas',n:'Sin combustible',i:'⛽',h:'Suministro de gasolina o diesel',c:'hi',kw:[/gasolina/i,/combustible/i,/tanque vac[íi]o/i]},
-    {id:'llaves',n:'Apertura de vehículo',i:'🔑',h:'Llaves perdidas o encerradas',c:'hi',kw:[/llaves?/i,/encerr[aá]d[oa]/i,/no puedo abrir/i,/apertura/i]},
-    {id:'mec',n:'Asistencia mecánica',i:'🔧',h:'Falla mecánica en ruta',c:'md',kw:[/falla/i,/humo/i,/recalentad[oa]/i,/frenos?/i,/gotea/i]},
-    {id:'info',n:'Consulta informativa',i:'ℹ️',h:'El cliente solicita información',c:'lo',kw:[/cuánto cuesta/i,/precio/i,/cobertura/i,/póliza/i]},
+    {id:'grua',n:'Grúa / Remolque',i:'',h:'Vehículo varado — necesita remolque',c:'hi',kw:[/grú[a]?/i,/remolque/i,/varad[oa]/i,/no arranca/i,/no enciende/i,/accidente/i,/choc[oó]/i,/atascad[oa]/i]},
+    {id:'bat',n:'Batería descargada',i:'',h:'Arranque o cambio de batería',c:'hi',kw:[/bater[íi]a/i,/no prende/i,/descargada/i,/jump/i,/cables/i]},
+    {id:'llanta',n:'Llanta ponchada',i:'',h:'Cambio de neumático',c:'hi',kw:[/llanta/i,/ponch[ae]/i,/neum[aá]tico/i,/desinflad[oa]/i,/reventó/i]},
+    {id:'gas',n:'Sin combustible',i:'',h:'Suministro de gasolina o diesel',c:'hi',kw:[/gasolina/i,/combustible/i,/tanque vac[íi]o/i]},
+    {id:'llaves',n:'Apertura de vehículo',i:'',h:'Llaves perdidas o encerradas',c:'hi',kw:[/llaves?/i,/encerr[aá]d[oa]/i,/no puedo abrir/i,/apertura/i]},
+    {id:'mec',n:'Asistencia mecánica',i:'',h:'Falla mecánica en ruta',c:'md',kw:[/falla/i,/humo/i,/recalentad[oa]/i,/frenos?/i,/gotea/i]},
+    {id:'info',n:'Consulta informativa',i:'',h:'El cliente solicita información',c:'lo',kw:[/cuánto cuesta/i,/precio/i,/cobertura/i,/póliza/i]},
   ];
   let _det=null,_sc={};
   function analyze(t){
@@ -3998,10 +4140,15 @@ const ServiceDetector=(()=>{
     var conf=document.getElementById('svc-conf');
     var confFill=document.getElementById('svc-conf-fill');
     var caEmpty=document.getElementById('ca-empty');
-    if(ico)ico.textContent=s.i;
+    if(ico){
+      var icoMap={grua:'ti-truck',bat:'ti-bolt',llanta:'ti-circle-dot',gas:'ti-droplet',llaves:'ti-key',mec:'ti-tool',info:'ti-info-circle'};
+      ico.className='ti '+(icoMap[s.id]||'ti-tool');
+      ico.textContent='';
+    }
     if(nm)nm.textContent=s.n;
     if(ht)ht.textContent=s.h;
-    if(conf)conf.textContent={hi:'Alta',md:'Media',lo:'Baja'}[s.c];
+    var dots=document.getElementById('conf-dots');
+    if(dots){dots.className='conf-dots '+s.c;}
     if(confFill)confFill.style.width={hi:'90%',md:'60%',lo:'35%'}[s.c];
     if(caEmpty)caEmpty.style.display='none';
     if(window.lastAnalysis)window.lastAnalysis.tipo_asistencia=s.n;
@@ -4100,13 +4247,13 @@ const POBuilder = (() => {
     color:         {i:'🎨',l:'Color',    req:['grua']},
     ubicación:     {i:'📍',l:'Ubicación',req:['grua','bat','llanta','gas','llaves','mec']},
     ubicacion_destino:{i:'🏁',l:'Ubicación destino',req:['grua'],wide:true},
-    tipo_asistencia:{i:'🔧',l:'Servicio',req:['grua','bat','llanta','gas','llaves','mec']},
+    tipo_asistencia:{i:'',l:'Servicio',req:['grua','bat','llanta','gas','llaves','mec']},
   };
   const SUGS={
     grua:  [{i:'📍',t:'Punto de referencia',q:'¿Puede darme un punto de referencia cercano?'},{i:'🔢',t:'Cédula del cliente',q:'¿Me puede confirmar su número de cédula?'}],
     bat:   [{i:'🔌',t:'¿Intentó arrancar?',q:'¿Ya intentó arrancar el vehículo?'},{i:'📍',t:'¿Vía pública?',q:'¿Está en vía pública o parqueo privado?'}],
-    llanta:[{i:'🛞',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'📍',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
-    gas:   [{i:'⛽',t:'Tipo combustible',q:'¿Su vehículo es gasolina o diesel?'},{i:'📐',t:'Cantidad necesaria',q:'¿Cuántos litros aproximadamente necesita?'}],
+    llanta:[{i:'',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'📍',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
+    gas:   [{i:'',t:'Tipo combustible',q:'¿Su vehículo es gasolina o diesel?'},{i:'📐',t:'Cantidad necesaria',q:'¿Cuántos litros aproximadamente necesita?'}],
     llaves:[{i:'🚪',t:'¿Tiene copia?',q:'¿Tiene una copia de la llave en casa?'},{i:'🔐',t:'¿Llave electrónica?',q:'¿Tiene seguro electrónico o llave convencional?'}],
     mec:   [{i:'💨',t:'¿Sale humo?',q:'¿El vehículo emite humo o hay olores extraños?'},{i:'🌡️',t:'Luz advertencia',q:'¿Vio alguna luz de advertencia encendida?'}],
     info:  [{i:'📄',t:'Número de póliza',q:'¿Me puede proporcionar su número de póliza?'}],
@@ -5112,7 +5259,7 @@ function openPOValidation(){
     if(_nm)data['nombre_cliente']=_nm+(_ap?' '+_ap:'');
   }
   const DEF=[
-    {k:'tipo_asistencia',i:'🔧',l:'Servicio',req:true},
+    {k:'tipo_asistencia',i:'',l:'Servicio',req:true},
     {k:'nombre_cliente', i:'👤',l:'Cliente', req:true},
     {k:'ubicación',      i:'📍',l:'Ubicación',req:true},
     {k:'placa',          i:'🪪',l:'Placa',   req:false},
