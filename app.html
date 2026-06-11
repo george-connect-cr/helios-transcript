@@ -2072,6 +2072,26 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 .ag-kv.y{color:var(--y);}
 .ag-kl{font-size:8px;color:var(--t2);margin-top:1px;}
 
+
+/* Sent icon con pulso de color dinámico */
+.sent-ico-new{
+  position:relative;width:32px;height:32px;border-radius:8px;
+  background:var(--c2);border:0.5px solid var(--gb2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sent-ico-new i{font-size:16px;color:var(--t2);transition:color .4s;}
+.sent-pulse-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--y);
+  animation:sentDotPulse 2s ease-in-out infinite;
+  transition:background .4s;
+}
+@keyframes sentDotPulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:.25;transform:scale(.6);}
+}
+
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -2373,7 +2393,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       </div>
     </div>
 
-    <div class="agent-strip">
+    <div class="agent-strip" style="display:none;">
       <div class="as-av" id="ag-av-ico" style="font-size:12px;font-weight:500;color:var(--t2);">—</div>
       <div class="as-info">
         <div class="as-name" id="ag-name">Agente Activo</div>
@@ -2449,9 +2469,9 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         </div>
         <div class="sent-body">
           <div class="sent-row">
-            <div class="sent-emo-wrap fill-0" id="sent-emo-wrap">
-              <span class="sent-emo-base" id="sent-emoji-base">😐</span>
-              <span class="sent-emo-color" id="sent-emoji-color">😐</span>
+            <div class="sent-ico-new" id="sent-ico-new">
+              <i class="ti ti-minus" id="sent-icon-new"></i>
+              <div class="sent-pulse-dot" id="sent-pulse-dot"></div>
             </div>
             <div class="sent-info">
               <div class="sent-lbl" id="sentiment-label">Neutro</div>
@@ -3165,6 +3185,14 @@ function renderSentiment(sent){
      '1':{ emoji:'😊', label:'Satisfecho', color:'#22c55e', pct:88, gradient:'linear-gradient(90deg,#22c55e,#4ade80)' },
   };
   const c = cfg[String(v)] || cfg['0'];
+  // Actualizar nuevo ícono con pulso
+  var sentIco = document.getElementById('sent-icon-new');
+  var sentPulse = document.getElementById('sent-pulse-dot');
+  if(sentIco){
+    sentIco.className = v===1?'ti ti-mood-happy':v===-1?'ti ti-mood-sad':'ti ti-minus';
+    sentIco.style.color = c.color || 'var(--t2)';
+  }
+  if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
   var wrap = document.getElementById('sent-emo-wrap');
   var base = document.getElementById('sent-emoji-base');
   var colored = document.getElementById('sent-emoji-color');
@@ -3857,6 +3885,14 @@ function _clearSession() {
   var label = document.getElementById('sentiment-label');
   var sub = document.getElementById('sentiment-sub');
   var fill = document.getElementById('sentiment-fill');
+  // Actualizar nuevo ícono con pulso
+  var sentIco = document.getElementById('sent-icon-new');
+  var sentPulse = document.getElementById('sent-pulse-dot');
+  if(sentIco){
+    sentIco.className = v===1?'ti ti-mood-happy':v===-1?'ti ti-mood-sad':'ti ti-minus';
+    sentIco.style.color = c.color || 'var(--t2)';
+  }
+  if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
   var wrap = document.getElementById('sent-emo-wrap');
   var base = document.getElementById('sent-emoji-base');
   var colored = document.getElementById('sent-emoji-color');
@@ -5847,7 +5883,7 @@ function setStatus(id,color,label,icon){
   }
 }
 
-var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
+var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'llamada_practica',label:'Llamada práctica',color:'#0ea5e9',key:false,icon:'🎙️'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
 var _curStatus='coaching_p';
 var _lastTranscriptText='';
 function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;m.innerHTML='';var s1=document.createElement('div');s1.className='status-sec';s1.textContent='Estado';m.appendChild(s1);PAUSAS.filter(function(p){return p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});var sep=document.createElement('div');sep.className='status-sep';m.appendChild(sep);var s2=document.createElement('div');s2.className='status-sec';s2.textContent='Pausas';m.appendChild(s2);PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});}
