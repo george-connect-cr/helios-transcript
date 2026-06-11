@@ -2079,7 +2079,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   background:var(--c2);border:0.5px solid var(--gb2);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.sent-ico-new i{font-size:16px;color:#8a8a85;transition:color .4s;display:block;}
+.sent-ico-new i{font-size:18px;color:#8a8a85;transition:color .4s;}
 .sent-pulse-dot{
   position:absolute;top:-3px;right:-3px;
   width:8px;height:8px;border-radius:50%;
@@ -2470,7 +2470,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         <div class="sent-body">
           <div class="sent-row">
             <div class="sent-ico-new" id="sent-ico-new">
-              <i class="ti ti-minus" id="sent-icon-new"></i>
+              <i class="ti ti-mood-neutral" id="sent-icon-new"></i>
               <div class="sent-pulse-dot" id="sent-pulse-dot"></div>
             </div>
             <div class="sent-info">
@@ -3189,7 +3189,7 @@ function renderSentiment(sent){
   var sentIco = document.getElementById('sent-icon-new');
   var sentPulse = document.getElementById('sent-pulse-dot');
   if(sentIco){
-    sentIco.className = v===1?'ti ti-mood-happy':v===-1?'ti ti-mood-sad':'ti ti-minus';
+    sentIco.className = v===1?'ti ti-mood-happy':v===-1?'ti ti-mood-sad':'ti ti-mood-neutral';
     sentIco.style.color = c.color || 'var(--t2)';
   }
   if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
@@ -3889,7 +3889,7 @@ function _clearSession() {
   var sentIco = document.getElementById('sent-icon-new');
   var sentPulse = document.getElementById('sent-pulse-dot');
   if(sentIco){
-    sentIco.className = v===1?'ti ti-mood-happy':v===-1?'ti ti-mood-sad':'ti ti-minus';
+    sentIco.className = v===1?'ti ti-mood-happy':v===-1?'ti ti-mood-sad':'ti ti-mood-neutral';
     sentIco.style.color = c.color || 'var(--t2)';
   }
   if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
