@@ -23,10 +23,23 @@ jobs:
 
       - name: Merge a main
         run: |
-          git fetch origin main
+          git fetch origin
+
+          # Verificar si hay diferencias entre este branch y main
+          DIFF=$(git diff origin/main origin/${{ github.ref_name }} --name-only)
+          if [ -z "$DIFF" ]; then
+            echo "No hay cambios nuevos respecto a main. Nada que mergear."
+            exit 0
+          fi
+
           git checkout main
+
+          # Merge: en conflictos, gana el branch que hizo push
           git merge origin/${{ github.ref_name }} \
             --no-ff \
             -X theirs \
-            -m "deploy: ${{ github.ref_name }} → main | ${{ github.event.head_commit.message }}"
+            -m "deploy(${{ github.ref_name }}): ${{ github.event.head_commit.message }}"
+
           git push origin main
+
+          echo "✅ Deploy completado: ${{ github.ref_name }} → main"
