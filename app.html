@@ -2059,6 +2059,19 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 .ctx-scroll{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding:10px 10px;min-height:0;}
 .ctx-scroll::-webkit-scrollbar{width:0;}
 
+
+/* Agent mini en col-r */
+.agent-mini{display:flex;align-items:center;gap:10px;padding:9px 13px;}
+.ag-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#5b8bff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:600;flex-shrink:0;}
+.ag-timer{font-size:14px;font-weight:600;color:var(--t0);font-variant-numeric:tabular-nums;letter-spacing:-.3px;line-height:1;}
+.ag-timer-lbl{font-size:8.5px;color:var(--t2);margin-top:1px;}
+.ag-kpis{display:flex;gap:10px;margin-left:auto;}
+.ag-kpi{text-align:right;}
+.ag-kv{font-size:12px;font-weight:600;color:var(--t0);line-height:1;}
+.ag-kv.g{color:var(--g);}
+.ag-kv.y{color:var(--y);}
+.ag-kl{font-size:8px;color:var(--t2);margin-top:1px;}
+
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -2086,7 +2099,6 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
     </div>
     <button class="n-dash" onclick="openDash()" title="Reportes & Analytics"><i class="ti ti-chart-bar" style="font-size:14px;" aria-hidden="true"></i></button>
     <div class="q-wrap">
-      <button class="qbtn" onclick="toggleQueue()" title="Cola">Cola <span class="qn" id="q-cnt">4</span></button>
       <div id="q-menu" class="q-menu"></div>
     </div>
     <button class="n-demo" onclick="triggerDemo()">Demo</button>
@@ -2392,6 +2404,22 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 
       <!-- Emergent rec popups -->
       <div class="rec-popup-stack" id="rec-popup-stack"></div>
+
+      <!-- 0. Agent mini — avatar + timer + KPIs -->
+      <div class="ctx-card" style="flex-shrink:0;">
+        <div class="agent-mini">
+          <div class="ag-av" id="ag-av-ico-r">—</div>
+          <div>
+            <div class="ag-timer" id="ag-timer-r">0:00</div>
+            <div class="ag-timer-lbl">Duración</div>
+          </div>
+          <div class="ag-kpis">
+            <div class="ag-kpi"><div class="ag-kv g" id="ag-sat-r">—</div><div class="ag-kl">Satisfac.</div></div>
+            <div class="ag-kpi"><div class="ag-kv" id="ag-fcr-r">—</div><div class="ag-kl">Protocolo</div></div>
+            <div class="ag-kpi"><div class="ag-kv" id="ag-goal-r">0<span style="font-size:9px;font-weight:400;color:var(--t2)">/20</span></div><div class="ag-kl">Meta</div></div>
+          </div>
+        </div>
+      </div>
 
       <!-- 1. Servicio detectado -->
       <div class="ctx-card" style="flex-shrink:0;">
@@ -5582,46 +5610,129 @@ function _dismissKBPill(itemId){
   setTimeout(()=>el.remove(), 850);
 }
 
+// ── Guía de llamada — renderizado en col-r ───────────────────────────
+var _guiaProto=[], _guiaQual=[];
+
+function _makeGuiaItem(txt, tag, isAuto, section, idx){
+  var el = document.createElement('div');
+  el.className = 'g-item';
+  el.dataset.section = section;
+  el.dataset.idx = idx;
+  el.innerHTML =
+    '<div class="g-box"><i class="ti ti-check" style="font-size:8px;color:transparent;"></i></div>'+
+    '<span class="g-txt">'+txt+'</span>'+
+    '<span class="g-tag'+(isAuto?' auto':'')+'">'+tag+'</span>';
+  el.addEventListener('click', function(){ _toggleGuiaItem(el, section, idx); });
+  return el;
+}
+
+function _toggleGuiaItem(el, section, idx){
+  el.classList.toggle('done');
+  var ico = el.querySelector('.g-box i');
+  if(ico) ico.style.color = el.classList.contains('done') ? 'var(--g)' : 'transparent';
+  if(section==='proto') _guiaProto[idx] = el.classList.contains('done');
+  else _guiaQual[idx]  = el.classList.contains('done');
+  _reorderGuia();
+  _updateGuiaScores();
+}
+
+function _reorderGuia(){
+  var body = document.getElementById('guia-body');
+  if(!body) return;
+  var items = Array.from(body.querySelectorAll('.g-item'));
+  var pending = items.filter(function(i){return !i.classList.contains('done');});
+  var done    = items.filter(function(i){return  i.classList.contains('done');});
+  // Limpiar etiquetas de sección previas
+  body.querySelectorAll('.guia-sec-lbl').forEach(function(l){l.remove();});
+  // Reinsertar con etiquetas
+  if(pending.length){
+    var lp=document.createElement('div');
+    lp.className='guia-sec-lbl';
+    lp.innerHTML='<span>Pendiente</span><em>'+pending.length+'</em>';
+    body.insertBefore(lp, body.firstChild);
+    pending.forEach(function(i){body.appendChild(i);});
+  }
+  if(done.length){
+    var ld=document.createElement('div');
+    ld.className='guia-sec-lbl done-lbl';
+    ld.innerHTML='<span>Completado</span><em>'+done.length+'</em>';
+    body.appendChild(ld);
+    done.forEach(function(i){body.appendChild(i);});
+  }
+}
+
+function _updateGuiaScores(){
+  var pd=_guiaProto.filter(Boolean).length, pt=_guiaProto.length;
+  var qd=_guiaQual.filter(Boolean).length,  qt=_guiaQual.length;
+  var ps=document.getElementById('guia-proto-score');
+  var qs=document.getElementById('guia-qual-score');
+  if(ps) ps.textContent=pd+'/'+pt;
+  if(qs) qs.textContent=qd+'/'+qt;
+  // también actualizar el indicador de protocolo en agent-strip
+  var fcr=document.getElementById('ag-fcr');
+  if(fcr&&pt>0) fcr.textContent=Math.round(pd/pt*100)+'%';
+  var fcrr=document.getElementById('ag-fcr-r');
+  if(fcrr&&pt>0) fcrr.textContent=Math.round(pd/pt*100)+'%';
+}
+
 function renderKBSugs(sugs) {
-  var cl = document.getElementById('kai-checklist');
-  if (!cl) return;
+  var empty = document.getElementById('guia-empty');
+  if(empty) empty.style.display='none';
+  var body = document.getElementById('guia-body');
+  if(!body) return;
+  // Limpiar ítems de protocolo previos
+  body.querySelectorAll('.g-item[data-section="proto"]').forEach(function(i){i.remove();});
+  body.querySelectorAll('.guia-sec-lbl').forEach(function(l){l.remove();});
   if (!sugs || sugs.length === 0) {
-    cl.innerHTML = '<div style="font-size:10px;color:var(--t2);padding:10px 13px;font-family:var(--f);">Sin protocolo definido para este servicio.</div>';
-    var pb = document.getElementById('kai-chk-progress-bar');
-    if (pb) pb.style.display = 'none';
+    if(empty){empty.style.display='';empty.textContent='Sin protocolo definido para este servicio.';}
     return;
   }
-  cl.innerHTML = sugs.map(function(s, i) {
-    return '<div class="kai-check-item" id="kc-' + i + '" onclick="toggleCheckItem(this)">' +
-      '<div class="kai-check-box"></div>' +
-      '<span class="kai-check-txt">' + s + '</span>' +
-      '<span class="kai-check-num">' + (i+1) + '</span>' +
-    '</div>';
-  }).join('');
-  var pb = document.getElementById('kai-chk-progress-bar');
-  if (pb) pb.style.display = 'flex';
-  _updateCheckProgress();
+  _guiaProto = sugs.map(function(){return false;});
+  sugs.forEach(function(s, i){
+    var el = _makeGuiaItem(s, 'P'+(i+1), false, 'proto', i);
+    body.appendChild(el);
+  });
+  _reorderGuia();
+  _updateGuiaScores();
+}
+
+function renderKBQual(items) {
+  // Renderizar ítems de calidad en el guia-list
+  var body = document.getElementById('guia-body');
+  if(!body) return;
+  body.querySelectorAll('.g-item[data-section="qual"]').forEach(function(i){i.remove();});
+  if(!items||!items.length) return;
+  _guiaQual = items.map(function(){return false;});
+  items.forEach(function(s, i){
+    var txt = typeof s==='string' ? s : s.label || s;
+    var el = _makeGuiaItem(txt, 'auto', true, 'qual', i);
+    body.appendChild(el);
+  });
+  _reorderGuia();
+  _updateGuiaScores();
 }
 
 function toggleCheckItem(el) {
-  el.classList.toggle('done');
-  var box = el.querySelector('.kai-check-box');
-  if (box) box.textContent = el.classList.contains('done') ? '✓' : '';
-  _updateCheckProgress();
+  // Legacy — redirige al nuevo sistema
+  var idx = parseInt(el.id.replace('kc-',''));
+  _toggleGuiaItem(el, 'proto', idx);
 }
 
 function _updateCheckProgress() {
-  var items = document.querySelectorAll('#kai-checklist .kai-check-item');
-  var done = document.querySelectorAll('#kai-checklist .kai-check-item.done').length;
-  var total = items.length;
-  if (!total) return;
-  var pct = Math.round(done / total * 100);
-  var fill = document.getElementById('kai-chk-fill');
-  var lbl = document.getElementById('kai-chk-lbl');
-  var badge = document.querySelector('.ctx-card:last-child .ctx-head-conf');
-  if (fill) fill.style.width = pct + '%';
-  if (lbl) lbl.textContent = done + ' / ' + total + ' completados';
-  if (badge) badge.textContent = done + ' / ' + total;
+  _updateGuiaScores();
+}
+
+// Marcar automáticamente un ítem del checklist desde la transcripción
+function autoCheckItem(keyword) {
+  var items = document.querySelectorAll('.g-item[data-section="proto"]');
+  items.forEach(function(item) {
+    var txt = item.querySelector('.g-txt');
+    if (txt && txt.textContent.toLowerCase().includes(keyword.toLowerCase())) {
+      if (!item.classList.contains('done')) {
+        _toggleGuiaItem(item, 'proto', parseInt(item.dataset.idx));
+      }
+    }
+  });
 }
 
 // Marcar automáticamente un ítem del checklist desde la transcripción
@@ -6071,6 +6182,24 @@ function setWave(state) {
 // ── Aliases para compatibilidad HTML de Dayana ──
 function openDash(){ if(typeof openDashboard==='function') openDashboard(); }
 function closeDash(){ if(typeof closeDashboard==='function') closeDashboard(); }
+
+// Sync agent mini en col-r con los datos del agent-strip
+function _syncAgentMini(){
+  var nm=document.getElementById('ag-name');
+  var av=document.getElementById('ag-av-ico-r');
+  if(nm&&av&&nm.textContent&&nm.textContent!=='Agente Activo'){
+    av.textContent=nm.textContent.trim()[0].toUpperCase();
+  }
+  var sat=document.getElementById('ag-sat');
+  var satr=document.getElementById('ag-sat-r');
+  if(sat&&satr) satr.textContent=sat.textContent;
+  var done=document.getElementById('ag-done');
+  var goalr=document.getElementById('ag-goal-r');
+  var goal=document.getElementById('ag-goal');
+  if(done&&goal&&goalr) goalr.innerHTML=done.textContent+'<span style="font-size:9px;font-weight:400;color:var(--t2)">/'+(goal.textContent||'20')+'</span>';
+}
+setInterval(_syncAgentMini, 3000);
+
 </script>
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t0);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;"></div>
 
