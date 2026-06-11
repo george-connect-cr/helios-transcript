@@ -2510,12 +2510,9 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         </div>
         <div class="sent-body">
           <div class="sent-row">
-            <div id="sent-ico-new" style="position:relative;width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.06);">
-              <div id="sent-icon-new" style="width:22px;height:22px;border-radius:50%;border:2px solid #555;position:relative;flex-shrink:0;">
-                <div id="sf-eyes" style="position:absolute;top:5px;left:4px;width:3px;height:3px;border-radius:50%;background:#555;box-shadow:6px 0 0 #555;"></div>
-                <div id="sf-mouth" style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:8px;height:2px;background:#555;border-radius:2px;"></div>
-              </div>
-              <div id="sent-pulse-dot" style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#e8a020;border:1.5px solid #fff;animation:sentDotPulse 2s ease-in-out infinite;"></div>
+            <div id="sent-ico-new" style="position:relative;width:36px;height:36px;border-radius:10px;background:#f5f5f4;border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <span id="sent-icon-new" style="font-size:20px;filter:grayscale(1) contrast(0.7);line-height:1;display:block;">😐</span>
+              <div id="sent-pulse-dot" style="position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:#e8a020;border:1.5px solid #fff;animation:sentDotPulse 2s ease-in-out infinite;z-index:1;"></div>
             </div>
             <div class="sent-info">
               <div class="sent-lbl" id="sentiment-label">Neutro</div>
@@ -3233,13 +3230,8 @@ function renderSentiment(sent){
   var sentIco = document.getElementById('sent-icon-new');
   var sentPulse = document.getElementById('sent-pulse-dot');
   if(sentIco){
-    var sc = c.color || '#8a8a85';
-    sentIco.className = v===1?'sent-face happy':v===-1?'sent-face sad':'sent-face';
-    sentIco.style.borderColor = sc;
-    var eyes = document.getElementById('sf-eyes');
-    var mouth = document.getElementById('sf-mouth');
-    if(eyes){ eyes.style.background=sc; eyes.style.boxShadow='5px 0 0 '+sc; }
-    if(mouth){ mouth.style.background=sc; mouth.style.borderColor=sc; }
+    sentIco.textContent = v===1?'😊':v===-1?'😟':'😐';
+    sentIco.style.filter = 'grayscale(1) contrast(0.7)';
   }
   if(sentPulse){ sentPulse.style.background = c.color || 'var(--y)'; }
   var wrap = document.getElementById('sent-emo-wrap');
