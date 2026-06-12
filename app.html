@@ -4109,6 +4109,10 @@ function _startDemoMode() {
     label: lblEl ? lblEl.textContent : 'Coaching'
   };
   setWave('idle'); setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+  // Pre-cargar items de calidad en la guía
+  if(typeof renderKBQual==='function' && typeof QUALITY_MATRIX!=='undefined'){
+    renderKBQual(QUALITY_MATRIX.map(function(q){return q.descripcion;}));
+  }
   _setDemoState(false);
   _showDemoReadyScreen();
 }
@@ -4404,6 +4408,13 @@ const ServiceDetector=(()=>{
     if(window.lastAnalysis)window.lastAnalysis.tipo_asistencia=s.n;
     else window._detectedService=s.n;
     POBuilder.setService(s.id,s.n);
+    // Cargar guía de llamada: protocolo por servicio + calidad siempre
+    if(typeof renderKBSugs==='function' && typeof KB!=='undefined'){
+      renderKBSugs(KB.sugerenciasParaServicio(s.id));
+    }
+    if(typeof renderKBQual==='function' && typeof QUALITY_MATRIX!=='undefined'){
+      renderKBQual(QUALITY_MATRIX.map(function(q){return q.descripcion;}));
+    }
   }
   function reset(){_det=null;_sc={};}
   return{analyze,reset};
