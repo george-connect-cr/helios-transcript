@@ -2138,6 +2138,221 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   50%{box-shadow:0 0 0 3px rgba(232,160,32,.18);}
 }
 
+
+/* ══ MOBILE HOME SCREEN ══════════════════════════════════════ */
+#mobile-home {
+  display: none;
+  position: fixed; inset: 0;
+  background: var(--bg);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 900;
+  padding: 32px 24px;
+}
+
+.mb-header {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  margin-bottom: 48px;
+}
+.mb-logo {
+  height: 36px; width: auto;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+.mb-title {
+  font-size: 20px; font-weight: 700;
+  color: var(--t0); font-family: var(--f);
+  letter-spacing: -.3px;
+}
+.mb-greeting {
+  font-size: 13px; color: var(--t2);
+  font-family: var(--f); font-weight: 400;
+}
+
+.mb-actions {
+  display: flex; flex-direction: column;
+  gap: 12px; width: 100%; max-width: 280px;
+  margin-bottom: 40px;
+}
+.mb-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 16px 20px;
+  border-radius: 12px; cursor: pointer;
+  font-family: var(--f); font-size: 15px; font-weight: 500;
+  border: none; transition: all .15s;
+}
+.mb-btn.primary {
+  background: var(--a); color: #fff;
+}
+.mb-btn.primary:hover { background: var(--a2); }
+.mb-btn.primary:active { transform: scale(.98); }
+.mb-btn.secondary {
+  background: var(--c1); color: var(--t0);
+  border: 1px solid var(--gb2);
+}
+.mb-btn.secondary:hover { background: var(--c2); }
+.mb-btn i { font-size: 18px; }
+
+.mb-logout {
+  font-size: 12px; color: var(--t2);
+  font-family: var(--f); cursor: pointer;
+  background: none; border: none; padding: 8px;
+  text-decoration: underline;
+}
+.mb-logout:hover { color: var(--r); }
+
+/* ══ MOBILE INCOMING CALL ════════════════════════════════════ */
+#mobile-call {
+  display: none;
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 950;
+  padding: 64px 32px 56px;
+}
+
+.mc-top {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+  margin-top: 20px;
+}
+.mc-status {
+  font-size: 13px; color: rgba(255,255,255,.6);
+  font-family: var(--f); letter-spacing: .05em;
+}
+.mc-name {
+  font-size: 26px; font-weight: 600;
+  color: #fff; font-family: var(--f);
+  letter-spacing: -.3px;
+}
+.mc-sub {
+  font-size: 13px; color: rgba(255,255,255,.5);
+  font-family: var(--f);
+}
+
+/* Avatar pulsante */
+.mc-avatar-wrap {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.mc-pulse {
+  position: absolute;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  animation: mc-pulse 1.8s ease-out infinite;
+}
+.mc-pulse:nth-child(2) { animation-delay: .6s; }
+.mc-pulse:nth-child(3) { animation-delay: 1.2s; }
+.mc-avatar {
+  position: relative;
+  width: 88px; height: 88px; border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  border: 2px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; color: #fff;
+  z-index: 1;
+}
+@keyframes mc-pulse {
+  0%   { transform: scale(1);   opacity: .6; }
+  100% { transform: scale(2.2); opacity: 0;  }
+}
+
+/* Botones de llamada */
+.mc-actions {
+  display: flex; align-items: center;
+  justify-content: center; gap: 48px;
+  width: 100%;
+}
+.mc-action-btn {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  cursor: pointer; background: none; border: none;
+}
+.mc-action-circle {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; transition: transform .15s;
+}
+.mc-action-circle:active { transform: scale(.92); }
+.mc-action-circle.decline { background: #e84040; }
+.mc-action-circle.answer  { background: #22c55e; }
+.mc-action-lbl {
+  font-size: 11px; color: rgba(255,255,255,.7);
+  font-family: var(--f);
+}
+
+/* ══ MOBILE ACTIVE CALL ══════════════════════════════════════ */
+#mobile-active-call {
+  display: none;
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 950;
+  padding: 64px 32px 56px;
+}
+.mac-top {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+}
+.mac-status {
+  font-size: 12px; color: #22c55e;
+  font-family: var(--f); letter-spacing: .05em;
+}
+.mac-timer {
+  font-size: 40px; font-weight: 200;
+  color: #fff; font-family: var(--m);
+  letter-spacing: 2px;
+}
+.mac-name {
+  font-size: 18px; font-weight: 500;
+  color: rgba(255,255,255,.8); font-family: var(--f);
+}
+.mac-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: #fff;
+}
+/* Onda de audio activa durante llamada */
+.mac-wave {
+  display: flex; align-items: center; gap: 3px; height: 24px;
+}
+.mac-wave span {
+  width: 3px; border-radius: 3px;
+  background: rgba(255,255,255,.5);
+  animation: mac-wv 1.2s ease-in-out infinite;
+}
+.mac-wave span:nth-child(1){ height: 6px;  animation-delay: 0s; }
+.mac-wave span:nth-child(2){ height: 14px; animation-delay: .15s; }
+.mac-wave span:nth-child(3){ height: 20px; animation-delay: .3s; }
+.mac-wave span:nth-child(4){ height: 14px; animation-delay: .45s; }
+.mac-wave span:nth-child(5){ height: 6px;  animation-delay: .6s; }
+@keyframes mac-wv {
+  0%,100%{ transform: scaleY(.4); opacity:.4; }
+  50%{     transform: scaleY(1);  opacity:1;  }
+}
+
+.mac-end-btn {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: #e84040; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #fff;
+  transition: transform .15s;
+}
+.mac-end-btn:active { transform: scale(.92); }
+.mac-end-lbl {
+  font-size: 11px; color: rgba(255,255,255,.6);
+  font-family: var(--f); margin-top: 6px;
+}
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -6215,8 +6430,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof setStatus === 'function') {
       setWave('idle'); setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     }
-    // Mostrar wizard de bienvenida
-    showWizard();
+    // Pantalla mobile — si es mobile, mostrar home screen
+    if (typeof initMobileHome === 'function') initMobileHome();
+    // Mostrar wizard de bienvenida (solo desktop)
+    if (!isMobileView()) showWizard();
     // Inicializar menú de perfil
     initProfileMenu();
   }, 600);
@@ -6405,6 +6622,68 @@ function setWave(state) {
   w.className = 'audio-wave ' + state;
 }
 
+
+// ══ MOBILE ════════════════════════════════════════════════════
+var _mbCallTimer = null;
+var _mbCallSecs  = 0;
+
+function isMobileView() {
+  return window.innerWidth <= 768;
+}
+
+function initMobileHome() {
+  if (!isMobileView()) return;
+  // Ocultar el layout del desktop
+  var body = document.querySelector('.body');
+  var nav  = document.querySelector('nav');
+  if (body) body.style.display = 'none';
+  if (nav)  nav.style.display  = 'none';
+  // Mostrar pantalla mobile
+  var mh = document.getElementById('mobile-home');
+  if (mh) mh.style.display = 'flex';
+  // Saludo personalizado
+  try {
+    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    var name = (s.user && s.user.name) ? s.user.name.split(' ')[0] : '';
+    var greet = document.getElementById('mb-greeting');
+    if (greet && name) greet.textContent = 'Hola, ' + name;
+  } catch(e) {}
+}
+
+function mobilePractica() {
+  document.getElementById('mobile-home').style.display  = 'none';
+  document.getElementById('mobile-call').style.display  = 'flex';
+}
+
+function mobileDecline() {
+  document.getElementById('mobile-call').style.display  = 'none';
+  document.getElementById('mobile-home').style.display  = 'flex';
+}
+
+function mobileAnswer() {
+  document.getElementById('mobile-call').style.display        = 'none';
+  document.getElementById('mobile-active-call').style.display = 'flex';
+  // Iniciar timer
+  _mbCallSecs = 0;
+  _mbCallTimer = setInterval(function() {
+    _mbCallSecs++;
+    var m = Math.floor(_mbCallSecs / 60);
+    var s = _mbCallSecs % 60;
+    var el = document.getElementById('mac-timer');
+    if (el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+}
+
+function mobileEndCall() {
+  clearInterval(_mbCallTimer);
+  _mbCallTimer = null;
+  _mbCallSecs  = 0;
+  var el = document.getElementById('mac-timer');
+  if (el) el.textContent = '0:00';
+  document.getElementById('mobile-active-call').style.display = 'none';
+  document.getElementById('mobile-home').style.display        = 'flex';
+}
+
 // ── Aliases para compatibilidad HTML de Dayana ──
 function openDash(){ if(typeof openDashboard==='function') openDashboard(); }
 function closeDash(){ if(typeof closeDashboard==='function') closeDashboard(); }
@@ -6483,6 +6762,71 @@ setInterval(_syncAgentMini, 3000);
       </label>
       <button class="kai-wizard-btn" onclick="closeWizard()">Comenzar →</button>
     </div>
+  </div>
+</div>
+
+
+<!-- ══ MOBILE HOME ══════════════════════════════════════════ -->
+<div id="mobile-home">
+  <div class="mb-header">
+    <img src="assets/connect-logo.png" alt="Connect" class="mb-logo"/>
+    <div class="mb-title">KAI Academy</div>
+    <div class="mb-greeting" id="mb-greeting">Hola</div>
+  </div>
+  <div class="mb-actions">
+    <button class="mb-btn primary" onclick="mobilePractica()">
+      <i class="ti ti-phone-call"></i> Práctica
+    </button>
+    <button class="mb-btn secondary" onclick="showWizard()">
+      <i class="ti ti-help-circle"></i> Ayuda
+    </button>
+  </div>
+  <button class="mb-logout" onclick="AUTH.logout()">Cerrar sesión</button>
+</div>
+
+<!-- ══ MOBILE LLAMADA ENTRANTE ══════════════════════════════ -->
+<div id="mobile-call">
+  <div class="mc-top">
+    <div class="mc-status">LLAMADA DE PRÁCTICA</div>
+    <div class="mc-name">Cliente Connect</div>
+    <div class="mc-sub">KAI Academy</div>
+  </div>
+  <div class="mc-avatar-wrap">
+    <div class="mc-pulse"></div>
+    <div class="mc-pulse"></div>
+    <div class="mc-pulse"></div>
+    <div class="mc-avatar"><i class="ti ti-user"></i></div>
+  </div>
+  <div class="mc-actions">
+    <button class="mc-action-btn" onclick="mobileDecline()">
+      <div class="mc-action-circle decline"><i class="ti ti-phone-off"></i></div>
+      <span class="mc-action-lbl">Rechazar</span>
+    </button>
+    <button class="mc-action-btn" onclick="mobileAnswer()">
+      <div class="mc-action-circle answer"><i class="ti ti-phone"></i></div>
+      <span class="mc-action-lbl">Contestar</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ MOBILE LLAMADA ACTIVA ════════════════════════════════ -->
+<div id="mobile-active-call">
+  <div class="mac-top">
+    <div class="mac-status">EN LLAMADA</div>
+    <div class="mac-timer" id="mac-timer">0:00</div>
+    <div class="mac-name">Cliente Connect</div>
+  </div>
+  <div>
+    <div class="mac-avatar"><i class="ti ti-user"></i></div>
+  </div>
+  <div class="mac-wave">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <button class="mac-end-btn" onclick="mobileEndCall()">
+      <i class="ti ti-phone-off"></i>
+    </button>
+    <div class="mac-end-lbl">Finalizar</div>
   </div>
 </div>
 
