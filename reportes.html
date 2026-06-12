@@ -1186,7 +1186,7 @@ function loadSupabaseData(callback){
   if (_usr.role === 'agente' && _usr.email) {
     _roleFilter = '&agent_email=eq.' + encodeURIComponent(_usr.email);
   }
-  fetch(_SB_URL+'/rest/v1/call_sessions?select=*&order=created_at.desc&limit=1000'+_roleFilter,{
+  fetch(_SB_URL+'/rest/v1/call_sessions?select=*,quality_scores(*)&order=created_at.desc&limit=1000'+_roleFilter,{
     headers:{
       'apikey': _SB_KEY,
       'Authorization': 'Bearer ' + _SB_KEY,
@@ -1196,6 +1196,23 @@ function loadSupabaseData(callback){
   .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
   .then(function(sessions){
     if(!sessions||!sessions.length){callback();return;}
+
+    // Normalizar — aplanar quality_scores al objeto de sesión
+    sessions = sessions.map(function(s) {
+      var qs = (s.quality_scores && s.quality_scores[0]) || {};
+      return Object.assign({}, s, {
+        score_total:        qs.score_total        || s.score_total        || 0,
+        score_satisfaction: qs.score_satisfaction || s.score_satisfaction || 0,
+        score_aht:          qs.score_aht          || s.score_efficiency   || 0,
+        score_completeness: qs.score_completeness || s.score_completeness || 0,
+        score_quality:      qs.score_quality      || s.score_speech       || 0,
+        score_protocol:     qs.score_protocol     || 0,
+        score_grade:        qs.score_grade        || s.score_grade        || '—',
+        quality_items:      qs.quality_items      || s.speech_items       || [],
+        protocol_items:     qs.protocol_items     || []
+      });
+    });
+
     var map={};
     sessions.forEach(function(s){
       var k=s.agent_email; if(!k)return;
@@ -1229,7 +1246,7 @@ function loadSupabaseData(callback){
         calls:n, pos:Math.round(pos/Math.max(n,1)*n),
         aht:dur, ahtS:minsec,
         sat:avg(ss,function(s){return s.score_satisfaction;}),
-        speech:avg(ss,function(s){return s.score_speech;}),
+        speech:avg(ss,function(s){return s.score_quality||s.score_speech||0;}),
         score:score,
         grade:score>=88?'A+':score>=73?'A':score>=55?'B':'C',
         sent:{

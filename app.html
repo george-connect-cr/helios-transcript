@@ -2824,16 +2824,33 @@ var SUPABASE_CONFIG = {
 
 function savePOToSupabase(entry) {
   if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) return;
+
+  // ── No guardar llamadas Demo ni sesiones de rol demo ──────
+  if (typeof _demoActive !== 'undefined' && _demoActive) {
+    console.log('[Supabase] Llamada Demo — no se guarda en BD');
+    return;
+  }
   try {
     var _sess = JSON.parse(localStorage.getItem('helios_session') || '{}');
     var _usr  = (_sess && _sess.user) || {};
-    var sc    = (entry.meta && entry.meta.scores) || {};
-    var sat   = sc.satisfaction || 0;
-    var eff   = sc.ahtScore     || 0;
-    var comp  = sc.completeness || 0;
-    var spch  = sc.speechScore  || 0;
-    var total = Math.round(sat*0.35 + eff*0.20 + comp*0.25 + spch*0.20);
+
+    // Doble verificación por rol
+    if (_usr.role === 'demo') {
+      console.log('[Supabase] Rol demo — no se guarda en BD');
+      return;
+    }
+
+    var sc = (entry.meta && entry.meta.scores) || {};
+
+    // ── Scores con nueva ponderación ──────────────────────────
+    var sat  = sc.satisfaction  || sc.score_satisfaction || 0;
+    var eff  = sc.ahtScore      || sc.score_aht          || 0;
+    var comp = sc.completeness  || sc.score_completeness  || 0;
+    var qual = sc.qualityScore  || sc.score_quality       || sc.speechScore || 0;
+    var prot = sc.protocolScore || sc.score_protocol      || 0;
+    var total = Math.round(sat*0.30 + eff*0.15 + comp*0.20 + qual*0.25 + prot*0.10);
     var grade = total>=88?'A+':total>=73?'A':total>=55?'B':'C';
+
     var sentVal = (entry.meta && entry.meta.sentVal) || 0;
     var sentLbl = sentVal===1?'positivo':sentVal===-1?'negativo':'neutro';
     var durStr  = (entry.meta && entry.meta.callDuration) || '';
@@ -2843,7 +2860,29 @@ function savePOToSupabase(entry) {
       durSecs = parseInt(dp[0]||0)*60 + parseInt(dp[1]||0);
     }
     var now = new Date();
-    var payload = {
+    var SB  = SUPABASE_CONFIG.url;
+    var KEY = SUPABASE_CONFIG.anonKey;
+    var hdrs = {
+      'apikey': KEY,
+      'Authorization': 'Bearer ' + KEY,
+      'Content-Type': 'application/json'
+    };
+
+    // ── 1. Upsert agente ──────────────────────────────────────
+    fetch(SB + '/rest/v1/agents', {
+      method: 'POST',
+      headers: Object.assign({}, hdrs, {'Prefer': 'resolution=merge-duplicates,return=minimal'}),
+      body: JSON.stringify({
+        email:   _usr.email   || '',
+        name:    _usr.name    || '',
+        role:    _usr.role    || 'agente',
+        country: _usr.country || '',
+        lane:    _usr.lane    || ''
+      })
+    }).catch(function(){});
+
+    // ── 2. Insertar call_session ──────────────────────────────
+    var sessionPayload = {
       po_number:          entry.num,
       created_at:         now.toISOString(),
       session_date:       now.toISOString().slice(0,10),
@@ -2861,7 +2900,7 @@ function savePOToSupabase(entry) {
       plate:              (entry.data && entry.data.placa)           || '',
       vehicle_brand:      (entry.data && entry.data.marca)           || '',
       vehicle_model:      (entry.data && entry.data.modelo)          || '',
-      vehicle_year:       parseInt(entry.data && entry.data['año']) || null,
+      vehicle_year:       parseInt(entry.data && entry.data['año'])  || null,
       vehicle_color:      (entry.data && entry.data.color)           || '',
       location_origin:    (entry.data && (entry.data['ubicación'] || entry.data.ubicacion)) || '',
       location_dest:      (entry.data && entry.data.ubicacion_destino) || '',
@@ -2869,44 +2908,53 @@ function savePOToSupabase(entry) {
       contact_phone:      (entry.data && entry.data.contacto_tel)   || '',
       sentiment_val:      sentVal,
       sentiment_label:    sentLbl,
-      score_satisfaction: sat,
-      score_efficiency:   eff,
-      score_completeness: comp,
-      score_speech:       spch,
-      score_total:        total,
-      score_grade:        grade,
-      speech_items:       sc.speechItems || [],
       raw_data:           entry
     };
-    // Upsert agente en tabla agents (sincroniza nombre/carril/país)
-    fetch(SUPABASE_CONFIG.url + '/rest/v1/agents', {
+
+    fetch(SB + '/rest/v1/call_sessions', {
       method: 'POST',
-      headers: {
-        'apikey': SUPABASE_CONFIG.anonKey,
-        'Authorization': 'Bearer ' + SUPABASE_CONFIG.anonKey,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=minimal'
-      },
-      body: JSON.stringify({
-        email:   _usr.email   || '',
-        name:    _usr.name    || '',
-        role:    _usr.role    || 'agente',
-        country: _usr.country || '',
-        lane:    _usr.lane    || ''
-      })
-    }).catch(function(){});
-    fetch(SUPABASE_CONFIG.url + '/rest/v1/' + SUPABASE_CONFIG.table, {
-      method: 'POST',
-      headers: {
-        'apikey':        SUPABASE_CONFIG.anonKey,
-        'Authorization': 'Bearer ' + SUPABASE_CONFIG.anonKey,
-        'Content-Type':  'application/json',
-        'Prefer':        'return=minimal'
-      },
-      body: JSON.stringify(payload)
-    }).catch(function(err) {
-      console.warn('[Supabase] Error al guardar sesión:', err.message);
+      headers: Object.assign({}, hdrs, {'Prefer': 'return=representation'}),
+      body: JSON.stringify(sessionPayload)
+    })
+    .then(function(r) {
+      if (!r.ok) throw new Error('call_sessions HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(rows) {
+      var sessionId = (rows && rows[0]) ? rows[0].id : null;
+      console.log('[Supabase] call_sessions OK — id:', sessionId);
+
+      // ── 3. Insertar quality_scores ────────────────────────
+      var qPayload = {
+        po_number:          entry.num,
+        session_id:         sessionId,
+        agent_email:        _usr.email || '',
+        session_date:       now.toISOString().slice(0,10),
+        score_satisfaction: sat,
+        score_aht:          eff,
+        score_completeness: comp,
+        score_quality:      qual,
+        score_protocol:     prot,
+        score_total:        total,
+        score_grade:        grade,
+        quality_items:      sc.qualityItems  || sc.speechItems    || [],
+        protocol_items:     sc.protocolItems || []
+      };
+
+      return fetch(SB + '/rest/v1/quality_scores', {
+        method: 'POST',
+        headers: Object.assign({}, hdrs, {'Prefer': 'return=minimal'}),
+        body: JSON.stringify(qPayload)
+      });
+    })
+    .then(function(r) {
+      if (!r.ok) throw new Error('quality_scores HTTP ' + r.status);
+      console.log('[Supabase] quality_scores OK — grade:', grade, '| total:', total);
+    })
+    .catch(function(err) {
+      console.warn('[Supabase] Error al guardar sesión:', err);
     });
+
   } catch(e) {
     console.warn('[Supabase] Error preparando payload:', e.message);
   }
