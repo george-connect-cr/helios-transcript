@@ -2895,6 +2895,7 @@ function savePOToSupabase(entry) {
       call_duration_secs: durSecs,
       wait_time_min:      (entry.meta && entry.meta.waitTime) || 0,
       service_type:       (entry.data && entry.data.tipo_asistencia) || '',
+      service_id:         (entry.meta && entry.meta.svcId) || '',
       customer_name:      (entry.data && entry.data.nombre_cliente)  || '',
       customer_phone:     (entry.data && entry.data.telefono)        || '',
       plate:              (entry.data && entry.data.placa)           || '',
@@ -4952,7 +4953,7 @@ function confirmPO(){
     // Save to list
     const poEntry = {num, ts, data:{...data},
       meta:{callDuration, sentVal:sent?Number(sent.valor):0,
-            waitTime:WAIT[svcId]||15, scores}};
+            waitTime:WAIT[svcId]||15, svcId:svcId, scores}};
     _poList.push(poEntry);
     savePOToSupabase(poEntry);
     if (_demoActive) _demoPOsaved++;
@@ -5422,35 +5423,89 @@ function _toggleDPO(idx){
   setTimeout(()=>detail.querySelectorAll('.dpo-bar-fill').forEach(f=>f.style.width=f.dataset.w),50);
 }
 
-function _buildScores(data,sent,proto,callDuration){
-  // Satisfaction: based on sentiment valor
-  const sentVal=sent?Number(sent.valor):0;
-  const satisfaction=sentVal===1?92:sentVal===0?70:38;
+function _buildScores(data, sent, proto, callDuration) {
+  // ── Satisfacción: sentimiento real ────────────────────────
+  const sentVal    = sent ? Number(sent.valor) : 0;
+  const satisfaction = sentVal===1 ? 92 : sentVal===0 ? 70 : 38;
 
-  // AHT score: based on call duration — ideal 2-5 min
-  let ahtScore=80;
-  if(callDuration&&callDuration!=='—'){
-    const parts=callDuration.split(':');
-    const mins=parseInt(parts[0]||0);
-
-    if(mins<3||mins>8){ ahtScore=Math.max(20, ahtScore-(Math.abs(mins-5)*8)); }
+  // ── AHT: duración real (ideal 3-6 min) ───────────────────
+  let ahtScore = 80;
+  if (callDuration && callDuration !== '—') {
+    const parts = callDuration.split(':');
+    const mins  = parseInt(parts[0] || 0);
+    if      (mins < 2)              ahtScore = 50;
+    else if (mins >= 3 && mins <= 6) ahtScore = 95;
+    else if (mins > 8)              ahtScore = Math.max(20, 80 - (mins - 8) * 8);
   }
-  const required=['nombre_cliente','ubicación','tipo_asistencia','placa','tablilla','marca','modelo'];
-  const filled=required.filter(k=>data[k]&&String(data[k]).trim());
 
-  // Speech compliance: protocol + data
-  const proto_ok=proto?.cumple===true;
-  const speechItems=[
-    {label:'Saludo de bienvenida',       ok: proto_ok },
-    {label:'Identificación del cliente', ok: !!data.nombre_cliente },
-    {label:'Validación de ubicación',    ok: !!data.ubicación },
-    {label:'Confirmación del servicio',  ok: !!data.tipo_asistencia },
-    {label:'ETA comunicado al cliente',  ok: proto_ok && !!data.ubicación && !!data.tipo_asistencia },
-  ];
-  const speechScore=Math.round(speechItems.filter(i=>i.ok).length/speechItems.length*100);
-  const completeness=Math.round(filled.length/required.length*100);
+  // ── Completitud: campos requeridos del PO ────────────────
+  const required = ['nombre_cliente','ubicación','tipo_asistencia','placa','marca','modelo'];
+  const filled   = required.filter(k => data[k] && String(data[k]).trim());
+  const completeness = Math.round(filled.length / required.length * 100);
 
-  return{satisfaction,ahtScore,completeness,speechScore,speechItems};
+  // ── Calidad: matriz real (QUALITY_MATRIX o KAIConfig) ────
+  var qualityItems  = [];
+  var qualityScore  = 0;
+
+  // Recopilar transcripción del agente desde las burbujas
+  var agentTranscript = '';
+  var agBubbles = document.querySelectorAll('.bubble.ag .b-txt');
+  agBubbles.forEach(function(b){ agentTranscript += ' ' + b.textContent; });
+
+  var matrix = [];
+  if (typeof KAIConfig !== 'undefined' && KAIConfig.getQualityMatrix().length) {
+    matrix = KAIConfig.getQualityMatrix();
+  } else if (typeof QUALITY_MATRIX !== 'undefined') {
+    matrix = QUALITY_MATRIX;
+  }
+
+  if (matrix.length) {
+    var t = agentTranscript.toLowerCase();
+    qualityItems = matrix.map(function(item) {
+      var kws     = item.keywords || [];
+      var cumple  = kws.some(function(kw){ return t.includes(kw.toLowerCase()); });
+      return { id_audara: item.id_audara, descripcion: item.descripcion,
+               categoria: item.categoria, puntaje: item.puntaje || 6.25, cumple: cumple };
+    });
+    var pts = qualityItems.reduce(function(s, i){ return s + (i.cumple ? i.puntaje : 0); }, 0);
+    qualityScore = Math.min(100, Math.round(pts));
+  }
+
+  // ── Protocolo: checklist marcado por el agente ────────────
+  var protocolItems = [];
+  var protocolScore = 0;
+  var chkAll  = document.querySelectorAll('#kai-checklist .kai-check-item');
+  var chkDone = document.querySelectorAll('#kai-checklist .kai-check-item.done');
+  if (chkAll.length) {
+    protocolScore = Math.round(chkDone.length / chkAll.length * 100);
+    chkAll.forEach(function(el) {
+      var txt = el.querySelector('.kai-check-txt');
+      protocolItems.push({
+        descripcion: txt ? txt.textContent : '',
+        cumple: el.classList.contains('done')
+      });
+    });
+  }
+
+  // ── Score total ponderado ─────────────────────────────────
+  // sat 30% | aht 15% | completitud 20% | calidad 25% | protocolo 10%
+  const scoreTotal = Math.round(
+    satisfaction  * 0.30 +
+    ahtScore      * 0.15 +
+    completeness  * 0.20 +
+    qualityScore  * 0.25 +
+    protocolScore * 0.10
+  );
+
+  // Backward compat — speechItems / speechScore mantienen estructura anterior
+  return {
+    satisfaction, ahtScore, completeness,
+    qualityScore,  qualityItems,
+    protocolScore, protocolItems,
+    speechScore:   qualityScore,
+    speechItems:   qualityItems,
+    scoreTotal
+  };
 }
 
 AgentBar.init()
