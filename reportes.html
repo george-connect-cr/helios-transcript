@@ -1304,7 +1304,7 @@ function showPODetail(regKey) {
 
   // Stars
   var stars='';
-  for(var si=0;si<5;si++) stars+='<span style="color:'+(si<(p.sat||0)?'var(--y)':'var(--c3)')+';font-size:16px;">★</span>';
+  for(var si=0;si<5;si++) stars+='<span style="color:'+(si<(p.sat||0)?'var(--y)':'var(--c3)')+';font-size:13px;line-height:1;">★</span>';
 
   // Estimate sub-scores from available data (or use if present)
   var satScore = typeof p.satisfaction !== 'undefined' ? p.satisfaction : (p.sat>=4?92:p.sat>=3?70:38);
@@ -1313,11 +1313,12 @@ function showPODetail(regKey) {
   var spkScore = typeof p.speechScore  !== 'undefined' ? p.speechScore  :
     (p.sp ? Math.round(Object.values(p.sp).filter(Boolean).length/Object.values(p.sp).length*100) : 80);
 
+  var _bg='linear-gradient(to right,rgba(91,134,245,.4),rgba(71,110,225,.85))';
   var bars = [
-    {l:'Satisfacción', v:satScore,  c:'var(--v)',    cb:'var(--pu2)'},
-    {l:'Eficiencia',   v:effScore,  c:'var(--blue)', cb:'var(--bl2)'},
-    {l:'Captura PO',   v:compScore, c:'var(--g)',    cb:'var(--gr2)'},
-    {l:'Protocolo',    v:spkScore,  c:'var(--y)',    cb:'var(--am2)'},
+    {l:'Satisfacción', v:satScore,  c:_bg, cb:'transparent'},
+    {l:'Eficiencia',   v:effScore,  c:_bg, cb:'transparent'},
+    {l:'Captura PO',   v:compScore, c:_bg, cb:'transparent'},
+    {l:'Protocolo',    v:spkScore,  c:_bg, cb:'transparent'},
   ];
 
   var spLbls={sal:'Saludo de bienvenida',id:'Identificación del cliente',ub:'Validación de ubicación',eta:'ETA comunicado',ci:'Confirmación del servicio'};
@@ -1349,32 +1350,30 @@ function showPODetail(regKey) {
       '</div>'+
       '<div style="text-align:right;">'+
         '<div style="font-size:22px;font-weight:400;color:'+scColor+';">'+sc+'</div>'+
-        '<div style="font-size:9px;color:var(--t2);letter-spacing:.05em;">SCORE</div>'+
+        '<div style="font-size:9px;color:var(--t2);">Score</div>'+
       '</div>'+
     '</div>'+
 
     // KPIs
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 20px;">'+
       '<div style="background:var(--c2);border-radius:8px;padding:10px 12px;">'+
-        '<div style="font-size:9px;color:var(--t2);letter-spacing:.08em;margin-bottom:4px;">DURACIÓN</div>'+
-        '<div style="font-size:16px;font-weight:500;color:var(--blue);">'+fs(p.dur||0)+'</div>'+
+        '<div style="font-size:9px;color:var(--t2);margin-bottom:4px;">Duración</div>'+
+        '<div style="font-size:16px;font-weight:400;color:var(--t0);">'+fs(p.dur||0)+'</div>'+
       '</div>'+
       '<div style="background:var(--c2);border-radius:8px;padding:10px 12px;">'+
-        '<div style="font-size:9px;color:var(--t2);letter-spacing:.08em;margin-bottom:4px;">SATISFACCIÓN</div>'+
+        '<div style="font-size:9px;color:var(--t2);margin-bottom:4px;">Satisfacción</div>'+
         '<div>'+stars+'</div>'+
       '</div>'+
       '<div style="background:var(--c2);border-radius:8px;padding:10px 12px;">'+
-        '<div style="font-size:9px;color:var(--t2);letter-spacing:.08em;margin-bottom:4px;">SENTIMIENTO</div>'+
-        '<div style="display:flex;align-items:center;gap:6px;">'+
-          '<span style="font-size:20px;">'+sentEmoji+'</span>'+
-          '<span style="font-size:11px;font-weight:400;color:'+sentColor+';">'+sentTxt+'</span>'+
-        '</div>'+
+        '<div style="font-size:9px;color:var(--t2);margin-bottom:4px;">Sentimiento</div>'+
+        sentFace(p.sent==='p'?80:p.sent==='g'?20:50, sentColor)+
+        '<span style="font-size:11px;color:'+sentColor+';margin-left:4px;">'+sentTxt+'</span>'+
       '</div>'+
     '</div>'+
 
     // Barras
     '<div style="padding:0 20px 16px;">'+
-      '<div style="font-size:10px;font-weight:400;color:var(--t2);margin-bottom:10px;">DESGLOSE DE MÉTRICAS</div>'+
+      '<div style="font-size:10px;color:var(--t2);margin-bottom:10px;">Desglose de métricas</div>'+
       bars.map(function(b){
         var nc=b.v>=80?'var(--g)':b.v>=65?'var(--y)':'var(--r)';
         return'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'+
