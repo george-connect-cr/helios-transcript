@@ -861,16 +861,17 @@ function agDet(a){
   var sentCard='<div class="stitle">Análisis de sentimiento</div><div class="card">'+
     '<div style="display:flex;align-items:center;gap:20px;margin-bottom:16px;">'+
       '<div style="text-align:center;flex-shrink:0;">'+
-        '<div style="font-size:30px;font-weight:400;color:var(--g);font-family:var(--m);">'+a.sent.p+'%</div>'+
-        '<div style="font-size:10px;font-weight:400;color:var(--t2);margin-top:3px;">Positivo</div>'+
+        sentFace(a.sent.p, a.sent.p>=70?'var(--g)':a.sent.p>=50?'var(--y)':'var(--r)')+
+        '<div style="font-size:22px;font-weight:400;color:'+(a.sent.p>=70?'var(--g)':a.sent.p>=50?'var(--y)':'var(--r)')+';font-family:var(--m);margin-top:4px;">'+a.sent.p+'%</div>'+
+        '<div style="font-size:10px;color:var(--t2);margin-top:2px;">Positivo</div>'+
       '</div>'+
       '<div style="flex:1;">'+
         [[null,'Positivo',a.sent.p,'var(--g)'],[null,'Neutro',a.sent.n,'var(--y)'],[null,'Negativo',a.sent.g,'var(--r)']].map(function(s){
           return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
-            '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><div class="sdot" style="background:'+s[3]+';"></div></span>'+
+            '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><div style="width:8px;height:8px;border-radius:50%;background:'+s[3]+';display:inline-block;"></div></span>'+
             '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
             '<div class="bar" style="flex:1;"><div class="barf" style="width:'+s[2]+'%;background:'+s[3]+';"></div></div>'+
-            '<span style="font-size:12px;font-weight:500;color:'+s[3]+';width:34px;text-align:right;font-family:var(--m);">'+s[2]+'%</span>'+
+            '<span style="font-size:12px;font-weight:400;color:'+s[3]+';width:34px;text-align:right;font-family:var(--m);">'+s[2]+'%</span>'+
           '</div>';
         }).join('')+
       '</div>'+
