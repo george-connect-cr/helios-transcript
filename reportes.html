@@ -953,7 +953,9 @@ function agDet(a){
       _PORegistry[_rk]={po:p, agentName:a.name||'—'};
       var sc2=p.score>=85?'var(--g)':p.score>=70?'var(--y)':'var(--r)';
       var sc2bg=p.score>=85?'var(--gr2)':p.score>=70?'var(--am2)':'var(--re2)';
-      var sico=p.sent==='p'?'●':p.sent==='g'?'●':'●';
+      var _sv=p.sent==='p'?80:p.sent==='g'?15:50;
+      var _sc=p.sent==='p'?'var(--g)':p.sent==='g'?'var(--r)':'var(--y)';
+      var sico=sentFace(_sv,_sc);
       var stars='';for(var si=0;si<5;si++)stars+='<span style="color:'+(si<p.sat?'var(--y)':'var(--c3)')+';font-size:11px;">★</span>';
       var spB=p.sp?Object.keys(p.sp).map(function(k){
         return'<span title="'+spLbls[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-size:9px;font-weight:500;background:'+(p.sp[k]?'var(--gr2)':'var(--re2)')+';color:'+(p.sp[k]?'var(--g)':'var(--r)')+'">'+(p.sp[k]?'✓':'✗')+'</span>';
@@ -967,7 +969,7 @@ function agDet(a){
         '<td style="font-size:11px;font-weight:400;font-family:var(--m);color:'+_durCol+';">'+_durFmt+'</td>'+
         '<td><span class="sbadge" style="color:'+sc2+';background:'+sc2bg+'">'+p.score+'</span></td>'+
         '<td>'+stars+'</td>'+
-        '<td style="font-size:15px;">'+sico+'</td>'+
+        '<td>'+sico+'</td>'+
         '<td><div style="display:flex;gap:2px;">'+spB+'</div></td>'+
         '<td style="font-size:10px;color:var(--t2);max-width:120px;">'+(p.obs||'—')+'</td>'+
       '</tr>';
