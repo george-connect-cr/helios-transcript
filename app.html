@@ -401,16 +401,16 @@ body.dark .n-th-thumb {
 .dash-kpi-val.g{color:var(--g);}
 .dash-kpi-val.y{color:var(--y);}
 .dash-kpi-val.r{color:var(--r);}
-.dash-kpi-val.violet{color:var(--v);}
-.dash-kpi-val.blue{color:var(--blue);}
+.dash-kpi-val.violet{color:var(--t0);}
+.dash-kpi-val.blue{color:var(--t0);}
 .dash-kpi-lbl{font-family:var(--f);font-size:9px;color:var(--t2);letter-spacing:.1px;margin-top:3px;}
 
 /* Triángulo cromático — KPI accent backgrounds
    Violeta (emocional) · Azul (tiempo) · Verde (proceso) · Ámbar (cumplimiento) */
-.kpi-violet{background:var(--pu2)!important;}
-.kpi-blue{background:var(--bl2)!important;}
-.kpi-green{background:var(--gr2)!important;}
-.kpi-amber{background:var(--am2)!important;}
+.kpi-violet{background:var(--c2);}
+.kpi-blue{background:var(--c2);}
+.kpi-green{background:var(--c2);}
+.kpi-amber{background:var(--c2);}
 
 /* Score bars — dsb — sin CSS previo, se añade aquí */
 .dsb-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
@@ -418,16 +418,16 @@ body.dark .n-th-thumb {
 .dsb-bar{flex:1;height:6px;background:var(--c3);border-radius:999px;overflow:hidden;}
 .dsb-fill{height:100%;border-radius:999px;transition:width .65s cubic-bezier(.22,1,.36,1);}
 /* Identidad por métrica — el ancho indica valor, el color indica QUÉ métrica es */
-.dsb-fill.violet{background:var(--v);}     /* Satisfacción */
-.dsb-fill.blue{background:var(--blue);}   /* Duración / Eficiencia */
-.dsb-fill.green{background:var(--g);}     /* Completitud */
-.dsb-fill.amber{background:var(--y);}     /* Protocolo */
-.dsb-fill.brand{background:var(--a);}     /* Score total */
+.dsb-fill.violet{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
+.dsb-fill.blue{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
+.dsb-fill.green{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
+.dsb-fill.amber{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
+.dsb-fill.brand{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
 .dsb-num{font-family:var(--f);font-size:11px;font-weight:400;min-width:38px;text-align:right;}
 
 /* Sentiment breakdown bars */
 .dash-sent-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
-.dash-sent-ico{font-size:13px;min-width:20px;text-align:center;}
+.dash-sent-ico{font-size:8px;min-width:20px;text-align:center;display:inline-flex;align-items:center;justify-content:center;}
 .dash-sent-lbl{font-family:var(--f);font-size:11px;color:var(--t1);min-width:60px;}
 .dash-sent-bar{flex:1;height:6px;background:var(--c3);border-radius:999px;overflow:hidden;}
 .dash-sent-fill{height:100%;border-radius:999px;transition:width .65s cubic-bezier(.22,1,.36,1);}
@@ -823,10 +823,10 @@ body.dark .n-th-thumb {
   height:100%;border-radius:999px;
   transition:width .55s cubic-bezier(.22,1,.36,1);
 }
-.dpo-bar-fill.violet{background:var(--v);}
-.dpo-bar-fill.blue{background:var(--blue);}
-.dpo-bar-fill.green{background:var(--g);}
-.dpo-bar-fill.amber{background:var(--y);}
+.dpo-bar-fill.violet{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
+.dpo-bar-fill.blue{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
+.dpo-bar-fill.green{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
+.dpo-bar-fill.amber{background:linear-gradient(to right,rgba(91,134,245,.5),rgba(71,110,225,.85));}
 .dpo-bar-num{
   font-family:var(--f);font-size:11px;font-weight:700;
   min-width:36px;text-align:right;
@@ -5235,7 +5235,7 @@ function _buildDashboard(){
   const posPct=n>0?Math.round(posN/n*100):0;
   const neuPct=n>0?Math.round(neuN/n*100):0;
   const negPct=n>0?Math.round(negN/n*100):0;
-  const sentEmoji=posPct>=neuPct&&posPct>=negPct?'😊':neuPct>=negPct?'😐':'😠';
+  const sentEmoji=posPct>=neuPct&&posPct>=negPct?'Positivo':neuPct>=negPct?'Neutro':'Negativo';
 
   // Fecha y agente
   const sess=JSON.parse(localStorage.getItem('helios_session')||'{}');
@@ -5259,10 +5259,10 @@ function _buildDashboard(){
 
   // Grade
   const grades=[
-    {min:88,lbl:'Sobresaliente',bg:'var(--gr2)',col:'var(--g)'},
-    {min:73,lbl:'Buen desempeño',bg:'var(--bl2)',col:'var(--blue)'},
-    {min:55,lbl:'En desarrollo',bg:'var(--am2)',col:'var(--y)'},
-    {min:0, lbl:'Requiere apoyo',bg:'var(--re2)',col:'var(--r)'},
+    {min:88,lbl:'Sobresaliente',bg:'var(--c2)',col:'var(--t1)'},
+    {min:73,lbl:'Buen desempeño',bg:'var(--c2)',col:'var(--t1)'},
+    {min:55,lbl:'En desarrollo',bg:'var(--c2)',col:'var(--t1)'},
+    {min:0, lbl:'Requiere apoyo',bg:'var(--c2)',col:'var(--t1)'},
   ];
   const gr=grades.find(x=>overall>=x.min);
   const grEl=document.getElementById('dash-grade');
@@ -5311,11 +5311,11 @@ function _buildDashboard(){
       sentEl.innerHTML='<div style="font-size:12px;color:var(--t2);padding:4px 0;">Sin datos de sentimiento aún.</div>';
     } else {
       sentEl.innerHTML=[
-        {ico:'😊',lbl:'Positivo',pct:posPct,cls:'pos'},
-        {ico:'😐',lbl:'Neutro',  pct:neuPct,cls:'neu'},
-        {ico:'😠',lbl:'Negativo',pct:negPct,cls:'neg'},
+        {ico:'●',lbl:'Positivo',pct:posPct,cls:'pos'},
+        {ico:'●',lbl:'Neutro',  pct:neuPct,cls:'neu'},
+        {ico:'●',lbl:'Negativo',pct:negPct,cls:'neg'},
       ].map(s=>`<div class="dash-sent-row">
-        <span class="dash-sent-ico">${s.ico}</span>
+        <span class="dash-sent-ico" style="color:${s.cls==='pos'?'var(--g)':s.cls==='neg'?'var(--r)':'var(--y)'}">${s.ico}</span>
         <span class="dash-sent-lbl">${s.lbl}</span>
         <div class="dash-sent-bar"><div class="dash-sent-fill ${s.cls}" style="width:0%" data-w="${s.pct}%"></div></div>
         <span class="dash-sent-pct" style="color:${s.cls==='pos'?'var(--g)':s.cls==='neg'?'var(--r)':'var(--y)'}">${s.pct}%</span>
