@@ -5235,7 +5235,21 @@ function _buildDashboard(){
   const posPct=n>0?Math.round(posN/n*100):0;
   const neuPct=n>0?Math.round(neuN/n*100):0;
   const negPct=n>0?Math.round(negN/n*100):0;
-  const sentEmoji=posPct>=neuPct&&posPct>=negPct?'Positivo':neuPct>=negPct?'Neutro':'Negativo';
+  const sentVal = posPct>=neuPct&&posPct>=negPct?1:neuPct>=negPct?0:-1;
+  const sentColor = sentVal===1?'var(--g)':sentVal===-1?'var(--r)':'var(--y)';
+  const sentMouth = sentVal===1
+    ? '<path d="M8 14 Q10.5 16.5 13 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>'
+    : sentVal===-1
+    ? '<path d="M8 15.5 Q10.5 13 13 15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>'
+    : '<line x1="8" y1="14" x2="13" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>';
+  const sentFaceHTML = '<div style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;">'
+    + '<svg width="20" height="20" viewBox="0 0 21 21" fill="none" style="color:var(--t2);">'
+    + '<circle cx="10.5" cy="10.5" r="9" stroke="currentColor" stroke-width="1.5"/>'
+    + '<circle cx="7.5" cy="8.5" r="1.2" fill="currentColor"/>'
+    + '<circle cx="13.5" cy="8.5" r="1.2" fill="currentColor"/>'
+    + sentMouth + '</svg>'
+    + '<div style="position:absolute;top:-1px;right:-1px;width:7px;height:7px;border-radius:50%;background:'+sentColor+';border:1.5px solid white;"></div>'
+    + '</div>';
 
   // Fecha y agente
   const sess=JSON.parse(localStorage.getItem('helios_session')||'{}');
@@ -5279,7 +5293,7 @@ function _buildDashboard(){
   setEl('dk-pos', n);
   setEl('dk-sat', satAvg+'%');
   setEl('dk-dur', durFmt);
-  setEl('dk-sent', sentEmoji);
+  const dkSent=document.getElementById('dk-sent');if(dkSent)dkSent.innerHTML=sentFaceHTML;
   setEl('dk-fcr', fcr+'%');
   setEl('dk-speech', speechAvg+'%');
 

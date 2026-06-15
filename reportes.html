@@ -685,13 +685,7 @@ function tblAgentes(data){
       '<td style="color:'+(a.aht>280?'var(--r)':'var(--t1)')+';">'+a.ahtS+'</td>'+
       '<td><div style="font-weight:500;color:'+rc(a.sat)+';">'+a.sat+'%</div>'+bar(a.sat,56)+'</td>'+
       '<td><div style="font-weight:500;color:'+rc(a.speech)+';">'+a.speech+'%</div>'+bar(a.speech,56)+'</td>'+
-      '<td><div style="display:flex;align-items:center;gap:5px;">'+
-      '<div style="position:relative;display:inline-flex;align-items:center;justify-content:center;">'+
-        '<i class="ti '+(a.sent.p>=70?'ti-mood-happy':a.sent.p>=50?'ti-mood-neutral':'ti-mood-sad')+'" style="font-size:14px;color:var(--t2);"></i>'+
-        '<div style="position:absolute;top:-2px;right:-2px;width:6px;height:6px;border-radius:50%;background:'+sc(a.sent.p)+';border:1px solid white;"></div>'+
-      '</div>'+
-      '<span style="font-size:11px;color:var(--t2);">'+a.sent.p+'%</span>'+
-      '</div></td>'+
+      '<td><div style="display:flex;align-items:center;gap:5px;">'+sentFace(a.sent.p,sc(a.sent.p))+'<span style="font-size:11px;color:var(--t2);">'+a.sent.p+'%</span></div></td>'+
       '<td>'+badge(a)+'</td></tr>';
     return tr;
   }).join('');
@@ -1425,6 +1419,24 @@ function toggleDrop(fpEl, e){
 document.addEventListener('click', function(){
   document.querySelectorAll('.fp.open').forEach(function(el){el.classList.remove('open');});
 });
+
+
+function sentFace(v, sc_color) {
+  var mouth = v>=70
+    ? '<path d="M8 14 Q10.5 16.5 13 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>'
+    : v>=50
+    ? '<line x1="8" y1="14" x2="13" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+    : '<path d="M8 15.5 Q10.5 13 13 15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>';
+  return '<div style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;">'
+    + '<svg width="16" height="16" viewBox="0 0 21 21" fill="none" style="color:var(--t2);">'
+    + '<circle cx="10.5" cy="10.5" r="9" stroke="currentColor" stroke-width="1.5"/>'
+    + '<circle cx="7.5" cy="8.5" r="1.2" fill="currentColor"/>'
+    + '<circle cx="13.5" cy="8.5" r="1.2" fill="currentColor"/>'
+    + mouth
+    + '</svg>'
+    + '<div style="position:absolute;top:-2px;right:-2px;width:6px;height:6px;border-radius:50%;background:'+sc_color+';border:1.5px solid white;"></div>'
+    + '</div>';
+}
 
 </script>
 </body>
