@@ -2157,7 +2157,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.0-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.1-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2592,7 +2592,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 <div class="dash-ov" id="dash-ov" onclick="if(event.target===this)closeDash()">
   <div class="dash-modal">
     <div class="dash-head">
-      <div class="dash-head-ico">📊</div>
+      <div class="dash-head-ico"><i class="ti ti-chart-bar" style="font-size:15px;color:var(--t3)"></i></div>
       <div style="flex:1;min-width:0;">
         <div class="dash-head-title">Análisis del turno</div>
         <div class="dash-head-sub" id="dash-date">—</div>
@@ -3316,9 +3316,9 @@ function renderSentiment(sent){
   const row=document.getElementById('sentiment-card');if(row){row.classList.add('show');}
   const v=Number(sent.valor);
   const cfg={
-    '-1':{ emoji:'😠', label:'Molesto',    color:'#ef4444', pct:10, gradient:'linear-gradient(90deg,#ef4444,#f87171)' },
-     '0':{ emoji:'😐', label:'Neutro',     color:'#f59e0b', pct:50, gradient:'linear-gradient(90deg,#f59e0b,#fcd34d)' },
-     '1':{ emoji:'😊', label:'Satisfecho', color:'#22c55e', pct:88, gradient:'linear-gradient(90deg,#22c55e,#4ade80)' },
+    '-1':{ emoji:'sad', label:'Molesto',    color:'#ef4444', pct:10, gradient:'linear-gradient(90deg,#ef4444,#f87171)' },
+     '0':{ emoji:'neutral', label:'Neutro',     color:'#f59e0b', pct:50, gradient:'linear-gradient(90deg,#f59e0b,#fcd34d)' },
+     '1':{ emoji:'happy', label:'Satisfecho', color:'#22c55e', pct:88, gradient:'linear-gradient(90deg,#22c55e,#4ade80)' },
   };
   const c = cfg[String(v)] || cfg['0'];
   // Actualizar nuevo ícono con pulso
@@ -3456,7 +3456,7 @@ function renderQ(){
   try{var _s2=JSON.parse(localStorage.getItem('helios_session')||'{}');_role=(_s2.user||{}).role||'agente';}catch(e){}
   var isAgent=(_role==='agente'||_role==='demo');
   var htitle=document.querySelector('.q-htitle');
-  if(htitle)htitle.textContent=isAgent?'📊 Mis métricas':'📋 Cola de llamadas';
+  if(htitle)htitle.textContent=isAgent?'Mis métricas':'Cola de llamadas';
   var list=document.getElementById('q-list');
   if(list){
     if(isAgent){
@@ -3467,7 +3467,7 @@ function renderQ(){
       list.innerHTML='<div style="padding:14px 18px;">'+
         '<div style="font-family:var(--f);font-size:9px;color:var(--t3);letter-spacing:.01em;margin-bottom:10px;">Mis llamadas hoy</div>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'+
-        [['📞','Llamadas',nn||0],['⭐','Satisf.',avgSat?avgSat+'%':'—'],['🎙','Speech',avgSp?avgSp+'%':'—']].map(function(mm){
+        [['<i class="ti ti-phone" style="font-size:12px"></i>','Llamadas',nn||0],['<i class="ti ti-star" style="font-size:12px"></i>','Satisf.',avgSat?avgSat+'%':'—'],['<i class="ti ti-microphone" style="font-size:12px"></i>','Speech',avgSp?avgSp+'%':'—']].map(function(mm){
           return'<div style="background:var(--gb);border-radius:10px;padding:10px;text-align:center;">'+
             '<div style="font-size:18px;margin-bottom:4px;">'+mm[0]+'</div>'+
             '<div style="font-size:16px;font-weight:700;color:var(--t0);">'+mm[2]+'</div>'+
@@ -3497,7 +3497,7 @@ function renderQ(){
       _qKB.map(function(k){
         var bg=k.ok?'rgba(74,138,114,.12)':'rgba(184,92,107,.1)';
         var col=k.ok?'var(--g)':'var(--r)';
-        return'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+bg+';color:'+col+';font-weight:600;">'+(k.ok?'✓':'✗')+' '+k.nm+'</span>';
+        return'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+bg+';color:'+col+';font-weight:500;">'+(k.ok?'<i class="ti ti-check" style="font-size:10px"></i>':'<i class="ti ti-x" style="font-size:10px"></i>')+' '+k.nm+'</span>';
       }).join('')+
     '</div>';
   }
@@ -4049,8 +4049,8 @@ function _clearSession() {
   var base = document.getElementById('sent-emoji-base');
   var colored = document.getElementById('sent-emoji-color');
   if(wrap) wrap.className = 'sent-emo-wrap fill-0';
-  if(base) base.textContent = '😐';
-  if(colored) colored.textContent = '😐';
+  if(base) base.textContent = '';
+  if(colored) colored.textContent = '';
   if (label) { label.textContent = 'Neutro'; label.style.color = ''; }
   if (sub) sub.textContent = 'Sin tensión detectada';
   if (fill) { fill.style.width = '50%'; fill.style.background = 'var(--y)'; }
@@ -4507,10 +4507,10 @@ const ServiceDetector=(()=>{
 const Recs=(()=>{
   let _a=new Set();
   const C=[
-    {id:'placa',ico:'🪪',lbl:'Placa',
+    {id:'placa',ico:'<i class="ti ti-id-badge" style="font-size:13px;color:var(--t3)"></i>',lbl:'Placa',
       txt:'Confirma la placa del vehículo con el cliente para evitar errores.',
       trig:d=>!d.placa, done:(d,s,t)=>!!d.placa||(t||'').toLowerCase().includes('tablilla')},
-    {id:'ubic_ref',ico:'📍',lbl:'Referencia',
+    {id:'ubic_ref',ico:'<i class="ti ti-map-pin" style="font-size:13px;color:var(--t3)"></i>',lbl:'Referencia',
       txt:'Solicita un punto de referencia adicional para facilitar el despacho.',
       trig:d=>!!d.ubicación&&d.ubicación.length<22, done:d=>d.ubicación&&d.ubicación.length>=22},
     {id:'eta',ico:'⏱',lbl:'ETA',
@@ -4595,8 +4595,8 @@ const POBuilder = (() => {
   };
   const SUGS={
     grua:  [{i:'<i class="ti ti-map-pin" style="font-size:14px;color:var(--t3)"></i>',t:'Punto de referencia',q:'¿Puede darme un punto de referencia cercano?'},{i:'<i class="ti ti-hash" style="font-size:14px;color:var(--t3)"></i>',t:'Cédula del cliente',q:'¿Me puede confirmar su número de cédula?'}],
-    bat:   [{i:'<i class="ti ti-plug" style="font-size:14px;color:var(--t3)"></i>',t:'¿Intentó arrancar?',q:'¿Ya intentó arrancar el vehículo?'},{i:'📍',t:'¿Vía pública?',q:'¿Está en vía pública o parqueo privado?'}],
-    llanta:[{i:'<i class="ti ti-circle" style="font-size:14px;color:var(--t3)"></i>',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'📍',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
+    bat:   [{i:'<i class="ti ti-plug" style="font-size:14px;color:var(--t3)"></i>',t:'¿Intentó arrancar?',q:'¿Ya intentó arrancar el vehículo?'},{i:'<i class="ti ti-road" style="font-size:14px;color:var(--t3)"></i>',t:'¿Vía pública?',q:'¿Está en vía pública o parqueo privado?'}],
+    llanta:[{i:'<i class="ti ti-circle" style="font-size:14px;color:var(--t3)"></i>',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'<i class="ti ti-shield-check" style="font-size:14px;color:var(--t3)"></i>',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
     gas:   [{i:'<i class="ti ti-droplet" style="font-size:14px;color:var(--t3)"></i>',t:'Tipo combustible',q:'¿Su vehículo es gasolina o diesel?'},{i:'<i class="ti ti-ruler" style="font-size:14px;color:var(--t3)"></i>',t:'Cantidad necesaria',q:'¿Cuántos litros aproximadamente necesita?'}],
     llaves:[{i:'<i class="ti ti-door" style="font-size:14px;color:var(--t3)"></i>',t:'¿Tiene copia?',q:'¿Tiene una copia de la llave en casa?'},{i:'<i class="ti ti-lock" style="font-size:14px;color:var(--t3)"></i>',t:'¿Llave electrónica?',q:'¿Tiene seguro electrónico o llave convencional?'}],
     mec:   [{i:'<i class="ti ti-wind" style="font-size:14px;color:var(--t3)"></i>',t:'¿Sale humo?',q:'¿El vehículo emite humo o hay olores extraños?'},{i:'<i class="ti ti-temperature" style="font-size:14px;color:var(--t3)"></i>',t:'Luz advertencia',q:'¿Vio alguna luz de advertencia encendida?'}],
@@ -4629,7 +4629,7 @@ const POBuilder = (() => {
     _showPanel(); _upsertRow('tipo_asistencia',svcName,isNew);
     _updateSugs(); _updateWait(); _updateStatus();
     // FlashPill for service only on first detection
-    if(isNew) FlashPill.show('🔧','Servicio',svcName);
+    if(isNew) FlashPill.show('<i class="ti ti-tool"></i>','Servicio',svcName);
   }
   function _upsertRow(key,value,isNew){
     const body=document.getElementById('pb-body'); if(!body)return;
@@ -4684,7 +4684,7 @@ const POBuilder = (() => {
     const isUbic = key==='ubicación';
     row.className='pf-row'+(isNew?' new':'')+(isWide?' wide':'')+(isUbic?' has-map':'');
     row.id='pbr_'+key;
-    const mapBtn=isUbic?`<button class="pf-map-btn" onclick="openMapFromField()" title="Ver en mapa">🗺</button>`:'';
+    const mapBtn=isUbic?`<button class="pf-map-btn" onclick="openMapFromField()" title="Ver en mapa"><i class="ti ti-map" style="font-size:13px"></i></button>`:'';
     row.innerHTML=`<span class="pf-ico">${f.i}</span><div class="pf-body"><div class="pf-lbl">${f.l}</div><input class="pf-input" value="${String(value).substring(0,60)}" placeholder="—" onchange="POBuilder._edit('${key}',this.value)" oninput="POBuilder._edit('${key}',this.value)">${mapBtn}</div>`;
     container.appendChild(row);
     if(isNew) setTimeout(()=>row.classList.remove('new'),600);
@@ -4700,7 +4700,7 @@ const POBuilder = (() => {
     sugs.slice(0,2).forEach(s=>{
       const el=document.createElement('div'); el.className='pb-sug';
       el.innerHTML=`<span class="po-sug-i">${s.i}</span><span class="po-sug-t">${s.t}</span><span class="po-sug-arr">›</span>`;
-      el.onclick=()=>{showToast('💬 '+s.q);el.style.opacity='.4';el.style.pointerEvents='none';};
+      el.onclick=()=>{showToast(s.q);el.style.opacity='.4';el.style.pointerEvents='none';};
       list.appendChild(el);
     });
     wrap.style.display='';
@@ -4754,13 +4754,13 @@ const POBuilder = (() => {
 const SF = (() => {
   // field map: key → {id, label, icon}
   const FIELDS = {
-    nombre_cliente: {id:'f-fname', label:'Nombre',    icon:'👤', split:true},
-    placa:          {id:'f-plate', label:'Placa',     icon:'🪪'},
-    marca:          {id:'f-make',  label:'Marca',     icon:'🚗'},
-    modelo:         {id:'f-model', label:'Modelo',    icon:'🔖'},
-    año:            {id:'f-year',  label:'Año',       icon:'📅'},
-    color:          {id:'f-color', label:'Color',     icon:'🎨'},
-    ubicación:      {id:'f-location', label:'Ubicación', icon:'📍'},
+    nombre_cliente: {id:'f-fname', label:'Nombre',    icon:'<i class="ti ti-user" style="font-size:14px;color:var(--t3)"></i>', split:true},
+    placa:          {id:'f-plate', label:'Placa',     icon:'<i class="ti ti-id-badge" style="font-size:14px;color:var(--t3)"></i>'},
+    marca:          {id:'f-make',  label:'Marca',     icon:'<i class="ti ti-car" style="font-size:14px;color:var(--t3)"></i>'},
+    modelo:         {id:'f-model', label:'Modelo',    icon:'<i class="ti ti-tag" style="font-size:14px;color:var(--t3)"></i>'},
+    año:            {id:'f-year',  label:'Año',       icon:'<i class="ti ti-calendar" style="font-size:14px;color:var(--t3)"></i>'},
+    color:          {id:'f-color', label:'Color',     icon:'<i class="ti ti-palette" style="font-size:14px;color:var(--t3)"></i>'},
+    ubicación:      {id:'f-location', label:'Ubicación', icon:'<i class="ti ti-map-pin" style="font-size:14px;color:var(--t3)"></i>'},
   };
 
   let _pending = {}; // key → {val, rendered}
@@ -5018,8 +5018,8 @@ function confirmPO(){
     if(pcmTs)  pcmTs.textContent  = ts;
     if(pcmBody){
       pcmBody.innerHTML = '';
-      const ICONS={tipo_asistencia:'🔧',nombre_cliente:'👤',ubicación:'📍',
-                   placa:'🪪',marca:'🚗',modelo:'🔖',año:'📅',color:'🎨'};
+      const ICONS={tipo_asistencia:'<i class="ti ti-tool" style="font-size:14px;color:var(--t3)"></i>',nombre_cliente:'<i class="ti ti-user" style="font-size:14px;color:var(--t3)"></i>',ubicación:'<i class="ti ti-map-pin" style="font-size:14px;color:var(--t3)"></i>',
+                   placa:'<i class="ti ti-id-badge" style="font-size:14px;color:var(--t3)"></i>',marca:'<i class="ti ti-car" style="font-size:14px;color:var(--t3)"></i>',modelo:'<i class="ti ti-tag" style="font-size:14px;color:var(--t3)"></i>',año:'<i class="ti ti-calendar" style="font-size:14px;color:var(--t3)"></i>',color:'<i class="ti ti-palette" style="font-size:14px;color:var(--t3)"></i>'};
       const LBLS ={tipo_asistencia:'Servicio',nombre_cliente:'Cliente',ubicación:'Ubicación',
                    placa:'Placa',marca:'Marca',modelo:'Modelo',año:'Año',color:'Color'};
       Object.entries(ICONS).forEach(([k,ico])=>{
@@ -5035,7 +5035,7 @@ function confirmPO(){
         (document.getElementById('pb-notes-ta')||{}).value?.trim() || '';
       if(notaFinal){
         const nrow=document.createElement('div'); nrow.className='pcm-field';
-        nrow.innerHTML='<span class="pd-det-i" style="filter:grayscale(1) brightness(10);opacity:.85;transition:filter .2s,opacity .2s" class="pcm-nota-ico">📝</span><div><div class="pd-det-lbl">Nota</div><div class="pd-det-v" style="font-style:italic;color:var(--t1)">'+notaFinal+'</div></div>';
+        nrow.innerHTML='<span class="pd-det-i" style="filter:grayscale(1) brightness(10);opacity:.85;transition:filter .2s,opacity .2s" class="pcm-nota-ico"><i class="ti ti-notes" style="font-size:13px;color:var(--t3)"></i></span><div><div class="pd-det-lbl">Nota</div><div class="pd-det-v" style="font-style:italic;color:var(--t1)">'+notaFinal+'</div></div>';
         pcmBody.appendChild(nrow);
         data.nota = notaFinal; // ensure saved in poEntry
         _pvpNotaValue = ''; // reset after use
@@ -5106,9 +5106,9 @@ function renderDrawer(){
         '<span class="pd-card-ts">'+po.ts+'</span>'+
       '</div>'+
       '<div class="pd-card-fields">'+
-        (po.data.nombre_cliente?'<span class="pd-card-tag">👤 '+po.data.nombre_cliente+'</span>':'')+
-        (po.data.placa?'<span class="pd-card-tag">🪪 '+po.data.placa+'</span>':'')+
-        (po.data.ubicación?'<span class="pd-card-tag">📍 '+po.data.ubicación+'</span>':'')+
+        (po.data.nombre_cliente?'<span class="pd-card-tag"><i class="ti ti-user" style="font-size:10px"></i> '+po.data.nombre_cliente+'</span>':'')+
+        (po.data.placa?'<span class="pd-card-tag"><i class="ti ti-id-badge" style="font-size:10px"></i> '+po.data.placa+'</span>':'')+
+        (po.data.ubicación?'<span class="pd-card-tag"><i class="ti ti-map-pin" style="font-size:10px"></i> '+po.data.ubicación+'</span>':'')+
       '</div>';
     list.appendChild(card);
   });
@@ -5161,11 +5161,11 @@ function openDetail(num){
   if(!body) return;
 
   const sentLbl = m.sentVal===1?'Satisfecho':m.sentVal===0?'Neutro':'Molesto';
-  const sentEmo = m.sentVal===1?'😊':m.sentVal===0?'😐':'😠';
+  const sentEmo = m.sentVal===1?'<i class="ti ti-mood-smile"></i>':m.sentVal===0?'<i class="ti ti-mood-neutral"></i>':'<i class="ti ti-mood-sad"></i>';
 
   // Build HTML
-  const ICONS = {tipo_asistencia:'🔧',nombre_cliente:'👤',ubicación:'📍',
-                 placa:'🪪',marca:'🚗',modelo:'🔖',año:'📅',color:'🎨',nota:'📝'};
+  const ICONS = {tipo_asistencia:'<i class="ti ti-tool" style="font-size:14px;color:var(--t3)"></i>',nombre_cliente:'<i class="ti ti-user" style="font-size:14px;color:var(--t3)"></i>',ubicación:'<i class="ti ti-map-pin" style="font-size:14px;color:var(--t3)"></i>',
+                 placa:'<i class="ti ti-id-badge" style="font-size:14px;color:var(--t3)"></i>',marca:'<i class="ti ti-car" style="font-size:14px;color:var(--t3)"></i>',modelo:'<i class="ti ti-tag" style="font-size:14px;color:var(--t3)"></i>',año:'<i class="ti ti-calendar" style="font-size:14px;color:var(--t3)"></i>',color:'<i class="ti ti-palette" style="font-size:14px;color:var(--t3)"></i>',nota:'<i class="ti ti-notes" style="font-size:14px;color:var(--t3)"></i>'};
   const LBLS  = {tipo_asistencia:'Servicio',nombre_cliente:'Cliente',ubicación:'Ubicación',
                  placa:'Placa',marca:'Marca',modelo:'Modelo',año:'Año',color:'Color',nota:'Nota'};
 
@@ -5496,14 +5496,14 @@ function loadAgentProgress(){
 
 function _genRecs(overall,sat,aht,comp,speech,n,wait){
   const recs=[];
-  if(sat<70)recs.push({ico:'😊',title:'Mejorar empatía con el cliente',body:'El índice de satisfacción está por debajo del estándar. Practica frases de empatía y confirma comprensión durante la llamada.',p:'alta'});
-  if(aht<70)recs.push({ico:'⏱',title:'Reducir tiempo de atención',body:'El AHT supera el rango óptimo. Prepara las preguntas clave y evita silencios prolongados.',p:'alta'});
-  if(comp<75)recs.push({ico:'📋',title:'Capturar todos los datos del PO',body:'Nombre, placa, ubicación y tipo de servicio son obligatorios. Completa el formulario en cada llamada.',p:'alta'});
-  if(speech<70)recs.push({ico:'🎤',title:'Reforzar protocolo de atención',body:'El cumplimiento del speech está por debajo del 70%. Repasa: bienvenida, confirmación y ETA al cliente.',p:'media'});
-  if(wait>22)recs.push({ico:'🚀',title:'Optimizar despacho en hora pico',body:'Los tiempos de espera son altos. Coordina con el equipo para priorizar casos urgentes en franjas críticas.',p:'media'});
-  if(n===0)recs.push({ico:'📊',title:'Crea POs durante las llamadas',body:'Sin POs no hay métricas de desempeño. Completa el formulario en cada llamada de asistencia.',p:'media'});
+  if(sat<70)recs.push({ico:'<i class="ti ti-mood-smile" style="font-size:14px;color:var(--t3)"></i>',title:'Mejorar empatía con el cliente',body:'El índice de satisfacción está por debajo del estándar. Practica frases de empatía y confirma comprensión durante la llamada.',p:'alta'});
+  if(aht<70)recs.push({ico:'<i class="ti ti-clock" style="font-size:14px;color:var(--t3)"></i>',title:'Reducir tiempo de atención',body:'El AHT supera el rango óptimo. Prepara las preguntas clave y evita silencios prolongados.',p:'alta'});
+  if(comp<75)recs.push({ico:'<i class="ti ti-clipboard-text" style="font-size:14px;color:var(--t3)"></i>',title:'Capturar todos los datos del PO',body:'Nombre, placa, ubicación y tipo de servicio son obligatorios. Completa el formulario en cada llamada.',p:'alta'});
+  if(speech<70)recs.push({ico:'<i class="ti ti-microphone" style="font-size:14px;color:var(--t3)"></i>',title:'Reforzar protocolo de atención',body:'El cumplimiento del speech está por debajo del 70%. Repasa: bienvenida, confirmación y ETA al cliente.',p:'media'});
+  if(wait>22)recs.push({ico:'<i class="ti ti-rocket" style="font-size:14px;color:var(--t3)"></i>',title:'Optimizar despacho en hora pico',body:'Los tiempos de espera son altos. Coordina con el equipo para priorizar casos urgentes en franjas críticas.',p:'media'});
+  if(n===0)recs.push({ico:'<i class="ti ti-chart-bar" style="font-size:14px;color:var(--t3)"></i>',title:'Crea POs durante las llamadas',body:'Sin POs no hay métricas de desempeño. Completa el formulario en cada llamada de asistencia.',p:'media'});
   if(overall>=85)recs.push({ico:'⭐',title:'Mantén el nivel de excelencia',body:'Tu rendimiento supera el estándar del equipo. Considera compartir tus mejores prácticas.',p:'baja'});
-  if(!recs.length)recs.push({ico:'👍',title:'Buen trabajo general',body:'Tu desempeño es sólido. Busca consistencia y mejora continua día a día.',p:'baja'});
+  if(!recs.length)recs.push({ico:'<i class="ti ti-thumb-up" style="font-size:14px;color:var(--t3)"></i>',title:'Buen trabajo general',body:'Tu desempeño es sólido. Busca consistencia y mejora continua día a día.',p:'baja'});
   return recs.slice(0,5);
 }
 
@@ -5522,12 +5522,12 @@ function _toggleDPO(idx){
   const sc=m.scores||{satisfaction:70,ahtScore:80,completeness:75,speechScore:80,speechItems:[]};
   const tot=Math.round(sc.satisfaction*.3+sc.ahtScore*.2+sc.completeness*.2+sc.speechScore*.3);
   const gc=v=>v>=80?'var(--g)':v>=65?'var(--y)':'var(--r)';
-  const sentLbl=m.sentVal===1?'😊 Satisfecho':m.sentVal===0?'😐 Neutro':'😠 Molesto';
+  const sentLbl=m.sentVal===1?'Satisfecho':m.sentVal===0?'Neutro':'Molesto';
   let html=`<div class="dpo-grid">
     <div class="dpo-metric"><div class="dpo-metric-lbl">Nota</div><div class="dpo-metric-val" style="color:${gc(tot)}">${tot}%</div></div>
     <div class="dpo-metric"><div class="dpo-metric-lbl">Satisfacción</div><div class="dpo-metric-val" style="color:var(--v)">${sc.satisfaction}%</div></div>
     <div class="dpo-metric"><div class="dpo-metric-lbl">Duración</div><div class="dpo-metric-val" style="color:var(--blue)">${m.callDuration||'—'}</div></div>
-    <div class="dpo-metric"><div class="dpo-metric-lbl">Sentimiento</div><div class="dpo-metric-val" style="font-size:20px;line-height:1.3">${m.sentVal===1?'😊':m.sentVal===0?'😐':'😠'}</div></div>
+    <div class="dpo-metric"><div class="dpo-metric-lbl">Sentimiento</div><div class="dpo-metric-val" style="font-size:20px;line-height:1.3">${m.sentVal===1?'<i class="ti ti-mood-smile"></i>':m.sentVal===0?'<i class="ti ti-mood-neutral"></i>':'<i class="ti ti-mood-sad"></i>'}</div></div>
   </div>
   <div class="dpo-bars">
     ${[
@@ -5541,7 +5541,7 @@ function _toggleDPO(idx){
     }).join('')}
   </div>`;
   if(sc.speechItems?.length){
-    html+=`<div class="dpo-speech">${sc.speechItems.map(i=>'<div class="dpo-speech-chip '+(i.ok?'ok':'fail')+'">'+(i.ok?'✓':'✗')+' '+i.label+'</div>').join('')}</div>`;
+    html+=`<div class="dpo-speech">${sc.speechItems.map(i=>'<div class="dpo-speech-chip '+(i.ok?'ok':'fail')+'">'+(i.ok?'<i class="ti ti-check" style="font-size:10px"></i>':'<i class="ti ti-x" style="font-size:10px"></i>')+' '+i.label+'</div>').join('')}</div>`;
   }
   detail.innerHTML=html;
   setTimeout(()=>detail.querySelectorAll('.dpo-bar-fill').forEach(f=>f.style.width=f.dataset.w),50);
@@ -5694,14 +5694,14 @@ function openPOValidation(){
   }
   const DEF=[
     {k:'tipo_asistencia',i:'',l:'Servicio',req:true},
-    {k:'nombre_cliente', i:'👤',l:'Cliente', req:true},
-    {k:'ubicación',      i:'📍',l:'Ubicación',req:true},
-    {k:'placa',          i:'🪪',l:'Placa',   req:false},
-    {k:'marca',          i:'🚗',l:'Marca',   req:false},
-    {k:'modelo',         i:'🔖',l:'Modelo',  req:false},
-    {k:'año',            i:'📅',l:'Año',     req:false},
-    {k:'color',          i:'🎨',l:'Color',   req:false},
-    {k:'ubicacion_destino',i:'🏁',l:'Destino remolque',req:false},
+    {k:'nombre_cliente', i:'<i class="ti ti-user" style="font-size:14px;color:var(--t3)"></i>',l:'Cliente', req:true},
+    {k:'ubicación',      i:'<i class="ti ti-map-pin" style="font-size:14px;color:var(--t3)"></i>',l:'Ubicación',req:true},
+    {k:'placa',          i:'<i class="ti ti-id-badge" style="font-size:14px;color:var(--t3)"></i>',l:'Placa',   req:false},
+    {k:'marca',          i:'<i class="ti ti-car" style="font-size:14px;color:var(--t3)"></i>',l:'Marca',   req:false},
+    {k:'modelo',         i:'<i class="ti ti-tag" style="font-size:14px;color:var(--t3)"></i>',l:'Modelo',  req:false},
+    {k:'año',            i:'<i class="ti ti-calendar" style="font-size:14px;color:var(--t3)"></i>',l:'Año',     req:false},
+    {k:'color',          i:'<i class="ti ti-palette" style="font-size:14px;color:var(--t3)"></i>',l:'Color',   req:false},
+    {k:'ubicacion_destino',i:'<i class="ti ti-flag" style="font-size:14px;color:var(--t3)"></i>',l:'Destino remolque',req:false},
   ];
   // Always show nota field (optional)
   const notaVal = (POBuilder.getData().nota||'');
@@ -5744,7 +5744,7 @@ function _pvpRefreshStatus(){
     const val = inp.value.trim();
     const filled = val.length > 0;
     const st = document.getElementById('pvp-st-'+key);
-    if(st){ st.textContent=filled?'✓':'✗'; st.className='pvp-status '+(filled?'ok':'miss'); }
+    if(st){ st.innerHTML=filled?'<i class="ti ti-check" style="font-size:11px"></i>':'<i class="ti ti-x" style="font-size:11px"></i>'; st.className='pvp-status '+(filled?'ok':'miss'); }
     inp.classList.toggle('empty', !filled);
     if(REQUIRED.includes(key) && !filled) allOk = false;
   });
@@ -5776,9 +5776,9 @@ function _renderDrawerCard(po) {
       '<span class="pd-card-ts">'+po.ts+'</span>' +
     '</div>' +
     '<div class="pd-card-fields">' +
-      (po.data.nombre_cliente?'<span class="pd-card-tag">👤 '+po.data.nombre_cliente+'</span>':'') +
-      (po.data.placa?'<span class="pd-card-tag">🪪 '+po.data.placa+'</span>':'') +
-      (po.data.ubicación?'<span class="pd-card-tag">📍 '+po.data.ubicación+'</span>':'') +
+      (po.data.nombre_cliente?'<span class="pd-card-tag"><i class="ti ti-user" style="font-size:10px"></i> '+po.data.nombre_cliente+'</span>':'') +
+      (po.data.placa?'<span class="pd-card-tag"><i class="ti ti-id-badge" style="font-size:10px"></i> '+po.data.placa+'</span>':'') +
+      (po.data.ubicación?'<span class="pd-card-tag"><i class="ti ti-map-pin" style="font-size:10px"></i> '+po.data.ubicación+'</span>':'') +
     '</div>';
   list.insertBefore(card, list.firstChild);
 }
@@ -5889,7 +5889,7 @@ function _showKBPill(c){
   btn.textContent = '✓';
   btn.onclick = function(){ _dismissKBPill(c.id); };
   el.innerHTML =
-    '<span class="rec-ico">📋</span>' +
+    '<span class="rec-ico"><i class="ti ti-clipboard-text" style="font-size:14px"></i></span>' +
     '<div class="rec-body">' +
       '<div class="rec-lbl">Checklist</div>' +
       '<div class="rec-txt">' + c.txt + '</div>' +
@@ -6040,7 +6040,7 @@ function autoCheckItem(keyword) {
       if (!item.classList.contains('done')) {
         item.classList.add('done');
         var box = item.querySelector('.kai-check-box');
-        if (box) box.textContent = '✓';
+        if (box) box.innerHTML = '<i class="ti ti-check" style="font-size:11px"></i>';
       }
     }
   });
@@ -6087,19 +6087,19 @@ function _spawnConfetti(){
 
 
 var PAUSAS=[
-  {id:"disponible",label:"Disponible",color:"#6aaa90",key:true,icon:"🟢"},
-  {id:"almuerzo",label:"Almuerzo",color:"#bf9455",key:true,icon:"🍽️"},
-  {id:"bano",label:"Baño",color:"#bf9455",key:true,icon:"🚻"},
+  {id:"disponible",label:"Disponible",color:"#6aaa90",key:true,icon:"●"},
+  {id:"almuerzo",label:"Almuerzo",color:"#bf9455",key:true,icon:"–"},
+  {id:"bano",label:"Baño",color:"#bf9455",key:true,icon:"–"},
   {id:"break",label:"Break",color:"#bf9455",key:true,icon:"☕"},
-  {id:"ocupado",label:"Ocupado",color:"#cc7580",key:true,icon:"🔴"},
-  {id:"capacitacion",label:"Capacitación",color:"#6366f1",key:false,icon:"📚"},
-  {id:"coaching",label:"Coaching",color:"#6366f1",key:false,icon:"🎯"},
-  {id:"reunion",label:"Reunión",color:"#6366f1",key:false,icon:"👥"},
-  {id:"backoffice",label:"Back Office",color:"#9ca3af",key:false,icon:"💼"},
+  {id:"ocupado",label:"Ocupado",color:"#cc7580",key:true,icon:"●"},
+  {id:"capacitacion",label:"Capacitación",color:"#6366f1",key:false,icon:"–"},
+  {id:"coaching",label:"Coaching",color:"#6366f1",key:false,icon:"–"},
+  {id:"reunion",label:"Reunión",color:"#6366f1",key:false,icon:"–"},
+  {id:"backoffice",label:"Back Office",color:"#9ca3af",key:false,icon:"–"},
   {id:"falla",label:"Falla técnica",color:"#cc7580",key:false,icon:"⚠️"},
-  {id:"training",label:"Training",color:"#6366f1",key:false,icon:"🎓"},
-  {id:"meeting",label:"Meeting",color:"#6366f1",key:false,icon:"📅"},
-  {id:"outbound",label:"Outbound",color:"#9ca3af",key:false,icon:"📞"}
+  {id:"training",label:"Training",color:"#6366f1",key:false,icon:"–"},
+  {id:"meeting",label:"Meeting",color:"#6366f1",key:false,icon:"–"},
+  {id:"outbound",label:"Outbound",color:"#9ca3af",key:false,icon:"–"}
 ];
 var _currentStatus="disponible";
 
@@ -6143,7 +6143,7 @@ function setStatus(id,color,label,icon){
   }
 }
 
-var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'🟢'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'🍽️'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'🚻'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'🔴'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'🎯'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'📚'},{id:'llamada_practica',label:'Llamada práctica',color:'#0ea5e9',key:false,icon:'🎙️'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'👥'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'💼'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
+var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'●'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'–'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'–'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'●'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'–'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'–'},{id:'llamada_practica',label:'Llamada práctica',color:'#0ea5e9',key:false,icon:'–'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'–'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'–'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
 var _curStatus='coaching_p';
 var _lastTranscriptText='';
 function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;m.innerHTML='';var s1=document.createElement('div');s1.className='status-sec';s1.textContent='Estado';m.appendChild(s1);PAUSAS.filter(function(p){return p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});var sep=document.createElement('div');sep.className='status-sep';m.appendChild(sep);var s2=document.createElement('div');s2.className='status-sec';s2.textContent='Pausas';m.appendChild(s2);PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});}
@@ -6161,8 +6161,8 @@ var RC=[
   {agent:'María Solano',obj:'Speech compliance al 90%',acts:['5 grabaciones propias/semana','Sesión con formador'],dl:'5 may',pct:20,coach:'Ana Vega'},
   {agent:'Carlos Mora',obj:'Comunicar ETA en 100% llamadas',acts:['Checklist visual','Feedback diario'],dl:'28 abr',pct:60,coach:'Roberto Salas'}
 ];
-var RP=[{icon:'📉',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},{icon:'⭐',title:'Alto rendimiento Concierge',type:'pos',desc:'Satisfacción +90% consistente.',agents:'Valeria Núñez, Andrés Fallas'},{icon:'⚠️',title:'Omisión de ETA',type:'neg',desc:'40% de agentes no comunican ETA al cerrar.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},{icon:'📈',title:'Mejora en speech',type:'pos',desc:'Speech compliance +8% en 2 semanas.',agents:'Dayana García, Sofía Ramírez'}];
-var RM=[{id:'resumen',i:'📊',l:'Resumen'},{id:'agentes',i:'🎧',l:'Agentes'},{id:'supervisor',i:'📈',l:'Supervisor'},{id:'formador',i:'🎓',l:'Formador'},{id:'agente_v',i:'👤',l:'Por Agente'},{id:'feedback',i:'💬',l:'Feedback'},{id:'coaching',i:'🎯',l:'Coaching'}];
+var RP=[{icon:'<i class="ti ti-trending-down" style="font-size:13px;color:var(--t3)"></i>',title:'AHT elevado en Road',type:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},{icon:'⭐',title:'Alto rendimiento Concierge',type:'pos',desc:'Satisfacción +90% consistente.',agents:'Valeria Núñez, Andrés Fallas'},{icon:'⚠️',title:'Omisión de ETA',type:'neg',desc:'40% de agentes no comunican ETA al cerrar.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},{icon:'<i class="ti ti-trending-up" style="font-size:13px;color:var(--t3)"></i>',title:'Mejora en speech',type:'pos',desc:'Speech compliance +8% en 2 semanas.',agents:'Dayana García, Sofía Ramírez'}];
+var RM=[{id:'resumen',i:'<i class="ti ti-chart-bar" style="font-size:13px;color:var(--t3)"></i>',l:'Resumen'},{id:'agentes',i:'<i class="ti ti-headphones" style="font-size:13px;color:var(--t3)"></i>',l:'Agentes'},{id:'supervisor',i:'<i class="ti ti-trending-up" style="font-size:13px;color:var(--t3)"></i>',l:'Supervisor'},{id:'formador',i:'<i class="ti ti-school" style="font-size:13px;color:var(--t3)"></i>',l:'Formador'},{id:'agente_v',i:'<i class="ti ti-user" style="font-size:13px;color:var(--t3)"></i>',l:'Por Agente'},{id:'feedback',i:'<i class="ti ti-message" style="font-size:13px;color:var(--t3)"></i>',l:'Feedback'},{id:'coaching',i:'<i class="ti ti-target" style="font-size:13px;color:var(--t3)"></i>',l:'Coaching'}];
 function switchDashTab(tab){
   try{var _uu=(JSON.parse(localStorage.getItem('helios_session')||'{}')||{}).user||{};if(_uu.role==='formador'&&tab==='dia')return;}catch(e){} // formador stays on rep
   _dashTab=tab;var dia=document.getElementById('dtab-dia-content');var rep=document.getElementById('dtab-rep-content');var bDia=document.getElementById('dtab-dia');var bRep=document.getElementById('dtab-rep');var ttl=document.getElementById('dash-view-title');if(tab==='dia'){if(dia){dia.style.display='flex';dia.style.flexDirection='column';}if(rep){rep.style.display='none';rep.className='';}if(bDia){bDia.style.background='rgba(255,255,255,.1)';bDia.style.color='#fff';bDia.style.borderColor='rgba(255,255,255,.15)';}if(bRep){bRep.style.background='transparent';bRep.style.color='rgba(255,255,255,.4)';bRep.style.borderColor='rgba(255,255,255,.06)';}if(ttl)ttl.textContent='Análisis del día';}else{if(dia)dia.style.display='none';if(rep){
@@ -6204,7 +6204,7 @@ var _cC={Home:'#6366f1',Road:'var(--g)',Concierge:'var(--y)'};
 var _pC={'Costa Rica':'var(--r)','Panamá':'var(--y)','Guatemala':'var(--g)','Honduras':'var(--t2)'};
 function repResumen(ag){var tot={calls:0,pos:0,sat:0,sp:0,sc:0};ag.forEach(function(a){tot.calls+=a.calls;tot.pos+=a.pos;tot.sat+=a.sat;tot.sp+=a.speech;tot.sc+=a.score;});var n=ag.length||1;var kpis=[['Llamadas',tot.calls],['POs',tot.pos],['Satisfacción',tot.calls?Math.round(tot.sat/n)+'%':'—'],['Speech',tot.calls?Math.round(tot.sp/n)+'%':'—'],['Score',tot.calls?Math.round(tot.sc/n):'—']];var out='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';kpis.forEach(function(k){out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;"><div style="font-family:var(--m);font-size:22px;font-weight:600;color:var(--t0);">'+k[1]+'</div><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-top:4px;">'+k[0]+'</div></div>';});return out+'</div>'+repTable(ag);}
 function repTable(ag){var ths=['Agente','Llamadas','AHT','Satisf.','Speech','Score'].map(function(x){return'<th style="padding:8px 12px;text-align:left;font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;font-weight:500;">'+x+'</th>';}).join('');var trs=ag.map(function(a){var sc=_rc(a.sat);var sp=_rc(a.speech);return'<tr style="border-bottom:1px solid var(--gb);"><td style="padding:9px 12px;"><div style="display:flex;align-items:center;gap:9px;"><div style="width:28px;height:28px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">'+a.letter+'</div><div><div style="font-size:12px;font-weight:600;color:var(--t0);">'+a.name+'</div><div style="font-family:var(--f);font-size:9px;color:var(--t2);">'+a.carril+' · '+a.pais+'</div></div></div></td><td style="padding:9px 12px;font-family:var(--f);font-size:11px;color:var(--t0);">'+a.calls+'</td><td style="padding:9px 12px;font-family:var(--f);font-size:11px;color:var(--t0);">'+a.aht+'</td><td style="padding:9px 12px;"><div style="font-family:var(--f);font-size:11px;font-weight:600;color:'+sc+';">'+a.sat+'%</div>'+_rBar(a.sat)+'</td><td style="padding:9px 12px;"><div style="font-family:var(--f);font-size:11px;font-weight:600;color:'+sp+';">'+a.speech+'%</div></td><td style="padding:9px 12px;">'+_rScore(a)+'</td></tr>';}).join('');return'<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;overflow:hidden;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--c2);">'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div>';}
-function repSup(ag){var tc={pos:'var(--g)',neg:'var(--r)',neu:'var(--y)'};var out=RP.map(function(p){var c=tc[p.type];return'<div style="background:var(--c1);border:1px solid var(--gb2);border-left:3px solid '+c+';border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:16px;">'+p.icon+'</span><span style="font-size:13px;font-weight:600;color:var(--t0);flex:1;">'+p.title+'</span></div><div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:4px;">'+p.desc+'</div><div style="font-family:var(--f);font-size:9px;color:var(--t2);">👥 '+p.agents+'</div></div>';}).join('');var sorted=ag.slice().sort(function(a,b){return b.score-a.score;});out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;"><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:10px;">Ranking</div>';sorted.forEach(function(a,i){out+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gb);"><span style="font-family:var(--f);font-size:11px;width:18px;color:var(--t2);">'+(i+1)+'</span><div style="width:24px;height:24px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">'+a.letter+'</div><span style="flex:1;font-size:12px;color:var(--t0);">'+a.name+'</span>'+_rScore(a)+_rBar(a.score)+'</div>';});return out+'</div>';}
+function repSup(ag){var tc={pos:'var(--g)',neg:'var(--r)',neu:'var(--y)'};var out=RP.map(function(p){var c=tc[p.type];return'<div style="background:var(--c1);border:1px solid var(--gb2);border-left:3px solid '+c+';border-radius:10px;padding:14px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:16px;">'+p.icon+'</span><span style="font-size:13px;font-weight:600;color:var(--t0);flex:1;">'+p.title+'</span></div><div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:4px;">'+p.desc+'</div><div style="font-family:var(--f);font-size:9px;color:var(--t2);"><i class="ti ti-users" style="font-size:11px;color:var(--t3)"></i> '+p.agents+'</div></div>';}).join('');var sorted=ag.slice().sort(function(a,b){return b.score-a.score;});out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:14px;"><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:10px;">Ranking</div>';sorted.forEach(function(a,i){out+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gb);"><span style="font-family:var(--f);font-size:11px;width:18px;color:var(--t2);">'+(i+1)+'</span><div style="width:24px;height:24px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">'+a.letter+'</div><span style="flex:1;font-size:12px;color:var(--t0);">'+a.name+'</span>'+_rScore(a)+_rBar(a.score)+'</div>';});return out+'</div>';}
 function repForm(){var opps=[{a:'Protocolo de apertura',imp:'alto',ag:'Luis Arias, María Solano',d:'Estandarizar saludo y preguntas clave.'},{a:'Comunicación de ETA',imp:'alto',ag:'Carlos Mora, Luis Arias',d:'Confirmar ETA antes de cerrar.'},{a:'Clientes molestos',imp:'medio',ag:'Luis Arias, María Solano',d:'Técnicas de desescalada.'}];var iC={alto:'var(--r)',medio:'var(--y)',bajo:'var(--g)'};var out='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"><div><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:10px;">Oportunidades</div>';opps.forEach(function(o){out+='<div style="background:var(--c1);border:1px solid var(--gb2);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="display:flex;margin-bottom:4px;"><span style="font-size:12px;font-weight:600;color:var(--t0);flex:1;">'+o.a+'</span><span style="font-family:var(--f);font-size:8px;color:'+iC[o.imp]+';">'+o.imp+'</span></div><div style="font-size:11px;color:var(--t1);margin-bottom:3px;">'+o.d+'</div><div style="font-family:var(--f);font-size:9px;color:var(--t2);">'+o.ag+'</div></div>';});return out+'</div><div><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:10px;">Planes activos</div><div style="font-size:11px;color:var(--t2);padding:20px;text-align:center;">Sin planes activos</div></div></div>';}
 function repAgSel(){var opts=RA.map(function(a){return'<option value="'+a.name+'">'+a.name+'</option>';}).join('');return'<select id="rep-ag-sel" onchange="repShowAg(this.value)" style="margin-bottom:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--gb2);background:var(--c1);color:var(--t0);font-family:var(--m);font-size:12px;width:240px;cursor:pointer;"><option value="">Seleccionar agente...</option>'+opts+'</select><div id="rep-ag-det" style="padding:32px;text-align:center;font-family:var(--f);font-size:11px;color:var(--t2);">Selecciona un agente</div>';}
 function repShowAg(name){var a=RA.find(function(x){return x.name===name;});var d=document.getElementById('rep-ag-det');if(!d||!a)return;d.innerHTML='<div style="text-align:center;padding:20px;"><div style="width:48px;height:48px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;margin:0 auto 10px;">'+a.letter+'</div><div style="font-size:16px;font-weight:700;color:var(--t0);">'+a.name+'</div></div>';}
@@ -6241,7 +6241,7 @@ function repCoach(){
         '<div style="font-family:var(--m);font-size:20px;font-weight:700;color:'+col+';">'+p.pct+'%</div>'+
       '</div>'+
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'+
-        '<span style="font-size:14px;">🎯</span>'+
+        '<i class="ti ti-target" style="font-size:14px;color:var(--t3)"></i>'+
         '<span style="font-size:13px;font-weight:600;color:var(--t0);">'+p.obj+'</span>'+
       '</div>'+
       '<div style="height:5px;background:var(--gb2);border-radius:3px;overflow:hidden;margin-bottom:10px;">'+
@@ -6265,8 +6265,8 @@ function showCallRating(){
   var spHtml=speechItems.map(function(k){var done=txt.includes(k.split(' ')[0].toLowerCase());if(done)spOk++;return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gb);"><div style="width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;background:'+(done?'var(--g)':'var(--gb2)')+';">'+(done?'✓':'')+'</div><span style="font-size:11px;color:var(--t1);">'+k+'</span></div>';}).join('');
   var spPct=Math.round(spOk/speechItems.length*100);
   var nPOs=window.POs?window.POs.length:0;var satPct=nPOs>0?Math.min(95,70+nPOs*5):50;var compPct=nPOs>0?Math.min(100,nPOs*30):0;
-  card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;"><div><div style="font-size:15px;font-weight:700;color:var(--t0);">Calificación de llamada</div><div style="font-family:var(--f);font-size:10px;color:var(--t2);margin-top:2px;">ID: #'+String(Date.now()).slice(-6)+'</div></div><span style="font-size:28px;">📋</span></div>'+
-    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">'+[['Satisfacción',satPct+'%','⭐'],['Speech',spPct+'%','🎙'],['AHT',aht,'⏱'],['Completitud',compPct+'%','✅']].map(function(m){return'<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:16px;margin-bottom:4px;">'+m[2]+'</div><div style="font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);">'+m[1]+'</div><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-top:2px;">'+m[0]+'</div></div>';}).join('')+'</div>'+
+  card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;"><div><div style="font-size:15px;font-weight:700;color:var(--t0);">Calificación de llamada</div><div style="font-family:var(--f);font-size:10px;color:var(--t2);margin-top:2px;">ID: #'+String(Date.now()).slice(-6)+'</div></div><i class="ti ti-clipboard-text" style="font-size:24px;color:var(--t3)"></i></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">'+[['Satisfacción',satPct+'%','<i class="ti ti-star" style="font-size:14px;color:var(--t3)"></i>'],['Speech',spPct+'%','<i class="ti ti-microphone" style="font-size:14px;color:var(--t3)"></i>'],['AHT',aht,'<i class="ti ti-clock" style="font-size:14px;color:var(--t3)"></i>'],['Completitud',compPct+'%','<i class="ti ti-circle-check" style="font-size:14px;color:var(--t3)"></i>']].map(function(m){return'<div style="background:var(--c2);border:1px solid var(--gb2);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:16px;margin-bottom:4px;">'+m[2]+'</div><div style="font-family:var(--m);font-size:18px;font-weight:700;color:var(--t0);">'+m[1]+'</div><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-top:2px;">'+m[0]+'</div></div>';}).join('')+'</div>'+
     '<div style="margin-bottom:16px;"><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:8px;">Speech compliance</div>'+spHtml+'</div>'+
     '<div style="margin-bottom:16px;"><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:6px;">Observaciones</div><textarea placeholder="Agrega una observación..." style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--gb2);background:var(--c2);color:var(--t0);font-family:var(--f);font-size:12px;resize:none;height:60px;outline:none;box-sizing:border-box;"></textarea></div>'+
     '<div style="display:flex;gap:8px;" id="cr-btns"></div>';
