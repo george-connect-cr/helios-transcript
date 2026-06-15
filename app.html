@@ -461,12 +461,12 @@ body.dark .n-th-thumb {
 .dash-foot-note{font-family:var(--f);font-size:9.5px;color:var(--t2);}
 .dash-foot-btn{
   display:inline-flex;align-items:center;gap:7px;
-  padding:9px 18px;border-radius:20px;border:none;
-  background:var(--a);color:#fff;
-  font-family:var(--f);font-size:12px;font-weight:600;
+  padding:9px 18px;border-radius:20px;
+  border:2px solid var(--a);background:transparent;color:var(--a);
+  font-family:var(--f);font-size:12px;font-weight:500;
   cursor:pointer;transition:background .15s;
 }
-.dash-foot-btn:hover{background:var(--a2);}
+.dash-foot-btn:hover{background:rgba(224,69,0,.06);}
 
 /* ═══ BODY — 3 COLUMNS ═════════════════════════════ */
 .body{flex:1;display:flex;overflow:hidden;background:var(--bg);}
@@ -1017,11 +1017,12 @@ body.dark .n-th-thumb {
 .pvp-btn-sec:hover{background:var(--c2);}
 .pvp-btn-pri{
   flex:2;padding:10px;border-radius:8px;
-  border:none;background:var(--a);color:#fff;
-  font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;
+  border:2px solid var(--a);background:transparent;color:var(--a);
+  font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
   transition:background .12s;
 }
-.pvp-btn-pri:hover{background:var(--a2);}
+.pvp-btn-pri:hover{background:rgba(224,69,0,.06);}
 
 /* CTA bar (sticky bottom of PO console) */
 .po-cta-bar{
@@ -2157,7 +2158,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.2-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.3-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
