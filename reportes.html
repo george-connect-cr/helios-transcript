@@ -268,7 +268,7 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
       <div class="fdrop-item" onclick="setF('grade','',event)">Todos</div>
       <div class="fdrop-item" onclick="setF('grade','A',event)">Excelente (A)</div>
       <div class="fdrop-item" onclick="setF('grade','B',event)">👍 Bueno (B)</div>
-      <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ Atención (C)</div>
+      <div class="fdrop-item" onclick="setF('grade','C',event)">Atención (C)</div>
     </div>
   </div>
   <div id="ftags" style="display:none;"></div>
@@ -276,16 +276,16 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 <div class="body-wrap">
   <div class="sb">
     <div class="sb-sec">General</div>
-    <div class="sb-item active" id="nav-resumen" onclick="go('resumen')"><span class="sb-ico">📊</span>Resumen</div>
+    <div class="sb-item active" id="nav-resumen" onclick="go('resumen')"><i class="ti ti-chart-bar sb-ico"></i>Resumen</div>
     <div class="sb-div"></div>
     <div class="sb-sec" id="sb-sec-formador">Formador</div>
-    <div class="sb-item" id="nav-agentes" onclick="go('agentes')"><span class="sb-ico">🎧</span>Agentes</div>
-    <div class="sb-item" id="nav-agente_v" onclick="go('agente_v')"><span class="sb-ico">👤</span>Por agente</div>
-    <div class="sb-item" id="nav-coaching" onclick="go('coaching')"><span class="sb-ico">🎯</span>Coaching</div>
-    <div class="sb-item" id="nav-feedback" onclick="go('feedback')"><span class="sb-ico">💬</span>Feedback</div>
+    <div class="sb-item" id="nav-agentes" onclick="go('agentes')"><i class="ti ti-headphones sb-ico"></i>Agentes</div>
+    <div class="sb-item" id="nav-agente_v" onclick="go('agente_v')"><i class="ti ti-user sb-ico"></i>Por agente</div>
+    <div class="sb-item" id="nav-coaching" onclick="go('coaching')"><i class="ti ti-target sb-ico"></i>Coaching</div>
+    <div class="sb-item" id="nav-feedback" onclick="go('feedback')"><i class="ti ti-message-circle sb-ico"></i>Feedback</div>
     <div class="sb-div" id="adm-div" style="display:none"></div>
     <div class="sb-sec" id="adm-sec" style="display:none">Admin / Supervisor</div>
-    <div class="sb-item" id="nav-supervisor" onclick="go('supervisor')" style="display:none"><span class="sb-ico">📈</span>Supervisor</div>
+    <div class="sb-item" id="nav-supervisor" onclick="go('supervisor')" style="display:none"><span class="sb-ico"><i class="ti ti-chart-line sb-ico"></i>Supervisor</div>
   </div>
 
   <div class="main">
@@ -569,7 +569,7 @@ function vResumen(){
   // Agente sin sesiones reales todavía — pantalla de bienvenida
   if(_role==='agente' && !_hasRealData){
     return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;">'+
-      '<div style="font-size:48px;">📊</div>'+
+      '<div style="margin-bottom:8px;"><i class="ti ti-chart-bar" style="font-size:36px;color:var(--t3);"></i></div>'+
       '<div style="font-family:var(--f);font-size:18px;font-weight:400;color:var(--t0);">Tus métricas aparecerán aquí</div>'+
       '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:380px;line-height:1.65;">'+
         'Cuando confirmes POs en una llamada, tus resultados — score, satisfacción, duración, protocolo — se registran automáticamente y se reflejan en este panel.'+
@@ -723,7 +723,7 @@ function vPorAgente(){
   }).join('');
 
   var detailPanel=_selAg?agDet(_selAg):
-    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--t3);"><div style="font-size:40px;margin-bottom:12px;">👤</div><div style="font-size:13px;">Selecciona un agente para ver su análisis</div></div>';
+    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--t3);"><div style="font-size:40px;margin-bottom:12px;"><i class="ti ti-user" style="font-size:36px;color:var(--t3);"></i></div><div style="font-size:13px;">Selecciona un agente para ver su análisis</div></div>';
 
   return'<div style="display:flex;gap:0;height:100%;min-height:0;">'+
     '<div style="width:200px;min-width:200px;flex-shrink:0;border-right:1px solid var(--gb);overflow-y:auto;background:#fff;">'+
@@ -926,7 +926,7 @@ function agDet(a){
       '<div class="card" style="border-left:3px solid '+planCol+';">'+
         '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">'+
           '<div>'+
-            '<div style="font-size:13px;font-weight:500;color:var(--t0);margin-bottom:4px;">🎯 '+ap.obj+'</div>'+
+            '<div style="font-size:13px;font-weight:400;color:var(--t0);margin-bottom:4px;">'+ap.obj+'</div>'+
             '<div style="font-size:11px;color:var(--t2);">Coach: '+ap.coach+' · '+ap.sessions+' sesiones · Próxima: '+ap.next+'</div>'+
           '</div>'+
           '<div style="font-size:28px;font-weight:400;color:'+planCol+';font-family:var(--m);">'+ap.pct+'%</div>'+
@@ -940,7 +940,7 @@ function agDet(a){
         }).join('')+
       '</div>':
       '<div class="card" style="text-align:center;padding:24px;">'+
-        '<div style="font-size:22px;margin-bottom:6px;opacity:.4;">🎯</div>'+
+        '<div style="margin-bottom:6px;"><i class="ti ti-target" style="font-size:20px;color:var(--t3);"></i></div>'+
         '<div style="font-size:12px;color:var(--t2);">Sin plan activo</div>'+
       '</div>');
 
@@ -1008,7 +1008,7 @@ function vCoaching(){
         '<div style="font-size:11px;color:var(--t2);">Coach: '+p.coach+' · '+p.sessions+' sesiones · Próxima: '+p.next+'</div></div>'+
         '<div style="font-size:24px;font-weight:500;color:'+col+';">'+p.pct+'%</div>'+
       '</div>'+
-      '<div style="font-size:13px;font-weight:500;color:var(--t0);margin-bottom:10px;">🎯 '+p.obj+'</div>'+
+      '<div style="font-size:13px;font-weight:400;color:var(--t0);margin-bottom:10px;">'+p.obj+'</div>'+
       '<div class="bar6" style="margin-bottom:12px;"><div class="bar6f" style="width:'+p.pct+'%;background:'+col+'"></div></div>'+
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">'+
         [['Sesiones',p.sessions],['Próxima',p.next],['Plazo',p.dl]].map(function(m){
