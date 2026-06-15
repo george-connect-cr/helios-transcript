@@ -186,9 +186,7 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 
 /* ── TAGS ── */
 .tag{
-  display:inline-flex;align-items:center;
-  padding:2px 8px;border-radius:20px;font-size:9px;font-weight:500;
-  box-shadow:inset 0 0 0 0.5px currentColor;letter-spacing:.01em;
+  display:inline;font-size:9px;font-weight:500;letter-spacing:.01em;
 }
 
 /* ── DROPDOWN ── */
@@ -965,7 +963,7 @@ function agDet(a){
       return'<tr data-po="'+p.id+'" style="cursor:pointer" onclick="showPODetail(\''+_rk+'\')" title="Ver detalle '+p.id+'">'+
         '<td style="font-family:var(--m);font-size:10px;font-weight:500;color:var(--a);">'+p.id+'</td>'+
         '<td style="font-size:10px;color:var(--t2);">'+p.f+'</td>'+
-        '<td><span style="font-size:9px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--bl2);color:var(--blue);">'+p.svc+'</span></td>'+
+        '<td><span style="font-size:9px;font-weight:400;color:var(--blue);">'+p.svc+'</span></td>'+
         '<td style="font-size:11px;font-weight:400;font-family:var(--m);color:'+_durCol+';">'+_durFmt+'</td>'+
         '<td><span class="sbadge" style="color:'+sc2+';background:'+sc2bg+'">'+p.score+'</span></td>'+
         '<td>'+stars+'</td>'+
@@ -1348,7 +1346,7 @@ function showPODetail(regKey) {
       '<div style="flex:1;">'+
         '<div style="font-size:14px;font-weight:500;color:var(--t0);">'+p.id+'</div>'+
         '<div style="font-size:11px;color:var(--t2);">'+agentName+' · '+p.f+' · '+
-          '<span style="padding:1px 7px;border-radius:20px;background:var(--bl2);color:var(--blue);font-weight:400;">'+p.svc+'</span>'+
+          '<span style="font-size:11px;font-weight:400;color:var(--blue);">'+p.svc+'</span>'+
         '</div>'+
       '</div>'+
       '<div style="text-align:right;">'+
