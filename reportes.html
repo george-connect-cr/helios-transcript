@@ -587,11 +587,11 @@ function vResumen(){
 
   // ── KPI strip — tint cards ──
   var kpiDefs=[
-    {ico:'📞',lbl:'Llamadas', val:t.calls,                   delta:'▲ 12%',cls:'bl',col:'var(--t0)'},
+    {ico:'<i class="ti ti-phone" style="font-size:15px;color:var(--t3);"></i>',lbl:'Llamadas', val:t.calls,                   delta:'▲ 12%',cls:'bl',col:'var(--t0)'},
     {ico:'📋',lbl:'POs',      val:t.pos,                     delta:'▲ 8%', cls:'bl',col:'var(--t0)'},
-    {ico:'⭐',lbl:'Satisf.',  val:Math.round(t.sat/n)+'%',   delta:'▲ 2%', cls:'bl',col:rcSent(Math.round(t.sat/n))},
+    {ico:'<i class="ti ti-star" style="font-size:15px;color:var(--t3);"></i>',lbl:'Satisf.',  val:Math.round(t.sat/n)+'%',   delta:'▲ 2%', cls:'bl',col:rcSent(Math.round(t.sat/n))},
     {ico:'🎙',lbl:'Speech',   val:Math.round(t.sp/n)+'%',    delta:'▲ 5%', cls:'bl',col:'var(--t0)'},
-    {ico:'⏱',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),   delta:'▼ 3%', cls:'bl',col:'var(--t0)'}
+    {ico:'<i class="ti ti-clock" style="font-size:15px;color:var(--t3);"></i>',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),   delta:'▼ 3%', cls:'bl',col:'var(--t0)'}
   ];
   h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';
   kpiDefs.forEach(function(k){
@@ -774,10 +774,10 @@ function agDet(a){
 
   // ── KPI strip — tint cards ──
   var kpiDefs=[
-    {ico:'📞',lbl:'Llamadas',val:a.calls,cls:'bl'},
+    {ico:'<i class="ti ti-phone" style="font-size:15px;color:var(--t3);"></i>',lbl:'Llamadas',val:a.calls,cls:'bl'},
     {ico:'📋',lbl:'POs',val:a.pos,cls:'gr'},
-    {ico:'⏱',lbl:'AHT',val:a.ahtS,cls:'pu'},
-    {ico:'⭐',lbl:'Satisfacción',val:a.sat+'%',cls:'am'},
+    {ico:'<i class="ti ti-clock" style="font-size:15px;color:var(--t3);"></i>',lbl:'AHT',val:a.ahtS,cls:'pu'},
+    {ico:'<i class="ti ti-star" style="font-size:15px;color:var(--t3);"></i>',lbl:'Satisfacción',val:a.sat+'%',cls:'am'},
     {ico:'🎙',lbl:'Speech',val:a.speech+'%',cls:'bl'},
     {ico:'💬',lbl:'Sentimiento',val:a.sent.p+'% pos',cls:'gr'}
   ];
@@ -1044,7 +1044,7 @@ function vSupervisor(){
   var data=ag();
   var RP=[
     {icon:'📉',title:'AHT elevado en Road',tipo:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},
-    {icon:'⭐',title:'Alto rendimiento Concierge',tipo:'pos',desc:'Satisfacción +90% consistente.',agents:'Valeria Núñez, Andrés Fallas'},
+    {icon:'★',title:'Alto rendimiento Concierge',tipo:'pos',desc:'Satisfacción +90% consistente.',agents:'Valeria Núñez, Andrés Fallas'},
     {icon:'⚠️',title:'Omisión de ETA',tipo:'neg',desc:'40% no comunican ETA al cierre.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},
     {icon:'📈',title:'Mejora en speech',tipo:'pos',desc:'Speech compliance +8% vs semana anterior.',agents:'Dayana García, Sofía Ramírez'}
   ];
