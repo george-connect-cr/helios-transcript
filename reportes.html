@@ -212,6 +212,9 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:2px;}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;}
+
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -644,7 +647,7 @@ function vResumen(){
     '<div style="flex:1;">';
   [[null,'Positivo',avgP,'var(--g)'],[null,'Neutro',avgN,'var(--y)'],[null,'Negativo',avgG,'var(--r)']].forEach(function(s){
     h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
-      '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><span style="width:8px;height:8px;border-radius:50%;background:'+s[3]+';display:inline-block;"></span></span>'+
+      '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><div class="sdot" style="background:'+s[3]+';"></div></span>'+
       '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
       '<div class="bar" style="flex:1;"><div class="barf" style="width:'+s[2]+'%;background:'+s[3]+';"></div></div>'+
       '<span style="font-size:12px;font-weight:500;color:'+s[3]+';width:32px;text-align:right;font-family:var(--m);">'+s[2]+'%</span>'+
@@ -864,7 +867,7 @@ function agDet(a){
       '<div style="flex:1;">'+
         [[null,'Positivo',a.sent.p,'var(--g)'],[null,'Neutro',a.sent.n,'var(--y)'],[null,'Negativo',a.sent.g,'var(--r)']].map(function(s){
           return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
-            '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><span style="width:8px;height:8px;border-radius:50%;background:'+s[3]+';display:inline-block;"></span></span>'+
+            '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><div class="sdot" style="background:'+s[3]+';"></div></span>'+
             '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
             '<div class="bar" style="flex:1;"><div class="barf" style="width:'+s[2]+'%;background:'+s[3]+';"></div></div>'+
             '<span style="font-size:12px;font-weight:500;color:'+s[3]+';width:34px;text-align:right;font-family:var(--m);">'+s[2]+'%</span>'+
