@@ -2158,7 +2158,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.5-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.6-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3498,7 +3498,7 @@ function renderQ(){
       _qKB.map(function(k){
         var bg=k.ok?'rgba(74,138,114,.12)':'rgba(184,92,107,.1)';
         var col=k.ok?'var(--g)':'var(--r)';
-        return'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+bg+';color:'+col+';font-weight:500;">'+(k.ok?'<i class="ti ti-check" style="font-size:10px"></i>':'<i class="ti ti-x" style="font-size:10px"></i>')+' '+k.nm+'</span>';
+        return'<span style="font-size:10px;color:'+col+';font-weight:500;">'+(k.ok?'<i class="ti ti-check" style="font-size:10px"></i>':'<i class="ti ti-x" style="font-size:10px"></i>')+' '+k.nm+'</span>';
       }).join('')+
     '</div>';
   }
@@ -6219,10 +6219,10 @@ function repFb(){
         '<div style="width:32px;height:32px;border-radius:50%;background:'+a.color+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">'+a.letter+'</div>'+
         '<div><div style="font-size:13px;font-weight:600;color:var(--t0);">'+f.agent+'</div>'+
         '<div style="font-family:var(--f);font-size:10px;color:var(--t2);">'+f.by+' · '+f.role+' · '+f.date+'</div></div>'+
-        '<span style="margin-left:auto;font-family:var(--f);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:'+pc+';border:1px solid var(--gb2);">'+f.priority.toUpperCase()+'</span>'+
+        '<span style="margin-left:auto;font-family:var(--f);font-size:9px;color:'+pc+';font-weight:500;">'+f.priority+'</span>'+
       '</div>'+
       '<div style="font-size:12px;color:var(--t1);line-height:1.6;margin-bottom:8px;">'+f.text+'</div>'+
-      '<div>'+f.tags.map(function(t){return'<span style="font-family:var(--f);font-size:8px;padding:2px 8px;border-radius:20px;background:var(--gb);color:var(--t2);border:1px solid var(--gb2);margin-right:4px;">'+t+'</span>';}).join('')+'</div>'+
+      '<div>'+f.tags.map(function(t){return'<span style="font-family:var(--f);font-size:9px;color:var(--t2);margin-right:6px;">'+t+'</span>';}).join('')+'</div>'+
     '</div>';
   }).join('');
 }
