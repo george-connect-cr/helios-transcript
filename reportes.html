@@ -262,7 +262,7 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
   </div>
   <div class="fp" id="f-grade" onclick="toggleDrop(this,event)">Rendimiento ▾ <div class="fdrop">
       <div class="fdrop-item" onclick="setF('grade','',event)">Todos</div>
-      <div class="fdrop-item" onclick="setF('grade','A',event)">⭐ Excelente (A)</div>
+      <div class="fdrop-item" onclick="setF('grade','A',event)">Excelente (A)</div>
       <div class="fdrop-item" onclick="setF('grade','B',event)">👍 Bueno (B)</div>
       <div class="fdrop-item" onclick="setF('grade','C',event)">⚠️ Atención (C)</div>
     </div>
@@ -517,7 +517,7 @@ function setF(key,val,e){
   var btn=document.getElementById('f-'+key);
   var lbl={carril:{'':"Carril",Home:"🏠 Home",Road:"🚗 Road",Concierge:"💎 Concierge"},
             pais:{'':"País","Costa Rica":"🇨🇷 CR","Panamá":"🇵🇦 PA","México":"🇲🇽 MX","Colombia":"🇨🇴 CO","Puerto Rico":"🇵🇷 PR"},
-            grade:{'':"Rendimiento",A:"⭐ A",B:"👍 B",C:"⚠️ C"},
+            grade:{'':"Rendimiento",A:"A",B:"B",C:"C"},
             agente:{'':"Agente"}};
   if(btn){
     var _fdropHtml=btn.querySelector('.fdrop').innerHTML;
@@ -587,11 +587,11 @@ function vResumen(){
 
   // ── KPI strip — tint cards ──
   var kpiDefs=[
-    {ico:'📞',lbl:'Llamadas', val:t.calls,                   delta:'▲ 12%',cls:'bl',col:'#3B6EF8'},
-    {ico:'📋',lbl:'POs',      val:t.pos,                     delta:'▲ 8%', cls:'bl',col:'#3B6EF8'},
+    {ico:'📞',lbl:'Llamadas', val:t.calls,                   delta:'▲ 12%',cls:'bl',col:'var(--t0)'},
+    {ico:'📋',lbl:'POs',      val:t.pos,                     delta:'▲ 8%', cls:'bl',col:'var(--t0)'},
     {ico:'⭐',lbl:'Satisf.',  val:Math.round(t.sat/n)+'%',   delta:'▲ 2%', cls:'bl',col:rcSent(Math.round(t.sat/n))},
-    {ico:'🎙',lbl:'Speech',   val:Math.round(t.sp/n)+'%',    delta:'▲ 5%', cls:'bl',col:'#3B6EF8'},
-    {ico:'⏱',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),   delta:'▼ 3%', cls:'bl',col:'#3B6EF8'}
+    {ico:'🎙',lbl:'Speech',   val:Math.round(t.sp/n)+'%',    delta:'▲ 5%', cls:'bl',col:'var(--t0)'},
+    {ico:'⏱',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),   delta:'▼ 3%', cls:'bl',col:'var(--t0)'}
   ];
   h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';
   kpiDefs.forEach(function(k){
@@ -642,9 +642,9 @@ function vResumen(){
     '</div>'+
     '<div style="width:0.5px;height:40px;background:rgba(0,0,0,.06);flex-shrink:0;"></div>'+
     '<div style="flex:1;">';
-  [['😊','Positivo',avgP,'var(--g)'],['😐','Neutro',avgN,'var(--y)'],['😞','Negativo',avgG,'var(--r)']].forEach(function(s){
+  [[sent_dot_pos,'Positivo',avgP,'var(--g)'],[sent_dot_neu,'Neutro',avgN,'var(--y)'],[sent_dot_neg,'Negativo',avgG,'var(--r)']].forEach(function(s){
     h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
-      '<span style="font-size:14px;width:20px;text-align:center;">'+s[0]+'</span>'+
+      '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><span style="width:8px;height:8px;border-radius:50%;background:'+s[3]+';display:inline-block;"></span></span>'+
       '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
       '<div class="bar" style="flex:1;"><div class="barf" style="width:'+s[2]+'%;background:'+s[3]+';"></div></div>'+
       '<span style="font-size:12px;font-weight:500;color:'+s[3]+';width:32px;text-align:right;font-family:var(--m);">'+s[2]+'%</span>'+
@@ -862,9 +862,9 @@ function agDet(a){
         '<div style="font-size:10px;font-weight:400;color:var(--t2);margin-top:3px;">Positivo</div>'+
       '</div>'+
       '<div style="flex:1;">'+
-        [['😊','Positivo',a.sent.p,'var(--g)'],['😐','Neutro',a.sent.n,'var(--y)'],['😞','Negativo',a.sent.g,'var(--r)']].map(function(s){
+        [[sent_dot_pos,'Positivo',a.sent.p,'var(--g)'],[sent_dot_neu,'Neutro',a.sent.n,'var(--y)'],[sent_dot_neg,'Negativo',a.sent.g,'var(--r)']].map(function(s){
           return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
-            '<span style="font-size:14px;width:20px;text-align:center;">'+s[0]+'</span>'+
+            '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><span style="width:8px;height:8px;border-radius:50%;background:'+s[3]+';display:inline-block;"></span></span>'+
             '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
             '<div class="bar" style="flex:1;"><div class="barf" style="width:'+s[2]+'%;background:'+s[3]+';"></div></div>'+
             '<span style="font-size:12px;font-weight:500;color:'+s[3]+';width:34px;text-align:right;font-family:var(--m);">'+s[2]+'%</span>'+
@@ -949,7 +949,7 @@ function agDet(a){
       _PORegistry[_rk]={po:p, agentName:a.name||'—'};
       var sc2=p.score>=85?'var(--g)':p.score>=70?'var(--y)':'var(--r)';
       var sc2bg=p.score>=85?'var(--gr2)':p.score>=70?'var(--am2)':'var(--re2)';
-      var sico=p.sent==='p'?'😊':p.sent==='g'?'😞':'😐';
+      var sico=p.sent==='p'?'●':p.sent==='g'?'●':'●';
       var stars='';for(var si=0;si<5;si++)stars+='<span style="color:'+(si<p.sat?'var(--y)':'var(--c3)')+';font-size:11px;">★</span>';
       var spB=p.sp?Object.keys(p.sp).map(function(k){
         return'<span title="'+spLbls[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-size:9px;font-weight:500;background:'+(p.sp[k]?'var(--gr2)':'var(--re2)')+';color:'+(p.sp[k]?'var(--g)':'var(--r)')+'">'+(p.sp[k]?'✓':'✗')+'</span>';
@@ -1295,7 +1295,7 @@ function showPODetail(regKey) {
 
   var sc = p.score || 0;
   var scColor = sc>=85?'var(--g)':sc>=70?'var(--y)':'var(--r)';
-  var sentEmoji = p.sent==='p'?'😊':p.sent==='g'?'😞':'😐';
+  var sentEmoji = '';
   var sentTxt   = p.sent==='p'?'Positivo':p.sent==='g'?'Negativo':'Neutro';
   var sentColor = p.sent==='p'?'var(--g)':p.sent==='g'?'var(--r)':'var(--y)';
 
