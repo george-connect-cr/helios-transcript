@@ -1029,7 +1029,7 @@ body.dark .n-th-thumb {
   flex:1;
   padding:11px 14px;
   border-radius:8px;
-  font-family:var(--f);font-size:12.5px;font-weight:600;
+  font-family:var(--f);font-size:12.5px;font-weight:500;
   cursor:pointer;border:none;
   transition:all .15s;
   display:flex;align-items:center;justify-content:center;gap:7px;
@@ -1037,12 +1037,11 @@ body.dark .n-th-thumb {
 .po-cta-btn.sec{background:var(--c2);color:var(--t1);}
 .po-cta-btn.sec:hover{background:var(--c3);color:var(--t0);}
 .po-cta-btn.pri{
-  background:var(--a);color:#fff;
-  box-shadow:0 1px 3px rgba(224,69,0,.25),0 4px 10px rgba(224,69,0,.12);
+  background:transparent;color:var(--a);
+  border:2px solid var(--a);
 }
 .po-cta-btn.pri:hover{
-  background:var(--a2);
-  box-shadow:0 1px 3px rgba(224,69,0,.35),0 6px 14px rgba(224,69,0,.22);
+  background:rgba(224,69,0,.06);
 }
 
 /* ══ CENTER — Transcript ════════════════════════════ */
@@ -2400,7 +2399,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 
     <div class="po-cta-bar">
       <button class="po-cta-btn sec" onclick="reopenPOValidation()">Revisar PO</button>
-      <button class="po-cta-btn pri" onclick="reopenPOValidation()">✓ Crear servicio</button>
+      <button class="po-cta-btn pri" onclick="reopenPOValidation()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>Crear servicio</button>
     </div>
   </aside>
 
