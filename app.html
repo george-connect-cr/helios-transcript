@@ -961,7 +961,7 @@ body.dark .n-th-thumb {
   padding:16px 18px 14px;
   border-bottom:1px solid var(--gb2);flex-shrink:0;
 }
-.pvp-head-title{flex:1;font-family:var(--f);font-size:14px;font-weight:700;color:var(--t0);}
+.pvp-head-title{flex:1;font-family:var(--f);font-size:14px;font-weight:500;color:var(--t0);}
 .pvp-close{
   width:28px;height:28px;border-radius:8px;border:none;
   background:var(--c2);color:var(--t2);cursor:pointer;font-size:11px;
@@ -982,7 +982,7 @@ body.dark .n-th-thumb {
 .pvp-field.miss{background:rgba(240,144,10,.08);}
 .pvp-field-ico{font-size:14px;min-width:20px;text-align:center;}
 .pvp-field-info{flex:1;min-width:0;}
-.pvp-field-lbl{font-family:var(--f);font-size:10px;font-weight:600;color:var(--t2);margin-bottom:2px;}
+.pvp-field-lbl{font-family:var(--f);font-size:10px;font-weight:400;color:var(--t2);margin-bottom:2px;}
 .pvp-input{
   width:100%;border:none;background:transparent;
   font-family:var(--f);font-size:13px;color:var(--t0);
@@ -2157,7 +2157,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.6.9-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.0-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -4583,24 +4583,24 @@ const Recs=(()=>{
 const POBuilder = (() => {
   let _data={}, _visible=false, _currentService=null;
   const FIELDS={
-    nombre_cliente:{i:'👤',l:'Cliente',  req:['grua','bat','llanta','gas','llaves','mec']},
-    placa:         {i:'🪪',l:'Placa',    req:['grua','bat','llanta','gas','llaves','mec']},
-    marca:         {i:'🚗',l:'Marca',    req:['grua','bat','llanta','mec']},
-    modelo:        {i:'🔖',l:'Modelo',   req:['grua','bat','llanta','mec']},
-    año:           {i:'📅',l:'Año',      req:['grua','mec']},
-    color:         {i:'🎨',l:'Color',    req:['grua']},
-    ubicación:     {i:'📍',l:'Ubicación',req:['grua','bat','llanta','gas','llaves','mec']},
-    ubicacion_destino:{i:'🏁',l:'Ubicación destino',req:['grua'],wide:true},
+    nombre_cliente:{i:'<i class="ti ti-user" style="font-size:14px;color:var(--t3)"></i>',l:'Cliente',  req:['grua','bat','llanta','gas','llaves','mec']},
+    placa:         {i:'<i class="ti ti-id-badge" style="font-size:14px;color:var(--t3)"></i>',l:'Placa',    req:['grua','bat','llanta','gas','llaves','mec']},
+    marca:         {i:'<i class="ti ti-car" style="font-size:14px;color:var(--t3)"></i>',l:'Marca',    req:['grua','bat','llanta','mec']},
+    modelo:        {i:'<i class="ti ti-tag" style="font-size:14px;color:var(--t3)"></i>',l:'Modelo',   req:['grua','bat','llanta','mec']},
+    año:           {i:'<i class="ti ti-calendar" style="font-size:14px;color:var(--t3)"></i>',l:'Año',      req:['grua','mec']},
+    color:         {i:'<i class="ti ti-palette" style="font-size:14px;color:var(--t3)"></i>',l:'Color',    req:['grua']},
+    ubicación:     {i:'<i class="ti ti-map-pin" style="font-size:14px;color:var(--t3)"></i>',l:'Ubicación',req:['grua','bat','llanta','gas','llaves','mec']},
+    ubicacion_destino:{i:'<i class="ti ti-flag" style="font-size:14px;color:var(--t3)"></i>',l:'Ubicación destino',req:['grua'],wide:true},
     tipo_asistencia:{i:'',l:'Servicio',req:['grua','bat','llanta','gas','llaves','mec']},
   };
   const SUGS={
-    grua:  [{i:'📍',t:'Punto de referencia',q:'¿Puede darme un punto de referencia cercano?'},{i:'🔢',t:'Cédula del cliente',q:'¿Me puede confirmar su número de cédula?'}],
-    bat:   [{i:'🔌',t:'¿Intentó arrancar?',q:'¿Ya intentó arrancar el vehículo?'},{i:'📍',t:'¿Vía pública?',q:'¿Está en vía pública o parqueo privado?'}],
-    llanta:[{i:'',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'📍',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
-    gas:   [{i:'',t:'Tipo combustible',q:'¿Su vehículo es gasolina o diesel?'},{i:'📐',t:'Cantidad necesaria',q:'¿Cuántos litros aproximadamente necesita?'}],
-    llaves:[{i:'🚪',t:'¿Tiene copia?',q:'¿Tiene una copia de la llave en casa?'},{i:'🔐',t:'¿Llave electrónica?',q:'¿Tiene seguro electrónico o llave convencional?'}],
-    mec:   [{i:'💨',t:'¿Sale humo?',q:'¿El vehículo emite humo o hay olores extraños?'},{i:'🌡️',t:'Luz advertencia',q:'¿Vio alguna luz de advertencia encendida?'}],
-    info:  [{i:'📄',t:'Número de póliza',q:'¿Me puede proporcionar su número de póliza?'}],
+    grua:  [{i:'<i class="ti ti-map-pin" style="font-size:14px;color:var(--t3)"></i>',t:'Punto de referencia',q:'¿Puede darme un punto de referencia cercano?'},{i:'<i class="ti ti-hash" style="font-size:14px;color:var(--t3)"></i>',t:'Cédula del cliente',q:'¿Me puede confirmar su número de cédula?'}],
+    bat:   [{i:'<i class="ti ti-plug" style="font-size:14px;color:var(--t3)"></i>',t:'¿Intentó arrancar?',q:'¿Ya intentó arrancar el vehículo?'},{i:'📍',t:'¿Vía pública?',q:'¿Está en vía pública o parqueo privado?'}],
+    llanta:[{i:'<i class="ti ti-circle" style="font-size:14px;color:var(--t3)"></i>',t:'¿Llanta de repuesto?',q:'¿Su vehículo tiene llanta de emergencia?'},{i:'📍',t:'Posición segura',q:'¿El vehículo está en posición segura?'}],
+    gas:   [{i:'<i class="ti ti-droplet" style="font-size:14px;color:var(--t3)"></i>',t:'Tipo combustible',q:'¿Su vehículo es gasolina o diesel?'},{i:'<i class="ti ti-ruler" style="font-size:14px;color:var(--t3)"></i>',t:'Cantidad necesaria',q:'¿Cuántos litros aproximadamente necesita?'}],
+    llaves:[{i:'<i class="ti ti-door" style="font-size:14px;color:var(--t3)"></i>',t:'¿Tiene copia?',q:'¿Tiene una copia de la llave en casa?'},{i:'<i class="ti ti-lock" style="font-size:14px;color:var(--t3)"></i>',t:'¿Llave electrónica?',q:'¿Tiene seguro electrónico o llave convencional?'}],
+    mec:   [{i:'<i class="ti ti-wind" style="font-size:14px;color:var(--t3)"></i>',t:'¿Sale humo?',q:'¿El vehículo emite humo o hay olores extraños?'},{i:'<i class="ti ti-temperature" style="font-size:14px;color:var(--t3)"></i>',t:'Luz advertencia',q:'¿Vio alguna luz de advertencia encendida?'}],
+    info:  [{i:'<i class="ti ti-file-text" style="font-size:14px;color:var(--t3)"></i>',t:'Número de póliza',q:'¿Me puede proporcionar su número de póliza?'}],
   };
   const WAIT={grua:20,bat:15,llanta:15,gas:25,llaves:20,mec:25,info:5};
 
@@ -5712,7 +5712,7 @@ function openPOValidation(){
     if(!ok&&f.req) miss++;
     const row=document.createElement('div');
     row.className='pvp-field '+(ok?'ok':f.req?'miss':'');
-    row.innerHTML='<span class="pvp-field-ico">'+f.i+'</span><div class="pvp-field-info"><div class="pvp-field-lbl">'+f.l+(f.req?' *':'')+'</div><input class="pvp-input'+(ok?'':' empty')+'" data-key="'+f.k+'" value="'+(ok?String(val).replace(/"/g,'&quot;'):'')+'" placeholder="—" oninput="_pvpRefreshStatus()"></div>'+(f.req?'<div class="pvp-status '+(ok?'ok':'miss')+'" id="pvp-st-'+f.k+'">'+(ok?'✓':'✗')+'</div>':'');
+    row.innerHTML='<span class="pvp-field-ico">'+f.i+'</span><div class="pvp-field-info"><div class="pvp-field-lbl">'+f.l+(f.req?' *':'')+'</div><input class="pvp-input'+(ok?'':' empty')+'" data-key="'+f.k+'" value="'+(ok?String(val).replace(/"/g,'&quot;'):'')+'" placeholder="—" oninput="_pvpRefreshStatus()"></div>'+(f.req?'<div class="pvp-status '+(ok?'ok':'miss')+'" id="pvp-st-'+f.k+'">'+(ok?'<i class=\"ti ti-check\" style=\"font-size:11px;\"></i>':'<i class=\"ti ti-x\" style=\"font-size:11px;\"></i>')+'</div>':'');
     fieldsEl.appendChild(row);
   });
   // Nota field
@@ -6566,7 +6566,7 @@ setInterval(_syncAgentMini, 3000);
       <button class="pvp-close" onclick="closePOValidation(true)" title="Cerrar">✕</button>
     </div>
     <div class="pvp-body">
-      <div id="pvp-warn" class="pvp-warn">⚠ Completá los campos requeridos antes de confirmar</div>
+      <div id="pvp-warn" class="pvp-warn"><i class="ti ti-alert-triangle" style="font-size:13px;color:var(--y);margin-right:4px;"></i>Completá los campos requeridos antes de confirmar</div>
       <div id="pvp-fields"></div>
       <div id="pvp-nota-wrap" class="pvp-nota-wrap">
         <span class="pvp-nota-lbl">Notas adicionales (opcional)</span>
@@ -6575,7 +6575,7 @@ setInterval(_syncAgentMini, 3000);
     </div>
     <div class="pvp-foot">
       <button class="pvp-btn-sec" onclick="closePOValidation(true)">Cancelar</button>
-      <button class="pvp-btn-pri" onclick="confirmPO()">✓ Confirmar PO</button>
+      <button class="pvp-btn-pri" onclick="confirmPO()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>Confirmar PO</button>
     </div>
   </div>
 </div>
