@@ -250,9 +250,9 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
   </div>
   <div class="fp" id="f-carril" onclick="toggleDrop(this,event)">Carril ▾ <div class="fdrop">
       <div class="fdrop-item" onclick="setF('carril','',event)">Todos</div>
-      <div class="fdrop-item" onclick="setF('carril','Home',event)">🏠 Home</div>
-      <div class="fdrop-item" onclick="setF('carril','Road',event)">🚗 Road</div>
-      <div class="fdrop-item" onclick="setF('carril','Concierge',event)">💎 Concierge</div>
+      <div class="fdrop-item" onclick="setF('carril','Home',event)"><i class="ti ti-home" style="font-size:12px;color:var(--t3)"></i> Home</div>
+      <div class="fdrop-item" onclick="setF('carril','Road',event)"><i class="ti ti-car" style="font-size:12px;color:var(--t3)"></i> Road</div>
+      <div class="fdrop-item" onclick="setF('carril','Concierge',event)"><i class="ti ti-diamond" style="font-size:12px;color:var(--t3)"></i> Concierge</div>
     </div>
   </div>
   <div class="fp" id="f-pais" onclick="toggleDrop(this,event)">País ▾ <div class="fdrop">
@@ -519,7 +519,7 @@ function setF(key,val,e){
   _filters[key]=val;
   document.querySelectorAll('.fp[id]').forEach(function(el){el.classList.remove('open');});
   var btn=document.getElementById('f-'+key);
-  var lbl={carril:{'':"Carril",Home:"🏠 Home",Road:"🚗 Road",Concierge:"💎 Concierge"},
+  var lbl={carril:{'':"Carril",Home:"<i class=\"ti ti-home\" style=\"font-size:11px;color:var(--t3)\"></i> Home",Road:"<i class=\"ti ti-car\" style=\"font-size:11px;color:var(--t3)\"></i> Road",Concierge:"<i class=\"ti ti-diamond\" style=\"font-size:11px;color:var(--t3)\"></i> Concierge"},
             pais:{'':"País","Costa Rica":"🇨🇷 CR","Panamá":"🇵🇦 PA","México":"🇲🇽 MX","Colombia":"🇨🇴 CO","Puerto Rico":"🇵🇷 PR"},
             grade:{'':"Rendimiento",A:"A",B:"B",C:"C"},
             agente:{'':"Agente"}};
