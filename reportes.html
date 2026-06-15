@@ -642,7 +642,7 @@ function vResumen(){
     '</div>'+
     '<div style="width:0.5px;height:40px;background:rgba(0,0,0,.06);flex-shrink:0;"></div>'+
     '<div style="flex:1;">';
-  [[sent_dot_pos,'Positivo',avgP,'var(--g)'],[sent_dot_neu,'Neutro',avgN,'var(--y)'],[sent_dot_neg,'Negativo',avgG,'var(--r)']].forEach(function(s){
+  [[null,'Positivo',avgP,'var(--g)'],[null,'Neutro',avgN,'var(--y)'],[null,'Negativo',avgG,'var(--r)']].forEach(function(s){
     h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
       '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><span style="width:8px;height:8px;border-radius:50%;background:'+s[3]+';display:inline-block;"></span></span>'+
       '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
@@ -862,7 +862,7 @@ function agDet(a){
         '<div style="font-size:10px;font-weight:400;color:var(--t2);margin-top:3px;">Positivo</div>'+
       '</div>'+
       '<div style="flex:1;">'+
-        [[sent_dot_pos,'Positivo',a.sent.p,'var(--g)'],[sent_dot_neu,'Neutro',a.sent.n,'var(--y)'],[sent_dot_neg,'Negativo',a.sent.g,'var(--r)']].map(function(s){
+        [[null,'Positivo',a.sent.p,'var(--g)'],[null,'Neutro',a.sent.n,'var(--y)'],[null,'Negativo',a.sent.g,'var(--r)']].map(function(s){
           return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'+
             '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;"><span style="width:8px;height:8px;border-radius:50%;background:'+s[3]+';display:inline-block;"></span></span>'+
             '<span style="font-size:11px;color:var(--t2);width:58px;">'+s[1]+'</span>'+
