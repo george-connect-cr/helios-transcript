@@ -373,7 +373,7 @@ body.dark .n-th-thumb {
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
 }
-.dash-ring-val{font-family:var(--f);font-size:26px;font-weight:400;color:var(--t0);line-height:1;}
+.dash-ring-val{font-family:var(--m);font-size:26px;font-weight:400;color:var(--t0);line-height:1;letter-spacing:-.03em;}
 .dash-ring-lbl{font-family:var(--f);font-size:9px;color:var(--t2);letter-spacing:.1px;margin-top:4px;}
 .dash-hero-info{flex:1;min-width:0;}
 .dash-agent-nm{font-size:16px;font-weight:500;color:var(--t0);margin-bottom:3px;}
@@ -397,7 +397,7 @@ body.dark .n-th-thumb {
   padding:12px 14px;background:var(--c2);border-radius:8px;
   display:flex;flex-direction:column;gap:3px;
 }
-.dash-kpi-val{font-family:var(--f);font-size:18px;font-weight:500;color:var(--t0);line-height:1.1;}
+.dash-kpi-val{font-family:var(--m);font-size:18px;font-weight:400;color:var(--t0);line-height:1.1;letter-spacing:-.03em;}
 .dash-kpi-val.g{color:var(--g);}
 .dash-kpi-val.y{color:var(--y);}
 .dash-kpi-val.r{color:var(--r);}
@@ -679,7 +679,7 @@ body.dark .n-th-thumb {
   font-family:var(--f);font-size:11px;font-weight:400;color:var(--t2);
   white-space:nowrap;
 }
-.fld-phone-flag{font-size:11px;line-height:1;}
+.fld-phone-flag{font-size:9px;font-weight:500;color:var(--t2);letter-spacing:.02em;}
 .fld-phone .fld-in{flex:1;}
 
 /* Toggle pills (Emergency/VIP/EV) */
@@ -875,6 +875,12 @@ body.dark .n-th-thumb {
 .dsd-rate{font-family:var(--f);font-size:11px;font-weight:700;min-width:36px;text-align:right;}
 
 /* ── Recomendaciones (dashboard) ────────────────────── */
+.prog-wrap{background:var(--c2);border:1px solid var(--gb2);border-radius:8px;padding:10px 12px;}
+.prog-hero{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.prog-val{font-family:var(--m);font-size:18px;font-weight:400;letter-spacing:-.03em;line-height:1;}
+.prog-lbl{font-size:9px;color:var(--t3);margin-top:2px;}
+.prog-spark{margin-left:auto;opacity:.85;}
+.prog-dates{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);}
 .dash-rec{
   border-radius:8px;padding:11px 13px;margin-bottom:8px;
   border-left:3px solid var(--c3);background:var(--c2);
@@ -1027,12 +1033,12 @@ body.dark .n-th-thumb {
 }
 .po-cta-btn{
   flex:1;
-  padding:11px 14px;
-  border-radius:8px;
-  font-family:var(--f);font-size:12.5px;font-weight:500;
+  padding:7px 10px;
+  border-radius:7px;
+  font-family:var(--f);font-size:11.5px;font-weight:500;
   cursor:pointer;border:none;
   transition:all .15s;
-  display:flex;align-items:center;justify-content:center;gap:7px;
+  display:flex;align-items:center;justify-content:center;gap:5px;
 }
 .po-cta-btn.sec{background:var(--c2);color:var(--t1);}
 .po-cta-btn.sec:hover{background:var(--c3);color:var(--t0);}
@@ -2151,7 +2157,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.6.8-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.6.9-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2261,7 +2267,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
             <div class="fld pending" data-key="telefono">
               <div class="fld-lbl-row"><span class="fld-lbl">Teléfono</span></div>
               <div class="fld-phone">
-                <div class="fld-phone-cc"><span class="fld-phone-flag">🇨🇷</span>+506</div>
+                <div class="fld-phone-cc"><span class="fld-phone-flag">CR</span><span>+506</span></div>
                 <input class="fld-in empty" placeholder="—"/>
               </div>
             </div>
@@ -2277,7 +2283,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
           <div class="fld pending" data-key="contacto_tel">
             <div class="fld-lbl-row"><span class="fld-lbl">Teléfono de contacto</span></div>
             <div class="fld-phone">
-              <div class="fld-phone-cc"><span class="fld-phone-flag">🇨🇷</span>+506</div>
+              <div class="fld-phone-cc"><span class="fld-phone-flag">CR</span><span>+506</span></div>
               <input class="fld-in empty" placeholder="—"/>
             </div>
           </div>
@@ -2670,6 +2676,12 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
         <div id="dash-speech-detail"></div>
       </div>
 
+      <!-- Avance en rendimiento -->
+      <div>
+        <div class="dash-section-lbl">Avance en rendimiento</div>
+        <div id="dash-progress"></div>
+      </div>
+
       <!-- Recomendaciones KAI -->
       <div>
         <div class="dash-section-lbl">Recomendaciones</div>
@@ -2815,6 +2827,28 @@ var AUTH = {
 };
 
 // ── Supabase — persistencia de métricas ──────────────────────────────────
+var COUNTRY_PHONE = {
+  'Costa Rica':   {initials:'CR', code:'+506'},
+  'Panamá':       {initials:'PA', code:'+507'},
+  'México':       {initials:'MX', code:'+52'},
+  'Colombia':     {initials:'CO', code:'+57'},
+  'Puerto Rico':  {initials:'PR', code:'+1'},
+  'Guatemala':    {initials:'GT', code:'+502'},
+  'Honduras':     {initials:'HN', code:'+504'},
+  'El Salvador':  {initials:'SV', code:'+503'},
+  'Nicaragua':    {initials:'NI', code:'+505'},
+  'Ecuador':      {initials:'EC', code:'+593'},
+  'Perú':         {initials:'PE', code:'+51'},
+  'Chile':        {initials:'CL', code:'+56'},
+  'Argentina':    {initials:'AR', code:'+54'},
+};
+function updatePhoneCC(country) {
+  var info = COUNTRY_PHONE[country] || {initials:'--', code:''};
+  document.querySelectorAll('.fld-phone-cc').forEach(function(el) {
+    el.innerHTML = '<span class="fld-phone-flag">'+info.initials+'</span>'+(info.code?'<span>'+info.code+'</span>':'');
+  });
+}
+
 var SUPABASE_CONFIG = {
   url:     'https://dednkgonnirybnpktbzp.supabase.co',
   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ',
@@ -3502,6 +3536,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
     if(_u.role==='supervisor'){window.location.href='reportes.html';return;}
     // Rol Demo: arranca el motor de simulación automáticamente
     if(_u.role==='demo'){setTimeout(_startDemoMode, 1500);}
+    // Actualizar código de área según país del agente
+    if(_u.country){updatePhoneCC(_u.country);}
 
     // ── Restaurar _poList del turno actual desde localStorage ──────────
     var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + new Date().toISOString().slice(0,10);
@@ -5380,6 +5416,82 @@ function _buildDashboard(){
     const cl=r.p==='alta'?'r':r.p==='media'?'y':'g';
     return`<div class="dash-rec ${cl}"><div class="dash-rec-head"><span class="dash-rec-ico">${r.ico}</span><span class="dash-rec-title">${r.title}</span><span class="dash-rec-badge ${cl}">${r.p}</span></div><div class="dash-rec-txt">${r.body}</div></div>`;
   }).join('');
+  loadAgentProgress();
+}
+
+function loadAgentProgress(){
+  var el=document.getElementById('dash-progress');
+  if(!el)return;
+  el.innerHTML='<div style="font-size:11px;color:var(--t3);padding:6px 0;">Cargando historial...</div>';
+  try{
+    var sess=JSON.parse(localStorage.getItem('helios_session')||'{}');
+    var email=(sess.user||{}).email||'';
+    if(!email||email==='anon'){el.innerHTML='<div style="font-size:11px;color:var(--t3);">Sin sesión activa.</div>';return;}
+    var SB=SUPABASE_CONFIG.url;
+    var KEY=SUPABASE_CONFIG.anonKey;
+    fetch(SB+'/rest/v1/call_sessions?agent_email=eq.'+encodeURIComponent(email)+'&select=session_date,total_score,grade&order=session_date.asc&limit=60',{
+      headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}
+    }).then(function(r){return r.json();}).then(function(rows){
+      if(!rows||!rows.length){el.innerHTML='<div style="font-size:11px;color:var(--t3);padding:6px 0;">Sin historial previo registrado.</div>';return;}
+      // Agrupar por fecha → promedio diario
+      var byDate={};
+      rows.forEach(function(r){
+        if(!r.session_date||!r.total_score)return;
+        if(!byDate[r.session_date])byDate[r.session_date]={sum:0,n:0};
+        byDate[r.session_date].sum+=r.total_score;
+        byDate[r.session_date].n++;
+      });
+      var dates=Object.keys(byDate).sort();
+      if(!dates.length){el.innerHTML='<div style="font-size:11px;color:var(--t3);">Sin scores registrados.</div>';return;}
+      var points=dates.map(function(d){return Math.round(byDate[d].sum/byDate[d].n);});
+      var last=points[points.length-1];
+      var first=points[0];
+      var trend=last-first;
+      var trendColor=trend>0?'var(--g)':trend<0?'var(--r)':'var(--t2)';
+      var trendIcon=trend>0?'ti-trending-up':trend<0?'ti-trending-down':'ti-minus';
+      var avg=Math.round(points.reduce(function(a,b){return a+b;},0)/points.length);
+      // Mini sparkline SVG
+      var max=Math.max.apply(null,points);var min=Math.min.apply(null,points);
+      var range=Math.max(max-min,10);
+      var W=180,H=36,pad=3;
+      var sparkPts=points.map(function(v,i){
+        var x=pad+i*(W-2*pad)/(Math.max(points.length-1,1));
+        var y=H-pad-(v-min)/(range)*(H-2*pad);
+        return x.toFixed(1)+','+y.toFixed(1);
+      }).join(' ');
+      var lastX=pad+(points.length-1)*(W-2*pad)/(Math.max(points.length-1,1));
+      var lastY=H-pad-(last-min)/(range)*(H-2*pad);
+      var gradeColor=last>=88?'var(--g)':last>=73?'var(--g)':last>=55?'var(--y)':'var(--r)';
+      el.innerHTML=
+        '<div class="prog-wrap">'+
+          '<div class="prog-hero">'+
+            '<div>'+
+              '<div class="prog-val" style="color:'+gradeColor+'">'+last+'</div>'+
+              '<div class="prog-lbl">score actual</div>'+
+            '</div>'+
+            '<div>'+
+              '<div class="prog-val" style="color:var(--t1)">'+avg+'</div>'+
+              '<div class="prog-lbl">promedio</div>'+
+            '</div>'+
+            '<div>'+
+              '<div class="prog-val" style="color:'+trendColor+'">'+(trend>0?'+':'')+trend+'</div>'+
+              '<div class="prog-lbl">vs inicio</div>'+
+            '</div>'+
+            '<div class="prog-spark">'+
+              '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+
+                '<polyline points="'+sparkPts+'" fill="none" stroke="var(--g)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity=".7"/>'+
+                '<circle cx="'+lastX.toFixed(1)+'" cy="'+lastY.toFixed(1)+'" r="2.5" fill="'+gradeColor+'"/>'+
+              '</svg>'+
+            '</div>'+
+          '</div>'+
+          '<div class="prog-dates">'+
+            '<span>'+dates[0]+'</span>'+
+            '<span>'+points.length+' sesiones</span>'+
+            '<span>'+dates[dates.length-1]+'</span>'+
+          '</div>'+
+        '</div>';
+    }).catch(function(){el.innerHTML='<div style="font-size:11px;color:var(--t3);">Error cargando historial.</div>';});
+  }catch(e){el.innerHTML='';}
 }
 
 function _genRecs(overall,sat,aht,comp,speech,n,wait){
