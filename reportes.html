@@ -178,11 +178,7 @@ tr[data-po]{cursor:pointer;}
 tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 
 /* ── SCORE BADGE ── */
-.sbadge{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:34px;height:22px;border-radius:3px;
-  font-size:11px;font-weight:500;
-}
+.sbadge{font-size:11px;font-weight:500;font-family:var(--m);letter-spacing:-.02em;}
 
 /* ── TAGS ── */
 .tag{
@@ -498,7 +494,7 @@ function rcWarm(v) {
 }
 function bar(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rcWarm(v)+'"></div></div>';}
 function barSent(v,w){w=w||60;return '<div class="bar" style="width:'+w+'px"><div class="barf" style="width:'+v+'%;background:'+rcSent(v)+'"></div></div>';}
-function badge(a){var v=a.score||0;return'<span class="sbadge" style="color:'+rcSent(v)+';background:rgba(0,0,0,.04)">'+v+'</span>';}
+function badge(a){var v=a.score||0;return'<span class="sbadge" style="color:'+rcSent(v)+';">'+v+'</span>';}
 
 // Registry global de POs para el modal de detalle
 var _PORegistry = {};
@@ -956,7 +952,7 @@ function agDet(a){
       var sico=sentFace(_sv,_sc);
       var stars='';for(var si=0;si<5;si++)stars+='<span style="color:'+(si<p.sat?'var(--y)':'var(--c3)')+';font-size:11px;">★</span>';
       var spB=p.sp?Object.keys(p.sp).map(function(k){
-        return'<span title="'+spLbls[k]+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-size:9px;font-weight:500;background:'+(p.sp[k]?'var(--gr2)':'var(--re2)')+';color:'+(p.sp[k]?'var(--g)':'var(--r)')+'">'+(p.sp[k]?'✓':'✗')+'</span>';
+        return'<i class="ti ti-'+(p.sp[k]?'check':'x')+'" title="'+spLbls[k]+'" style="font-size:11px;color:'+(p.sp[k]?'var(--g)':'var(--r)')+';"></i>';
       }).join(''):'';
       var _durFmt=p.dur>0?fs(p.dur):'—';
       var _durCol=p.dur>0&&p.dur<180?'var(--r)':p.dur>480?'var(--y)':'var(--t0)';
@@ -965,7 +961,7 @@ function agDet(a){
         '<td style="font-size:10px;color:var(--t2);">'+p.f+'</td>'+
         '<td><span style="font-size:9px;font-weight:400;color:var(--blue);">'+p.svc+'</span></td>'+
         '<td style="font-size:11px;font-weight:400;font-family:var(--m);color:'+_durCol+';">'+_durFmt+'</td>'+
-        '<td><span class="sbadge" style="color:'+sc2+';background:'+sc2bg+'">'+p.score+'</span></td>'+
+        '<td><span class="sbadge" style="color:'+sc2+';">'+p.score+'</span></td>'+
         '<td>'+stars+'</td>'+
         '<td>'+sico+'</td>'+
         '<td><div style="display:flex;gap:2px;">'+spB+'</div></td>'+
@@ -1037,7 +1033,7 @@ function vFeedback(){
         '<span class="tag" style="color:'+pc+';border-color:'+pc+';background:rgba(0,0,0,.02);">'+f.pri+'</span>'+
       '</div>'+
       '<div style="font-size:13px;color:var(--t1);line-height:1.7;margin-bottom:10px;">'+f.text+'</div>'+
-      '<div>'+f.tags.map(function(t){return'<span class="tag" style="color:var(--t2);border-color:var(--gb2);background:rgba(0,0,0,.02);margin-right:5px;">'+t+'</span>';}).join('')+'</div>'+
+      '<div>'+f.tags.map(function(t){return'<span style="font-size:9px;color:var(--t2);margin-right:6px;">'+t+'</span>';}).join('')+'</div>'+
     '</div>';
   }).join('');
   return h;
