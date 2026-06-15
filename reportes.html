@@ -680,7 +680,7 @@ function tblAgentes(data){
     var tr='<tr class="clickable" onclick="_rowClick('+a.id+')">';
     tr+='<td><div style="display:flex;align-items:center;gap:9px;">'+
       '<div><div style="font-weight:500;color:var(--t0);">'+a.name+'</div><div style="font-size:10px;color:var(--t3);">'+a.pais+'</div></div></div></td>'+
-      '<td><span class="tag" style="color:#3B6EF8;border-color:rgba(59,110,248,.3);background:rgba(59,110,248,.06);">'+a.carril+'</span></td>'+
+      '<td><span style="font-size:11px;color:var(--t2);">'+a.carril+'</span></td>'+
       '<td>'+a.calls+'</td>'+
       '<td style="color:'+(a.aht>280?'var(--r)':'var(--t1)')+';">'+a.ahtS+'</td>'+
       '<td><div style="font-weight:500;color:'+rc(a.sat)+';">'+a.sat+'%</div>'+bar(a.sat,56)+'</td>'+
