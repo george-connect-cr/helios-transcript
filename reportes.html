@@ -685,8 +685,13 @@ function tblAgentes(data){
       '<td style="color:'+(a.aht>280?'var(--r)':'var(--t1)')+';">'+a.ahtS+'</td>'+
       '<td><div style="font-weight:500;color:'+rc(a.sat)+';">'+a.sat+'%</div>'+bar(a.sat,56)+'</td>'+
       '<td><div style="font-weight:500;color:'+rc(a.speech)+';">'+a.speech+'%</div>'+bar(a.speech,56)+'</td>'+
-      '<td><div style="display:flex;align-items:center;gap:5px;"><div class="sdot" style="background:'+sc(a.sent.p)+'"></div>'+
-      '<span style="font-size:11px;font-weight:400;color:'+rc(a.sent.p)+';">'+a.sent.p+'%</span></div></td>'+
+      '<td><div style="display:flex;align-items:center;gap:5px;">'+
+      '<div style="position:relative;display:inline-flex;align-items:center;justify-content:center;">'+
+        '<i class="ti '+(a.sent.p>=70?'ti-mood-happy':a.sent.p>=50?'ti-mood-neutral':'ti-mood-sad')+'" style="font-size:14px;color:var(--t2);"></i>'+
+        '<div style="position:absolute;top:-2px;right:-2px;width:6px;height:6px;border-radius:50%;background:'+sc(a.sent.p)+';border:1px solid white;"></div>'+
+      '</div>'+
+      '<span style="font-size:11px;color:var(--t2);">'+a.sent.p+'%</span>'+
+      '</div></td>'+
       '<td>'+badge(a)+'</td></tr>';
     return tr;
   }).join('');
