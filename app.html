@@ -1990,60 +1990,80 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;
 }
 .guia-head{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 13px 8px;border-bottom:0.5px solid var(--gb2);flex-shrink:0;
+  display:flex;align-items:center;gap:9px;
+  padding:9px 12px 8px;flex-shrink:0;
 }
-.guia-head-lbl{font-size:11px;font-weight:600;color:var(--t0);flex:1;}
-.guia-scores{display:flex;gap:8px;}
-.guia-score{font-size:9.5px;color:var(--t2);}
-.guia-score strong{color:var(--t0);font-weight:500;}
-.guia-body{flex:1;overflow-y:auto;padding:6px 8px;}
+/* Progress ring */
+.guia-ring-wrap{position:relative;width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.guia-ring{position:absolute;top:0;left:0;}
+.guia-ring-pct{font-family:var(--m);font-size:8px;font-weight:400;color:var(--t1);letter-spacing:-.02em;position:relative;z-index:1;}
+/* Header text */
+.guia-head-lbl{font-size:11px;font-weight:500;color:var(--t0);line-height:1.2;}
+.guia-head-sub{font-size:9px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* Counters */
+.guia-counters{display:flex;gap:6px;flex-shrink:0;}
+.guia-counter{display:flex;flex-direction:column;align-items:center;min-width:22px;}
+.guia-counter span:first-child{font-family:var(--m);font-size:13px;font-weight:400;color:var(--r);line-height:1;letter-spacing:-.02em;}
+.guia-counter.done span:first-child{color:var(--g);}
+.guia-ctr-lbl{font-size:8px;color:var(--t3);margin-top:1px;}
+/* Progress bar */
+.guia-prog-bar{height:2px;background:var(--c3);flex-shrink:0;}
+.guia-prog-fill{height:100%;background:var(--g);transition:width .4s ease,background .3s;border-radius:0 2px 2px 0;}
+/* Body */
+.guia-body{flex:1;overflow-y:auto;padding:5px 8px 6px;}
 .guia-body::-webkit-scrollbar{width:3px;}
 .guia-body::-webkit-scrollbar-thumb{background:var(--c3);border-radius:3px;}
+/* Section label */
 .guia-sec-lbl{
-  font-size:8.5px;font-weight:500;color:var(--t2);
-  text-transform:uppercase;letter-spacing:.06em;
-  padding:5px 4px 3px;display:flex;justify-content:space-between;
+  font-size:8px;font-weight:500;color:var(--t3);
+  letter-spacing:.05em;text-transform:uppercase;
+  padding:6px 4px 3px;display:flex;justify-content:space-between;align-items:center;
 }
-.guia-sec-lbl em{font-style:normal;color:var(--t3);}
-.guia-sec-lbl.done-lbl{color:var(--g);}
-.guia-sec-lbl.done-lbl em{color:rgba(82,166,118,.6);}
-
-/* Ítems de guía */
-@keyframes guiaItemIn{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:translateY(0);}}
+.guia-sec-lbl em{font-style:normal;font-family:var(--m);font-size:9px;color:var(--t3);}
+.guia-sec-lbl.done-lbl{color:rgba(82,166,118,.7);}
+.guia-sec-lbl.done-lbl em{color:rgba(82,166,118,.5);}
+/* Items */
+@keyframes guiaItemIn{from{opacity:0;transform:translateX(-4px);}to{opacity:1;transform:translateX(0);}}
+@keyframes guiaAutoFlash{0%{background:rgba(82,166,118,.18);}100%{background:transparent;}}
 .g-item{
   display:flex;align-items:center;gap:7px;
-  padding:5px 8px;margin-bottom:3px;
-  border-radius:7px;cursor:pointer;
-  border:1px solid rgba(216,96,96,.2);
-  background:rgba(216,96,96,.015);
-  transition:border-color .2s,background .15s,opacity .2s;
+  padding:5px 7px;margin-bottom:2px;
+  border-radius:6px;cursor:pointer;
+  transition:background .15s,opacity .25s;
 }
-.g-item.new-item{animation:guiaItemIn .3s ease forwards;}
-.g-item:hover{background:rgba(216,96,96,.05);}
-.g-item.done{
-  border-color:rgba(82,166,118,.25);
-  background:rgba(82,166,118,.025);
-  opacity:.65;
-}
-.g-item.done:hover{background:rgba(82,166,118,.06);}
+.g-item.new-item{animation:guiaItemIn .25s ease forwards;}
+.g-item:hover{background:var(--c2);}
+.g-item.done{opacity:.55;}
+.g-item.done:hover{opacity:.75;background:var(--c2);}
 .g-item.done .g-txt{text-decoration:line-through;color:var(--t3);}
+.g-item.auto-flash{animation:guiaAutoFlash .7s ease forwards;}
+/* Checkbox */
 .g-box{
-  width:13px;height:13px;border-radius:3px;flex-shrink:0;
-  border:1px solid rgba(216,96,96,.3);background:transparent;
+  width:14px;height:14px;border-radius:3.5px;flex-shrink:0;
+  border:1.5px solid var(--c3);background:transparent;
   display:flex;align-items:center;justify-content:center;
-  transition:all .15s;
+  transition:all .2s;
 }
 .g-box i{font-size:8px;color:transparent;transition:color .15s;}
-.g-item.done .g-box{border-color:rgba(82,166,118,.4);background:rgba(82,166,118,.12);}
+.g-item:hover .g-box{border-color:var(--t2);}
+.g-item.done .g-box{border-color:rgba(82,166,118,.5);background:rgba(82,166,118,.15);}
 .g-item.done .g-box i{color:var(--g);}
-.g-txt{font-size:10px;color:var(--t1);flex:1;line-height:1.35;font-family:var(--f);}
-.g-tag{font-size:8px;color:var(--t3);padding:1px 4px;border-radius:3px;background:var(--c2);font-family:var(--f);}
+/* Text */
+.g-txt{font-size:10.5px;color:var(--t1);flex:1;line-height:1.35;font-family:var(--f);}
+/* Tag */
+.g-tag{font-size:7.5px;color:var(--t3);font-family:var(--f);flex-shrink:0;}
 .g-tag.auto{color:var(--g);}
-.g-skel{display:flex;align-items:center;gap:7px;padding:5px 8px;margin-bottom:3px;border-radius:7px;border:1px solid var(--c3);opacity:.3;}
-.g-skel-box{width:13px;height:13px;border-radius:3px;background:var(--c3);flex-shrink:0;}
+/* Skeleton */
+.g-skel{display:flex;align-items:center;gap:7px;padding:5px 8px;margin-bottom:2px;border-radius:6px;opacity:.25;}
+.g-skel-box{width:14px;height:14px;border-radius:3.5px;background:var(--c3);flex-shrink:0;}
 .g-skel-line{height:7px;background:var(--c3);border-radius:4px;flex:1;animation:gSkelShim 1.8s ease-in-out infinite;}
-@keyframes gSkelShim{0%,100%{opacity:.4;}50%{opacity:.7;}}
+@keyframes gSkelShim{0%,100%{opacity:.4;}50%{opacity:.8;}}
+/* Empty state */
+.guia-empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 12px;color:var(--t3);font-size:10px;text-align:center;gap:2px;
+  font-family:var(--f);line-height:1.5;
+}
 
 /* KAI float en col-c sobre el agent-strip */
 .kai-float-wrap{
@@ -2158,7 +2178,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.9-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.0-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2545,14 +2565,38 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 
       <!-- 3. Guía de llamada (protocolo + calidad unificados) -->
       <div class="guia-card">
+        <!-- Header con progress ring -->
         <div class="guia-head">
-          <i class="ti ti-list-check ctx-head-ico" aria-hidden="true"></i>
-          <span class="guia-head-lbl">Guía de llamada</span>
-          <div class="guia-scores">
-            <span class="guia-score">P&nbsp;<strong id="guia-proto-score">0/0</strong></span>
-            <span class="guia-score">C&nbsp;<strong id="guia-qual-score">0/0</strong></span>
+          <div class="guia-ring-wrap">
+            <svg class="guia-ring" width="32" height="32" viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="12" fill="none" stroke="var(--c3)" stroke-width="2.5"/>
+              <circle id="guia-ring-fill" cx="16" cy="16" r="12" fill="none" stroke="var(--g)" stroke-width="2.5"
+                stroke-linecap="round" stroke-dasharray="75.4" stroke-dashoffset="75.4"
+                transform="rotate(-90 16 16)" style="transition:stroke-dashoffset .4s ease,stroke .3s;"/>
+            </svg>
+            <span class="guia-ring-pct" id="guia-ring-pct">0%</span>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div class="guia-head-lbl">Guía de llamada</div>
+            <div class="guia-head-sub" id="guia-svc-lbl">Esperando servicio…</div>
+          </div>
+          <div class="guia-counters">
+            <div class="guia-counter" id="guia-ctr-p">
+              <span id="guia-ctr-p-val">0</span>
+              <span class="guia-ctr-lbl">pend.</span>
+            </div>
+            <div class="guia-counter done" id="guia-ctr-d">
+              <span id="guia-ctr-d-val">0</span>
+              <span class="guia-ctr-lbl">ok</span>
+            </div>
           </div>
         </div>
+
+        <!-- Barra de progreso delgada -->
+        <div class="guia-prog-bar">
+          <div class="guia-prog-fill" id="guia-prog-fill" style="width:0%;"></div>
+        </div>
+
         <div class="guia-body" id="guia-body">
           <!-- ítems legacy ocultos — los IDs se mantienen para el JS existente -->
           <div id="kai-checklist" style="display:none"></div>
@@ -2565,8 +2609,9 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
           <!-- Lista dinámica de ítems -->
           <div id="guia-list-pending"></div>
           <div id="guia-list-done"></div>
-          <div style="font-size:10px;color:var(--t2);padding:12px 4px;text-align:center;font-family:var(--f);" id="guia-empty">
-            La guía cargará al detectar el servicio
+          <div class="guia-empty-state" id="guia-empty">
+            <i class="ti ti-list-check" style="font-size:20px;color:var(--t3);margin-bottom:6px;"></i>
+            <div>La guía cargará al detectar el servicio</div>
           </div>
         </div>
       </div>
@@ -4679,6 +4724,7 @@ const POBuilder = (() => {
     const isNew = _currentService !== svcId;
     _currentService=svcId; _data.tipo_asistencia=svcName;
     _setFldValue('tipo_svc', svcName); // sincronizar campo visible del formulario
+    if(typeof updateGuiaSvcLabel==='function') updateGuiaSvcLabel(svcName);
     _showPanel(); _upsertRow('tipo_asistencia',svcName,isNew);
     _updateSugs(); _updateWait(); _updateStatus();
     // FlashPill for service only on first detection
@@ -6013,11 +6059,35 @@ function _reorderGuia(){
 function _updateGuiaScores(){
   var pd=_guiaProto.filter(Boolean).length, pt=_guiaProto.length;
   var qd=_guiaQual.filter(Boolean).length,  qt=_guiaQual.length;
+  var totalD = pd+qd, totalT = pt+qt;
+  var pct = totalT > 0 ? Math.round(totalD/totalT*100) : 0;
+  // Legacy score spans (kept for compatibility)
   var ps=document.getElementById('guia-proto-score');
   var qs=document.getElementById('guia-qual-score');
   if(ps) ps.textContent=pd+'/'+pt;
   if(qs) qs.textContent=qd+'/'+qt;
-  // también actualizar el indicador de protocolo en agent-strip
+  // Ring
+  var ring = document.getElementById('guia-ring-fill');
+  var pctEl = document.getElementById('guia-ring-pct');
+  if(ring){
+    var circ = 75.4;
+    ring.style.strokeDashoffset = circ - (pct/100)*circ;
+    ring.style.stroke = pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';
+  }
+  if(pctEl) pctEl.textContent = pct+'%';
+  // Progress bar
+  var bar = document.getElementById('guia-prog-fill');
+  if(bar){
+    bar.style.width = pct+'%';
+    bar.style.background = pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';
+  }
+  // Counters
+  var pending = totalT - totalD;
+  var pVal = document.getElementById('guia-ctr-p-val');
+  var dVal = document.getElementById('guia-ctr-d-val');
+  if(pVal) pVal.textContent = pending;
+  if(dVal) dVal.textContent = totalD;
+  // Agent-strip
   var fcr=document.getElementById('ag-fcr');
   if(fcr&&pt>0) fcr.textContent=Math.round(pd/pt*100)+'%';
   var fcrr=document.getElementById('ag-fcr-r');
@@ -6079,9 +6149,18 @@ function autoCheckItem(keyword) {
     if (txt && txt.textContent.toLowerCase().includes(keyword.toLowerCase())) {
       if (!item.classList.contains('done')) {
         _toggleGuiaItem(item, 'proto', parseInt(item.dataset.idx));
+        // Flash visual para auto-check
+        item.classList.add('auto-flash');
+        setTimeout(function(){ item.classList.remove('auto-flash'); }, 700);
       }
     }
   });
+}
+
+// Actualizar label de servicio en guía
+function updateGuiaSvcLabel(svcName) {
+  var el = document.getElementById('guia-svc-lbl');
+  if(el && svcName) el.textContent = svcName;
 }
 
 // Marcar automáticamente un ítem del checklist desde la transcripción
