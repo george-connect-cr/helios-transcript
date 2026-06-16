@@ -2158,7 +2158,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.8-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.7.9-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2269,7 +2269,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
               <div class="fld-lbl-row"><span class="fld-lbl">Teléfono</span></div>
               <div class="fld-phone">
                 <div class="fld-phone-cc"><span class="fld-phone-flag" style="color:var(--t3)">--</span></div>
-                <input class="fld-in empty" placeholder="—"/>
+                <input class="fld-in empty" placeholder="—" oninput="updatePhoneCCFromInput(this)"/>
               </div>
             </div>
             <div class="fld-tog" onclick="togWa(this)" data-key="whatsapp">
@@ -2285,7 +2285,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
             <div class="fld-lbl-row"><span class="fld-lbl">Teléfono de contacto</span></div>
             <div class="fld-phone">
               <div class="fld-phone-cc"><span class="fld-phone-flag" style="color:var(--t3)">--</span></div>
-              <input class="fld-in empty" placeholder="—"/>
+              <input class="fld-in empty" placeholder="—" oninput="updatePhoneCCFromInput(this)"/>
             </div>
           </div>
         </div>
@@ -2829,24 +2829,76 @@ var AUTH = {
 
 // ── Supabase — persistencia de métricas ──────────────────────────────────
 var COUNTRY_PHONE = {
-  'Costa Rica':   {initials:'CR', code:'+506'},
-  'Panamá':       {initials:'PA', code:'+507'},
-  'México':       {initials:'MX', code:'+52'},
-  'Colombia':     {initials:'CO', code:'+57'},
-  'Puerto Rico':  {initials:'PR', code:'+1'},
-  'Guatemala':    {initials:'GT', code:'+502'},
-  'Honduras':     {initials:'HN', code:'+504'},
-  'El Salvador':  {initials:'SV', code:'+503'},
-  'Nicaragua':    {initials:'NI', code:'+505'},
-  'Ecuador':      {initials:'EC', code:'+593'},
-  'Perú':         {initials:'PE', code:'+51'},
-  'Chile':        {initials:'CL', code:'+56'},
-  'Argentina':    {initials:'AR', code:'+54'},
+  'Costa Rica':   {initials:'CR', code:'+506', prefixes:['2','4','5','6','7','8']},
+  'Panamá':       {initials:'PA', code:'+507', prefixes:['2','3','4','5','6','7','8','9']},
+  'México':       {initials:'MX', code:'+52',  prefixes:['1','2','3','4','5','6','7','8','9']},
+  'Colombia':     {initials:'CO', code:'+57',  prefixes:['1','2','3','4','5','6','7','8','9']},
+  'Puerto Rico':  {initials:'PR', code:'+1',   prefixes:['7','8','9']},
+  'Guatemala':    {initials:'GT', code:'+502', prefixes:['2','3','4','5','6','7']},
+  'Honduras':     {initials:'HN', code:'+504', prefixes:['2','3','7','8','9']},
+  'El Salvador':  {initials:'SV', code:'+503', prefixes:['2','6','7']},
+  'Nicaragua':    {initials:'NI', code:'+505', prefixes:['2','5','6','7','8']},
+  'Ecuador':      {initials:'EC', code:'+593', prefixes:['2','3','4','5','6','9']},
+  'Perú':         {initials:'PE', code:'+51',  prefixes:['1','4','5','6','7','8','9']},
+  'Chile':        {initials:'CL', code:'+56',  prefixes:['2','3','4','5','6','7','8','9']},
+  'Argentina':    {initials:'AR', code:'+54',  prefixes:['1','2','3','4','5','6','7','8','9']},
 };
+
+// Detectar país por longitud y prefijo del número ingresado
+function detectCountryFromPhone(num) {
+  // limpiar: solo dígitos
+  var digits = num.replace(/\D/g,'');
+  if (!digits || digits.length < 3) return null;
+  // si empieza con + o código de país conocido
+  var intl = digits;
+  var matches = [];
+  Object.keys(COUNTRY_PHONE).forEach(function(country) {
+    var info = COUNTRY_PHONE[country];
+    var code = info.code.replace('+','');
+    if (intl.startsWith(code)) {
+      matches.push({country: country, info: info, priority: code.length});
+    }
+  });
+  if (matches.length) {
+    matches.sort(function(a,b){return b.priority-a.priority;});
+    return matches[0];
+  }
+  // Detección por longitud local (sin código de país)
+  var sess = {};
+  try { sess = JSON.parse(localStorage.getItem('helios_session')||'{}'); } catch(e){}
+  var agentCountry = (sess.user||{}).country || '';
+  if (agentCountry && COUNTRY_PHONE[agentCountry]) {
+    return {country: agentCountry, info: COUNTRY_PHONE[agentCountry]};
+  }
+  return null;
+}
+
+function updatePhoneCCFromInput(input) {
+  var cc = input.closest('.fld-phone');
+  if (!cc) return;
+  var ccEl = cc.querySelector('.fld-phone-cc');
+  if (!ccEl) return;
+  var val = input.value.trim();
+  if (!val) {
+    ccEl.innerHTML = '<span class="fld-phone-flag" style="color:var(--t3)">--</span>';
+    return;
+  }
+  var match = detectCountryFromPhone(val);
+  if (match) {
+    ccEl.innerHTML = '<span class="fld-phone-flag">' + match.info.initials + '</span><span>' + match.info.code + '</span>';
+  } else {
+    ccEl.innerHTML = '<span class="fld-phone-flag" style="color:var(--t3)">--</span>';
+  }
+}
+
 function updatePhoneCC(country) {
   var info = COUNTRY_PHONE[country] || {initials:'--', code:''};
+  // Solo actualizar campos que aún muestren placeholder (--)
   document.querySelectorAll('.fld-phone-cc').forEach(function(el) {
-    el.innerHTML = '<span class="fld-phone-flag">'+info.initials+'</span>'+(info.code?'<span>'+info.code+'</span>':'');
+    var flagEl = el.querySelector('.fld-phone-flag');
+    if (flagEl && flagEl.textContent === '--') {
+      el.innerHTML = '<span class="fld-phone-flag">' + info.initials + '</span>' + (info.code ? '<span>' + info.code + '</span>' : '');
+    }
   });
 }
 
@@ -6327,6 +6379,10 @@ function _setFldValue(dataKey, value) {
   inp.style.transition = 'background .3s';
   inp.style.background = 'rgba(14,168,116,.12)';
   setTimeout(function() { inp.style.background = ''; }, 800);
+  // Si es campo de teléfono, actualizar CC automáticamente
+  if (dataKey === 'telefono' || dataKey === 'contacto_tel') {
+    updatePhoneCCFromInput(inp);
+  }
 }
 
 function fillVisiblePOField(kaiKey, value) {
