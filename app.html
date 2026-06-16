@@ -7170,8 +7170,8 @@ function setWave(state) {
 
 // Agentes ElevenLabs (ambos Public)
 var MOB_AGENTS = [
-  { id: 'agent_2801ksghx06pemcsgy5v55rthxzk', name: 'Asistencia Tranquila', gender: 'F' },
-  { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j', name: 'Asistencia Molesta',   gender: 'M' }
+  { id: 'agent_2801ksghx06pemcsgy5v55rthxzk', caller: 'Mariam Fernández', phone: '+506 8823 4501' },
+  { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j', caller: 'Carlos Mendoza',   phone: '+506 6341 7892' }
 ];
 var _mobConversation  = null;   // instancia ElevenLabs Conversation
 var _mobTimerInterval = null;
@@ -7263,11 +7263,13 @@ function _mobNextAgent() {
 function mobStartPractica() {
   _mobCurrentAgent = _mobNextAgent();
 
-  // Actualizar nombre en pantallas
-  var incName = document.getElementById('mob-inc-name');
-  var actName = document.getElementById('mob-act-name');
-  if (incName) incName.textContent = _mobCurrentAgent.name;
-  if (actName) actName.textContent = _mobCurrentAgent.name;
+  // Actualizar nombre y número en pantallas
+  var incName  = document.getElementById('mob-inc-name');
+  var incPhone = document.getElementById('mob-inc-phone');
+  var actName  = document.getElementById('mob-act-name');
+  if (incName)  incName.textContent  = _mobCurrentAgent.caller;
+  if (incPhone) incPhone.textContent = _mobCurrentAgent.phone;
+  if (actName)  actName.textContent  = _mobCurrentAgent.caller;
 
   // Mostrar pantalla de llamada entrante
   document.getElementById('mob-home').classList.remove('visible');
@@ -7549,9 +7551,9 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
 <!-- ══ MOBILE LLAMADA ENTRANTE ══════════════════════════════ -->
 <div id="mob-incoming">
   <div class="mob-inc-top">
-    <div class="mob-inc-label">Llamada de práctica</div>
-    <div class="mob-inc-name" id="mob-inc-name">Cliente Connect</div>
-    <div class="mob-inc-sub">KAI Academy</div>
+    <div class="mob-inc-label">Llamada entrante</div>
+    <div class="mob-inc-name" id="mob-inc-name">—</div>
+    <div class="mob-inc-sub" id="mob-inc-phone">—</div>
   </div>
   <div class="mob-inc-avatar-wrap">
     <div class="mob-inc-ring"></div>
@@ -7576,7 +7578,7 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
     <div class="mob-act-status">En llamada</div>
     <div class="mob-act-timer" id="mob-timer">0:00</div>
-    <div class="mob-act-name" id="mob-act-name">Cliente Connect</div>
+    <div class="mob-act-name" id="mob-act-name">—</div>
   </div>
   <div class="mob-act-avatar"><i class="ti ti-user"></i></div>
   <div class="mob-act-wave" id="mob-wave">
