@@ -17,7 +17,35 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="assets/js/quality-matrix.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@latest/dist/index.umd.js"></script>
+<script>
+// Cargar ElevenLabs SDK con detección robusta del namespace
+(function() {
+  var script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@latest/dist/index.umd.js';
+  script.onload = function() {
+    // Detectar el namespace correcto del UMD bundle
+    var ns = window.ElevenLabsClient || window.ElevenLabs || window.elevenlabs || window['@elevenlabs/client'];
+    if (ns && ns.Conversation) {
+      window.__EL_Conversation = ns.Conversation;
+      console.log('[ElevenLabs SDK] Cargado — namespace:', Object.keys(window).filter(k => k.toLowerCase().includes('eleven')));
+    } else {
+      // Buscar Conversation directamente en window
+      if (window.Conversation && window.Conversation.startSession) {
+        window.__EL_Conversation = window.Conversation;
+        console.log('[ElevenLabs SDK] Conversation encontrado directamente en window');
+      } else {
+        // Log de todos los objetos globales para debug
+        console.warn('[ElevenLabs SDK] No se encontró Conversation. Globals disponibles:', 
+          Object.keys(window).filter(k => /eleven|conv|el$/i.test(k)));
+      }
+    }
+  };
+  script.onerror = function() {
+    console.error('[ElevenLabs SDK] Error al cargar el script');
+  };
+  document.head.appendChild(script);
+})();
+</script>
 <style>
 /* ═══ DS v6 TOKENS ═══════════════════════════════════ */
 :root{
@@ -7248,24 +7276,30 @@ async function mobAnswer() {
 
   // Conectar ElevenLabs WebRTC
   try {
-    var EL = window.ElevenLabs || window.elevenlabs;
-    if (!EL || !EL.Conversation) {
-      console.warn('[ElevenLabs] SDK no disponible — modo simulado');
-      return; // Timer sigue corriendo — prueba visual
+    var ELConv = window.__EL_Conversation;
+    if (!ELConv || typeof ELConv.startSession !== 'function') {
+      console.warn('[ElevenLabs] SDK no disponible o Conversation no encontrado.');
+      console.warn('[ElevenLabs] Globals:', Object.keys(window).filter(k => /eleven|conv/i.test(k)));
+      // Timer sigue corriendo — modo visual sin audio
+      return;
     }
 
-    _mobConversation = await EL.Conversation.startSession({
+    console.log('[ElevenLabs] Iniciando sesión con agente:', _mobCurrentAgent.id);
+    _mobConversation = await ELConv.startSession({
       agentId: _mobCurrentAgent.id,
       connectionType: 'webrtc',
-      onConnect: function() {
-        console.log('[ElevenLabs] Conectado — agente:', _mobCurrentAgent.name);
+      onConnect: function(data) {
+        console.log('[ElevenLabs] ✅ Conectado — agente:', _mobCurrentAgent.name, '| conversationId:', data && data.conversationId);
+      },
+      onMessage: function(msg) {
+        console.log('[ElevenLabs] Mensaje recibido — tipo:', msg.type, '| source:', msg.source, '| texto:', msg.message && msg.message.slice(0, 60));
       },
       onDisconnect: function() {
         console.log('[ElevenLabs] Desconectado');
         _mobCleanup();
       },
       onError: function(err) {
-        console.warn('[ElevenLabs] Error:', err);
+        console.error('[ElevenLabs] ❌ Error:', err);
       },
       onModeChange: function(data) {
         // Cambiar color de la onda según quién habla
