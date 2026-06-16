@@ -46,7 +46,52 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
 
 
 
-@media(max-width:640px){.card-right{display:none;}.card-left{width:100%;}}
+/* ── RESPONSIVE MOBILE ── */
+@media(max-width:640px){
+  .wrap { padding:0; align-items:stretch; background:#fff; }
+  .card {
+    max-width:100%; min-height:100vh; border-radius:0;
+    box-shadow:none; flex-direction:column;
+  }
+  .card-right { display:none; }
+  .card-left {
+    width:100% !important; min-width:unset !important;
+    padding:48px 24px 40px; justify-content:center;
+    min-height:100vh;
+  }
+  .brand { margin-bottom:32px; }
+  .brand-name { font-size:28px; }
+  .brand img { height:40px; }
+  .form { gap:16px; }
+  .input { height:48px; font-size:15px; border-radius:14px; }
+  .btn-primary { height:50px; font-size:15px; border-radius:14px; }
+  .btn-google {
+    height:50px; font-size:14px; border-radius:14px;
+    padding:0 20px;
+  }
+  .btn-google img { width:20px; height:20px; }
+  .divider { margin:20px 0; }
+  /* Role cards */
+  .role-grid { grid-template-columns:1fr 1fr; gap:10px; }
+  .role-card { max-width:100%; padding:24px 16px; border-radius:16px; }
+  .role-icon { font-size:28px; }
+  .role-name { font-size:13px; }
+  /* Ext card */
+  .ext-card { max-width:100%; padding:28px 20px; border-radius:16px; }
+  /* User card */
+  .user-card { max-width:100%; }
+  /* Popup overlay */
+  .popup-overlay { padding:0; }
+  .popup {
+    width:100%; max-width:100%; border-radius:20px 20px 0 0;
+    padding:28px 20px 36px; position:fixed; bottom:0; left:0; right:0;
+  }
+}
+@media(max-width:375px){
+  .card-left { padding:40px 20px 32px; }
+  .role-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .role-card { padding:20px 12px; }
+}
 
 /* ── BRAND ── */
 .brand{text-align:center;margin-bottom:28px;}
