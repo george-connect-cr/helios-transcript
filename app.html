@@ -2554,6 +2554,34 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 }
 .mob-act-end:active { transform: scale(.91); }
 .mob-act-end-lbl { font-size: 11px; color: rgba(255,255,255,.5); font-family: var(--f); }
+
+/* ── Mobile controles de llamada activa ── */
+.mob-act-controls {
+  display:flex; align-items:center; justify-content:center;
+  gap:20px;
+}
+.mob-ctrl-btn {
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  background:none; border:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-ctrl-circle {
+  width:52px; height:52px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; color:#fff;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.2);
+  transition:all .15s;
+}
+.mob-ctrl-circle:active { transform:scale(.9); }
+.mob-ctrl-circle.active {
+  background:rgba(255,255,255,.9);
+  color:#111;
+}
+.mob-ctrl-lbl {
+  font-size:10px; color:rgba(255,255,255,.55);
+  font-family:var(--f);
+}
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -7210,6 +7238,14 @@ async function mobAnswer() {
     if (el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
   }, 1000);
 
+  // Pedir acceso al mic y guardar el stream para poder mutearlo
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    window._mobMicStream = stream;
+  } catch(e) {
+    console.warn('[Mobile] No se pudo acceder al micrófono:', e.message);
+  }
+
   // Conectar ElevenLabs WebRTC
   try {
     var EL = window.ElevenLabs || window.elevenlabs;
@@ -7256,7 +7292,74 @@ async function mobEndCall() {
   _mobCleanup();
 }
 
+var _mobIsMuted  = false;
+var _mobSpkHigh  = false;  // false = normal (0.7), true = max (1.0)
+
+function mobToggleMute() {
+  _mobIsMuted = !_mobIsMuted;
+
+  // Mute via WebRTC track — funciona aunque el SDK no tenga setMuted directo
+  try {
+    var streams = document.querySelectorAll('audio');
+    // Mute via getUserMedia stream si está disponible
+    if (window._mobMicStream) {
+      window._mobMicStream.getAudioTracks().forEach(function(t) {
+        t.enabled = !_mobIsMuted;
+      });
+    }
+  } catch(e) {}
+
+  // Actualizar UI
+  var circle = document.getElementById('mob-mute-circle');
+  var ico    = document.getElementById('mob-mute-ico');
+  var lbl    = document.getElementById('mob-mute-lbl');
+  if (circle) circle.classList.toggle('active', _mobIsMuted);
+  if (ico)    ico.className = _mobIsMuted ? 'ti ti-microphone-off' : 'ti ti-microphone';
+  if (lbl)    lbl.textContent = _mobIsMuted ? 'Activar mic' : 'Silenciar';
+}
+
+function mobToggleSpeaker() {
+  _mobSpkHigh = !_mobSpkHigh;
+  var vol = _mobSpkHigh ? 1.0 : 0.7;
+
+  // Ajustar volumen via SDK si está disponible
+  if (_mobConversation && typeof _mobConversation.setVolume === 'function') {
+    try { _mobConversation.setVolume({ volume: vol }); } catch(e) {}
+  }
+
+  // Actualizar UI
+  var circle = document.getElementById('mob-spk-circle');
+  var ico    = document.getElementById('mob-spk-ico');
+  var lbl    = document.getElementById('mob-spk-lbl');
+  if (circle) circle.classList.toggle('active', _mobSpkHigh);
+  if (ico)    ico.className = _mobSpkHigh ? 'ti ti-volume-2' : 'ti ti-volume';
+  if (lbl)    lbl.textContent = _mobSpkHigh ? 'Vol. alto' : 'Altavoz';
+}
+
 function _mobCleanup() {
+  // Reset estados
+  _mobIsMuted = false;
+  _mobSpkHigh = false;
+
+  // Restaurar UI controles
+  var muteCircle = document.getElementById('mob-mute-circle');
+  var muteIco    = document.getElementById('mob-mute-ico');
+  var muteLbl    = document.getElementById('mob-mute-lbl');
+  var spkCircle  = document.getElementById('mob-spk-circle');
+  var spkIco     = document.getElementById('mob-spk-ico');
+  var spkLbl     = document.getElementById('mob-spk-lbl');
+  if (muteCircle) muteCircle.classList.remove('active');
+  if (muteIco)    muteIco.className = 'ti ti-microphone';
+  if (muteLbl)    muteLbl.textContent = 'Silenciar';
+  if (spkCircle)  spkCircle.classList.remove('active');
+  if (spkIco)     spkIco.className = 'ti ti-volume';
+  if (spkLbl)     spkLbl.textContent = 'Altavoz';
+
+  // Re-activar mic si estaba muted
+  if (window._mobMicStream) {
+    window._mobMicStream.getAudioTracks().forEach(function(t){ t.enabled = true; });
+  }
+
   clearInterval(_mobTimerInterval);
   _mobTimerInterval = null;
   _mobTimerSecs = 0;
@@ -7392,11 +7495,26 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
   <div class="mob-act-wave" id="mob-wave">
     <span></span><span></span><span></span><span></span><span></span>
   </div>
-  <div class="mob-act-end-wrap">
-    <button class="mob-act-end" onclick="mobEndCall()">
-      <i class="ti ti-phone-off"></i>
+  <!-- Controles: mute + speaker + finalizar -->
+  <div class="mob-act-controls">
+    <button class="mob-ctrl-btn" onclick="mobToggleMute()" id="mob-mute-btn">
+      <div class="mob-ctrl-circle" id="mob-mute-circle">
+        <i class="ti ti-microphone" id="mob-mute-ico"></i>
+      </div>
+      <span class="mob-ctrl-lbl" id="mob-mute-lbl">Silenciar</span>
     </button>
-    <div class="mob-act-end-lbl">Finalizar</div>
+    <div class="mob-act-end-wrap" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <button class="mob-act-end" onclick="mobEndCall()">
+        <i class="ti ti-phone-off"></i>
+      </button>
+      <div class="mob-act-end-lbl">Finalizar</div>
+    </div>
+    <button class="mob-ctrl-btn" onclick="mobToggleSpeaker()" id="mob-spk-btn">
+      <div class="mob-ctrl-circle" id="mob-spk-circle">
+        <i class="ti ti-volume" id="mob-spk-ico"></i>
+      </div>
+      <span class="mob-ctrl-lbl" id="mob-spk-lbl">Altavoz</span>
+    </button>
   </div>
 </div>
 
