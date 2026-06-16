@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="assets/js/quality-matrix.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@latest/dist/index.umd.js"></script>
 <style>
 /* ═══ DS v6 TOKENS ═══════════════════════════════════ */
 :root{
@@ -2331,6 +2332,192 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   50%{box-shadow:0 0 0 3px rgba(232,160,32,.18);}
 }
 
+
+/* ══ MOBILE HOME SCREEN (≤768px) ════════════════════════════ */
+#mob-home {
+  display: none;
+  position: fixed; inset: 0;
+  background: var(--c1);
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 500;
+  padding: env(safe-area-inset-top, 32px) 28px env(safe-area-inset-bottom, 40px);
+}
+@media (max-width: 768px) {
+  #mob-home.visible { display: flex; }
+}
+.mob-home-top {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  padding-top: 24px;
+}
+.mob-home-logo { height: 32px; border-radius: 5px; }
+.mob-home-title {
+  font-size: 20px; font-weight: 700; color: var(--t0);
+  font-family: var(--f); letter-spacing: -.3px;
+  margin-top: 4px;
+}
+.mob-home-sub { font-size: 13px; color: var(--t2); font-family: var(--f); }
+.mob-home-greeting {
+  font-size: 15px; font-weight: 500; color: var(--t0);
+  font-family: var(--f); margin-top: 16px;
+}
+
+.mob-home-actions {
+  display: flex; flex-direction: column;
+  gap: 12px; width: 100%;
+}
+.mob-home-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px 20px; border-radius: 12px; cursor: pointer;
+  font-family: var(--f); font-size: 15px; font-weight: 500;
+  border: none; transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-home-btn.primary { background: var(--a); color: #fff; }
+.mob-home-btn.primary:active { transform: scale(.97); background: var(--a2); }
+.mob-home-btn.secondary {
+  background: transparent; color: var(--t0);
+  border: 1px solid var(--gb2);
+}
+.mob-home-btn.secondary:active { background: var(--c2); }
+.mob-home-btn i { font-size: 20px; }
+
+.mob-home-footer {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.mob-home-version { font-size: 10px; color: var(--t3); font-family: var(--f); }
+.mob-home-logout {
+  font-size: 12px; color: var(--t2); font-family: var(--f);
+  background: none; border: none; cursor: pointer; padding: 8px 16px;
+  text-decoration: underline;
+}
+.mob-home-logout:hover { color: var(--r); }
+
+/* ══ MOBILE INCOMING CALL ════════════════════════════════════ */
+#mob-incoming {
+  display: none;
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, #111827 0%, #1e2d40 60%, #0f3460 100%);
+  flex-direction: column; align-items: center;
+  justify-content: space-between; z-index: 600;
+  padding: env(safe-area-inset-top, 60px) 32px env(safe-area-inset-bottom, 52px);
+}
+@media (max-width: 768px) {
+  #mob-incoming.visible { display: flex; }
+}
+.mob-inc-top {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.mob-inc-label {
+  font-size: 11px; color: rgba(255,255,255,.5);
+  font-family: var(--f); letter-spacing: .12em; text-transform: uppercase;
+}
+.mob-inc-name {
+  font-size: 26px; font-weight: 600; color: #fff;
+  font-family: var(--f); letter-spacing: -.3px;
+}
+.mob-inc-sub { font-size: 13px; color: rgba(255,255,255,.45); font-family: var(--f); }
+
+.mob-inc-avatar-wrap {
+  position: relative; display: flex;
+  align-items: center; justify-content: center;
+}
+.mob-inc-ring {
+  position: absolute; width: 110px; height: 110px;
+  border-radius: 50%; background: rgba(255,255,255,.1);
+  animation: mob-ring 2s ease-out infinite;
+}
+.mob-inc-ring:nth-child(2) { animation-delay: .65s; }
+.mob-inc-ring:nth-child(3) { animation-delay: 1.3s; }
+@keyframes mob-ring {
+  0%   { transform: scale(1); opacity: .5; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.mob-inc-avatar {
+  position: relative; z-index: 1;
+  width: 88px; height: 88px; border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; color: #fff;
+}
+
+.mob-inc-actions {
+  display: flex; align-items: center;
+  justify-content: center; gap: 56px;
+}
+.mob-inc-action {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  background: none; border: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-inc-circle {
+  width: 68px; height: 68px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #fff;
+  transition: transform .12s;
+}
+.mob-inc-circle:active { transform: scale(.91); }
+.mob-inc-circle.decline { background: #ef4444; }
+.mob-inc-circle.answer  { background: #22c55e; }
+.mob-inc-lbl { font-size: 11px; color: rgba(255,255,255,.6); font-family: var(--f); }
+
+/* ══ MOBILE ACTIVE CALL ══════════════════════════════════════ */
+#mob-active {
+  display: none;
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, #111827 0%, #1e2d40 60%, #0f3460 100%);
+  flex-direction: column; align-items: center;
+  justify-content: space-between; z-index: 600;
+  padding: env(safe-area-inset-top, 60px) 32px env(safe-area-inset-bottom, 52px);
+}
+@media (max-width: 768px) {
+  #mob-active.visible { display: flex; }
+}
+.mob-act-status { font-size: 11px; color: #22c55e; font-family: var(--f); letter-spacing: .1em; text-transform: uppercase; }
+.mob-act-timer  { font-size: 44px; font-weight: 200; color: #fff; font-family: var(--m); letter-spacing: 3px; }
+.mob-act-name   { font-size: 16px; color: rgba(255,255,255,.7); font-family: var(--f); margin-top: 4px; }
+.mob-act-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: #fff;
+}
+/* onda activa */
+.mob-act-wave { display: flex; align-items: center; gap: 4px; height: 28px; }
+.mob-act-wave span {
+  width: 3px; border-radius: 3px; background: rgba(255,255,255,.45);
+  animation: mob-wv 1.2s ease-in-out infinite;
+}
+.mob-act-wave span:nth-child(1){ height:5px;  animation-delay:0s; }
+.mob-act-wave span:nth-child(2){ height:13px; animation-delay:.15s; }
+.mob-act-wave span:nth-child(3){ height:22px; animation-delay:.3s; }
+.mob-act-wave span:nth-child(4){ height:13px; animation-delay:.45s; }
+.mob-act-wave span:nth-child(5){ height:5px;  animation-delay:.6s; }
+@keyframes mob-wv {
+  0%,100%{ transform:scaleY(.35); opacity:.35; }
+  50%    { transform:scaleY(1);   opacity:1; }
+}
+.mob-act-wave.agent span { background: #60a5fa; }
+.mob-act-wave.client span { background: #fbbf24; }
+
+.mob-act-end-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.mob-act-end {
+  width: 68px; height: 68px; border-radius: 50%;
+  background: #ef4444; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: #fff;
+  transition: transform .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-act-end:active { transform: scale(.91); }
+.mob-act-end-lbl { font-size: 11px; color: rgba(255,255,255,.5); font-family: var(--f); }
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -6902,6 +7089,150 @@ function setWave(state) {
   w.className = 'audio-wave ' + state;
 }
 
+
+// ══ MOBILE + ELEVENLABS WEBRTC ════════════════════════════════
+
+// Agentes ElevenLabs (ambos Public)
+var MOB_AGENTS = [
+  { id: 'agent_2801ksghx06pemcsgy5v55rthxzk', name: 'Asistencia Tranquila', gender: 'F' },
+  { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j', name: 'Asistencia Molesta',   gender: 'M' }
+];
+var _mobConversation  = null;   // instancia ElevenLabs Conversation
+var _mobTimerInterval = null;
+var _mobTimerSecs     = 0;
+var _mobCurrentAgent  = null;
+var _mobLastAgentIdx  = -1;
+
+function _isMob() { return window.innerWidth <= 768; }
+
+// ── Inicializar pantalla home en mobile ─────────────────────
+function _mobInit() {
+  if (!_isMob()) return;
+
+  // Ocultar tab bar de Daya mientras estamos en home
+  var tabbar = document.getElementById('mob-tabbar');
+  if (tabbar) tabbar.style.display = 'none';
+
+  // Mostrar home
+  var home = document.getElementById('mob-home');
+  if (home) home.classList.add('visible');
+
+  // Saludo con nombre del agente
+  try {
+    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    var name = (s.user && s.user.name) ? s.user.name.split(' ')[0] : '';
+    var greet = document.getElementById('mob-greeting');
+    if (greet) greet.textContent = name ? 'Hola, ' + name + ' 👋' : 'Bienvenido';
+  } catch(e) {}
+}
+
+// ── Seleccionar agente (shuffle sin repetir) ────────────────
+function _mobNextAgent() {
+  var idx;
+  do { idx = Math.floor(Math.random() * MOB_AGENTS.length); }
+  while (idx === _mobLastAgentIdx && MOB_AGENTS.length > 1);
+  _mobLastAgentIdx = idx;
+  return MOB_AGENTS[idx];
+}
+
+// ── Botón Práctica ──────────────────────────────────────────
+function mobStartPractica() {
+  _mobCurrentAgent = _mobNextAgent();
+
+  // Actualizar nombre en pantallas
+  var incName = document.getElementById('mob-inc-name');
+  var actName = document.getElementById('mob-act-name');
+  if (incName) incName.textContent = _mobCurrentAgent.name;
+  if (actName) actName.textContent = _mobCurrentAgent.name;
+
+  // Mostrar pantalla de llamada entrante
+  document.getElementById('mob-home').classList.remove('visible');
+  document.getElementById('mob-incoming').classList.add('visible');
+}
+
+// ── Rechazar llamada ────────────────────────────────────────
+function mobDecline() {
+  document.getElementById('mob-incoming').classList.remove('visible');
+  document.getElementById('mob-home').classList.add('visible');
+  _mobCurrentAgent = null;
+}
+
+// ── Contestar — iniciar ElevenLabs WebRTC ──────────────────
+async function mobAnswer() {
+  if (!_mobCurrentAgent) return;
+
+  document.getElementById('mob-incoming').classList.remove('visible');
+  document.getElementById('mob-active').classList.add('visible');
+
+  // Iniciar timer
+  _mobTimerSecs = 0;
+  _mobTimerInterval = setInterval(function() {
+    _mobTimerSecs++;
+    var m = Math.floor(_mobTimerSecs / 60);
+    var s = _mobTimerSecs % 60;
+    var el = document.getElementById('mob-timer');
+    if (el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+
+  // Conectar ElevenLabs WebRTC
+  try {
+    var EL = window.ElevenLabs || window.elevenlabs;
+    if (!EL || !EL.Conversation) {
+      console.warn('[ElevenLabs] SDK no disponible — modo simulado');
+      return; // Timer sigue corriendo — prueba visual
+    }
+
+    _mobConversation = await EL.Conversation.startSession({
+      agentId: _mobCurrentAgent.id,
+      connectionType: 'webrtc',
+      onConnect: function() {
+        console.log('[ElevenLabs] Conectado — agente:', _mobCurrentAgent.name);
+      },
+      onDisconnect: function() {
+        console.log('[ElevenLabs] Desconectado');
+        _mobCleanup();
+      },
+      onError: function(err) {
+        console.warn('[ElevenLabs] Error:', err);
+      },
+      onModeChange: function(data) {
+        // Cambiar color de la onda según quién habla
+        var wave = document.getElementById('mob-wave');
+        if (!wave) return;
+        wave.className = 'mob-act-wave ' + (data.mode === 'speaking' ? 'client' : 'agent');
+      }
+    });
+
+    console.log('[ElevenLabs] Sesión iniciada');
+  } catch(err) {
+    console.warn('[ElevenLabs] Error al iniciar sesión:', err);
+    // No bloquear — el timer sigue para prueba visual
+  }
+}
+
+// ── Finalizar llamada ───────────────────────────────────────
+async function mobEndCall() {
+  // Terminar sesión ElevenLabs si existe
+  if (_mobConversation) {
+    try { await _mobConversation.endSession(); } catch(e) {}
+    _mobConversation = null;
+  }
+  _mobCleanup();
+}
+
+function _mobCleanup() {
+  clearInterval(_mobTimerInterval);
+  _mobTimerInterval = null;
+  _mobTimerSecs = 0;
+  var el = document.getElementById('mob-timer');
+  if (el) el.textContent = '0:00';
+  var wave = document.getElementById('mob-wave');
+  if (wave) wave.className = 'mob-act-wave';
+
+  document.getElementById('mob-active').classList.remove('visible');
+  document.getElementById('mob-home').classList.add('visible');
+}
+
 // ── Aliases para compatibilidad HTML de Dayana ──
 function openDash(){ if(typeof openDashboard==='function') openDashboard(); }
 function closeDash(){ if(typeof closeDashboard==='function') closeDashboard(); }
@@ -6959,10 +7290,79 @@ window.addEventListener('resize', function(){
   }
 });
 
-document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); });
+document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _mobInit(); });
 
 </script>
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t0);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;"></div>
+
+
+<!-- ══ MOBILE HOME ══════════════════════════════════════════ -->
+<div id="mob-home">
+  <div class="mob-home-top">
+    <img src="assets/connect-logo.png" alt="Connect" class="mob-home-logo"/>
+    <div class="mob-home-title">KAI Academy</div>
+    <div class="mob-home-sub">Portal de entrenamiento</div>
+    <div class="mob-home-greeting" id="mob-greeting">Hola</div>
+  </div>
+  <div class="mob-home-actions">
+    <button class="mob-home-btn primary" onclick="mobStartPractica()">
+      <i class="ti ti-phone-call"></i>
+      Práctica
+    </button>
+    <button class="mob-home-btn secondary" onclick="showWizard()">
+      <i class="ti ti-help-circle"></i>
+      Ayuda
+    </button>
+  </div>
+  <div class="mob-home-footer">
+    <span class="mob-home-version" id="mob-version">v0.8.8-beta</span>
+    <button class="mob-home-logout" onclick="AUTH.logout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- ══ MOBILE LLAMADA ENTRANTE ══════════════════════════════ -->
+<div id="mob-incoming">
+  <div class="mob-inc-top">
+    <div class="mob-inc-label">Llamada de práctica</div>
+    <div class="mob-inc-name" id="mob-inc-name">Cliente Connect</div>
+    <div class="mob-inc-sub">KAI Academy</div>
+  </div>
+  <div class="mob-inc-avatar-wrap">
+    <div class="mob-inc-ring"></div>
+    <div class="mob-inc-ring"></div>
+    <div class="mob-inc-ring"></div>
+    <div class="mob-inc-avatar"><i class="ti ti-user"></i></div>
+  </div>
+  <div class="mob-inc-actions">
+    <button class="mob-inc-action" onclick="mobDecline()">
+      <div class="mob-inc-circle decline"><i class="ti ti-phone-off"></i></div>
+      <span class="mob-inc-lbl">Rechazar</span>
+    </button>
+    <button class="mob-inc-action" onclick="mobAnswer()">
+      <div class="mob-inc-circle answer"><i class="ti ti-phone"></i></div>
+      <span class="mob-inc-lbl">Contestar</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ MOBILE LLAMADA ACTIVA ════════════════════════════════ -->
+<div id="mob-active">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+    <div class="mob-act-status">En llamada</div>
+    <div class="mob-act-timer" id="mob-timer">0:00</div>
+    <div class="mob-act-name" id="mob-act-name">Cliente Connect</div>
+  </div>
+  <div class="mob-act-avatar"><i class="ti ti-user"></i></div>
+  <div class="mob-act-wave" id="mob-wave">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="mob-act-end-wrap">
+    <button class="mob-act-end" onclick="mobEndCall()">
+      <i class="ti ti-phone-off"></i>
+    </button>
+    <div class="mob-act-end-lbl">Finalizar</div>
+  </div>
+</div>
 
 <!-- KAI Academy Welcome Wizard -->
 <div class="kai-wizard-ov" id="kai-wizard-ov" style="display:none;">
