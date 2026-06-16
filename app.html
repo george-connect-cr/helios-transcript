@@ -2058,12 +2058,61 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 .g-skel-box{width:14px;height:14px;border-radius:3.5px;background:var(--c3);flex-shrink:0;}
 .g-skel-line{height:7px;background:var(--c3);border-radius:4px;flex:1;animation:gSkelShim 1.8s ease-in-out infinite;}
 @keyframes gSkelShim{0%,100%{opacity:.4;}50%{opacity:.8;}}
-/* Empty state */
+/* Empty / done states */
 .guia-empty-state{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:24px 12px;color:var(--t3);font-size:10px;text-align:center;gap:2px;
   font-family:var(--f);line-height:1.5;
 }
+.guia-done-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px 12px;text-align:center;gap:2px;
+}
+/* Active card — one item at a time */
+@keyframes guiaCardIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.guia-active-card{
+  background:var(--c2);border-radius:8px;
+  border:1px solid var(--gb2);
+  padding:10px 11px;margin-bottom:8px;
+  animation:guiaCardIn .25s ease forwards;
+}
+.guia-active-top{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;
+}
+.guia-active-step{font-size:9px;color:var(--t3);font-family:var(--m);}
+.guia-active-tag{font-size:8px;color:var(--g);font-weight:500;letter-spacing:.02em;}
+.guia-active-txt{
+  font-size:11.5px;color:var(--t0);line-height:1.45;
+  font-family:var(--f);margin-bottom:10px;
+}
+.guia-active-actions{display:flex;gap:6px;}
+.guia-btn-done{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:6px 10px;border-radius:6px;border:none;cursor:pointer;
+  background:rgba(82,166,118,.12);color:var(--g);
+  font-family:var(--f);font-size:11px;font-weight:500;
+  transition:background .15s;
+}
+.guia-btn-done:hover{background:rgba(82,166,118,.22);}
+.guia-btn-skip{
+  display:flex;align-items:center;gap:4px;
+  padding:6px 9px;border-radius:6px;border:none;cursor:pointer;
+  background:transparent;color:var(--t3);
+  font-family:var(--f);font-size:11px;
+  transition:color .15s,background .15s;
+}
+.guia-btn-skip:hover{color:var(--t1);background:var(--c3);}
+/* History — completed items */
+.guia-history{display:flex;flex-direction:column;gap:3px;}
+@keyframes guiaHistIn{from{opacity:0;transform:translateX(-3px);}to{opacity:.7;transform:translateX(0);}}
+.guia-hist-item{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 6px;border-radius:5px;
+  opacity:.65;animation:guiaHistIn .2s ease forwards;
+}
+.guia-hist-item:hover{opacity:1;background:var(--c2);}
+.guia-hist-ico{color:var(--g);flex-shrink:0;}
+.guia-hist-txt{font-size:10px;color:var(--t2);font-family:var(--f);flex:1;text-decoration:line-through;}
 
 /* KAI float en col-c sobre el agent-strip */
 .kai-float-wrap{
@@ -2178,7 +2227,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.0-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.1-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2591,14 +2640,13 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
             </div>
           </div>
         </div>
-
         <!-- Barra de progreso delgada -->
         <div class="guia-prog-bar">
           <div class="guia-prog-fill" id="guia-prog-fill" style="width:0%;"></div>
         </div>
 
         <div class="guia-body" id="guia-body">
-          <!-- ítems legacy ocultos — los IDs se mantienen para el JS existente -->
+          <!-- legacy hidden -->
           <div id="kai-checklist" style="display:none"></div>
           <div id="rec-stack" style="display:none"></div>
           <div id="kai-chk-progress-bar" style="display:none">
@@ -2606,12 +2654,40 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
             <span class="kai-chk-lbl" id="kai-chk-lbl">0 / 0</span>
           </div>
           <div id="kai-chk-progress-bar-badge" style="display:none"></div>
-          <!-- Lista dinámica de ítems -->
-          <div id="guia-list-pending"></div>
-          <div id="guia-list-done"></div>
+
+          <!-- Tarjeta activa: un ítem a la vez -->
+          <div id="guia-active-wrap" style="display:none;">
+            <div class="guia-active-card" id="guia-active-card">
+              <div class="guia-active-top">
+                <span class="guia-active-step" id="guia-active-step">1 de 0</span>
+                <span class="guia-active-tag" id="guia-active-tag">protocolo</span>
+              </div>
+              <div class="guia-active-txt" id="guia-active-txt">—</div>
+              <div class="guia-active-actions">
+                <button class="guia-btn-done" onclick="_guiaMarkCurrent()">
+                  <i class="ti ti-check" style="font-size:11px;"></i> Confirmar
+                </button>
+                <button class="guia-btn-skip" onclick="_guiaSkipCurrent()">
+                  Saltar <i class="ti ti-arrow-right" style="font-size:10px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Historial de completados (últimos 3) -->
+            <div class="guia-history" id="guia-history"></div>
+          </div>
+
+          <!-- Empty state -->
           <div class="guia-empty-state" id="guia-empty">
             <i class="ti ti-list-check" style="font-size:20px;color:var(--t3);margin-bottom:6px;"></i>
             <div>La guía cargará al detectar el servicio</div>
+          </div>
+
+          <!-- All done state -->
+          <div class="guia-done-state" id="guia-done" style="display:none;">
+            <i class="ti ti-circle-check" style="font-size:22px;color:var(--g);margin-bottom:6px;"></i>
+            <div style="font-size:11px;color:var(--t0);font-weight:500;">¡Protocolo completo!</div>
+            <div id="guia-done-score" style="font-size:10px;color:var(--t2);margin-top:2px;"></div>
           </div>
         </div>
       </div>
@@ -6006,161 +6082,202 @@ function _dismissKBPill(itemId){
 }
 
 // ── Guía de llamada — renderizado en col-r ───────────────────────────
-var _guiaProto=[], _guiaQual=[];
+// ── GUÍA DINÁMICA — un ítem a la vez ──────────────────────────────────────
+var _guiaItems  = [];   // [{txt, tag, isAuto, section, secIdx, done, skipped}]
+var _guiaProto  = [];   // legacy compat
+var _guiaQual   = [];   // legacy compat
+var _guiaCursor = 0;    // índice del ítem activo
 
-function _makeGuiaItem(txt, tag, isAuto, section, idx){
-  var el = document.createElement('div');
-  el.className = 'g-item';
-  el.dataset.section = section;
-  el.dataset.idx = idx;
-  el.innerHTML =
-    '<div class="g-box"><i class="ti ti-check" style="font-size:8px;color:transparent;"></i></div>'+
-    '<span class="g-txt">'+txt+'</span>'+
-    '<span class="g-tag'+(isAuto?' auto':'')+'">'+tag+'</span>';
-  el.addEventListener('click', function(){ _toggleGuiaItem(el, section, idx); });
-  return el;
+function _guiaReset(){
+  _guiaItems=[]; _guiaProto=[]; _guiaQual=[]; _guiaCursor=0;
+  _guiaRender();
 }
 
-function _toggleGuiaItem(el, section, idx){
-  el.classList.toggle('done');
-  var ico = el.querySelector('.g-box i');
-  if(ico) ico.style.color = el.classList.contains('done') ? 'var(--g)' : 'transparent';
-  if(section==='proto') _guiaProto[idx] = el.classList.contains('done');
-  else _guiaQual[idx]  = el.classList.contains('done');
-  _reorderGuia();
+function _guiaRender(){
+  var wrap  = document.getElementById('guia-active-wrap');
+  var empty = document.getElementById('guia-empty');
+  var doneEl= document.getElementById('guia-done');
+  if(!wrap) return;
+
+  var total    = _guiaItems.length;
+  var doneCount= _guiaItems.filter(function(x){return x.done;}).length;
+  var allDone  = total>0 && doneCount===total;
+
+  if(total===0){
+    wrap.style.display='none';
+    if(doneEl) doneEl.style.display='none';
+    if(empty) empty.style.display='';
+    _updateGuiaScores(); return;
+  }
+  if(allDone){
+    wrap.style.display='none';
+    if(empty) empty.style.display='none';
+    if(doneEl){
+      doneEl.style.display='';
+      var ds=document.getElementById('guia-done-score');
+      if(ds) ds.textContent=doneCount+' de '+total+' ítems completados';
+    }
+    _updateGuiaScores(); return;
+  }
+
+  wrap.style.display='';
+  if(empty) empty.style.display='none';
+  if(doneEl) doneEl.style.display='none';
+
+  // Encontrar siguiente ítem pendiente
+  var next=-1;
+  for(var i=_guiaCursor;i<_guiaItems.length;i++){
+    if(!_guiaItems[i].done&&!_guiaItems[i].skipped){next=i;break;}
+  }
+  if(next<0){
+    // todos saltados, volver a iterar
+    _guiaItems.forEach(function(x){if(x.skipped&&!x.done) x.skipped=false;});
+    _guiaCursor=0;
+    for(var i=0;i<_guiaItems.length;i++){
+      if(!_guiaItems[i].done){next=i;break;}
+    }
+  }
+
+  if(next>=0){
+    _guiaCursor=next;
+    var item=_guiaItems[next];
+    var stepEl=document.getElementById('guia-active-step');
+    var tagEl =document.getElementById('guia-active-tag');
+    var txtEl =document.getElementById('guia-active-txt');
+    var card  =document.getElementById('guia-active-card');
+    if(stepEl) stepEl.textContent=(doneCount+1)+' de '+total;
+    if(tagEl)  tagEl.textContent=item.isAuto?'auto':item.tag||'protocolo';
+    if(txtEl)  txtEl.textContent=item.txt;
+    if(card){card.style.animation='none';void card.offsetWidth;card.style.animation='';}
+  }
+
+  // Historial: últimos 3 completados
+  var histEl=document.getElementById('guia-history');
+  if(histEl){
+    var completed=_guiaItems.filter(function(x){return x.done;}).slice(-3);
+    histEl.innerHTML=completed.map(function(x){
+      return '<div class="guia-hist-item">'+
+        '<i class="ti ti-check guia-hist-ico" style="font-size:10px;"></i>'+
+        '<span class="guia-hist-txt">'+x.txt+'</span>'+
+        '</div>';
+    }).join('');
+  }
   _updateGuiaScores();
 }
 
-function _reorderGuia(){
-  var body = document.getElementById('guia-body');
-  if(!body) return;
-  var items = Array.from(body.querySelectorAll('.g-item'));
-  var pending = items.filter(function(i){return !i.classList.contains('done');});
-  var done    = items.filter(function(i){return  i.classList.contains('done');});
-  // Limpiar etiquetas de sección previas
-  body.querySelectorAll('.guia-sec-lbl').forEach(function(l){l.remove();});
-  // Reinsertar con etiquetas
-  if(pending.length){
-    var lp=document.createElement('div');
-    lp.className='guia-sec-lbl';
-    lp.innerHTML='<span>Pendiente</span><em>'+pending.length+'</em>';
-    body.insertBefore(lp, body.firstChild);
-    pending.forEach(function(i){body.appendChild(i);});
-  }
-  if(done.length){
-    var ld=document.createElement('div');
-    ld.className='guia-sec-lbl done-lbl';
-    ld.innerHTML='<span>Completado</span><em>'+done.length+'</em>';
-    body.appendChild(ld);
-    done.forEach(function(i){body.appendChild(i);});
+function _guiaMarkCurrent(){
+  if(_guiaCursor<_guiaItems.length){
+    var item=_guiaItems[_guiaCursor];
+    item.done=true;
+    if(item.section==='proto'&&item.secIdx!=null) _guiaProto[item.secIdx]=true;
+    else if(item.section==='qual'&&item.secIdx!=null) _guiaQual[item.secIdx]=true;
+    _guiaCursor++;
+    _guiaRender();
   }
 }
 
+function _guiaSkipCurrent(){
+  if(_guiaCursor<_guiaItems.length){
+    _guiaItems[_guiaCursor].skipped=true;
+    _guiaCursor++;
+    _guiaRender();
+  }
+}
+
+function _makeGuiaItem(txt, tag, isAuto, section, idx){
+  _guiaItems.push({txt:txt,tag:tag,isAuto:isAuto,section:section,secIdx:idx,done:false,skipped:false});
+}
+
+function _toggleGuiaItem(el, section, idx){
+  var item=_guiaItems.find(function(x){return x.section===section&&x.secIdx===idx;});
+  if(item){item.done=!item.done; _guiaRender();}
+}
+
+function _reorderGuia(){ /* no-op */ }
+
 function _updateGuiaScores(){
+  var doneCount=_guiaItems.filter(function(x){return x.done;}).length;
+  var total=_guiaItems.length;
+  var pct=total>0?Math.round(doneCount/total*100):0;
   var pd=_guiaProto.filter(Boolean).length, pt=_guiaProto.length;
   var qd=_guiaQual.filter(Boolean).length,  qt=_guiaQual.length;
-  var totalD = pd+qd, totalT = pt+qt;
-  var pct = totalT > 0 ? Math.round(totalD/totalT*100) : 0;
-  // Legacy score spans (kept for compatibility)
   var ps=document.getElementById('guia-proto-score');
   var qs=document.getElementById('guia-qual-score');
   if(ps) ps.textContent=pd+'/'+pt;
   if(qs) qs.textContent=qd+'/'+qt;
-  // Ring
-  var ring = document.getElementById('guia-ring-fill');
-  var pctEl = document.getElementById('guia-ring-pct');
-  if(ring){
-    var circ = 75.4;
-    ring.style.strokeDashoffset = circ - (pct/100)*circ;
-    ring.style.stroke = pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';
-  }
-  if(pctEl) pctEl.textContent = pct+'%';
-  // Progress bar
-  var bar = document.getElementById('guia-prog-fill');
-  if(bar){
-    bar.style.width = pct+'%';
-    bar.style.background = pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';
-  }
-  // Counters
-  var pending = totalT - totalD;
-  var pVal = document.getElementById('guia-ctr-p-val');
-  var dVal = document.getElementById('guia-ctr-d-val');
-  if(pVal) pVal.textContent = pending;
-  if(dVal) dVal.textContent = totalD;
-  // Agent-strip
+  var ring=document.getElementById('guia-ring-fill');
+  var pctEl=document.getElementById('guia-ring-pct');
+  if(ring){ring.style.strokeDashoffset=75.4-(pct/100)*75.4;ring.style.stroke=pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';}
+  if(pctEl) pctEl.textContent=pct+'%';
+  var bar=document.getElementById('guia-prog-fill');
+  if(bar){bar.style.width=pct+'%';bar.style.background=pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';}
+  var pVal=document.getElementById('guia-ctr-p-val');
+  var dVal=document.getElementById('guia-ctr-d-val');
+  if(pVal) pVal.textContent=total-doneCount;
+  if(dVal) dVal.textContent=doneCount;
   var fcr=document.getElementById('ag-fcr');
-  if(fcr&&pt>0) fcr.textContent=Math.round(pd/pt*100)+'%';
+  if(fcr&&total>0) fcr.textContent=pct+'%';
   var fcrr=document.getElementById('ag-fcr-r');
-  if(fcrr&&pt>0) fcrr.textContent=Math.round(pd/pt*100)+'%';
+  if(fcrr&&total>0) fcrr.textContent=pct+'%';
 }
 
-function renderKBSugs(sugs) {
-  var empty = document.getElementById('guia-empty');
+function renderKBSugs(sugs){
+  var empty=document.getElementById('guia-empty');
   if(empty) empty.style.display='none';
-  var body = document.getElementById('guia-body');
-  if(!body) return;
-  // Limpiar ítems de protocolo previos
-  body.querySelectorAll('.g-item[data-section="proto"]').forEach(function(i){i.remove();});
-  body.querySelectorAll('.guia-sec-lbl').forEach(function(l){l.remove();});
-  if (!sugs || sugs.length === 0) {
+  _guiaItems=_guiaItems.filter(function(x){return x.section!=='proto';});
+  _guiaProto=[];
+  _guiaCursor=0;
+  if(!sugs||!sugs.length){
     if(empty){empty.style.display='';empty.textContent='Sin protocolo definido para este servicio.';}
-    return;
+    _guiaRender(); return;
   }
-  _guiaProto = sugs.map(function(){return false;});
-  sugs.forEach(function(s, i){
-    var el = _makeGuiaItem(s, 'P'+(i+1), false, 'proto', i);
-    body.appendChild(el);
+  _guiaProto=sugs.map(function(){return false;});
+  sugs.forEach(function(s,i){_makeGuiaItem(s,'protocolo',false,'proto',i);});
+  _guiaRender();
+}
+
+function renderKBQual(items){
+  _guiaItems=_guiaItems.filter(function(x){return x.section!=='qual';});
+  _guiaQual=[];
+  if(!items||!items.length){_guiaRender();return;}
+  _guiaQual=items.map(function(){return false;});
+  items.forEach(function(s,i){
+    var txt=typeof s==='string'?s:s.label||s;
+    _makeGuiaItem(txt,'calidad',true,'qual',i);
   });
-  _reorderGuia();
-  _updateGuiaScores();
+  _guiaRender();
 }
 
-function renderKBQual(items) {
-  // Renderizar ítems de calidad en el guia-list
-  var body = document.getElementById('guia-body');
-  if(!body) return;
-  body.querySelectorAll('.g-item[data-section="qual"]').forEach(function(i){i.remove();});
-  if(!items||!items.length) return;
-  _guiaQual = items.map(function(){return false;});
-  items.forEach(function(s, i){
-    var txt = typeof s==='string' ? s : s.label || s;
-    var el = _makeGuiaItem(txt, 'auto', true, 'qual', i);
-    body.appendChild(el);
-  });
-  _reorderGuia();
-  _updateGuiaScores();
+function toggleCheckItem(el){
+  var idx=parseInt(el.id.replace('kc-',''));
+  _toggleGuiaItem(el,'proto',idx);
 }
+function _updateCheckProgress(){_updateGuiaScores();}
 
-function toggleCheckItem(el) {
-  // Legacy — redirige al nuevo sistema
-  var idx = parseInt(el.id.replace('kc-',''));
-  _toggleGuiaItem(el, 'proto', idx);
-}
-
-function _updateCheckProgress() {
-  _updateGuiaScores();
-}
-
-// Marcar automáticamente un ítem del checklist desde la transcripción
-function autoCheckItem(keyword) {
-  var items = document.querySelectorAll('.g-item[data-section="proto"]');
-  items.forEach(function(item) {
-    var txt = item.querySelector('.g-txt');
-    if (txt && txt.textContent.toLowerCase().includes(keyword.toLowerCase())) {
-      if (!item.classList.contains('done')) {
-        _toggleGuiaItem(item, 'proto', parseInt(item.dataset.idx));
-        // Flash visual para auto-check
-        item.classList.add('auto-flash');
-        setTimeout(function(){ item.classList.remove('auto-flash'); }, 700);
+function autoCheckItem(keyword){
+  var found=false;
+  var cur=_guiaItems[_guiaCursor];
+  if(cur&&!cur.done&&!cur.skipped&&cur.txt.toLowerCase().includes(keyword.toLowerCase())){
+    cur.done=true;
+    if(cur.section==='proto'&&cur.secIdx!=null) _guiaProto[cur.secIdx]=true;
+    _guiaCursor++; found=true;
+  }
+  if(!found){
+    for(var i=0;i<_guiaItems.length;i++){
+      var item=_guiaItems[i];
+      if(!item.done&&item.txt.toLowerCase().includes(keyword.toLowerCase())){
+        item.done=true;
+        if(item.section==='proto'&&item.secIdx!=null) _guiaProto[item.secIdx]=true;
+        found=true; break;
       }
     }
-  });
+  }
+  if(found) _guiaRender();
 }
 
-// Actualizar label de servicio en guía
-function updateGuiaSvcLabel(svcName) {
-  var el = document.getElementById('guia-svc-lbl');
-  if(el && svcName) el.textContent = svcName;
+function updateGuiaSvcLabel(svcName){
+  var el=document.getElementById('guia-svc-lbl');
+  if(el&&svcName) el.textContent=svcName;
 }
 
 // Marcar automáticamente un ítem del checklist desde la transcripción
