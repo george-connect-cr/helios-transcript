@@ -2400,11 +2400,12 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 #mob-home, #mob-incoming, #mob-active {
   display: none;
   position: fixed; inset: 0;
-  background: var(--mb-bg);
+  background: #000000 !important;
   flex-direction: column;
   z-index: 500;
   font-family: var(--f);
   -webkit-font-smoothing: antialiased;
+  color: #ffffff;
 }
 @media (max-width: 768px) {
   #mob-home.visible    { display: flex; }
@@ -2432,12 +2433,12 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 }
 .mob-home-title {
   font-size: 13px; font-weight: 400;
-  color: var(--mb-t2); letter-spacing: .08em;
+  color: #555555; letter-spacing: .08em;
   text-transform: uppercase;
 }
 .mob-home-greeting {
   font-size: 28px; font-weight: 300;
-  color: var(--mb-t0); letter-spacing: -.5px;
+  color: #ffffff; letter-spacing: -.5px;
   line-height: 1.2; text-align: center;
   margin-top: 2px;
 }
@@ -2470,22 +2471,22 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   -webkit-tap-highlight-color: transparent; letter-spacing: -.1px;
 }
 .mob-home-btn:active { opacity: .7; transform: scale(.98); }
-.mob-home-btn.primary { background: var(--mb-t0); color: #000; }
+.mob-home-btn.primary { background: #ffffff !important; color: #000000 !important; }
 .mob-home-btn.secondary {
-  background: transparent; color: var(--mb-acc);
-  border: 1px solid #2a2a2a;
+  background: transparent !important; color: #e5e5e5 !important;
+  border: 1px solid #2a2a2a !important;
 }
 .mob-home-btn i { font-size: 17px; }
 
 .mob-home-footer {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
-.mob-home-version { font-size: 10px; color: var(--mb-t2); }
+.mob-home-version { font-size: 10px; color: #555555; }
 .mob-home-logout {
-  font-size: 12px; color: var(--mb-t2); background: none; border: none;
+  font-size: 12px; color: #555555; background: none; border: none;
   cursor: pointer; padding: 6px 16px; letter-spacing: .02em;
 }
-.mob-home-logout:active { color: var(--mb-r); }
+.mob-home-logout:active { color: #ef4444; }
 
 /* ══════════════════════════════════════════
    PANTALLA LLAMADA ENTRANTE
@@ -9703,6 +9704,14 @@ function _mobInit() {
     var greet = document.getElementById('mob-greeting');
     if (greet) greet.textContent = name ? 'Hola, ' + name + ' 👋' : 'Bienvenido';
   } catch(e) {}
+
+  // Configurar wizard para mobile antes de que se muestre
+  var desktop = document.getElementById('wizard-body-desktop');
+  var mobile  = document.getElementById('wizard-body-mobile');
+  var sub     = document.getElementById('wizard-sub');
+  if (desktop) desktop.style.display = 'none';
+  if (mobile)  mobile.style.display  = 'block';
+  if (sub)     sub.textContent = 'Cómo usar KAI Academy desde tu teléfono.';
 }
 
 // ── Seleccionar agente (shuffle sin repetir) ────────────────
@@ -10108,7 +10117,7 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
     </div>
 
     <!-- Contenido mobile -->
-    <div class="kai-wizard-body" id="wizard-body-mobile" style="display:none;">
+    <div class="kai-wizard-body" id="wizard-body-mobile" style="display:none;" aria-hidden="true">
       <div class="kai-wizard-features">
         <div class="kai-wizard-feat">
           <div class="kai-wizard-feat-ico"><i class="ti ti-phone-incoming" style="font-size:16px;color:var(--t2);"></i></div>
