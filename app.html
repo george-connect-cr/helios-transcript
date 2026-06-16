@@ -29,6 +29,213 @@
     console.warn('[ElevenLabs SDK] ElevenLabsClient no encontrado en window');
   }
 })();
+
+
+// ══ MOBILE + ELEVENLABS WEBRTC ════════════════════════════════
+
+var MOB_AGENTS = [
+  { id: 'agent_2801ksghx06pemcsgy5v55rthxzk' },
+  { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j' }
+];
+var _mobConversation  = null;
+var _mobTimerInterval = null;
+var _mobTimerSecs     = 0;
+var _mobCurrentAgent  = null;
+var _mobLastAgentIdx  = -1;
+var _mobRingCtx       = null;
+var _mobRingInterval  = null;
+var _mobIsMuted       = false;
+var _mobSpkHigh       = false;
+
+function _isMob() { return window.innerWidth <= 768; }
+
+function _mobRingOnce() {
+  try {
+    if (!_mobRingCtx) _mobRingCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var ctx = _mobRingCtx;
+    function beep(freq, start, dur) {
+      var osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+      gain.gain.setValueAtTime(0, ctx.currentTime + start);
+      gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + start + 0.02);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + start + dur - 0.04);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start); osc.stop(ctx.currentTime + start + dur);
+    }
+    beep(440, 0.0, 0.4); beep(480, 0.0, 0.4);
+    beep(440, 0.55, 0.4); beep(480, 0.55, 0.4);
+  } catch(e) {}
+}
+
+function _mobStartRing() {
+  _mobRingOnce();
+  _mobRingInterval = setInterval(_mobRingOnce, 2200);
+}
+
+function _mobStopRing() {
+  clearInterval(_mobRingInterval);
+  _mobRingInterval = null;
+  if (_mobRingCtx) { try { _mobRingCtx.suspend(); } catch(e) {} }
+}
+
+function _mobInit() {
+  if (!_isMob()) return;
+  var tabbar = document.getElementById('mob-tabbar');
+  if (tabbar) tabbar.style.display = 'none';
+  var home = document.getElementById('mob-home');
+  if (home) home.classList.add('visible');
+  try {
+    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    var u = s.user || {};
+    var name = u.name ? u.name.split(' ')[0] : '';
+    var greet = document.getElementById('mob-greeting');
+    if (greet) greet.textContent = name ? 'Hola, ' + name : 'Bienvenido';
+    var roleEl = document.getElementById('mob-role');
+    var roleLabel = u.role ? (u.role.charAt(0).toUpperCase() + u.role.slice(1)) : 'Agente';
+    if (roleEl) roleEl.textContent = u.country ? roleLabel + ' · ' + u.country : roleLabel;
+  } catch(e) {}
+  var desktop = document.getElementById('wizard-body-desktop');
+  var mobile  = document.getElementById('wizard-body-mobile');
+  var sub     = document.getElementById('wizard-sub');
+  if (desktop) desktop.style.display = 'none';
+  if (mobile)  mobile.style.display  = 'block';
+  if (sub)     sub.textContent = 'Cómo usar KAI Academy desde tu teléfono.';
+}
+
+function _mobNextAgent() {
+  var idx;
+  do { idx = Math.floor(Math.random() * MOB_AGENTS.length); }
+  while (idx === _mobLastAgentIdx && MOB_AGENTS.length > 1);
+  _mobLastAgentIdx = idx;
+  return MOB_AGENTS[idx];
+}
+
+function mobStartPractica() {
+  _mobCurrentAgent = _mobNextAgent();
+  document.getElementById('mob-home').classList.remove('visible');
+  document.getElementById('mob-incoming').classList.add('visible');
+  _mobStartRing();
+}
+
+function mobDecline() {
+  _mobStopRing();
+  document.getElementById('mob-incoming').classList.remove('visible');
+  document.getElementById('mob-home').classList.add('visible');
+  _mobCurrentAgent = null;
+}
+
+async function mobAnswer() {
+  if (!_mobCurrentAgent) return;
+  _mobStopRing();
+  document.getElementById('mob-incoming').classList.remove('visible');
+  document.getElementById('mob-active').classList.add('visible');
+  var statusEl = document.getElementById('mob-act-status');
+  if (statusEl) statusEl.textContent = 'CONECTANDO';
+  _mobTimerSecs = 0;
+  _mobTimerInterval = setInterval(function() {
+    _mobTimerSecs++;
+    var m = Math.floor(_mobTimerSecs / 60), s = _mobTimerSecs % 60;
+    var el = document.getElementById('mob-timer');
+    if (el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    window._mobMicStream = stream;
+  } catch(e) { console.warn('[Mobile] Mic:', e.message); }
+  try {
+    var ELConv = window.__EL_Conversation;
+    if (!ELConv || typeof ELConv.startSession !== 'function') {
+      console.warn('[ElevenLabs] SDK no disponible'); return;
+    }
+    console.log('[ElevenLabs] Iniciando sesion:', _mobCurrentAgent.id);
+    _mobConversation = await ELConv.startSession({
+      agentId: _mobCurrentAgent.id,
+      connectionType: 'webrtc',
+      onConnect: function(data) {
+        console.log('[ElevenLabs] Conectado:', data && data.conversationId);
+        var st = document.getElementById('mob-act-status');
+        if (st) st.textContent = 'EN LLAMADA';
+        if (_mobRingCtx && _mobRingCtx.state === 'suspended') _mobRingCtx.resume().catch(function(){});
+      },
+      onDisconnect: function() { _mobCleanup(); },
+      onError: function(err) { console.error('[ElevenLabs]', err); },
+      onModeChange: function(data) {
+        var wave = document.getElementById('mob-wave');
+        if (wave) wave.className = 'mob-act-wave ' + (data.mode === 'speaking' ? 'client' : 'agent');
+      }
+    });
+  } catch(err) { console.warn('[ElevenLabs] Error:', err); }
+}
+
+async function mobEndCall() {
+  if (_mobConversation) {
+    try { await _mobConversation.endSession(); } catch(e) {}
+    _mobConversation = null;
+  }
+  _mobCleanup();
+}
+
+function _mobCleanup() {
+  _mobStopRing();
+  _mobIsMuted = false; _mobSpkHigh = false;
+  var mc = document.getElementById('mob-mute-circle');
+  var mi = document.getElementById('mob-mute-ico');
+  var ml = document.getElementById('mob-mute-lbl');
+  var sc = document.getElementById('mob-spk-circle');
+  var si = document.getElementById('mob-spk-ico');
+  var sl = document.getElementById('mob-spk-lbl');
+  if (mc) mc.classList.remove('active');
+  if (mi) mi.className = 'ti ti-microphone';
+  if (ml) ml.textContent = 'Silenciar';
+  if (sc) sc.classList.remove('active');
+  if (si) si.className = 'ti ti-volume';
+  if (sl) sl.textContent = 'Altavoz';
+  if (window._mobMicStream) {
+    window._mobMicStream.getAudioTracks().forEach(function(t){ t.enabled = true; });
+  }
+  clearInterval(_mobTimerInterval);
+  _mobTimerInterval = null; _mobTimerSecs = 0;
+  var el = document.getElementById('mob-timer');
+  if (el) el.textContent = '0:00';
+  var wave = document.getElementById('mob-wave');
+  if (wave) wave.className = 'mob-act-wave';
+  var st = document.getElementById('mob-act-status');
+  if (st) st.textContent = 'EN LLAMADA';
+  document.getElementById('mob-active').classList.remove('visible');
+  document.getElementById('mob-home').classList.add('visible');
+}
+
+function mobToggleMute() {
+  _mobIsMuted = !_mobIsMuted;
+  if (window._mobMicStream) {
+    window._mobMicStream.getAudioTracks().forEach(function(t){ t.enabled = !_mobIsMuted; });
+  }
+  var circle = document.getElementById('mob-mute-circle');
+  var ico    = document.getElementById('mob-mute-ico');
+  var lbl    = document.getElementById('mob-mute-lbl');
+  if (circle) circle.classList.toggle('active', _mobIsMuted);
+  if (ico)    ico.className = _mobIsMuted ? 'ti ti-microphone-off' : 'ti ti-microphone';
+  if (lbl)    lbl.textContent = _mobIsMuted ? 'Activar' : 'Silenciar';
+}
+
+function mobToggleSpeaker() {
+  _mobSpkHigh = !_mobSpkHigh;
+  var vol = _mobSpkHigh ? 1.0 : 0.7;
+  if (_mobConversation && typeof _mobConversation.setVolume === 'function') {
+    try { _mobConversation.setVolume({ volume: vol }); } catch(e) {}
+  }
+  var circle = document.getElementById('mob-spk-circle');
+  var ico    = document.getElementById('mob-spk-ico');
+  var lbl    = document.getElementById('mob-spk-lbl');
+  if (circle) circle.classList.toggle('active', _mobSpkHigh);
+  if (ico)    ico.className = _mobSpkHigh ? 'ti ti-volume-2' : 'ti ti-volume';
+  if (lbl)    lbl.textContent = _mobSpkHigh ? 'Vol. alto' : 'Altavoz';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof _mobInit === 'function') _mobInit();
+});
 </script>
 <style>
 /* ═══ DS v6 TOKENS ═══════════════════════════════════ */
