@@ -1450,8 +1450,126 @@ body.dark .n-th-thumb {
 .preview-hint-close:hover{color:var(--t1);background:var(--c3);}
 
 @media (max-width:1180px){
-  .col-l{width:380px;min-width:380px;}
-  .col-r{width:260px;min-width:260px;}
+  .col-l{width:380px;min-width:340px;}
+  .col-r{width:260px;min-width:240px;}
+}
+
+@media (max-width:900px){
+  .col-l{width:320px;min-width:300px;}
+  .col-r{width:240px;min-width:220px;}
+}
+
+/* ── TABLET / MOBILE ≤768px — tab-based layout ── */
+@media (max-width:768px){
+
+  /* Nav */
+  nav{height:46px;padding:0 12px;gap:6px;}
+  .n-brand>div>span:first-child{font-size:13px;}
+  .n-brand>div>div{display:none;}
+  .n-r{gap:4px;}
+  .n-dash,.qbtn{height:28px;}
+  .qbtn{padding:0 8px;}
+  .n-demo{display:none;}
+  #status-wrap>button{padding:0 8px;height:28px;}
+  #status-label{display:none!important;}
+  .n-ver{display:none;}
+
+  /* Body: single column, fills viewport minus nav and tabbar */
+  .body{
+    flex-direction:column;
+    height:calc(100dvh - 46px - 52px);
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* All cols: full width, hidden by default */
+  .col-l,.col-c,.col-r{
+    position:absolute;
+    inset:0;
+    width:100%!important;
+    min-width:100%!important;
+    height:100%!important;
+    max-height:100%!important;
+    border:none;
+    overflow-y:auto;
+    transition:opacity .18s,transform .18s;
+    opacity:0;
+    pointer-events:none;
+    transform:translateX(8px);
+  }
+
+  /* Active col */
+  .col-l.mob-active,.col-c.mob-active,.col-r.mob-active{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateX(0);
+    z-index:1;
+  }
+
+  /* Col-l PO panel */
+  .col-l{border-right:none;}
+  .ps-body{padding:8px 12px;gap:6px;}
+  .fld-in{font-size:12px;}
+  .po-scroll{padding:8px 12px;gap:5px;}
+  .po-cta-bar{padding:8px 12px;}
+  .po-tools{display:none!important;}
+
+  /* Col-c transcript */
+  .col-c{border-right:none;}
+  .tp-body{padding:10px 14px 8px;}
+  .tp-hd{padding:0 12px;height:38px;}
+  .as-bar{padding:6px 12px;height:auto;flex-wrap:wrap;gap:6px;}
+  .as-kpis{gap:8px;}
+  .as-kv{font-size:11px;}
+  .bubble{padding:7px 10px;font-size:12px;max-width:92%;}
+  .kai-float-wrap{padding:0 10px 8px;}
+
+  /* Col-r guide */
+  .col-r{
+    flex-direction:column;
+    padding:10px 12px;
+    gap:8px;
+  }
+  .ctx-scroll{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    overflow-y:auto;
+    padding:0;
+  }
+  .guia-card{min-height:200px;}
+
+  /* Menus */
+  #status-menu{right:auto;left:0;}
+  .profile-menu{right:0;width:240px;}
+
+  /* Wizard */
+  .kai-wizard{width:96vw;max-height:90dvh;}
+
+  /* Modals fullscreen */
+  .pvp-modal{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;}
+  .dash-modal{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;}
+
+  /* Tab bar visible */
+  .mob-tabbar{display:flex;}
+}
+
+/* ── SMALL PHONES ≤480px ── */
+@media (max-width:480px){
+  nav{padding:0 8px;}
+  .as-kpis{display:none;}
+  .fld-in{font-size:11px;}
+  .bubble{font-size:11px;}
+  .tp-body{padding:8px 10px;}
+  .pvp-modal,.dash-modal{border-radius:0;}
+}
+
+/* ── LANDSCAPE PHONE ── */
+@media (max-width:768px) and (orientation:landscape){
+  .body{height:calc(100dvh - 46px - 48px);}
+  .mob-tabbar{height:48px;}
+  .mob-tab{font-size:10px;gap:3px;}
+  .mob-tab i{font-size:16px;}
 }
 
 /* ── Toast notification ── */
@@ -1886,103 +2004,28 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
    Estrategia: col-l arriba (PO), col-c centro (transcript),
    col-r abajo (KAI cards). Nav colapsa. Sin pérdida de funcionalidad.
    ══════════════════════════════════════════ */
-@media (max-width:768px) {
-
-  /* Nav — compacto */
-  nav { height:46px; padding:0 12px; gap:6px; }
-  .n-brand { margin-right:8px; }
-  .n-brand > div > span:first-child { font-size:13px; }
-  .n-brand > div > div { display:none; } /* ocultar subtítulo */
-  .n-r { gap:4px; }
-  .n-dash, .qbtn, .n-demo { height:28px; }
-  .qbtn { padding:0 8px; }
-  .n-demo { display:none; } /* ocultar Demo en mobile */
-  #status-wrap > button { padding:0 8px; height:28px; }
-  #status-label { display:none !important; } /* solo el dot en mobile */
-
-  /* Layout — vertical en lugar de 3 columnas */
-  .body {
-    flex-direction:column;
-    height:auto;
-    overflow-y:auto;
-    overflow-x:hidden;
-  }
-
-  /* Col-l — ancho completo, altura fija con scroll */
-  .col-l {
-    width:100% !important;
-    min-width:100% !important;
-    border-right:none;
-    border-bottom:1px solid var(--gb2);
-    max-height:50vh;
-    overflow-y:auto;
-    flex-shrink:0;
-  }
-
-  /* Col-c — ancho completo, transcript más compacto */
-  .col-c {
-    width:100% !important;
-    min-height:40vh;
-    flex-shrink:0;
-    border-right:none;
-    border-bottom:1px solid var(--gb2);
-  }
-  .tp-body { padding:12px 16px 8px; }
-  .tp-hd { padding:0 12px; height:38px; }
-
-  /* Agent bar — más compacto */
-  .as-bar { padding:6px 12px; height:auto; flex-wrap:wrap; gap:6px; }
-  .as-kpis { gap:10px; }
-  .as-kv { font-size:11px; }
-
-  /* Col-r — ancho completo, cards en grid 2 columnas */
-  .col-r {
-    width:100% !important;
-    min-width:100% !important;
-    flex-direction:column;
-    padding:10px 12px;
-    gap:8px;
-  }
-  .ctx-scroll {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-  /* Análisis de calidad ocupa el ancho completo */
-  #calidad-card { grid-column:1 / -1; }
-
-  /* PO — campos más compactos */
-  .ps-body { padding:6px 10px 8px; gap:6px; }
-  .fld-in { font-size:11px; }
-  .po-scroll { padding:8px 10px; gap:5px; }
-  .po-cta-bar { padding:8px 10px; }
-
-  /* Ocultar po-tools en mobile */
-  .po-tools { display:none !important; }
-
-  /* Burbujas transcript — más compactas */
-  .bubble { padding:7px 10px; font-size:12px; max-width:90%; }
-
-  /* Status menu — posición fija */
-  #status-menu { right:auto; left:0; }
-
-  /* Profile menu */
-  .profile-menu { right:0; width:240px; }
-
-  /* Mapas — más pequeños */
-  .map-mini { height:100px !important; }
-
-  /* Wizard — fullscreen en mobile */
-  .kai-wizard { width:96vw; margin:0 auto; }
+/* ── Mobile tab bar ── */
+.mob-tabbar{
+  display:none; /* shown via media query */
+  position:fixed;bottom:0;left:0;right:0;
+  height:52px;z-index:200;
+  background:var(--c1);
+  border-top:1px solid var(--gb2);
+  padding:0 4px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
-
-/* Breakpoint muy pequeño — 480px */
-@media (max-width:480px) {
-  .ctx-scroll { grid-template-columns:1fr; }
-  #calidad-card { grid-column:1; }
-  .as-kpis { display:none; } /* ocultar KPIs en pantallas muy pequeñas */
-  nav { padding:0 8px; }
+.mob-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;background:none;border:none;cursor:pointer;
+  color:var(--t3);font-family:var(--f);font-size:9px;
+  padding:6px 4px;border-radius:8px;
+  transition:color .15s,background .15s;
+  -webkit-tap-highlight-color:transparent;
 }
+.mob-tab i{font-size:18px;transition:color .15s;}
+.mob-tab.active{color:var(--a);}
+.mob-tab.active i{color:var(--a);}
+.mob-tab:hover{background:var(--c2);}
 
 /* ── Guía de llamada en col-r ── */
 .guia-card{
@@ -2239,7 +2282,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.6-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.7-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2305,7 +2348,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 <div class="body">
 
   <!-- LEFT — PO CONSOLE (PRIMARY) -->
-  <aside class="col-l">
+  <aside class="col-l" id="col-l">
     <div class="po-scroll">
       <div class="po-empty" id="pb-empty" style="display:none"></div>
       <div class="po-fields" id="pb-body" style="display:none"></div>
@@ -2492,7 +2535,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   </aside>
 
   <!-- CENTER — Transcript -->
-  <main class="col-c">
+  <main class="col-c" id="col-c">
     <div class="tp-hd">
       <span class="tp-lbl">Transcripción en tiempo real</span>
       <div style="display:flex;align-items:center;gap:10px;">
@@ -2552,7 +2595,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   </main>
 
   <!-- RIGHT — Context / KAI / Recs -->
-  <aside class="col-r">
+  <aside class="col-r" id="col-r">
     <div class="ctx-scroll">
 
       <!-- Emergent rec popups -->
@@ -6817,6 +6860,44 @@ function _syncAgentMini(){
 }
 setInterval(_syncAgentMini, 3000);
 
+// ── Mobile tab navigation ──────────────────────────────────────────────────
+function mobTab(btn, colId) {
+  if(window.innerWidth > 768) return;
+  // Update tabs
+  document.querySelectorAll('.mob-tab').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+  // Show/hide columns
+  document.querySelectorAll('.col-l,.col-c,.col-r').forEach(function(c){ c.classList.remove('mob-active'); });
+  var col = document.getElementById(colId) || document.querySelector('.'+colId);
+  if(col) col.classList.add('mob-active');
+}
+
+// Init mobile layout
+function _initMobileLayout() {
+  if(window.innerWidth > 768) return;
+  // Activate first tab (PO) by default
+  var firstTab = document.querySelector('.mob-tab[data-col="col-l"]');
+  var colL = document.querySelector('.col-l');
+  if(firstTab && colL) {
+    document.querySelectorAll('.mob-tab').forEach(function(t){ t.classList.remove('active'); });
+    firstTab.classList.add('active');
+    document.querySelectorAll('.col-l,.col-c,.col-r').forEach(function(c){ c.classList.remove('mob-active'); });
+    colL.classList.add('mob-active');
+  }
+}
+
+// Re-init on resize
+window.addEventListener('resize', function(){
+  if(window.innerWidth > 768){
+    // Desktop: remove mob-active, restore normal layout
+    document.querySelectorAll('.col-l,.col-c,.col-r').forEach(function(c){ c.classList.remove('mob-active'); });
+  } else {
+    _initMobileLayout();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); });
+
 </script>
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t0);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;"></div>
 
@@ -6899,6 +6980,20 @@ setInterval(_syncAgentMini, 3000);
       <button class="pvp-btn-pri" onclick="confirmPO()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>Confirmar PO</button>
     </div>
   </div>
+<!-- Mobile tab bar — only visible on ≤768px -->
+<div class="mob-tabbar" id="mob-tabbar">
+  <button class="mob-tab active" data-col="col-l" onclick="mobTab(this,'col-l')">
+    <i class="ti ti-file-text"></i>
+    <span>PO</span>
+  </button>
+  <button class="mob-tab" data-col="col-c" onclick="mobTab(this,'col-c')">
+    <i class="ti ti-message-2"></i>
+    <span>Transcripción</span>
+  </button>
+  <button class="mob-tab" data-col="col-r" onclick="mobTab(this,'col-r')">
+    <i class="ti ti-list-check"></i>
+    <span>Guía</span>
+  </button>
 </div>
 </body>
 </html>
