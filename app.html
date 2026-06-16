@@ -9741,7 +9741,18 @@ function _updatePOProgress() {
 // ── KAI Academy Wizard ──────────────────────────────
 function showWizard() {
   var ov = document.getElementById('kai-wizard-ov');
-  if (ov) ov.style.display = 'flex';
+  if(!ov) return;
+  // Mostrar contenido según dispositivo
+  var isMob = window.innerWidth <= 768;
+  var desktop = document.getElementById('wizard-body-desktop');
+  var mobile  = document.getElementById('wizard-body-mobile');
+  var sub     = document.getElementById('wizard-sub');
+  if (desktop) desktop.style.display = isMob ? 'none' : 'block';
+  if (mobile)  mobile.style.display  = isMob ? 'block' : 'none';
+  if (sub) sub.textContent = isMob
+    ? 'Cómo usar KAI Academy desde tu teléfono.'
+    : 'Tu portal de entrenamiento para agentes de Contact Center.';
+  ov.style.display = 'flex';
 }
 function closeWizard() {
   var ov = document.getElementById('kai-wizard-ov');
@@ -10249,10 +10260,12 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
   <div class="kai-wizard">
     <div class="kai-wizard-hero">
       <img src="assets/connect-logo.png" alt="Connect" class="kai-wizard-logo"/>
-      <div class="kai-wizard-title">Bienvenido a KAI Academy</div>
-      <div class="kai-wizard-sub">Tu portal de entrenamiento para agentes de Contact Center.<br>Practica con clientes virtuales y mejora tu desempeño en tiempo real.</div>
+      <div class="kai-wizard-title" id="wizard-title">Bienvenido a KAI Academy</div>
+      <div class="kai-wizard-sub" id="wizard-sub">Tu portal de entrenamiento para agentes de Contact Center.</div>
     </div>
-    <div class="kai-wizard-body">
+
+    <!-- Contenido desktop -->
+    <div class="kai-wizard-body" id="wizard-body-desktop">
       <div class="kai-wizard-features">
         <div class="kai-wizard-feat">
           <div class="kai-wizard-feat-ico"><i class="ti ti-phone-call" style="font-size:16px;color:var(--t2);"></i></div>
@@ -10291,6 +10304,48 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
         </div>
       </div>
     </div>
+
+    <!-- Contenido mobile -->
+    <div class="kai-wizard-body" id="wizard-body-mobile" style="display:none;">
+      <div class="kai-wizard-features">
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-phone-incoming" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Iniciar práctica</div>
+            <div class="kai-wizard-feat-desc">Toca "Iniciar práctica" en la pantalla principal. Recibirás una llamada entrante simulada.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-phone" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Contestar la llamada</div>
+            <div class="kai-wizard-feat-desc">Toca el botón verde para contestar. Hablarás directamente con un cliente virtual por voz.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-microphone-off" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Silenciar y altavoz</div>
+            <div class="kai-wizard-feat-desc">Durante la llamada podés silenciar tu micrófono o subir el volumen con los botones laterales.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-phone-off" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Finalizar</div>
+            <div class="kai-wizard-feat-desc">Toca el botón rojo para cerrar la llamada. Podés iniciar una nueva práctica cuando quieras.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-device-desktop" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Versión completa en computadora</div>
+            <div class="kai-wizard-feat-desc">En desktop tenés acceso al PO, análisis de sentimiento, guía de protocolo y evaluación de calidad.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="kai-wizard-footer">
       <label class="kai-wizard-toggle">
         <input type="checkbox" id="wizard-no-show" onchange="wizardToggle(this)"/>
