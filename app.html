@@ -2227,7 +2227,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.1-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.2-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -6013,35 +6013,27 @@ let _kbSvcId = null;
 
 function initKBChecklist(svcId){
   if(!KB_CHECKS[svcId]) return;
-  // Clear previous KB pills
-  document.querySelectorAll('.kb-rec').forEach(p=>p.remove());
   _kbSvcId = svcId;
   _kbState = {};
   (KB_CHECKS[svcId]||[]).forEach(c => { _kbState[c.id] = 'pending'; });
-  // Stagger pill appearance
-  const checks = KB_CHECKS[svcId];
-  checks.forEach((c, i) => {
-    setTimeout(() => {
-      if(_kbState[c.id] === 'pending') _showKBPill(c);
-    }, i * 300);
-  });
+  // Alimentar el sistema dinámico de guía
+  var items = (KB_CHECKS[svcId]||[]).map(function(c){ return c.txt; });
+  if(typeof renderKBSugs === 'function') renderKBSugs(items);
+}
 }
 
 function checkKBTranscript(transcriptText){
   if(!_kbSvcId) return;
   const checks = KB_CHECKS[_kbSvcId] || [];
   const t = transcriptText.toLowerCase();
-  let changed = false;
   checks.forEach(c => {
     if(_kbState[c.id] === 'pending'){
       if(c.keywords.some(k => t.includes(k))){
         _kbState[c.id] = 'done';
-        changed = true;
-        _dismissKBPill(c.id);
+        if(typeof autoCheckItem === 'function') autoCheckItem(c.txt);
       }
     }
   });
-  if(changed) _renderKBChecklist();
 }
 
 function _renderKBChecklist(){
