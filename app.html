@@ -7178,6 +7178,54 @@ var _mobTimerInterval = null;
 var _mobTimerSecs     = 0;
 var _mobCurrentAgent  = null;
 var _mobLastAgentIdx  = -1;
+var _mobRingCtx       = null;   // AudioContext para el ringtone
+var _mobRingInterval  = null;   // intervalo del ringtone
+
+// ── Ringtone con Web Audio API ────────────────────────────
+function _mobRingOnce() {
+  try {
+    if (!_mobRingCtx) {
+      _mobRingCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    var ctx = _mobRingCtx;
+    // Tono doble estilo iPhone — dos beeps cortos
+    function beep(freq, start, dur) {
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+      gain.gain.setValueAtTime(0, ctx.currentTime + start);
+      gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + start + 0.02);
+      gain.gain.setValueAtTime(0.35, ctx.currentTime + start + dur - 0.04);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur);
+    }
+    // Tono doble: 440Hz + 480Hz, dos veces con pequeña pausa
+    beep(440, 0.0,  0.4);
+    beep(480, 0.0,  0.4);
+    beep(440, 0.55, 0.4);
+    beep(480, 0.55, 0.4);
+  } catch(e) {
+    console.warn('[Ringtone] Web Audio no disponible:', e.message);
+  }
+}
+
+function _mobStartRing() {
+  _mobRingOnce(); // primer tono inmediato
+  _mobRingInterval = setInterval(_mobRingOnce, 2200); // repetir cada 2.2s
+}
+
+function _mobStopRing() {
+  clearInterval(_mobRingInterval);
+  _mobRingInterval = null;
+  // Silenciar AudioContext gradualmente
+  if (_mobRingCtx) {
+    try { _mobRingCtx.suspend(); } catch(e) {}
+  }
+}
 
 function _isMob() { return window.innerWidth <= 768; }
 
@@ -7224,10 +7272,14 @@ function mobStartPractica() {
   // Mostrar pantalla de llamada entrante
   document.getElementById('mob-home').classList.remove('visible');
   document.getElementById('mob-incoming').classList.add('visible');
+
+  // Iniciar ringtone
+  _mobStartRing();
 }
 
 // ── Rechazar llamada ────────────────────────────────────────
 function mobDecline() {
+  _mobStopRing();
   document.getElementById('mob-incoming').classList.remove('visible');
   document.getElementById('mob-home').classList.add('visible');
   _mobCurrentAgent = null;
@@ -7237,8 +7289,13 @@ function mobDecline() {
 async function mobAnswer() {
   if (!_mobCurrentAgent) return;
 
+  _mobStopRing();
   document.getElementById('mob-incoming').classList.remove('visible');
   document.getElementById('mob-active').classList.add('visible');
+
+  // Mostrar estado "Conectando..." mientras carga WebRTC
+  var statusEl = document.querySelector('#mob-active .mob-act-status');
+  if (statusEl) statusEl.textContent = 'Conectando...';
 
   // Iniciar timer
   _mobTimerSecs = 0;
@@ -7274,6 +7331,13 @@ async function mobAnswer() {
       connectionType: 'webrtc',
       onConnect: function(data) {
         console.log('[ElevenLabs] ✅ Conectado — agente:', _mobCurrentAgent.name, '| conversationId:', data && data.conversationId);
+        // Actualizar estado visual a "En llamada"
+        var statusEl = document.querySelector('#mob-active .mob-act-status');
+        if (statusEl) statusEl.textContent = 'En llamada';
+        // Reanudar AudioContext si fue suspendido
+        if (_mobRingCtx && _mobRingCtx.state === 'suspended') {
+          _mobRingCtx.resume().catch(function(){});
+        }
       },
       onMessage: function(msg) {
         console.log('[ElevenLabs] Mensaje recibido — tipo:', msg.type, '| source:', msg.source, '| texto:', msg.message && msg.message.slice(0, 60));
@@ -7355,6 +7419,9 @@ function mobToggleSpeaker() {
 }
 
 function _mobCleanup() {
+  // Parar ringtone por si acaso
+  _mobStopRing();
+
   // Reset estados
   _mobIsMuted = false;
   _mobSpkHigh = false;
@@ -7385,6 +7452,8 @@ function _mobCleanup() {
   if (el) el.textContent = '0:00';
   var wave = document.getElementById('mob-wave');
   if (wave) wave.className = 'mob-act-wave';
+  var statusEl = document.querySelector('#mob-active .mob-act-status');
+  if (statusEl) statusEl.textContent = 'En llamada';
 
   document.getElementById('mob-active').classList.remove('visible');
   document.getElementById('mob-home').classList.add('visible');
