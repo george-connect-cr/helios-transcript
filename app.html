@@ -2102,8 +2102,20 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
   transition:color .15s,background .15s;
 }
 .guia-btn-skip:hover{color:var(--t1);background:var(--c3);}
-/* History — completed items */
-.guia-history{display:flex;flex-direction:column;gap:3px;}
+/* Pending queue */
+.guia-pending-label{
+  font-size:8px;font-weight:500;color:var(--t3);letter-spacing:.05em;
+  text-transform:uppercase;padding:8px 4px 3px;
+}
+.guia-queue-item{
+  display:flex;align-items:center;gap:6px;
+  padding:3px 4px;border-radius:4px;opacity:.5;
+  transition:opacity .15s;
+}
+.guia-queue-item:hover{opacity:.8;}
+.guia-queue-txt{font-size:9.5px;color:var(--t2);font-family:var(--f);line-height:1.3;}
+/* History auto badge */
+.guia-hist-auto{font-size:7.5px;color:var(--g);margin-left:4px;}
 @keyframes guiaHistIn{from{opacity:0;transform:translateX(-3px);}to{opacity:.7;transform:translateX(0);}}
 .guia-hist-item{
   display:flex;align-items:center;gap:6px;
@@ -2227,7 +2239,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.2-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.3-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -2675,6 +2687,10 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 
             <!-- Historial de completados (últimos 3) -->
             <div class="guia-history" id="guia-history"></div>
+
+            <!-- Cola de pendientes restantes -->
+            <div class="guia-pending-label" id="guia-pending-label">Pendientes</div>
+            <div class="guia-pending-list" id="guia-pending-list"></div>
           </div>
 
           <!-- Empty state -->
@@ -6074,203 +6090,242 @@ function _dismissKBPill(itemId){
 }
 
 // ── Guía de llamada — renderizado en col-r ───────────────────────────
-// ── GUÍA DINÁMICA — un ítem a la vez ──────────────────────────────────────
-var _guiaItems  = [];   // [{txt, tag, isAuto, section, secIdx, done, skipped}]
-var _guiaProto  = [];   // legacy compat
-var _guiaQual   = [];   // legacy compat
-var _guiaCursor = 0;    // índice del ítem activo
+// ── GUÍA DINÁMICA — detección por transcript, sin orden fijo ──────────────
+var _guiaItems  = [];  // [{id, txt, keywords, done, autoDetected}]
+var _guiaProto  = [];  // legacy compat
+var _guiaQual   = [];  // legacy compat
 
-function _guiaReset(){
-  _guiaItems=[]; _guiaProto=[]; _guiaQual=[]; _guiaCursor=0;
+// Inicializar desde KB_CHECKS — todos pendientes, sin orden impuesto
+function _guiaLoad(svcId) {
+  var checks = KB_CHECKS[svcId] || [];
+  _guiaItems = checks.map(function(c) {
+    return { id:c.id, txt:c.txt, keywords:c.keywords||[], done:false, autoDetected:false };
+  });
+  _guiaProto = _guiaItems.map(function(){ return false; });
+  _guiaQual  = [];
   _guiaRender();
 }
 
-function _guiaRender(){
+// Render principal: muestra sugerencia activa + lista de pendientes + historial
+function _guiaRender() {
   var wrap  = document.getElementById('guia-active-wrap');
   var empty = document.getElementById('guia-empty');
   var doneEl= document.getElementById('guia-done');
-  if(!wrap) return;
+  if (!wrap) return;
 
-  var total    = _guiaItems.length;
-  var doneCount= _guiaItems.filter(function(x){return x.done;}).length;
-  var allDone  = total>0 && doneCount===total;
+  var total     = _guiaItems.length;
+  var doneItems = _guiaItems.filter(function(x){ return x.done; });
+  var pending   = _guiaItems.filter(function(x){ return !x.done; });
+  var pct       = total > 0 ? Math.round(doneItems.length / total * 100) : 0;
 
-  if(total===0){
-    wrap.style.display='none';
-    if(doneEl) doneEl.style.display='none';
-    if(empty) empty.style.display='';
-    _updateGuiaScores(); return;
+  if (total === 0) {
+    wrap.style.display = 'none';
+    if (doneEl) doneEl.style.display = 'none';
+    if (empty)  empty.style.display  = '';
+    _guiaUpdateHeader(0, 0, 0); return;
   }
-  if(allDone){
-    wrap.style.display='none';
-    if(empty) empty.style.display='none';
-    if(doneEl){
-      doneEl.style.display='';
-      var ds=document.getElementById('guia-done-score');
-      if(ds) ds.textContent=doneCount+' de '+total+' ítems completados';
+
+  if (pending.length === 0) {
+    wrap.style.display = 'none';
+    if (empty)  empty.style.display  = 'none';
+    if (doneEl) {
+      doneEl.style.display = '';
+      var ds = document.getElementById('guia-done-score');
+      if (ds) ds.textContent = total + ' de ' + total + ' ítems detectados';
     }
-    _updateGuiaScores(); return;
+    _guiaUpdateHeader(pct, 0, total); return;
   }
 
-  wrap.style.display='';
-  if(empty) empty.style.display='none';
-  if(doneEl) doneEl.style.display='none';
+  wrap.style.display = '';
+  if (empty)  empty.style.display  = 'none';
+  if (doneEl) doneEl.style.display = 'none';
 
-  // Encontrar siguiente ítem pendiente
-  var next=-1;
-  for(var i=_guiaCursor;i<_guiaItems.length;i++){
-    if(!_guiaItems[i].done&&!_guiaItems[i].skipped){next=i;break;}
-  }
-  if(next<0){
-    // todos saltados, volver a iterar
-    _guiaItems.forEach(function(x){if(x.skipped&&!x.done) x.skipped=false;});
-    _guiaCursor=0;
-    for(var i=0;i<_guiaItems.length;i++){
-      if(!_guiaItems[i].done){next=i;break;}
-    }
-  }
-
-  if(next>=0){
-    _guiaCursor=next;
-    var item=_guiaItems[next];
-    var stepEl=document.getElementById('guia-active-step');
-    var tagEl =document.getElementById('guia-active-tag');
-    var txtEl =document.getElementById('guia-active-txt');
-    var card  =document.getElementById('guia-active-card');
-    if(stepEl) stepEl.textContent=(doneCount+1)+' de '+total;
-    if(tagEl)  tagEl.textContent=item.isAuto?'auto':item.tag||'protocolo';
-    if(txtEl)  txtEl.textContent=item.txt;
-    if(card){card.style.animation='none';void card.offsetWidth;card.style.animation='';}
+  // ── Sugerencia activa: primer pendiente ──
+  var next = pending[0];
+  var stepEl = document.getElementById('guia-active-step');
+  var tagEl  = document.getElementById('guia-active-tag');
+  var txtEl  = document.getElementById('guia-active-txt');
+  if (stepEl) stepEl.textContent = (doneItems.length + 1) + ' de ' + total;
+  if (tagEl)  tagEl.textContent  = next.autoDetected ? 'auto' : 'sugerencia';
+  if (txtEl && txtEl.textContent !== next.txt) {
+    txtEl.textContent = next.txt;
+    var card = document.getElementById('guia-active-card');
+    if (card) { card.style.animation = 'none'; void card.offsetWidth; card.style.animation = ''; }
   }
 
-  // Historial: últimos 3 completados
-  var histEl=document.getElementById('guia-history');
-  if(histEl){
-    var completed=_guiaItems.filter(function(x){return x.done;}).slice(-3);
-    histEl.innerHTML=completed.map(function(x){
-      return '<div class="guia-hist-item">'+
-        '<i class="ti ti-check guia-hist-ico" style="font-size:10px;"></i>'+
-        '<span class="guia-hist-txt">'+x.txt+'</span>'+
+  // ── Lista de pendientes restantes (sin el activo) ──
+  var listEl = document.getElementById('guia-pending-list');
+  if (listEl) {
+    var rest = pending.slice(1);
+    listEl.innerHTML = rest.length
+      ? rest.map(function(x) {
+          return '<div class="guia-queue-item">' +
+            '<i class="ti ti-circle-dashed" style="font-size:10px;color:var(--t3);flex-shrink:0;"></i>' +
+            '<span class="guia-queue-txt">' + x.txt + '</span>' +
+            '</div>';
+        }).join('')
+      : '';
+    listEl.style.display = rest.length ? '' : 'none';
+  }
+
+  // ── Historial: últimos 3 completados ──
+  var histEl = document.getElementById('guia-history');
+  if (histEl) {
+    var recent = doneItems.slice(-3);
+    histEl.innerHTML = recent.map(function(x) {
+      return '<div class="guia-hist-item">' +
+        '<i class="ti ti-check guia-hist-ico" style="font-size:10px;"></i>' +
+        '<span class="guia-hist-txt">' + x.txt + '</span>' +
+        (x.autoDetected ? '<span class="guia-hist-auto">auto</span>' : '') +
         '</div>';
     }).join('');
   }
-  _updateGuiaScores();
+
+  _guiaUpdateHeader(pct, pending.length, doneItems.length);
 }
 
-function _guiaMarkCurrent(){
-  if(_guiaCursor<_guiaItems.length){
-    var item=_guiaItems[_guiaCursor];
-    item.done=true;
-    if(item.section==='proto'&&item.secIdx!=null) _guiaProto[item.secIdx]=true;
-    else if(item.section==='qual'&&item.secIdx!=null) _guiaQual[item.secIdx]=true;
-    _guiaCursor++;
-    _guiaRender();
-  }
+function _guiaUpdateHeader(pct, pendingCount, doneCount) {
+  var ring   = document.getElementById('guia-ring-fill');
+  var pctEl  = document.getElementById('guia-ring-pct');
+  var bar    = document.getElementById('guia-prog-fill');
+  var pVal   = document.getElementById('guia-ctr-p-val');
+  var dVal   = document.getElementById('guia-ctr-d-val');
+  var color  = pct >= 80 ? 'var(--g)' : pct >= 50 ? 'var(--y)' : 'var(--r)';
+  if (ring)  { ring.style.strokeDashoffset = 75.4 - (pct/100)*75.4; ring.style.stroke = color; }
+  if (pctEl)   pctEl.textContent = pct + '%';
+  if (bar)   { bar.style.width = pct + '%'; bar.style.background = color; }
+  if (pVal)    pVal.textContent = pendingCount;
+  if (dVal)    dVal.textContent = doneCount;
+  // agent-strip
+  var total = pendingCount + doneCount;
+  var fcr  = document.getElementById('ag-fcr');
+  var fcrr = document.getElementById('ag-fcr-r');
+  if (fcr  && total > 0) fcr.textContent  = pct + '%';
+  if (fcrr && total > 0) fcrr.textContent = pct + '%';
+  // legacy
+  var ps = document.getElementById('guia-proto-score');
+  var qs = document.getElementById('guia-qual-score');
+  if (ps) ps.textContent = doneCount + '/' + total;
+  if (qs) qs.textContent = '0/0';
 }
 
-function _guiaSkipCurrent(){
-  if(_guiaCursor<_guiaItems.length){
-    _guiaItems[_guiaCursor].skipped=true;
-    _guiaCursor++;
-    _guiaRender();
-  }
-}
-
-function _makeGuiaItem(txt, tag, isAuto, section, idx){
-  _guiaItems.push({txt:txt,tag:tag,isAuto:isAuto,section:section,secIdx:idx,done:false,skipped:false});
-}
-
-function _toggleGuiaItem(el, section, idx){
-  var item=_guiaItems.find(function(x){return x.section===section&&x.secIdx===idx;});
-  if(item){item.done=!item.done; _guiaRender();}
-}
-
-function _reorderGuia(){ /* no-op */ }
-
-function _updateGuiaScores(){
-  var doneCount=_guiaItems.filter(function(x){return x.done;}).length;
-  var total=_guiaItems.length;
-  var pct=total>0?Math.round(doneCount/total*100):0;
-  var pd=_guiaProto.filter(Boolean).length, pt=_guiaProto.length;
-  var qd=_guiaQual.filter(Boolean).length,  qt=_guiaQual.length;
-  var ps=document.getElementById('guia-proto-score');
-  var qs=document.getElementById('guia-qual-score');
-  if(ps) ps.textContent=pd+'/'+pt;
-  if(qs) qs.textContent=qd+'/'+qt;
-  var ring=document.getElementById('guia-ring-fill');
-  var pctEl=document.getElementById('guia-ring-pct');
-  if(ring){ring.style.strokeDashoffset=75.4-(pct/100)*75.4;ring.style.stroke=pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';}
-  if(pctEl) pctEl.textContent=pct+'%';
-  var bar=document.getElementById('guia-prog-fill');
-  if(bar){bar.style.width=pct+'%';bar.style.background=pct>=80?'var(--g)':pct>=50?'var(--y)':'var(--r)';}
-  var pVal=document.getElementById('guia-ctr-p-val');
-  var dVal=document.getElementById('guia-ctr-d-val');
-  if(pVal) pVal.textContent=total-doneCount;
-  if(dVal) dVal.textContent=doneCount;
-  var fcr=document.getElementById('ag-fcr');
-  if(fcr&&total>0) fcr.textContent=pct+'%';
-  var fcrr=document.getElementById('ag-fcr-r');
-  if(fcrr&&total>0) fcrr.textContent=pct+'%';
-}
-
-function renderKBSugs(sugs){
-  var empty=document.getElementById('guia-empty');
-  if(empty) empty.style.display='none';
-  _guiaItems=_guiaItems.filter(function(x){return x.section!=='proto';});
-  _guiaProto=[];
-  _guiaCursor=0;
-  if(!sugs||!sugs.length){
-    if(empty){empty.style.display='';empty.textContent='Sin protocolo definido para este servicio.';}
-    _guiaRender(); return;
-  }
-  _guiaProto=sugs.map(function(){return false;});
-  sugs.forEach(function(s,i){_makeGuiaItem(s,'protocolo',false,'proto',i);});
+// Marcar ítem manualmente (botón Confirmar)
+function _guiaMarkCurrent() {
+  var pending = _guiaItems.filter(function(x){ return !x.done; });
+  if (!pending.length) return;
+  pending[0].done = true;
   _guiaRender();
 }
 
-function renderKBQual(items){
-  _guiaItems=_guiaItems.filter(function(x){return x.section!=='qual';});
-  _guiaQual=[];
-  if(!items||!items.length){_guiaRender();return;}
-  _guiaQual=items.map(function(){return false;});
-  items.forEach(function(s,i){
-    var txt=typeof s==='string'?s:s.label||s;
-    _makeGuiaItem(txt,'calidad',true,'qual',i);
+// Saltar ítem activo — mueve al final de pendientes
+function _guiaSkipCurrent() {
+  var pending = _guiaItems.filter(function(x){ return !x.done; });
+  if (!pending.length) return;
+  var skipped = pending[0];
+  // mover al final del array
+  var idx = _guiaItems.indexOf(skipped);
+  _guiaItems.splice(idx, 1);
+  _guiaItems.push(skipped);
+  _guiaRender();
+}
+
+// Auto-detección desde transcript — busca keywords en TODOS los pendientes
+function autoCheckItem(keyword) {
+  var found = false;
+  for (var i = 0; i < _guiaItems.length; i++) {
+    var item = _guiaItems[i];
+    if (item.done) continue;
+    var match = false;
+    // Buscar por keywords del ítem
+    if (item.keywords && item.keywords.length) {
+      match = item.keywords.some(function(k){ return keyword.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(keyword.toLowerCase()); });
+    }
+    // También buscar por texto del ítem
+    if (!match) match = item.txt.toLowerCase().includes(keyword.toLowerCase());
+    if (match) {
+      item.done = true;
+      item.autoDetected = true;
+      // Actualizar legacy compat
+      var legacyIdx = _guiaProto.indexOf(false);
+      if (legacyIdx >= 0) _guiaProto[legacyIdx] = true;
+      found = true;
+      break;
+    }
+  }
+  if (found) _guiaRender();
+}
+
+// Detección completa por transcript — pasa todo el texto
+function checkKBFromTranscript(transcriptText) {
+  if (!_guiaItems.length) return;
+  var t = transcriptText.toLowerCase();
+  var changed = false;
+  _guiaItems.forEach(function(item) {
+    if (item.done) return;
+    if (item.keywords && item.keywords.some(function(k){ return t.includes(k.toLowerCase()); })) {
+      item.done = true;
+      item.autoDetected = true;
+      changed = true;
+    }
+  });
+  if (changed) _guiaRender();
+}
+
+// Compatibilidad con renderKBSugs / renderKBQual
+function renderKBSugs(sugs) {
+  // Si llega array de strings (de KB.sugerenciasParaServicio), cargarlo
+  if (!sugs || !sugs.length) return;
+  // Solo usamos si no hay _guiaItems ya cargados desde KB_CHECKS
+  if (_guiaItems.length) return;
+  _guiaProto = sugs.map(function(){ return false; });
+  _guiaItems = sugs.map(function(s, i) {
+    return { id:'proto_'+i, txt:s, keywords:[], done:false, autoDetected:false };
   });
   _guiaRender();
 }
+function renderKBQual(items) { /* absorbido en _guiaLoad */ }
 
-function toggleCheckItem(el){
-  var idx=parseInt(el.id.replace('kc-',''));
-  _toggleGuiaItem(el,'proto',idx);
+// Inicializar desde KB_CHECKS cuando se detecta servicio
+function initKBChecklist(svcId) {
+  _kbSvcId = svcId;
+  _kbState = {};
+  (KB_CHECKS[svcId]||[]).forEach(function(c){ _kbState[c.id] = 'pending'; });
+  _guiaLoad(svcId);
 }
-function _updateCheckProgress(){_updateGuiaScores();}
 
-function autoCheckItem(keyword){
-  var found=false;
-  var cur=_guiaItems[_guiaCursor];
-  if(cur&&!cur.done&&!cur.skipped&&cur.txt.toLowerCase().includes(keyword.toLowerCase())){
-    cur.done=true;
-    if(cur.section==='proto'&&cur.secIdx!=null) _guiaProto[cur.secIdx]=true;
-    _guiaCursor++; found=true;
-  }
-  if(!found){
-    for(var i=0;i<_guiaItems.length;i++){
-      var item=_guiaItems[i];
-      if(!item.done&&item.txt.toLowerCase().includes(keyword.toLowerCase())){
-        item.done=true;
-        if(item.section==='proto'&&item.secIdx!=null) _guiaProto[item.secIdx]=true;
-        found=true; break;
+// checkKBTranscript — ahora alimenta la guía dinámica
+function checkKBTranscript(transcriptText) {
+  if (!_kbSvcId) return;
+  var checks = KB_CHECKS[_kbSvcId] || [];
+  var t = transcriptText.toLowerCase();
+  checks.forEach(function(c) {
+    if (_kbState[c.id] === 'pending') {
+      if (c.keywords.some(function(k){ return t.includes(k); })) {
+        _kbState[c.id] = 'done';
+        // Marcar en guía dinámica
+        var item = _guiaItems.find(function(x){ return x.id === c.id; });
+        if (item && !item.done) {
+          item.done = true;
+          item.autoDetected = true;
+          _guiaRender();
+        }
       }
     }
-  }
-  if(found) _guiaRender();
+  });
 }
 
-function updateGuiaSvcLabel(svcName){
-  var el=document.getElementById('guia-svc-lbl');
-  if(el&&svcName) el.textContent=svcName;
+function toggleCheckItem(el) { /* legacy no-op */ }
+function _makeGuiaItem()     { /* legacy no-op */ }
+function _toggleGuiaItem()   { /* legacy no-op */ }
+function _reorderGuia()      { /* legacy no-op */ }
+function _updateCheckProgress() { _guiaUpdateHeader(0,0,0); }
+function _updateGuiaScores() { /* driven by _guiaUpdateHeader */ }
+
+function updateGuiaSvcLabel(svcName) {
+  var el = document.getElementById('guia-svc-lbl');
+  if (el && svcName) el.textContent = svcName;
 }
+
 
 // Marcar automáticamente un ítem del checklist desde la transcripción
 function autoCheckItem(keyword) {
