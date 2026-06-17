@@ -7071,6 +7071,17 @@ function _mobInit() {
   if(desktop)desktop.style.display='none';
   if(mobile)mobile.style.display='block';
   if(sub)sub.textContent='Cómo usar KAI Academy desde tu teléfono.';
+
+  // Pre-calentar permiso del mic para reducir delay al contestar
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(function(stream) {
+        window._mobMicStream = stream;
+        stream.getAudioTracks().forEach(function(t){ t.enabled = false; });
+        console.log('[Mobile] Permiso mic listo');
+      })
+      .catch(function(){});
+  }
 }
 
 // ── Seleccionar agente (shuffle sin repetir) ────────────────
@@ -7117,12 +7128,6 @@ async function mobAnswer() {
     if (el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
   }, 1000);
 
-  // Pedir micrófono
-  try {
-    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    window._mobMicStream = stream;
-  } catch(e) { console.warn('[Mobile] Mic:', e.message); }
-
   // Conectar ElevenLabs WebRTC
   var statusEl = document.getElementById('mob-act-status');
   if (statusEl) statusEl.textContent = 'CONECTANDO';
@@ -7133,6 +7138,11 @@ async function mobAnswer() {
       console.warn('[ElevenLabs] SDK no disponible — __EL_Conversation:', typeof ELConv);
       if (statusEl) statusEl.textContent = 'EN LLAMADA';
       return;
+    }
+
+    // Reactivar mic pre-calentado si existe
+    if (window._mobMicStream) {
+      window._mobMicStream.getAudioTracks().forEach(function(t){ t.enabled = true; });
     }
 
     console.log('[ElevenLabs] Iniciando sesión:', _mobCurrentAgent.id);
