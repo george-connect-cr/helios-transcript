@@ -379,7 +379,7 @@ var RF=[
 
 // HELPERS
 var _filters={carril:'',pais:'',grade:'',agente:''};
-var RA = RA_MOCK.slice(); // inicializar con mock como fallback
+var RA = [];              // inicia vacío — se llena desde Supabase
 var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
 var RBAC = {
@@ -505,9 +505,48 @@ function fs(s){return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
 function sc(v){return v>=70?'var(--g)':v>=50?'var(--y)':'var(--r)';}
 
 // FILTERS
+var _period = 'week';
 function selPeriod(el,p){
   document.querySelectorAll('.filters .fp:not([id])').forEach(function(e){e.classList.remove('active');});
   el.classList.add('active');
+  _period = p;
+  // Filtrar RA_MOCK o datos reales por período
+  var now = new Date();
+  var cutoff = new Date();
+  if(p==='week'){
+    // lunes de esta semana
+    var day = now.getDay()||7;
+    cutoff.setDate(now.getDate() - day + 1);
+    cutoff.setHours(0,0,0,0);
+  } else if(p==='prev'){
+    // lunes y domingo de semana anterior
+    var day2 = now.getDay()||7;
+    cutoff.setDate(now.getDate() - day2 - 6);
+    cutoff.setHours(0,0,0,0);
+    var prevEnd = new Date(cutoff); prevEnd.setDate(cutoff.getDate()+6); prevEnd.setHours(23,59,59,999);
+    window._periodEnd = prevEnd;
+  } else if(p==='month'){
+    cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  window._periodStart = cutoff;
+  if(_hasRealData){
+    // Filtrar los poscores/polist de cada agente según fecha
+    RA = _RA_FULL.map(function(a){
+      var filteredPO = (a._allPO||a.polist||[]).filter(function(po){
+        if(!po._date) return true;
+        var d = new Date(po._date);
+        if(p==='prev') return d>=cutoff && d<=(window._periodEnd||now);
+        return d>=cutoff;
+      });
+      return Object.assign({},a,{
+        polist: filteredPO.slice(0,15),
+        calls:  filteredPO.length || 1,
+        poscores: filteredPO.map(function(po){return po.score||0;})
+      });
+    }).filter(function(a){return a.calls>0;});
+    if(!RA.length) RA = _RA_FULL; // fallback: todos si no hay datos del período
+  }
+  go(_cur);
 }
 
 function setF(key,val,e){
@@ -573,6 +612,16 @@ function vResumen(){
       '<a href="app.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;background:var(--t0);color:#fff;font-family:var(--f);font-size:13px;font-weight:400;text-decoration:none;margin-top:8px;">'+
         '← Ir a la pantalla de llamadas'+
       '</a>'+
+    '</div>';
+  }
+  // Supervisor/formador sin datos reales — pantalla limpia
+  if((_role==='supervisor'||_role==='formador'||_role==='admin') && !_hasRealData){
+    return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;">'+
+      '<div><i class="ti ti-users" style="font-size:36px;color:var(--t3);"></i></div>'+
+      '<div style="font-family:var(--f);font-size:18px;font-weight:400;color:var(--t0);">Sin datos del equipo aún</div>'+
+      '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:380px;line-height:1.65;">'+
+        'Las métricas del equipo aparecerán aquí cuando los agentes completen llamadas y confirmen POs en la plataforma.'+
+      '</div>'+
     '</div>';
   }
   var data=ag(),n=data.length||1;
@@ -689,12 +738,33 @@ function tblAgentes(data){
 }
 
 function vAgentes(){
+  if(!_hasRealData){
+    return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;">'+
+      '<div><i class="ti ti-headphones" style="font-size:36px;color:var(--t3);"></i></div>'+
+      '<div style="font-family:var(--f);font-size:18px;font-weight:400;color:var(--t0);">Sin agentes registrados</div>'+
+      '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:360px;line-height:1.65;">'+
+        'Los agentes aparecerán aquí cuando confirmen su primera PO en una llamada real.'+
+      '</div>'+
+    '</div>';
+  }
   var data=ag();
   return'<div class="pt">Todos los agentes</div><div class="ps">'+data.length+' agentes · clic para ver perfil detallado</div>'+tblAgentes(data);
 }
 
 // POR AGENTE
 function vPorAgente(){
+  if(!_hasRealData && (_role==='agente'||_role==='demo')){
+    return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;padding:32px;">'+
+      '<div><i class="ti ti-chart-line" style="font-size:36px;color:var(--t3);"></i></div>'+
+      '<div style="font-family:var(--f);font-size:18px;font-weight:400;color:var(--t0);">Tu historial aparecerá aquí</div>'+
+      '<div style="font-family:var(--f);font-size:13px;color:var(--t1);max-width:360px;line-height:1.65;">'+
+        'Completa llamadas y confirma POs para ver tus métricas, evolución y calificaciones acumuladas.'+
+      '</div>'+
+      '<a href="app.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;border:2px solid var(--a);color:var(--a);font-family:var(--f);font-size:12px;font-weight:500;text-decoration:none;margin-top:4px;">'+
+        '← Ir a llamadas'+
+      '</a>'+
+    '</div>';
+  }
   var data=ag();
   // If role is agente: show own profile only, no sidebar list
   if(_role==='agente'||_role==='demo'){
@@ -1087,7 +1157,7 @@ function _rowClick(id){
 // INIT
 try{
   var _s=JSON.parse(localStorage.getItem('helios_session')||'null');
-  if(!_s||(Date.now()-_s.ts>3600000)){window.location.href='index.html';}
+  if(!_s||(Date.now()-_s.ts>28800000)){window.location.href='index.html';}
   else{
     _role=(_s.user||{}).role||'formador';
     var rb=document.getElementById('hd-role');
@@ -1123,7 +1193,7 @@ try{
 (function(){
   try{
     var _sess=JSON.parse(localStorage.getItem('helios_session')||'null');
-    if(!_sess||(Date.now()-_sess.ts>3600000)){window.location.href='index.html';return;}
+    if(!_sess||(Date.now()-_sess.ts>28800000)){window.location.href='index.html';return;}
     _role=(_sess.user||{}).role||'formador';
     var _uname=(_sess.user||{}).name||'';
     var rb=document.getElementById('hd-role');
@@ -1275,7 +1345,17 @@ function loadSupabaseData(callback){
       };
     });
     if(newRA.length>0){
-      RA=newRA; _hasRealData=true;
+      // Enriquecer polist con _date para filtrado por período
+      newRA.forEach(function(a){
+        a._allPO = (a.polist||[]).map(function(po,i){
+          var s = a._ss ? a._ss[i] : null;
+          po._date = (s && s.session_date) ? s.session_date : po.f ? ('2026-'+po.f.replace('/','-')) : null;
+          return po;
+        });
+      });
+      RA = newRA;
+      window._RA_FULL = newRA; // copia completa para filtrado por período
+      _hasRealData = true;
       console.log('[Reportes] '+newRA.length+' agente(s) cargados desde Supabase');
     }
     callback();

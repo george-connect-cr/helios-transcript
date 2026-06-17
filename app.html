@@ -2347,7 +2347,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.8-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.8.9-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3828,7 +3828,7 @@ setInterval(function(){
 window.addEventListener('DOMContentLoaded', ()=>{
   try{
     var _s=JSON.parse(localStorage.getItem('helios_session')||'null');
-    if(!_s||(Date.now()-_s.ts>3600000)){window.location.href='index.html?reason=noauth';return;}
+    if(!_s||(Date.now()-_s.ts>28800000)){window.location.href='index.html?reason=noauth';return;}
     var _u=_s.user||{};
     // Admin y Supervisor no tienen acceso a la pantalla de transcripción
     if(_u.role==='supervisor'){window.location.href='reportes.html';return;}
