@@ -428,7 +428,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
     <div class="brand">
       <img src="assets/connect-logo.png" alt="Connect" style="height:62px;width:auto;display:block;margin:0 auto 10px;border-radius:6px;"/>
       <div class="brand-sub" style="letter-spacing:6px;font-size:42px;font-weight:300;white-space:nowrap;">KAI ACADEMY</div>
-      <div style="font-family:var(--f);font-size:11px;font-weight:500;color:var(--acc);margin-top:4px;">v0.8.9-beta</div>
+      <div style="font-family:var(--f);font-size:11px;font-weight:500;color:var(--acc);margin-top:4px;">v0.9.0-beta</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -467,19 +467,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
 </div>
 
 <script>
-var USERS = {
-  agente:     [{name:'Dayana García',  email:'dayana.garcia@connect.inc',  color:'#e04500', letter:'D'},
-               {name:'Carlos Mora',    email:'carlos.mora@connect.inc',    color:'#3b6ef8', letter:'C'},
-               {name:'Valeria Núñez',  email:'valeria.nunez@connect.inc',  color:'#7048e8', letter:'V'},
-               {name:'Luis Arias',     email:'luis.arias@connect.inc',     color:'#0ea874', letter:'L'}],
-  formador:   [{name:'Laura Méndez',   email:'laura.mendez@connect.inc',   color:'#7048e8', letter:'L'},
-               {name:'Andrés Campos',  email:'andres.campos@connect.inc',  color:'#3b6ef8', letter:'A'}],
-  supervisor: [{name:'Ana Vega',       email:'ana.vega@connect.inc',       color:'#f0900a', letter:'A'},
-               {name:'Roberto Salas',  email:'roberto.salas@connect.inc',  color:'#e04500', letter:'R'}],
-  admin:      [{name:'George Esna',    email:'george.esna@connect.inc',    color:'#7048e8', letter:'G'},
-               {name:'María Torres',   email:'maria.torres@connect.inc',   color:'#3b6ef8', letter:'M'}],
-  demo:       [{name:'Usuario Demo',   email:'demo@connect.inc',           color:'#8892b0', letter:'D'}]
-};
+// USERS eliminado — usuarios se cargan desde Supabase agents table
 var ROLE_LABELS = {agente:'Agente',formador:'Formador',supervisor:'Supervisor',admin:'Admin',demo:'Demo'};
 var _pendingUser = null;
 
@@ -555,7 +543,11 @@ function doGoogleSSO() {
       // hd es solo un hint — la verificación debe hacerse aquí
       if (domain !== 'connect.inc') {
         firebase.auth().signOut();
-        _showLoginErr('Esta cuenta no tiene acceso. Comunicate con el administrador del sitio para solicitar acceso.');
+        _showAccessDenied(
+          'Dominio no autorizado.',
+          'El correo <strong>' + email + '</strong> no pertenece a un dominio autorizado para acceder a KAI Academy.'
+        );
+        firebase.auth().signOut();
         return;
       }
 
@@ -583,17 +575,43 @@ function _lookupAgentInSupabase(email, displayName, firebaseUid) {
   .then(function(r){ return r.json(); })
   .then(function(data){
     var agent = data && data.length ? data[0] : null;
+
+    // ── Sin cuenta registrada ─────────────────────────────────────────────────
     if (!agent) {
-      // Primer login — crear agente con rol 'agente' por defecto
-      return fetch(_SB_URL2 + '/rest/v1/agents', {
-        method: 'POST',
-        headers: Object.assign({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=representation'}, sbHdrs),
-        body: JSON.stringify({ email: email, name: name, role: 'agente', firebase_uid: firebaseUid })
-      })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ return Array.isArray(d) ? d[0] : d; });
+      document.getElementById('loading').classList.remove('show');
+      firebase.auth().signOut();
+      _showAccessDenied(
+        'Tu cuenta no está registrada en el sistema.',
+        'Tu correo <strong>' + email + '</strong> no tiene acceso a KAI Academy. ' +
+        'Solicitá al administrador que active tu cuenta.'
+      );
+      return null;
     }
-    // Sincronizar firebase_uid si cambió o no estaba
+
+    // ── Cuenta inactiva ───────────────────────────────────────────────────────
+    if (agent.active === false) {
+      document.getElementById('loading').classList.remove('show');
+      firebase.auth().signOut();
+      _showAccessDenied(
+        'Tu cuenta está inactiva.',
+        'Tu acceso ha sido desactivado. Contactá al administrador para reactivarlo.'
+      );
+      return null;
+    }
+
+    // ── Sin rol válido ────────────────────────────────────────────────────────
+    var validRoles = ['agente','demo','formador','supervisor','admin'];
+    if (!agent.role || validRoles.indexOf(agent.role) === -1) {
+      document.getElementById('loading').classList.remove('show');
+      firebase.auth().signOut();
+      _showAccessDenied(
+        'Tu cuenta no tiene un rol asignado.',
+        'Comunicate con el administrador para que asigne tu rol en el sistema.'
+      );
+      return null;
+    }
+
+    // ── Sincronizar firebase_uid si cambió ────────────────────────────────────
     if (firebaseUid && agent.firebase_uid !== firebaseUid) {
       fetch(_SB_URL2 + '/rest/v1/agents?email=eq.' + encodeURIComponent(email), {
         method: 'PATCH',
@@ -604,6 +622,7 @@ function _lookupAgentInSupabase(email, displayName, firebaseUid) {
     return agent;
   })
   .then(function(agent){
+    if (!agent) return; // bloqueado arriba
     document.getElementById('loading').classList.remove('show');
     var userObj = {
       name:         agent.name        || name,
@@ -611,15 +630,11 @@ function _lookupAgentInSupabase(email, displayName, firebaseUid) {
       firebase_uid: firebaseUid       || agent.firebase_uid || '',
       color:        '#e04500',
       letter:       (agent.name || name)[0].toUpperCase(),
-      role:         agent.role        || 'agente',
+      role:         agent.role,
       country:      agent.country     || 'Costa Rica',
       lane:         agent.lane        || 'Home'
     };
-    if (agent.role === 'agente' || agent.role === 'demo') {
-      saveAndRedirect(userObj, agent.role, null);
-    } else {
-      saveAndRedirect(userObj, agent.role, null);
-    }
+    saveAndRedirect(userObj, agent.role, null);
   })
   .catch(function(err){
     document.getElementById('loading').classList.remove('show');
@@ -633,11 +648,33 @@ function _showLoginErr(msg) {
   if (existing) existing.remove();
   var el = document.createElement('div');
   el.id = 'login-err';
-  el.style.cssText = 'background:#fff3f3;color:#e84040;padding:9px 14px;border-radius:6px;font-size:12px;font-weight:600;margin-top:8px;text-align:center;';
+  el.style.cssText = 'background:#fff3f3;color:#e84040;padding:9px 14px;border-radius:6px;font-size:12px;font-weight:500;margin-top:8px;text-align:center;';
   el.textContent = msg;
   var form = document.querySelector('.form');
   if (form) form.appendChild(el);
-  setTimeout(function(){ el.remove(); }, 5000);
+  setTimeout(function(){ el.remove(); }, 6000);
+}
+
+function _showAccessDenied(title, detail) {
+  var existing = document.getElementById('access-denied-ov');
+  if (existing) existing.remove();
+  var ov = document.createElement('div');
+  ov.id = 'access-denied-ov';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;';
+  ov.innerHTML =
+    '<div style="background:#fff;border-radius:12px;padding:32px 28px;max-width:420px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.18);">' +
+      '<div style="width:48px;height:48px;border-radius:50%;background:#fff3f3;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e84040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>' +
+      '</div>' +
+      '<div style="font-size:16px;font-weight:600;color:#111;margin-bottom:8px;">' + title + '</div>' +
+      '<div style="font-size:13px;color:#555;line-height:1.6;margin-bottom:24px;">' + detail + '</div>' +
+      '<div style="font-size:12px;color:#888;margin-bottom:20px;">Si creés que es un error, abrí un ticket por <strong style=\"color:#e04500;\">KAI</strong>.</div>' +
+      '<button onclick="document.getElementById(\'access-denied-ov\').remove()" ' +
+        'style="background:transparent;border:2px solid #e04500;color:#e04500;padding:9px 24px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;">'+
+        'Entendido' +
+      '</button>' +
+    '</div>';
+  document.body.appendChild(ov);
 }
 
 
@@ -648,11 +685,11 @@ function showRoleSelector(user){
   ov.id = 'role-ov';
 
   var roles = [
-    {key:'agente',    icon:'🎯', av:'bl', sub:'Atención'},
-    {key:'formador',  icon:'📋', av:'pu', sub:'Coaching'},
-    {key:'supervisor',icon:'📊', av:'am', sub:'Equipo'},
-    {key:'admin',     icon:'⚙️', av:'re', sub:'Total'},
-    {key:'demo',      icon:'🎬', av:'gr', sub:'Preview'}
+    {key:'agente',    icon:'<i class="ti ti-headphones" style="font-size:20px"></i>', av:'bl', sub:'Atención'},
+    {key:'formador',  icon:'<i class="ti ti-school" style="font-size:20px"></i>',     av:'pu', sub:'Coaching'},
+    {key:'supervisor',icon:'<i class="ti ti-chart-bar" style="font-size:20px"></i>',  av:'am', sub:'Equipo'},
+    {key:'admin',     icon:'<i class="ti ti-settings" style="font-size:20px"></i>',   av:'re', sub:'Total'},
+    {key:'demo',      icon:'<i class="ti ti-player-play" style="font-size:20px"></i>',av:'gr', sub:'Preview'}
   ];
 
   var cards = roles.map(function(r){
@@ -812,23 +849,38 @@ function skipExtension(){
 
 /* ── FINAL: Save session and redirect ── */
 function saveAndRedirect(user, role, extension){
+  // Validar rol antes de guardar sesión
+  var validRoles = ['agente','demo','formador','supervisor','admin'];
+  if (!role || validRoles.indexOf(role) === -1) {
+    _showAccessDenied('Rol no válido.', 'Tu cuenta tiene un rol no reconocido por el sistema. Contactá al administrador.');
+    firebase.auth().signOut();
+    return;
+  }
   document.getElementById('loading').classList.add('show');
   setTimeout(function(){
     var session = {
       user:{
-        name:user.name,
-        email:user.email,
-        color:user.color||'#8892b0',
-        letter:user.letter||(user.name[0]||'U').toUpperCase(),
-        role:role,
-        extension:extension
+        name:    user.name,
+        email:   user.email,
+        color:   user.color   || '#8892b0',
+        letter:  user.letter  || (user.name[0]||'U').toUpperCase(),
+        role:    role,
+        country: user.country || 'Costa Rica',
+        lane:    user.lane    || 'Home',
+        extension: extension
       },
-      ts:Date.now()
+      ts: Date.now()
     };
     localStorage.setItem('helios_session', JSON.stringify(session));
-    // Routing por rol: supervisor, admin y formador van directo a reportes
-    var _dest = (role==='supervisor'||role==='formador'||role==='admin') ? 'reportes.html' : 'app.html';
-    window.location.href = _dest;
+    // Routing por rol
+    var ROLE_DEST = {
+      supervisor: 'reportes.html',
+      formador:   'reportes.html',
+      admin:      'reportes.html',
+      agente:     'app.html',
+      demo:       'app.html'
+    };
+    window.location.href = ROLE_DEST[role] || 'app.html';
   }, 900);
 }
 </script>
