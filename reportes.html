@@ -1193,7 +1193,12 @@ try{
 (function(){
   try{
     var _sess=JSON.parse(localStorage.getItem('helios_session')||'null');
-    if(!_sess||(Date.now()-_sess.ts>28800000)){window.location.href='index.html';return;}
+    var _validRoles=['agente','demo','formador','supervisor','admin'];
+    if(!_sess||(Date.now()-_sess.ts>28800000)){window.location.href='index.html?reason=noauth';return;}
+    if(!_sess.user||!_sess.user.role||_validRoles.indexOf(_sess.user.role)===-1){
+      localStorage.removeItem('helios_session');
+      window.location.href='index.html?reason=invalid_role';return;
+    }
     _role=(_sess.user||{}).role||'formador';
     var _uname=(_sess.user||{}).name||'';
     var rb=document.getElementById('hd-role');
