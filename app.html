@@ -6907,7 +6907,17 @@ function _updatePOProgress() {
 // ── KAI Academy Wizard ──────────────────────────────
 function showWizard() {
   var ov = document.getElementById('kai-wizard-ov');
-  if (ov) ov.style.display = 'flex';
+  if (!ov) return;
+  var isMob = window.innerWidth <= 768;
+  var desktop = document.getElementById('wizard-body-desktop');
+  var mobile  = document.getElementById('wizard-body-mobile');
+  var sub     = document.getElementById('wizard-sub');
+  if (desktop) desktop.style.display = isMob ? 'none' : 'block';
+  if (mobile)  mobile.style.display  = isMob ? 'block' : 'none';
+  if (sub) sub.innerHTML = isMob
+    ? 'Cómo usar KAI Academy desde tu teléfono.'
+    : 'Tu portal de entrenamiento para agentes de Contact Center.<br>Practica con clientes virtuales y mejora tu desempeño en tiempo real.';
+  ov.style.display = 'flex';
 }
 function closeWizard() {
   var ov = document.getElementById('kai-wizard-ov');
@@ -6981,7 +6991,52 @@ var MOB_AGENTS = [
   { id: 'agent_2801ksghx06pemcsgy5v55rthxzk', name: 'Asistencia Tranquila', gender: 'F' },
   { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j', name: 'Asistencia Molesta',   gender: 'M' }
 ];
-var _mobConversation  = null;   // instancia ElevenLabs Conversation
+var _mobConversation  = null;
+var _mobRingCtx       = null;
+var _mobRingInterval  = null;
+var _mobSpkHigh       = false;
+
+function _mobRingOnce() {
+  try {
+    if (!_mobRingCtx) _mobRingCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var ctx = _mobRingCtx;
+    function beep(freq, t, d) {
+      var o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination); o.type='sine';
+      o.frequency.setValueAtTime(freq, ctx.currentTime+t);
+      g.gain.setValueAtTime(0, ctx.currentTime+t);
+      g.gain.linearRampToValueAtTime(0.3, ctx.currentTime+t+0.02);
+      g.gain.setValueAtTime(0.3, ctx.currentTime+t+d-0.04);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+t+d);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+d);
+    }
+    beep(440,0.0,0.4); beep(480,0.0,0.4);
+    beep(440,0.55,0.4); beep(480,0.55,0.4);
+  } catch(e) {}
+}
+function _mobStartRing() {
+  _mobRingOnce();
+  _mobRingInterval = setInterval(_mobRingOnce, 2200);
+}
+function _mobStopRing() {
+  clearInterval(_mobRingInterval); _mobRingInterval = null;
+  if (_mobRingCtx) { try { _mobRingCtx.suspend(); } catch(e) {} }
+}
+function mobToggleSpeaker() {
+  _mobSpkHigh = !_mobSpkHigh;
+  var vol = _mobSpkHigh ? 1.0 : 0.7;
+  if (_mobConversation && typeof _mobConversation.setVolume==='function') {
+    try { _mobConversation.setVolume({ volume: vol }); } catch(e) {}
+  }
+  var circle=document.getElementById('mob-spk-circle');
+  var ico=document.getElementById('mob-spk-ico');
+  var lbl=document.getElementById('mob-spk-lbl');
+  if (circle) circle.classList.toggle('active', _mobSpkHigh);
+  if (ico) ico.className = _mobSpkHigh ? 'ti ti-volume-2' : 'ti ti-volume';
+  if (lbl) lbl.textContent = _mobSpkHigh ? 'Vol. alto' : 'Altavoz';
+}
+
+var _mobConversation  = null;
 var _mobTimerInterval = null;
 var _mobTimerSecs     = 0;
 var _mobCurrentAgent  = null;
@@ -7041,10 +7096,12 @@ function mobStartPractica() {
   // Mostrar pantalla de llamada entrante
   document.getElementById('mob-home').classList.remove('visible');
   document.getElementById('mob-incoming').classList.add('visible');
+  _mobStartRing();
 }
 
 // ── Rechazar llamada ────────────────────────────────────────
 function mobDecline() {
+  _mobStopRing();
   document.getElementById('mob-incoming').classList.remove('visible');
   document.getElementById('mob-home').classList.add('visible');
   _mobCurrentAgent = null;
@@ -7053,7 +7110,7 @@ function mobDecline() {
 // ── Contestar — iniciar ElevenLabs WebRTC ──────────────────
 async function mobAnswer() {
   if (!_mobCurrentAgent) return;
-
+  _mobStopRing();
   document.getElementById('mob-incoming').classList.remove('visible');
   document.getElementById('mob-active').classList.add('visible');
 
@@ -7114,6 +7171,14 @@ async function mobEndCall() {
 }
 
 function _mobCleanup() {
+  _mobStopRing();
+  _mobSpkHigh = false;
+  var sc=document.getElementById('mob-spk-circle');
+  var si=document.getElementById('mob-spk-ico');
+  var sl=document.getElementById('mob-spk-lbl');
+  if(sc)sc.classList.remove('active');
+  if(si)si.className='ti ti-volume';
+  if(sl)sl.textContent='Altavoz';
   clearInterval(_mobTimerInterval);
   _mobTimerInterval = null;
   _mobTimerSecs = 0;
@@ -7263,7 +7328,8 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
       <div class="kai-wizard-title">Bienvenido a KAI Academy</div>
       <div class="kai-wizard-sub">Tu portal de entrenamiento para agentes de Contact Center.<br>Practica con clientes virtuales y mejora tu desempeño en tiempo real.</div>
     </div>
-    <div class="kai-wizard-body">
+    <!-- Desktop -->
+    <div class="kai-wizard-body" id="wizard-body-desktop">
       <div class="kai-wizard-features">
         <div class="kai-wizard-feat">
           <div class="kai-wizard-feat-ico"><i class="ti ti-phone-call" style="font-size:16px;color:var(--t2);"></i></div>
@@ -7298,6 +7364,46 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
           <div class="kai-wizard-feat-info">
             <div class="kai-wizard-feat-title">Evaluación y feedback</div>
             <div class="kai-wizard-feat-desc">Nota de calidad, métricas y oportunidades de mejora al finalizar.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile -->
+    <div class="kai-wizard-body" id="wizard-body-mobile" style="display:none;">
+      <div class="kai-wizard-features">
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-phone-incoming" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Iniciar práctica</div>
+            <div class="kai-wizard-feat-desc">Toca "Iniciar práctica". Recibirás una llamada entrante simulada.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-phone" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Contestar</div>
+            <div class="kai-wizard-feat-desc">Toca el botón verde. Hablarás por voz con el cliente virtual.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-microphone-off" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Silenciar y altavoz</div>
+            <div class="kai-wizard-feat-desc">Controles laterales durante la llamada activa.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-phone-off" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Finalizar</div>
+            <div class="kai-wizard-feat-desc">Botón rojo central para cerrar la llamada.</div>
+          </div>
+        </div>
+        <div class="kai-wizard-feat">
+          <div class="kai-wizard-feat-ico"><i class="ti ti-device-desktop" style="font-size:16px;color:var(--t2);"></i></div>
+          <div class="kai-wizard-feat-info">
+            <div class="kai-wizard-feat-title">Versión completa en computadora</div>
+            <div class="kai-wizard-feat-desc">En desktop: PO, sentimiento, protocolo y evaluación de calidad.</div>
           </div>
         </div>
       </div>
