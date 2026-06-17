@@ -27,7 +27,6 @@
   }
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@latest/dist/index.umd.js"></script>
 <style>
 /* ═══ DS v6 TOKENS ═══════════════════════════════════ */
 :root{
@@ -7089,9 +7088,7 @@ function mobStartPractica() {
 
   // Actualizar nombre en pantallas
   var incName = document.getElementById('mob-inc-name');
-  var actName = document.getElementById('mob-act-name');
-  if (incName) incName.textContent = _mobCurrentAgent.name;
-  if (actName) actName.textContent = _mobCurrentAgent.name;
+  // No mostrar nombre del agente (es simulado)
 
   // Mostrar pantalla de llamada entrante
   document.getElementById('mob-home').classList.remove('visible');
@@ -7303,20 +7300,36 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
 
 <!-- ══ MOBILE LLAMADA ACTIVA ════════════════════════════════ -->
 <div id="mob-active">
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-    <div class="mob-act-status">En llamada</div>
+  <div class="mob-act-top">
+    <div class="mob-act-status" id="mob-act-status">EN LLAMADA</div>
     <div class="mob-act-timer" id="mob-timer">0:00</div>
-    <div class="mob-act-name" id="mob-act-name">Cliente Connect</div>
+    <div class="mob-act-name">Cola: Connect</div>
   </div>
-  <div class="mob-act-avatar"><i class="ti ti-user"></i></div>
-  <div class="mob-act-wave" id="mob-wave">
-    <span></span><span></span><span></span><span></span><span></span>
+  <div class="mob-act-wave-wrap">
+    <div class="mob-act-wave" id="mob-wave">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
   </div>
-  <div class="mob-act-end-wrap">
-    <button class="mob-act-end" onclick="mobEndCall()">
-      <i class="ti ti-phone-off"></i>
+  <div class="mob-act-controls">
+    <button class="mob-ctrl-btn" onclick="mobToggleMute()" id="mob-mute-btn">
+      <div class="mob-ctrl-circle" id="mob-mute-circle">
+        <i class="ti ti-microphone" id="mob-mute-ico" aria-hidden="true"></i>
+      </div>
+      <span class="mob-ctrl-lbl" id="mob-mute-lbl">Silenciar</span>
     </button>
-    <div class="mob-act-end-lbl">Finalizar</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:7px;">
+      <button class="mob-act-end" onclick="mobEndCall()">
+        <i class="ti ti-phone-off" aria-hidden="true"></i>
+      </button>
+      <div class="mob-act-end-lbl">Finalizar</div>
+    </div>
+    <button class="mob-ctrl-btn" onclick="mobToggleSpeaker()" id="mob-spk-btn">
+      <div class="mob-ctrl-circle" id="mob-spk-circle">
+        <i class="ti ti-volume" id="mob-spk-ico" aria-hidden="true"></i>
+      </div>
+      <span class="mob-ctrl-lbl" id="mob-spk-lbl">Altavoz</span>
+    </button>
   </div>
 </div>
 
