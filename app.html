@@ -6987,8 +6987,8 @@ function setWave(state) {
 
 // Agentes ElevenLabs (ambos Public)
 var MOB_AGENTS = [
-  { id: 'agent_2801ksghx06pemcsgy5v55rthxzk', name: 'Asistencia Tranquila', gender: 'F' },
-  { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j', name: 'Asistencia Molesta',   gender: 'M' }
+  { id: 'agent_2801ksghx06pemcsgy5v55rthxzk' },
+  { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j' }
 ];
 var _mobConversation  = null;
 var _mobRingCtx       = null;
@@ -7085,10 +7085,6 @@ function _mobNextAgent() {
 // ── Botón Práctica ──────────────────────────────────────────
 function mobStartPractica() {
   _mobCurrentAgent = _mobNextAgent();
-
-  // Actualizar nombre en pantallas
-  var incName = document.getElementById('mob-inc-name');
-  // No mostrar nombre del agente (es simulado)
 
   // Mostrar pantalla de llamada entrante
   document.getElementById('mob-home').classList.remove('visible');
