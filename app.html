@@ -6607,23 +6607,34 @@ var _currentStatus="disponible";
 function _buildStatusMenu(){
   var menu=document.getElementById('status-menu');
   if(!menu)return;
-  var out="<div class='status-sec'>Estado</div>";
-  PAUSAS.filter(function(p){return p.key;}).forEach(function(p){
-    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
-      "<span class='sm-ico'>"+p.icon+"</span>"+
-      "<span class='sm-lbl'>"+p.label+"</span>"+
-      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
-    "</div>";
-  });
-  out+="<div class='status-sep'></div><div class='status-sec'>Pausas</div>";
-  PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){
-    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
-      "<span class='sm-ico'>"+p.icon+"</span>"+
-      "<span class='sm-lbl'>"+p.label+"</span>"+
-      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
-    "</div>";
-  });
-  menu.innerHTML=out;
+  menu.innerHTML='';
+
+  function addSection(label){
+    var s=document.createElement('div');
+    s.className='status-sec';
+    s.textContent=label;
+    menu.appendChild(s);
+  }
+  function addSep(){
+    var s=document.createElement('div');
+    s.className='status-sep';
+    menu.appendChild(s);
+  }
+  function addItem(p){
+    var d=document.createElement('div');
+    d.className='status-opt';
+    d.innerHTML='<span class="sm-ico">'+p.icon+'</span>'+
+      '<span class="sm-lbl">'+p.label+'</span>'+
+      (p.id===_currentStatus?'<i class="ti ti-check sm-chk"></i>':'');
+    d.onclick=function(){setStatus(p.id,p.color,p.label,p.id);};
+    menu.appendChild(d);
+  }
+
+  addSection('Estado');
+  PAUSAS.filter(function(p){return p.key;}).forEach(addItem);
+  addSep();
+  addSection('Pausas');
+  PAUSAS.filter(function(p){return !p.key;}).forEach(addItem);
 }
 function toggleStatusMenu(){
   var m=document.getElementById("status-menu");
@@ -6655,27 +6666,7 @@ function setStatus(id,color,label,icon){
 var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'●'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'–'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'–'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'●'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'–'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'–'},{id:'llamada_practica',label:'Llamada práctica',color:'#0ea5e9',key:false,icon:'–'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'–'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'–'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
 var _curStatus='coaching_p';
 var _lastTranscriptText='';
-function _buildStatusMenu(){
-  var menu=document.getElementById('status-menu');
-  if(!menu)return;
-  var out="<div class='status-sec'>Estado</div>";
-  PAUSAS.filter(function(p){return p.key;}).forEach(function(p){
-    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
-      "<span class='sm-ico'>"+p.icon+"</span>"+
-      "<span class='sm-lbl'>"+p.label+"</span>"+
-      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
-    "</div>";
-  });
-  out+="<div class='status-sep'></div><div class='status-sec'>Pausas</div>";
-  PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){
-    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
-      "<span class='sm-ico'>"+p.icon+"</span>"+
-      "<span class='sm-lbl'>"+p.label+"</span>"+
-      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
-    "</div>";
-  });
-  menu.innerHTML=out;
-}
+
 function toggleStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;_buildStatusMenu();var open=m.style.display==='block';m.style.display=open?'none':'block';if(!open)setTimeout(function(){document.addEventListener('click',function cl(e){if(!document.getElementById('status-wrap').contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}});},10);}
 var _dashTab='dia',_repView='resumen';
 var RA=[{id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:2,name:'Carlos Mora',letter:'C',color:'#6aaa90',carril:'Road',pais:'Costa Rica',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:4,name:'Luis Arias',letter:'L',color:'#4a8a72',carril:'Home',pais:'Costa Rica',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:8,name:'José Quesada',letter:'J',color:'#0ea5e9',carril:'Road',pais:'Panamá',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'}];
