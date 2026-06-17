@@ -235,17 +235,23 @@ body.dark .n-th-thumb {
   position:absolute;top:calc(100% + 8px);right:0;
   background:var(--c1);box-shadow:var(--sh);
   border-radius:8px;padding:6px;
-  min-width:190px;max-height:360px;overflow-y:auto;
+  min-width:200px;max-height:360px;overflow-y:auto;
   z-index:21;display:none;
 }
 #status-menu.open{display:block;}
 .status-opt{
-  display:flex;align-items:center;gap:8px;
-  padding:7px 10px;border-radius:6px;
+  display:flex;align-items:center;gap:9px;
+  padding:6px 10px;border-radius:6px;
   font-family:var(--f);font-size:11.5px;color:var(--t1);
   cursor:pointer;transition:background .12s;
 }
 .status-opt:hover{background:var(--c2);color:var(--t0);}
+.sm-ico{display:flex;align-items:center;justify-content:center;width:16px;flex-shrink:0;}
+.sm-lbl{flex:1;}
+.sm-chk{font-size:11px;color:var(--g);flex-shrink:0;}
+.status-sec{font-size:9px;font-weight:500;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;padding:6px 10px 3px;}
+.status-sep{height:1px;background:var(--gb2);margin:4px 6px;}
+.sd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .status-opt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 
 /* Logout */
@@ -6582,32 +6588,40 @@ function _spawnConfetti(){
 
 
 var PAUSAS=[
-  {id:"disponible",label:"Disponible",color:"#6aaa90",key:true,icon:"●"},
-  {id:"almuerzo",label:"Almuerzo",color:"#bf9455",key:true,icon:"–"},
-  {id:"bano",label:"Baño",color:"#bf9455",key:true,icon:"–"},
-  {id:"break",label:"Break",color:"#bf9455",key:true,icon:"☕"},
-  {id:"ocupado",label:"Ocupado",color:"#cc7580",key:true,icon:"●"},
-  {id:"capacitacion",label:"Capacitación",color:"#6366f1",key:false,icon:"–"},
-  {id:"coaching",label:"Coaching",color:"#6366f1",key:false,icon:"–"},
-  {id:"reunion",label:"Reunión",color:"#6366f1",key:false,icon:"–"},
-  {id:"backoffice",label:"Back Office",color:"#9ca3af",key:false,icon:"–"},
-  {id:"falla",label:"Falla técnica",color:"#cc7580",key:false,icon:"⚠️"},
-  {id:"training",label:"Training",color:"#6366f1",key:false,icon:"–"},
-  {id:"meeting",label:"Meeting",color:"#6366f1",key:false,icon:"–"},
-  {id:"outbound",label:"Outbound",color:"#9ca3af",key:false,icon:"–"}
+  {id:"disponible",  label:"Disponible",       color:"#6aaa90", key:true,  icon:'<i class="ti ti-circle-filled" style="font-size:9px;color:#6aaa90;"></i>'},
+  {id:"almuerzo",    label:"Almuerzo",          color:"#bf9455", key:true,  icon:'<i class="ti ti-soup" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"bano",        label:"Baño",              color:"#bf9455", key:true,  icon:'<i class="ti ti-clock-pause" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"break",       label:"Break",             color:"#bf9455", key:true,  icon:'<i class="ti ti-coffee" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"ocupado",     label:"Ocupado",           color:"#cc7580", key:true,  icon:'<i class="ti ti-circle-filled" style="font-size:9px;color:#cc7580;"></i>'},
+  {id:"capacitacion",label:"Capacitación",      color:"#6366f1", key:false, icon:'<i class="ti ti-school" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"coaching",    label:"Coaching",          color:"#6366f1", key:false, icon:'<i class="ti ti-target" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"reunion",     label:"Reunión",           color:"#6366f1", key:false, icon:'<i class="ti ti-users" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"backoffice",  label:"Back Office",       color:"#9ca3af", key:false, icon:'<i class="ti ti-files" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"falla",       label:"Falla técnica",     color:"#cc7580", key:false, icon:'<i class="ti ti-alert-triangle" style="font-size:13px;color:var(--y);"></i>'},
+  {id:"training",    label:"Training",          color:"#6366f1", key:false, icon:'<i class="ti ti-book" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"meeting",     label:"Meeting",           color:"#6366f1", key:false, icon:'<i class="ti ti-calendar-event" style="font-size:13px;color:var(--t2);"></i>'},
+  {id:"outbound",    label:"Outbound",          color:"#9ca3af", key:false, icon:'<i class="ti ti-phone-outgoing" style="font-size:13px;color:var(--t2);"></i>'}
 ];
 var _currentStatus="disponible";
 
 function _buildStatusMenu(){
-  var menu=document.getElementById("status-menu");
+  var menu=document.getElementById('status-menu');
   if(!menu)return;
   var out="<div class='status-sec'>Estado</div>";
   PAUSAS.filter(function(p){return p.key;}).forEach(function(p){
-    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.icon+"')\"><div class='sd' style='background:"+p.color+"'></div>"+p.icon+" "+p.label+(p.id===_currentStatus?" ✓":"")+"</div>";
+    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
+      "<span class='sm-ico'>"+p.icon+"</span>"+
+      "<span class='sm-lbl'>"+p.label+"</span>"+
+      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
+    "</div>";
   });
   out+="<div class='status-sep'></div><div class='status-sec'>Pausas</div>";
   PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){
-    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.icon+"')\"><div class='sd' style='background:"+p.color+"'></div>"+p.icon+" "+p.label+(p.id===_currentStatus?" ✓":"")+"</div>";
+    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
+      "<span class='sm-ico'>"+p.icon+"</span>"+
+      "<span class='sm-lbl'>"+p.label+"</span>"+
+      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
+    "</div>";
   });
   menu.innerHTML=out;
 }
@@ -6641,7 +6655,27 @@ function setStatus(id,color,label,icon){
 var PAUSAS=[{id:'disponible',label:'Disponible',color:'#6aaa90',key:true,icon:'●'},{id:'almuerzo',label:'Almuerzo',color:'#bf9455',key:true,icon:'–'},{id:'bano',label:'Baño',color:'#bf9455',key:true,icon:'–'},{id:'break',label:'Break',color:'#bf9455',key:true,icon:'☕'},{id:'ocupado',label:'Ocupado',color:'#cc7580',key:true,icon:'●'},{id:'coaching_p',label:'Coaching',color:'#6366f1',key:false,icon:'–'},{id:'capacitacion',label:'Capacitación',color:'#6366f1',key:false,icon:'–'},{id:'llamada_practica',label:'Llamada práctica',color:'#0ea5e9',key:false,icon:'–'},{id:'reunion',label:'Reunión',color:'#6366f1',key:false,icon:'–'},{id:'backoffice',label:'Back Office',color:'#9ca3af',key:false,icon:'–'},{id:'falla',label:'Falla técnica',color:'#cc7580',key:false,icon:'⚠️'}];
 var _curStatus='coaching_p';
 var _lastTranscriptText='';
-function _buildStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;m.innerHTML='';var s1=document.createElement('div');s1.className='status-sec';s1.textContent='Estado';m.appendChild(s1);PAUSAS.filter(function(p){return p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});var sep=document.createElement('div');sep.className='status-sep';m.appendChild(sep);var s2=document.createElement('div');s2.className='status-sec';s2.textContent='Pausas';m.appendChild(s2);PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){var d=document.createElement('div');d.className='status-opt';d.innerHTML='<div class="sd" style="background:'+p.color+'"></div>'+p.icon+' '+p.label+(_curStatus===p.id?' ✓':'');d.onclick=function(){setStatus(p.id,p.color,p.label,p.icon);};m.appendChild(d);});}
+function _buildStatusMenu(){
+  var menu=document.getElementById('status-menu');
+  if(!menu)return;
+  var out="<div class='status-sec'>Estado</div>";
+  PAUSAS.filter(function(p){return p.key;}).forEach(function(p){
+    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
+      "<span class='sm-ico'>"+p.icon+"</span>"+
+      "<span class='sm-lbl'>"+p.label+"</span>"+
+      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
+    "</div>";
+  });
+  out+="<div class='status-sep'></div><div class='status-sec'>Pausas</div>";
+  PAUSAS.filter(function(p){return !p.key;}).forEach(function(p){
+    out+="<div class='status-opt' onclick=\"setStatus('"+p.id+"','"+p.color+"','"+p.label+"','"+p.id+"')\">"+
+      "<span class='sm-ico'>"+p.icon+"</span>"+
+      "<span class='sm-lbl'>"+p.label+"</span>"+
+      (p.id===_currentStatus?"<i class='ti ti-check sm-chk'></i>":"")+
+    "</div>";
+  });
+  menu.innerHTML=out;
+}
 function toggleStatusMenu(){var m=document.getElementById('status-menu');if(!m)return;_buildStatusMenu();var open=m.style.display==='block';m.style.display=open?'none':'block';if(!open)setTimeout(function(){document.addEventListener('click',function cl(e){if(!document.getElementById('status-wrap').contains(e.target)){m.style.display='none';document.removeEventListener('click',cl);}});},10);}
 var _dashTab='dia',_repView='resumen';
 var RA=[{id:1,name:'Dayana García',letter:'D',color:'#ff5c00',carril:'Home',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:2,name:'Carlos Mora',letter:'C',color:'#6aaa90',carril:'Road',pais:'Costa Rica',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:3,name:'Valeria Núñez',letter:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:4,name:'Luis Arias',letter:'L',color:'#4a8a72',carril:'Home',pais:'Costa Rica',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:5,name:'Sofía Ramírez',letter:'S',color:'#bf9455',carril:'Road',pais:'Guatemala',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:6,name:'Andrés Fallas',letter:'A',color:'#6366f1',carril:'Concierge',pais:'Costa Rica',cuenta:'CallCenter',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:7,name:'María Solano',letter:'M',color:'#8b5cf6',carril:'Home',pais:'Honduras',cuenta:'PausasCC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'},{id:8,name:'José Quesada',letter:'J',color:'#0ea5e9',carril:'Road',pais:'Panamá',cuenta:'SODAC',calls:0,pos:0,aht:'—',sat:0,speech:0,score:0,grade:'A'}];
