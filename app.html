@@ -7117,39 +7117,51 @@ async function mobAnswer() {
     if (el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
   }, 1000);
 
-  // Conectar ElevenLabs WebRTC
+  // Pedir micrófono
   try {
-    var EL = window.ElevenLabs || window.elevenlabs;
-    if (!EL || !EL.Conversation) {
-      console.warn('[ElevenLabs] SDK no disponible — modo simulado');
-      return; // Timer sigue corriendo — prueba visual
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    window._mobMicStream = stream;
+  } catch(e) { console.warn('[Mobile] Mic:', e.message); }
+
+  // Conectar ElevenLabs WebRTC
+  var statusEl = document.getElementById('mob-act-status');
+  if (statusEl) statusEl.textContent = 'CONECTANDO';
+
+  try {
+    var ELConv = window.__EL_Conversation;
+    if (!ELConv || typeof ELConv.startSession !== 'function') {
+      console.warn('[ElevenLabs] SDK no disponible — __EL_Conversation:', typeof ELConv);
+      if (statusEl) statusEl.textContent = 'EN LLAMADA';
+      return;
     }
 
-    _mobConversation = await EL.Conversation.startSession({
+    console.log('[ElevenLabs] Iniciando sesión:', _mobCurrentAgent.id);
+    _mobConversation = await ELConv.startSession({
       agentId: _mobCurrentAgent.id,
       connectionType: 'webrtc',
-      onConnect: function() {
-        console.log('[ElevenLabs] Conectado — agente:', _mobCurrentAgent.name);
+      onConnect: function(data) {
+        console.log('[ElevenLabs] ✅ Conectado | id:', data && data.conversationId);
+        var st = document.getElementById('mob-act-status');
+        if (st) st.textContent = 'EN LLAMADA';
+        if (_mobRingCtx && _mobRingCtx.state === 'suspended') _mobRingCtx.resume().catch(function(){});
       },
       onDisconnect: function() {
         console.log('[ElevenLabs] Desconectado');
         _mobCleanup();
       },
       onError: function(err) {
-        console.warn('[ElevenLabs] Error:', err);
+        console.error('[ElevenLabs] ❌', err);
       },
       onModeChange: function(data) {
-        // Cambiar color de la onda según quién habla
         var wave = document.getElementById('mob-wave');
-        if (!wave) return;
-        wave.className = 'mob-act-wave ' + (data.mode === 'speaking' ? 'client' : 'agent');
+        if (wave) wave.className = 'mob-act-wave ' + (data.mode === 'speaking' ? 'client' : 'agent');
       }
     });
-
     console.log('[ElevenLabs] Sesión iniciada');
   } catch(err) {
-    console.warn('[ElevenLabs] Error al iniciar sesión:', err);
-    // No bloquear — el timer sigue para prueba visual
+    console.warn('[ElevenLabs] Error al iniciar:', err);
+    var st = document.getElementById('mob-act-status');
+    if (st) st.textContent = 'EN LLAMADA';
   }
 }
 
