@@ -262,9 +262,9 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
   </div>
   <div class="fp" id="f-grade" onclick="toggleDrop(this,event)">Rendimiento ▾ <div class="fdrop">
       <div class="fdrop-item" onclick="setF('grade','',event)">Todos</div>
-      <div class="fdrop-item" onclick="setF('grade','A',event)">Excelente (A)</div>
-      <div class="fdrop-item" onclick="setF('grade','B',event)">👍 Bueno (B)</div>
-      <div class="fdrop-item" onclick="setF('grade','C',event)">Atención (C)</div>
+      <div class="fdrop-item" onclick="setF('grade','A',event)"><i class="ti ti-star" style="font-size:12px;color:var(--g)"></i> Excelente (A)</div>
+      <div class="fdrop-item" onclick="setF('grade','B',event)"><i class="ti ti-star-half" style="font-size:12px;color:var(--y)"></i> Bueno (B)</div>
+      <div class="fdrop-item" onclick="setF('grade','C',event)"><i class="ti ti-alert-circle" style="font-size:12px;color:var(--r)"></i> Atención (C)</div>
     </div>
   </div>
   <div id="ftags" style="display:none;"></div>
@@ -551,16 +551,23 @@ function selPeriod(el,p){
 
 function setF(key,val,e){
   e.stopPropagation();
+  // Toggle: click en ítem ya seleccionado → deseleccionar
+  if(_filters[key]===val&&val!=='') val='';
   _filters[key]=val;
   document.querySelectorAll('.fp[id]').forEach(function(el){el.classList.remove('open');});
   var btn=document.getElementById('f-'+key);
   var lbl={carril:{'':"Carril",Home:"<i class=\"ti ti-home\" style=\"font-size:11px;color:var(--t3)\"></i> Home",Road:"<i class=\"ti ti-car\" style=\"font-size:11px;color:var(--t3)\"></i> Road",Concierge:"<i class=\"ti ti-diamond\" style=\"font-size:11px;color:var(--t3)\"></i> Concierge"},
-            pais:{'':"País","Costa Rica":"🇨🇷 CR","Panamá":"🇵🇦 PA","México":"🇲🇽 MX","Colombia":"🇨🇴 CO","Puerto Rico":"🇵🇷 PR"},
-            grade:{'':"Rendimiento",A:"A",B:"B",C:"C"},
+            pais:{'':"País","Costa Rica":"CR","Panamá":"PA","México":"MX","Colombia":"CO","Puerto Rico":"PR"},
+            grade:{'':"Rendimiento",A:"<i class=\"ti ti-star\" style=\"font-size:11px;color:var(--g)\"></i> Excelente (A)",B:"<i class=\"ti ti-star-half\" style=\"font-size:11px;color:var(--y)\"></i> Bueno (B)",C:"<i class=\"ti ti-alert-circle\" style=\"font-size:11px;color:var(--r)\"></i> Atención (C)"},
             agente:{'':"Agente"}};
   if(btn){
     var _fdropHtml=btn.querySelector('.fdrop').innerHTML;
     var _defaults={carril:'Carril',pais:'País',grade:'Rendimiento',agente:'Agente'};
+    // Marcar ítem activo con clase sel
+    btn.querySelectorAll('.fdrop-item').forEach(function(it){
+      var itVal=it.getAttribute('onclick')||'';
+      it.classList.toggle('sel', itVal.indexOf("'"+val+"'")>-1&&val!=='');
+    });
     if(val){
       btn.className='fp filtered';
       btn.innerHTML='<span class="fp-check">✓</span>'+(lbl[key][val]||val)
