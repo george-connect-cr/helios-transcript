@@ -3039,26 +3039,32 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 
 <script>
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
-// ── Permisos desde Connect Auth API — no RBAC hardcodeado ──────────────────
-// Los permisos vienen en session.permissions desde /auth/session.
-// Usar can(page, feature) para cualquier control de visibilidad.
+// ── Permisos desde Connect Auth API — evaluación dinámica ───────────────────
 function _getPermissions() {
   try {
     var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
     return s.permissions || {};
   } catch(e) { return {}; }
 }
+// can() siempre lee permissions frescos del localStorage
 function can(page, feature) {
-  return !!(_getPermissions()[page] && _getPermissions()[page][feature]);
+  var p = _getPermissions();
+  return !!(p[page] && p[page][feature]);
 }
-// Compatibilidad con código existente que usa RBAC[role].canViewTeam etc.
-var RBAC = {
-  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:can('app','demo_button'), selfOnly:!can('reportes','ver_equipo') },
-  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true, selfOnly:true },
-  formador:   { pages:['app','reportes'],canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false },
-  supervisor: { pages:['reportes'],     canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false },
-  admin:      { pages:['app','reportes'],canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false, selfOnly:false }
-};
+// RBAC dinámico — se evalúa en tiempo de llamada, no de carga
+function _getRBAC(role) {
+  return {
+    agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, autoDemo:can('app','demo_button'), selfOnly:!can('reportes','ver_equipo') },
+    demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, autoDemo:true, selfOnly:true },
+    formador:   { pages:['app','reportes'], canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false },
+    supervisor: { pages:['reportes'],      canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false },
+    admin:      { pages:['app','reportes'], canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false, selfOnly:false }
+  }[role] || { pages:[], canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true };
+}
+// Mantener var RBAC como proxy dinámico para compatibilidad
+var RBAC = new Proxy({}, {
+  get: function(_, role) { return _getRBAC(role); }
+});
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
 // pageName: 'app' | 'reportes'
@@ -3097,43 +3103,60 @@ function requireAuth(pageName) {
       window.location.href = 'index.html';
       return;
     }
-    // Verificar rol autorizado para esta página
+    // Verificar acceso a esta página via permissions de la API
     var role = sess.user.role || 'agente';
-    var perms = RBAC[role];
-    if (!perms || !perms.pages.includes(pageName)) {
-      var fallback = (role==='supervisor') ? 'reportes.html' : 'app.html';
-      window.location.href = fallback;
-      return;
+    var sessPerms = sess.permissions || {};
+    // Si hay permissions de la API, usarlos; sino fallback a RBAC
+    if (Object.keys(sessPerms).length > 0) {
+      if (!sessPerms[pageName]) {
+        var fallback = (role==='supervisor'||role==='formador') ? 'reportes.html' : 'app.html';
+        window.location.href = fallback;
+        return;
+      }
+    } else {
+      // Fallback: RBAC local mientras no haya permissions
+      var rbacPerms = _getRBAC(role);
+      if (!rbacPerms.pages.includes(pageName)) {
+        var fallback2 = (role==='supervisor') ? 'reportes.html' : 'app.html';
+        window.location.href = fallback2;
+        return;
+      }
     }
-    // Re-validar rol contra Supabase (anti-tampering de localStorage)
+    // Re-validar silenciosamente contra la Auth API
     _revalidateRole(fbUser.email, role, sess);
   });
 }
 
 function _revalidateRole(email, localRole, sess) {
-  var _SB = 'https://dednkgonnirybnpktbzp.supabase.co';
-  var _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
-  fetch(_SB+'/rest/v1/agents?email=eq.'+encodeURIComponent(email)+'&select=role,country,lane', {
-    headers:{'apikey':_KEY,'Authorization':'Bearer '+_KEY}
-  })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if (!data || !data.length) return; // sin datos, usar local
-    var dbRole = data[0].role;
-    if (dbRole !== localRole) {
-      // Rol cambió en Supabase — actualizar sesión y redirigir
-      sess.user.role    = dbRole;
-      sess.user.country = data[0].country || sess.user.country;
-      sess.user.lane    = data[0].lane    || sess.user.lane;
+  // Revalidar via Connect Auth API — no Supabase directo
+  var currentUser = typeof firebase !== 'undefined' && firebase.auth().currentUser;
+  if (!currentUser) return;
+  currentUser.getIdToken()
+    .then(function(idToken) {
+      return fetch('https://connect-it-auth-api-cjd8hqduekeagnc0.eastus2-01.azurewebsites.net/api/auth/session', {
+        headers: {
+          'Authorization': 'Bearer ' + idToken,
+          'X-App-ID': '0ce416a6-d34c-4c94-8758-8a1e862d1c9d'
+        }
+      });
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.user) return;
+      var apiRole = data.user.role;
+      // Actualizar sesión con datos frescos de la API
+      sess.user.role        = apiRole;
+      sess.user.country     = data.user.country || sess.user.country;
+      sess.user.lane        = data.user.lane    || sess.user.lane;
+      sess.permissions      = data.permissions  || sess.permissions || {};
       localStorage.setItem('helios_session', JSON.stringify(sess));
-      var perms = RBAC[dbRole];
-      if (perms && !perms.pages.includes(window._currentPage)) {
-        var fallback = (dbRole==='supervisor') ? 'reportes.html' : 'app.html';
+      // Redirigir si la página actual no está en los permisos
+      if (sess.permissions && !sess.permissions[window._currentPage]) {
+        var fallback = (apiRole==='supervisor'||apiRole==='formador') ? 'reportes.html' : 'app.html';
         window.location.href = fallback;
       }
-    }
-  })
-  .catch(function(){}); // silencioso — no bloquear la app si Supabase falla
+    })
+    .catch(function() {}); // silencioso — no bloquear la app
 }
 
 
