@@ -382,12 +382,22 @@ var _filters={carril:'',pais:'',grade:'',agente:''};
 var RA = [];              // inicia vacío — se llena desde Supabase
 var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
+// ── Permisos desde Connect Auth API ─────────────────────────────────────────
+function _getPermissions() {
+  try {
+    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    return s.permissions || {};
+  } catch(e) { return {}; }
+}
+function can(page, feature) {
+  return !!(_getPermissions()[page] && _getPermissions()[page][feature]);
+}
 var RBAC = {
-  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
-  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
-  formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
-  supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
-  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false, selfOnly:false }
+  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, selfOnly:true },
+  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, selfOnly:true },
+  formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true  },
+  supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true  },
+  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true, selfOnly:false }
 };
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
@@ -1205,6 +1215,11 @@ try{
     if(!_sess.user||!_sess.user.role||_validRoles.indexOf(_sess.user.role)===-1){
       localStorage.removeItem('helios_session');
       window.location.href='index.html?reason=invalid_role';return;
+    }
+    // Validar acceso a reportes via permissions de la API
+    if(_sess.permissions&&!_sess.permissions.reportes){
+      localStorage.removeItem('helios_session');
+      window.location.href='index.html?reason=no_page_access';return;
     }
     _role=(_sess.user||{}).role||'formador';
     var _uname=(_sess.user||{}).name||'';
