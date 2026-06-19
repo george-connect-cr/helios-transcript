@@ -382,7 +382,7 @@ var _filters={carril:'',pais:'',grade:'',agente:''};
 var RA = [];              // inicia vacío — se llena desde Supabase
 var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
-// ── Permisos desde Connect Auth API — evaluación dinámica ───────────────────
+// ── Permisos desde Connect Auth API ─────────────────────────────────────────
 function _getPermissions() {
   try {
     var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
@@ -394,17 +394,24 @@ function can(page, feature) {
   return !!(p[page] && p[page][feature]);
 }
 function _getRBAC(role) {
-  return {
+  var p = _getPermissions();
+  var hasPerms = Object.keys(p).length > 0;
+  var map = {
     agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
     demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
-    formador:   { pages:['app','reportes'], canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching') },
-    supervisor: { pages:['reportes'],      canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching') },
-    admin:      { pages:['app','reportes'], canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), selfOnly:false }
-  }[role] || { pages:[], canViewTeam:false, canCoach:false, selfOnly:true };
+    formador:   { pages:['app','reportes'], canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true },
+    supervisor: { pages:['reportes'],      canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true },
+    admin:      { pages:['app','reportes'], canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true, selfOnly:false }
+  };
+  return map[role] || { pages:[], canViewTeam:false, canCoach:false, selfOnly:true };
 }
-var RBAC = new Proxy({}, {
-  get: function(_, role) { return _getRBAC(role); }
-});
+var RBAC = {
+  agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
+  demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
+  formador:   { pages:['app','reportes'], canViewTeam:true,  canCoach:true  },
+  supervisor: { pages:['reportes'],      canViewTeam:true,  canCoach:true  },
+  admin:      { pages:['app','reportes'], canViewTeam:true,  canCoach:true,  selfOnly:false }
+};
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
 // pageName: 'app' | 'reportes'
