@@ -533,8 +533,12 @@ function _lookupAgentInSupabase(email, name, firebaseUid) {
       });
     })
     .then(function(res) {
-      return res.json().then(function(body) {
-        return { ok: res.ok, status: res.status, body: body };
+      var status = res.status;
+      var ok = res.ok;
+      return res.text().then(function(text) {
+        var body = {};
+        try { body = text ? JSON.parse(text) : {}; } catch(e) { body = {}; }
+        return { ok: ok, status: status, body: body };
       });
     })
     .then(function(r) {
@@ -567,6 +571,18 @@ function _lookupAgentInSupabase(email, name, firebaseUid) {
       console.error('[Auth API] Error:', err);
       _showLoginErr('No se pudo verificar tu cuenta. Revisá tu conexión e intentá de nuevo.');
     });
+}
+
+function _showLoginErr(msg) {
+  var existing = document.getElementById('login-err');
+  if (existing) existing.remove();
+  var el = document.createElement('div');
+  el.id = 'login-err';
+  el.style.cssText = 'background:#fff3f3;color:#e84040;padding:9px 14px;border-radius:6px;font-size:12px;font-weight:500;margin-top:8px;text-align:center;';
+  el.textContent = msg;
+  var form = document.querySelector('.form');
+  if (form) form.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) el.remove(); }, 6000);
 }
 
 function _showAccessDenied(title, detail) {
