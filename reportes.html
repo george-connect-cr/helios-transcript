@@ -382,7 +382,7 @@ var _filters={carril:'',pais:'',grade:'',agente:''};
 var RA = [];              // inicia vacío — se llena desde Supabase
 var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
-// ── Permisos desde Connect Auth API ─────────────────────────────────────────
+// ── Permisos desde Connect Auth API — evaluación dinámica ───────────────────
 function _getPermissions() {
   try {
     var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
@@ -390,15 +390,21 @@ function _getPermissions() {
   } catch(e) { return {}; }
 }
 function can(page, feature) {
-  return !!(_getPermissions()[page] && _getPermissions()[page][feature]);
+  var p = _getPermissions();
+  return !!(p[page] && p[page][feature]);
 }
-var RBAC = {
-  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, selfOnly:true },
-  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, selfOnly:true },
-  formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true  },
-  supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true  },
-  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true, selfOnly:false }
-};
+function _getRBAC(role) {
+  return {
+    agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
+    demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
+    formador:   { pages:['app','reportes'], canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching') },
+    supervisor: { pages:['reportes'],      canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching') },
+    admin:      { pages:['app','reportes'], canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), selfOnly:false }
+  }[role] || { pages:[], canViewTeam:false, canCoach:false, selfOnly:true };
+}
+var RBAC = new Proxy({}, {
+  get: function(_, role) { return _getRBAC(role); }
+});
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
 // pageName: 'app' | 'reportes'
@@ -1216,8 +1222,9 @@ try{
       localStorage.removeItem('helios_session');
       window.location.href='index.html?reason=invalid_role';return;
     }
-    // Validar acceso a reportes via permissions de la API
-    if(_sess.permissions&&!_sess.permissions.reportes){
+    // Validar acceso via permissions de la API (si existen)
+    var _sessPerms = _sess.permissions || {};
+    if(Object.keys(_sessPerms).length > 0 && !_sessPerms.reportes){
       localStorage.removeItem('helios_session');
       window.location.href='index.html?reason=no_page_access';return;
     }
