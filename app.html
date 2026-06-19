@@ -2423,7 +2423,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.0-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.1-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3039,12 +3039,25 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 
 <script>
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
+// ── Permisos desde Connect Auth API — no RBAC hardcodeado ──────────────────
+// Los permisos vienen en session.permissions desde /auth/session.
+// Usar can(page, feature) para cualquier control de visibilidad.
+function _getPermissions() {
+  try {
+    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
+    return s.permissions || {};
+  } catch(e) { return {}; }
+}
+function can(page, feature) {
+  return !!(_getPermissions()[page] && _getPermissions()[page][feature]);
+}
+// Compatibilidad con código existente que usa RBAC[role].canViewTeam etc.
 var RBAC = {
-  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
-  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
-  formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
-  supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
-  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false, selfOnly:false }
+  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:can('app','demo_button'), selfOnly:!can('reportes','ver_equipo') },
+  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true, selfOnly:true },
+  formador:   { pages:['app','reportes'],canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false },
+  supervisor: { pages:['reportes'],     canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false },
+  admin:      { pages:['app','reportes'],canViewTeam:can('reportes','ver_equipo'), canCoach:can('reportes','coaching'), autoDemo:false, selfOnly:false }
 };
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
