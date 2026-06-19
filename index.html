@@ -545,21 +545,38 @@ function _lookupAgentInSupabase(email, name, firebaseUid) {
       document.getElementById('loading').classList.remove('show');
       if (!r.ok) {
         var code = (r.body.error || {}).code || 'INTERNAL';
-        var msgs = {
-          MISSING_TOKEN:     'Error de sesión. Intentá de nuevo.',
-          MISSING_APP_ID:    'Error de configuración. Contactá al administrador.',
-          INVALID_TOKEN:     'Tu sesión expiró. Iniciá sesión nuevamente.',
-          REVOKED_TOKEN:     'Tu sesión fue revocada. Volvé a ingresar.',
-          DOMAIN_NOT_ALLOWED:'El dominio de tu correo no está autorizado para acceder a KAI Academy.',
-          ORIGIN_NOT_ALLOWED:'Origen de solicitud no autorizado.',
-          USER_NOT_FOUND:    'Tu cuenta no está registrada en el sistema. Solicitá acceso al administrador.',
-          APP_ACCESS_DENIED: 'Tu rol no tiene acceso a KAI Academy. Contactá al administrador.',
-          INTERNAL:          'Error del servidor. Intentá de nuevo en unos minutos.'
+        console.warn('[Auth API] Error code:', code, r.body);
+
+        // Títulos — qué pasó
+        var titles = {
+          MISSING_TOKEN:     'Error de sesión',
+          MISSING_APP_ID:    'Error de configuración',
+          INVALID_TOKEN:     'Sesión expirada',
+          REVOKED_TOKEN:     'Sesión revocada',
+          DOMAIN_NOT_ALLOWED:'Dominio no autorizado',
+          ORIGIN_NOT_ALLOWED:'Acceso no permitido',
+          USER_NOT_FOUND:    'Sin acceso al sistema',
+          APP_ACCESS_DENIED: 'Sin acceso a esta aplicación',
+          INTERNAL:          'Error temporal'
         };
+
+        // Detalles — qué hacer
+        var details = {
+          MISSING_TOKEN:     'Hubo un problema al iniciar sesión. Cerrá el navegador e intentá de nuevo.',
+          MISSING_APP_ID:    'Ocurrió un error de configuración. Contactá al equipo de soporte.',
+          INVALID_TOKEN:     'Tu sesión venció o no es válida. Volvé a ingresar con tu cuenta de Google.',
+          REVOKED_TOKEN:     'Tu sesión fue cerrada desde otro dispositivo. Volvé a ingresar.',
+          DOMAIN_NOT_ALLOWED:'Tu correo no pertenece al dominio autorizado para usar KAI Academy. Si creés que es un error, contactá al administrador.',
+          ORIGIN_NOT_ALLOWED:'Esta solicitud no está permitida desde este origen. Contactá al equipo de IT.',
+          USER_NOT_FOUND:    'Tu correo no está registrado en KAI Academy. Solicitá acceso a tu supervisor o al equipo de IT para que activen tu cuenta.',
+          APP_ACCESS_DENIED: 'Tu usuario no tiene permiso para acceder a KAI Academy. Contactá a tu supervisor para que revisen tu perfil de acceso.',
+          INTERNAL:          'Ocurrió un error en el servidor. Esperá unos minutos e intentá de nuevo. Si el problema persiste, contactá a IT.'
+        };
+
         firebase.auth().signOut();
         _showAccessDenied(
-          msgs[code] || 'Acceso denegado.',
-          'Código: ' + code
+          titles[code] || 'No pudimos verificar tu acceso',
+          details[code] || 'Ocurrió un error inesperado. Intentá de nuevo o contactá al administrador.'
         );
         return;
       }
