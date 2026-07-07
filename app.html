@@ -3885,6 +3885,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
     // Actualizar código de área según país del agente
     if(_u.country){updatePhoneCC(_u.country);}
 
+    // ── Visibilidad del botón Demo según rol y permissions ─────────────
+    var _demoBtn = document.querySelector('.n-demo');
+    if (_demoBtn) {
+      var _showDemo = _u.role === 'demo' || _u.role === 'admin' || can('app','demo_button');
+      _demoBtn.style.display = _showDemo ? '' : 'none';
+    }
+
     // ── Restaurar _poList del turno actual desde localStorage ──────────
     var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + new Date().toISOString().slice(0,10);
     try {
@@ -4486,7 +4493,7 @@ var DEMO_SCENARIOS = [
 
 // ── Punto de entrada: botón Demo ─────────────────────────────────
 function triggerDemo() {
-  if (_demoActive) { showToast('⚠ Ya hay un Demo activo'); return; }
+  if (_demoActive) { showToast('Ya hay un Demo activo — finalizalo primero'); return; }
   if (_callInProgress) {
     _showDemoSavePOModal();
   } else {
@@ -5586,7 +5593,7 @@ function closeDashboard(){
       setTimeout(_showDemoContinueModal, 400);
     } else if (_demoScene === 2 && _demoPOsaved >= 2) {
       setTimeout(function() {
-        showToast('🎬 Demo completo · Dos escenarios guardados en métricas');
+        showToast('Demo completo · Dos escenarios guardados en métricas');
         _exitDemo();
       }, 300);
     }
