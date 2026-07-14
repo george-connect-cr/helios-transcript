@@ -3377,23 +3377,21 @@ function savePOToSupabase(entry) {
   }
 }
 
-// ── KAI Academy — llamadas simuladas ──────────────────
-var SEND_CALL_URL = "https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/sendCall?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==";
-// UCs activos — agregar/descomentar cuando estén configurados en Audara
-var UC_DESTINATIONS_ALL = [
-  "17876065812",  // UC-1: Asistencia Tranquilo F
-  // "17876065813",  // UC-2: Asistencia Tranquilo M — pendiente
-  // "17876065814",  // UC-3: Asistencia Molesto F — pendiente
-  "17879654585",  // UC-4: Asistencia Molesto M
-  // "17876065816",  // UC-5: Gestión F — pendiente
-  // "17876065817",  // UC-6: Gestión M — pendiente
+// ── KAI Academy — llamadas simuladas (ElevenLabs SDK · desktop) ──
+// Migrado de Audara/cc-services a ElevenLabs WebRTC directo.
+// Mobile mantiene su propio flujo en MOB_AGENTS / mobAnswer() — no tocar.
+var UC_AGENTS = [
+  { id: 'agent_2801ksghx06pemcsgy5v55rthxzk', label: 'UC-1: Asistencia Tranquilo F' },
+  { id: 'agent_2601ksgj42hpf2hrdj6ptbb4b02j', label: 'UC-4: Asistencia Molesto M'  },
+  // UC-2, UC-3, UC-5, UC-6 — agregar agent_id cuando estén configurados en ElevenLabs
 ];
 var SESSION_MAX_CALLS = 5;
 var _sessionCallCount = 0;
 var _ucQueue = [];  // cola barajada sin repetición
 var _callInProgress = false;
+var _desktopConversation = null; // instancia ElevenLabs activa en desktop
 
-// Barajar array (Fisher-Yates)
+// Barajar array (Fisher-Yates) — sin cambios
 function _shuffle(arr) {
   var a = arr.slice();
   for (var i = a.length - 1; i > 0; i--) {
@@ -3404,66 +3402,86 @@ function _shuffle(arr) {
 }
 
 function _nextUC() {
-  if (_ucQueue.length === 0) {
-    _ucQueue = _shuffle(UC_DESTINATIONS_ALL);
-  }
+  if (_ucQueue.length === 0) _ucQueue = _shuffle(UC_AGENTS);
   return _ucQueue.shift();
 }
 
 async function triggerSimulatedCall() {
-  var extension = '7874120'; // extensión fija del agente KAI Academy
-
   if (_sessionCallCount >= SESSION_MAX_CALLS) {
     showToast('Sesión completa — ' + SESSION_MAX_CALLS + ' llamadas de entrenamiento realizadas');
     setWave('idle'); setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
     return;
   }
 
+  // Solicitar acceso al micrófono antes de mostrar cualquier UI
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch(e) {
+    showToast('⚠ Necesitamos acceso al micrófono para la llamada simulada');
+    setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+    return;
+  }
+
   _callInProgress = true;
-  var destination = _nextUC();
+  var agent = _nextUC();
 
-  // Limpiar sesión previa (demo u otra llamada) antes de iniciar
+  // Limpiar sesión previa antes de iniciar
   _clearSession();
-
-  // Mostrar botón Finalizar INMEDIATAMENTE — no esperar el fetch
   _setDemoState(false);
   _showEndCallButton();
   showToast('📞 Conectando llamada de entrenamiento...');
 
-  try {
-    var res = await fetch(SEND_CALL_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        source: extension,
-        destination: destination,
-        accountName: 'Connect',
-        branch: 'PR',
-        poNumber: '4117472'
-      })
-    });
-    if (res.ok) {
-      _sessionCallCount++;
-      showToast('🎯 Llamada entrante — ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
-    } else {
-      showToast('⚠ PBX no disponible (' + res.status + ') — permanecés en Disponible');
-      _callInProgress = false;
-      _hideEndCallButton();
-      _setDemoState(true);
-      setStatus('disponible', '#6aaa90', 'Disponible', '🟢');
-    }
-  } catch(err) {
-    showToast('⚠ Sin conexión al PBX — permanecés en Disponible');
-    _callInProgress = false;
-    _hideEndCallButton();
-    _setDemoState(true);
+  var ELConv = window.__EL_Conversation;
+  if (!ELConv || typeof ELConv.startSession !== 'function') {
+    showToast('⚠ SDK ElevenLabs no disponible — recargá la página');
+    _callInProgress = false; _hideEndCallButton(); _setDemoState(true);
     setStatus('disponible', '#6aaa90', 'Disponible', '🟢');
-    console.warn('triggerSimulatedCall:', err);
+    return;
+  }
+
+  try {
+    _desktopConversation = await ELConv.startSession({
+      agentId: agent.id,
+      connectionType: 'webrtc',
+      onConnect: function(data) {
+        _sessionCallCount++;
+        showToast('🎯 Llamada entrante — ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
+        console.log('[ElevenLabs Desktop] ✅ Conectado | id:', data && data.conversationId, '| agent:', agent.label);
+      },
+      onDisconnect: function() {
+        console.log('[ElevenLabs Desktop] Desconectado');
+        // endCall() solo si la llamada sigue activa (no fue el agente quien colgó)
+        if (_callInProgress) endCall();
+      },
+      onMessage: function(msg) {
+        // msg.source: 'ai' = cliente simulado | 'user' = agente real
+        var speaker = (msg.source === 'ai') ? 'cliente' : 'agente';
+        if (msg.message) appendTranscript(speaker, msg.message);
+      },
+      onModeChange: function(data) {
+        // 'speaking' = cliente hablando | 'listening' = agente puede hablar
+        setWave(data.mode === 'speaking' ? 'client' : 'agent');
+      },
+      onError: function(err) {
+        console.error('[ElevenLabs Desktop] ❌', err);
+        showToast('⚠ Error en la llamada simulada');
+      }
+    });
+  } catch(err) {
+    showToast('⚠ Sin conexión a ElevenLabs — ' + (err.message || 'intentá de nuevo'));
+    _callInProgress = false; _hideEndCallButton(); _setDemoState(true);
+    setStatus('disponible', '#6aaa90', 'Disponible', '🟢');
+    console.warn('[ElevenLabs Desktop] Error al iniciar sesión:', err);
   }
 }
 
 function endCall() {
   if (!_callInProgress) return; // Evitar doble disparo
+  // Cerrar sesión ElevenLabs si hay una activa
+  if (_desktopConversation && typeof _desktopConversation.endSession === 'function') {
+    _desktopConversation.endSession().catch(function(){});
+    _desktopConversation = null;
+  }
   _callInProgress = false;
   _hideEndCallButton();
   _setDemoState(true);
