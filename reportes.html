@@ -382,6 +382,15 @@ var _filters={carril:'',pais:'',grade:'',agente:''};
 var RA = [];              // inicia vacío — se llena desde Supabase
 var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
+// ── can() — permissions de la Auth API ──────────────────────────────────────
+function _getSessPerms() {
+  try { return JSON.parse(localStorage.getItem('helios_session')||'{}').permissions||{}; }
+  catch(e){ return {}; }
+}
+function can(page, feature) {
+  var p = _getSessPerms();
+  return !!(p[page] && p[page][feature]);
+}
 var RBAC = {
   agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
   demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
@@ -404,8 +413,9 @@ function requireAuth(pageName) {
   if (typeof firebase === 'undefined') return; // SDK no cargado aún
   if (!firebase.apps.length) firebase.initializeApp(_FB_CFG);
 
+  var _authDone=false;
   firebase.auth().onAuthStateChanged(function(fbUser) {
-    // Sin sesión Firebase → login
+    if(_authDone) return; _authDone=true;
     if (!fbUser) {
       localStorage.removeItem('helios_session');
       window.location.href = 'index.html';
@@ -441,29 +451,26 @@ function requireAuth(pageName) {
 }
 
 function _revalidateRole(email, localRole, sess) {
-  var _SB = 'https://dednkgonnirybnpktbzp.supabase.co';
-  var _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
-  fetch(_SB+'/rest/v1/agents?email=eq.'+encodeURIComponent(email)+'&select=role,country,lane', {
-    headers:{'apikey':_KEY,'Authorization':'Bearer '+_KEY}
-  })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if (!data || !data.length) return; // sin datos, usar local
-    var dbRole = data[0].role;
-    if (dbRole !== localRole) {
-      // Rol cambió en Supabase — actualizar sesión y redirigir
-      sess.user.role    = dbRole;
-      sess.user.country = data[0].country || sess.user.country;
-      sess.user.lane    = data[0].lane    || sess.user.lane;
-      localStorage.setItem('helios_session', JSON.stringify(sess));
-      var perms = RBAC[dbRole];
-      if (perms && !perms.pages.includes(window._currentPage)) {
-        var fallback = (dbRole==='agente'||dbRole==='demo') ? 'app.html' : 'reportes.html';
-        window.location.href = fallback;
-      }
-    }
-  })
-  .catch(function(){}); // silencioso — no bloquear la app si Supabase falla
+  var cu = typeof firebase!=='undefined' && firebase.auth().currentUser;
+  if (!cu) return;
+  setTimeout(function(){
+    cu.getIdToken()
+      .then(function(idToken){
+        return fetch('https://connect-it-auth-api-cjd8hqduekeagnc0.eastus2-01.azurewebsites.net/api/auth/session',{
+          headers:{'Authorization':'Bearer '+idToken,'X-App-ID':'0ce416a6-d34c-4c94-8758-8a1e862d1c9d'}
+        });
+      })
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(data){
+        if(!data||!data.user) return;
+        sess.user.role    = data.user.role;
+        sess.user.country = data.user.country||sess.user.country;
+        sess.user.lane    = data.user.lane||sess.user.lane;
+        sess.permissions  = data.permissions||sess.permissions||{};
+        localStorage.setItem('helios_session',JSON.stringify(sess));
+      })
+      .catch(function(){});
+  }, 3000);
 }
 
 
