@@ -2423,7 +2423,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.1-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.0-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3039,36 +3039,12 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 
 <script>
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
-// ── Permisos desde Connect Auth API ─────────────────────────────────────────
-function _getPermissions() {
-  try {
-    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
-    return s.permissions || {};
-  } catch(e) { return {}; }
-}
-function can(page, feature) {
-  var p = _getPermissions();
-  return !!(p[page] && p[page][feature]);
-}
-function _getRBAC(role) {
-  var p = _getPermissions();
-  var hasPerms = Object.keys(p).length > 0;
-  var map = {
-    agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, autoDemo:hasPerms?can('app','demo_button'):false, selfOnly:true },
-    demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, autoDemo:true, selfOnly:true },
-    formador:   { pages:['app','reportes'], canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true, autoDemo:false },
-    supervisor: { pages:['reportes'],      canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true, autoDemo:false },
-    admin:      { pages:['app','reportes'], canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true, autoDemo:false, selfOnly:false }
-  };
-  return map[role] || { pages:[], canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true };
-}
-// RBAC como objeto simple — usar _getRBAC(role) para evaluación fresca
 var RBAC = {
-  agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
-  demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
-  formador:   { pages:['app','reportes'], canViewTeam:true,  canCoach:true,  autoDemo:false },
-  supervisor: { pages:['reportes'],      canViewTeam:true,  canCoach:true,  autoDemo:false },
-  admin:      { pages:['app','reportes'], canViewTeam:true,  canCoach:true,  autoDemo:false, selfOnly:false }
+  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
+  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
+  formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
+  supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
+  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false, selfOnly:false }
 };
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
@@ -3085,10 +3061,7 @@ function requireAuth(pageName) {
   if (typeof firebase === 'undefined') return; // SDK no cargado aún
   if (!firebase.apps.length) firebase.initializeApp(_FB_CFG);
 
-  var _authHandled = false; // previene múltiples ejecuciones de onAuthStateChanged
   firebase.auth().onAuthStateChanged(function(fbUser) {
-    if (_authHandled) return;
-    _authHandled = true;
     // Sin sesión Firebase → login
     if (!fbUser) {
       localStorage.removeItem('helios_session');
@@ -3111,57 +3084,43 @@ function requireAuth(pageName) {
       window.location.href = 'index.html';
       return;
     }
-    // Verificar acceso a esta página via permissions de la API
+    // Verificar rol autorizado para esta página
     var role = sess.user.role || 'agente';
-    var sessPerms = sess.permissions || {};
-    // Si hay permissions de la API, usarlos; sino fallback a RBAC
-    if (Object.keys(sessPerms).length > 0) {
-      if (!sessPerms[pageName]) {
-        var fallback = (role==='supervisor'||role==='formador') ? 'reportes.html' : 'app.html';
-        window.location.href = fallback;
-        return;
-      }
-    } else {
-      // Fallback: RBAC local mientras no haya permissions
-      var rbacPerms = _getRBAC(role);
-      if (!rbacPerms.pages.includes(pageName)) {
-        var fallback2 = (role==='supervisor') ? 'reportes.html' : 'app.html';
-        window.location.href = fallback2;
-        return;
-      }
+    var perms = RBAC[role];
+    if (!perms || !perms.pages.includes(pageName)) {
+      var fallback = (role==='supervisor') ? 'reportes.html' : 'app.html';
+      window.location.href = fallback;
+      return;
     }
-    // Re-validar silenciosamente contra la Auth API
+    // Re-validar rol contra Supabase (anti-tampering de localStorage)
     _revalidateRole(fbUser.email, role, sess);
   });
 }
 
 function _revalidateRole(email, localRole, sess) {
-  // Revalidar silenciosamente via Auth API — sin bloquear la UI
-  var currentUser = typeof firebase !== 'undefined' && firebase.auth().currentUser;
-  if (!currentUser) return;
-  setTimeout(function() {
-    currentUser.getIdToken()
-      .then(function(idToken) {
-        return fetch('https://connect-it-auth-api-cjd8hqduekeagnc0.eastus2-01.azurewebsites.net/api/auth/session', {
-          headers: {
-            'Authorization': 'Bearer ' + idToken,
-            'X-App-ID': '0ce416a6-d34c-4c94-8758-8a1e862d1c9d'
-          }
-        });
-      })
-      .then(function(r) { return r.ok ? r.json() : null; })
-      .then(function(data) {
-        if (!data || !data.user) return;
-        sess.user.role    = data.user.role;
-        sess.user.country = data.user.country || sess.user.country;
-        sess.user.lane    = data.user.lane    || sess.user.lane;
-        sess.permissions  = data.permissions  || sess.permissions || {};
-        localStorage.setItem('helios_session', JSON.stringify(sess));
-        // No redirigir — solo actualizar sesión silenciosamente
-        // El redirect por cambio de rol ocurrirá en el próximo login
-      })
-      .catch(function() {});
-  }, 2000); // diferir 2s para no bloquear carga inicial
+  var _SB = 'https://dednkgonnirybnpktbzp.supabase.co';
+  var _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
+  fetch(_SB+'/rest/v1/agents?email=eq.'+encodeURIComponent(email)+'&select=role,country,lane', {
+    headers:{'apikey':_KEY,'Authorization':'Bearer '+_KEY}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if (!data || !data.length) return; // sin datos, usar local
+    var dbRole = data[0].role;
+    if (dbRole !== localRole) {
+      // Rol cambió en Supabase — actualizar sesión y redirigir
+      sess.user.role    = dbRole;
+      sess.user.country = data[0].country || sess.user.country;
+      sess.user.lane    = data[0].lane    || sess.user.lane;
+      localStorage.setItem('helios_session', JSON.stringify(sess));
+      var perms = RBAC[dbRole];
+      if (perms && !perms.pages.includes(window._currentPage)) {
+        var fallback = (dbRole==='supervisor') ? 'reportes.html' : 'app.html';
+        window.location.href = fallback;
+      }
+    }
+  })
+  .catch(function(){}); // silencioso — no bloquear la app si Supabase falla
 }
 
 
@@ -3954,13 +3913,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
     // Actualizar código de área según país del agente
     if(_u.country){updatePhoneCC(_u.country);}
 
-    // ── Visibilidad del botón Demo según rol y permissions ─────────────
-    var _demoBtn = document.querySelector('.n-demo');
-    if (_demoBtn) {
-      var _showDemo = _u.role === 'demo' || _u.role === 'admin' || can('app','demo_button');
-      _demoBtn.style.display = _showDemo ? '' : 'none';
-    }
-
     // ── Restaurar _poList del turno actual desde localStorage ──────────
     var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + new Date().toISOString().slice(0,10);
     try {
@@ -4562,7 +4514,7 @@ var DEMO_SCENARIOS = [
 
 // ── Punto de entrada: botón Demo ─────────────────────────────────
 function triggerDemo() {
-  if (_demoActive) { showToast('Ya hay un Demo activo — finalizalo primero'); return; }
+  if (_demoActive) { showToast('⚠ Ya hay un Demo activo'); return; }
   if (_callInProgress) {
     _showDemoSavePOModal();
   } else {
@@ -5662,7 +5614,7 @@ function closeDashboard(){
       setTimeout(_showDemoContinueModal, 400);
     } else if (_demoScene === 2 && _demoPOsaved >= 2) {
       setTimeout(function() {
-        showToast('Demo completo · Dos escenarios guardados en métricas');
+        showToast('🎬 Demo completo · Dos escenarios guardados en métricas');
         _exitDemo();
       }, 300);
     }

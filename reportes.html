@@ -382,35 +382,12 @@ var _filters={carril:'',pais:'',grade:'',agente:''};
 var RA = [];              // inicia vacío — se llena desde Supabase
 var _hasRealData = false;   // flag: true cuando Supabase cargó datos reales
 // ── RBAC centralizado — matriz de permisos por rol ────────────────
-// ── Permisos desde Connect Auth API ─────────────────────────────────────────
-function _getPermissions() {
-  try {
-    var s = JSON.parse(localStorage.getItem('helios_session') || '{}');
-    return s.permissions || {};
-  } catch(e) { return {}; }
-}
-function can(page, feature) {
-  var p = _getPermissions();
-  return !!(p[page] && p[page][feature]);
-}
-function _getRBAC(role) {
-  var p = _getPermissions();
-  var hasPerms = Object.keys(p).length > 0;
-  var map = {
-    agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
-    demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
-    formador:   { pages:['app','reportes'], canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true },
-    supervisor: { pages:['reportes'],      canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true },
-    admin:      { pages:['app','reportes'], canViewTeam:hasPerms?can('reportes','ver_equipo'):true, canCoach:hasPerms?can('reportes','coaching'):true, selfOnly:false }
-  };
-  return map[role] || { pages:[], canViewTeam:false, canCoach:false, selfOnly:true };
-}
 var RBAC = {
-  agente:     { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
-  demo:       { pages:['app','reportes'], canViewTeam:false, canCoach:false, selfOnly:true },
-  formador:   { pages:['app','reportes'], canViewTeam:true,  canCoach:true  },
-  supervisor: { pages:['reportes'],      canViewTeam:true,  canCoach:true  },
-  admin:      { pages:['app','reportes'], canViewTeam:true,  canCoach:true,  selfOnly:false }
+  agente:     { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:false, selfOnly:true },
+  demo:       { pages:['app','reportes'],canViewTeam:false, canCoach:false, autoDemo:true,  selfOnly:true },
+  formador:   { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false },
+  supervisor: { pages:['reportes'],     canViewTeam:true,  canCoach:true,  autoDemo:false },
+  admin:      { pages:['app','reportes'],canViewTeam:true,  canCoach:true,  autoDemo:false, selfOnly:false }
 };
 
 // Guard: verifica Firebase auth + rol autorizado para esta página
@@ -427,10 +404,7 @@ function requireAuth(pageName) {
   if (typeof firebase === 'undefined') return; // SDK no cargado aún
   if (!firebase.apps.length) firebase.initializeApp(_FB_CFG);
 
-  var _authHandled = false;
   firebase.auth().onAuthStateChanged(function(fbUser) {
-    if (_authHandled) return;
-    _authHandled = true;
     // Sin sesión Firebase → login
     if (!fbUser) {
       localStorage.removeItem('helios_session');
@@ -1231,12 +1205,6 @@ try{
     if(!_sess.user||!_sess.user.role||_validRoles.indexOf(_sess.user.role)===-1){
       localStorage.removeItem('helios_session');
       window.location.href='index.html?reason=invalid_role';return;
-    }
-    // Validar acceso via permissions de la API (si existen)
-    var _sessPerms = _sess.permissions || {};
-    if(Object.keys(_sessPerms).length > 0 && !_sessPerms.reportes){
-      localStorage.removeItem('helios_session');
-      window.location.href='index.html?reason=no_page_access';return;
     }
     _role=(_sess.user||{}).role||'formador';
     var _uname=(_sess.user||{}).name||'';
