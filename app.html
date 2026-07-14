@@ -3085,7 +3085,10 @@ function requireAuth(pageName) {
   if (typeof firebase === 'undefined') return; // SDK no cargado aún
   if (!firebase.apps.length) firebase.initializeApp(_FB_CFG);
 
+  var _authHandled = false; // previene múltiples ejecuciones de onAuthStateChanged
   firebase.auth().onAuthStateChanged(function(fbUser) {
+    if (_authHandled) return;
+    _authHandled = true;
     // Sin sesión Firebase → login
     if (!fbUser) {
       localStorage.removeItem('helios_session');
@@ -3154,12 +3157,8 @@ function _revalidateRole(email, localRole, sess) {
         sess.user.lane    = data.user.lane    || sess.user.lane;
         sess.permissions  = data.permissions  || sess.permissions || {};
         localStorage.setItem('helios_session', JSON.stringify(sess));
-        // Solo redirigir si el rol cambió a uno sin acceso a esta página
-        var newPerms = sess.permissions;
-        if (Object.keys(newPerms).length > 0 && !newPerms[window._currentPage]) {
-          var fallback = (data.user.role==='supervisor'||data.user.role==='formador') ? 'reportes.html' : 'app.html';
-          window.location.href = fallback;
-        }
+        // No redirigir — solo actualizar sesión silenciosamente
+        // El redirect por cambio de rol ocurrirá en el próximo login
       })
       .catch(function() {});
   }, 2000); // diferir 2s para no bloquear carga inicial
@@ -3955,6 +3954,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
     // Actualizar código de área según país del agente
     if(_u.country){updatePhoneCC(_u.country);}
 
+    // ── Visibilidad del botón Demo según rol y permissions ─────────────
+    var _demoBtn = document.querySelector('.n-demo');
+    if (_demoBtn) {
+      var _showDemo = _u.role === 'demo' || _u.role === 'admin' || can('app','demo_button');
+      _demoBtn.style.display = _showDemo ? '' : 'none';
+    }
+
     // ── Restaurar _poList del turno actual desde localStorage ──────────
     var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + new Date().toISOString().slice(0,10);
     try {
@@ -4556,7 +4562,7 @@ var DEMO_SCENARIOS = [
 
 // ── Punto de entrada: botón Demo ─────────────────────────────────
 function triggerDemo() {
-  if (_demoActive) { showToast('⚠ Ya hay un Demo activo'); return; }
+  if (_demoActive) { showToast('Ya hay un Demo activo — finalizalo primero'); return; }
   if (_callInProgress) {
     _showDemoSavePOModal();
   } else {
@@ -5656,7 +5662,7 @@ function closeDashboard(){
       setTimeout(_showDemoContinueModal, 400);
     } else if (_demoScene === 2 && _demoPOsaved >= 2) {
       setTimeout(function() {
-        showToast('🎬 Demo completo · Dos escenarios guardados en métricas');
+        showToast('Demo completo · Dos escenarios guardados en métricas');
         _exitDemo();
       }, 300);
     }

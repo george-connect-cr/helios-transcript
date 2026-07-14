@@ -427,7 +427,10 @@ function requireAuth(pageName) {
   if (typeof firebase === 'undefined') return; // SDK no cargado aún
   if (!firebase.apps.length) firebase.initializeApp(_FB_CFG);
 
+  var _authHandled = false;
   firebase.auth().onAuthStateChanged(function(fbUser) {
+    if (_authHandled) return;
+    _authHandled = true;
     // Sin sesión Firebase → login
     if (!fbUser) {
       localStorage.removeItem('helios_session');
