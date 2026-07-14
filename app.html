@@ -5570,12 +5570,12 @@ function _buildDashboard(){
   const pos=_poList, n=pos.length;
   const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
 
-  // Scores acumulados
-  const satAvg  = avg(pos.map(p=>p.meta?.scores?.satisfaction||0))||72;
-  const ahtAvg  = avg(pos.map(p=>p.meta?.scores?.ahtScore||0))||80;
-  const compAvg = avg(pos.map(p=>p.meta?.scores?.completeness||0))||75;
-  const speechAvg= avg(pos.map(p=>p.meta?.scores?.speechScore||0))||78;
-  const overall = Math.round(satAvg*.35+ahtAvg*.2+compAvg*.25+speechAvg*.2);
+  // Scores acumulados — 0 si no hay datos reales
+  const satAvg   = avg(pos.map(p=>p.meta?.scores?.satisfaction||0));
+  const ahtAvg   = avg(pos.map(p=>p.meta?.scores?.ahtScore||0));
+  const compAvg  = avg(pos.map(p=>p.meta?.scores?.completeness||0));
+  const speechAvg= avg(pos.map(p=>p.meta?.scores?.speechScore||0));
+  const overall  = n>0 ? Math.round(satAvg*.35+ahtAvg*.2+compAvg*.25+speechAvg*.2) : 0;
 
   // Duración real promedio (de callDuration MM:SS)
   function parseDur(s){if(!s||s==='—')return 0;const p=s.split(':');return(parseInt(p[0]||0)*60)+parseInt(p[1]||0);}

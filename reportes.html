@@ -292,75 +292,7 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 <script>
 
 // DATA
-var RA_MOCK=[
-  {id:1,name:'Dayana García',lt:'D',color:'#E8440A',carril:'Home',pais:'Costa Rica',calls:187,pos:142,aht:232,ahtS:'3:52',sat:92,speech:96,score:91,grade:'A',
-   sent:{p:78,n:14,g:8},durs:[210,185,265,190,245,178,220,195,240,200,185,230,195,210,188],
-   poscores:[88,92,85,94,90,87,93,89,91,86],
-   mejoras:['Comunicar ETA en todas las llamadas','Reducir pausas de silencio'],
-   polist:[
-     {id:'PO-2045',f:'28 abr',svc:'Grúa',dur:195,score:94,sat:5,sent:'p',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:''},
-     {id:'PO-2043',f:'28 abr',svc:'Batería',dur:210,score:91,sat:4,sent:'p',sp:{sal:true,id:true,ub:true,eta:true,ci:true},obs:''},
-     {id:'PO-2037',f:'27 abr',svc:'Llanta',dur:185,score:88,sat:4,sent:'p',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:'ETA no comunicado'}
-   ]},
-  {id:2,name:'Carlos Mora',lt:'C',color:'var(--g)',carril:'Road',pais:'Costa Rica',calls:164,pos:118,aht:271,ahtS:'4:31',sat:84,speech:88,score:83,grade:'B',
-   sent:{p:62,n:22,g:16},durs:[280,310,265,290,320,285,260,295,305,270,285,310,275,290,265],
-   poscores:[80,85,78,83,86,79,84,81,83,77],
-   mejoras:['ETA antes de despedirse','Reducir AHT en apertura','Confirmar ubicación en primeros 60s'],
-   polist:[
-     {id:'PO-2041',f:'28 abr',svc:'Grúa',dur:290,score:83,sat:4,sent:'n',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:'ETA omitido'},
-     {id:'PO-2038',f:'27 abr',svc:'Llanta',dur:310,score:80,sat:3,sent:'n',sp:{sal:true,id:false,ub:true,eta:false,ci:false},obs:'Sin identificación ni cierre'}
-   ]},
-  {id:3,name:'Valeria Núñez',lt:'V',color:'#cc7580',carril:'Concierge',pais:'Panamá',calls:201,pos:167,aht:224,ahtS:'3:44',sat:95,speech:98,score:94,grade:'A',
-   sent:{p:85,n:12,g:3},durs:[220,210,235,195,225,215,205,230,210,225,195,215,220,210,205],
-   poscores:[95,93,96,94,97,92,95,94,96,93],
-   mejoras:['Mantener consistencia en horarios pico'],
-   polist:[
-     {id:'PO-2046',f:'28 abr',svc:'Concierge',dur:215,score:96,sat:5,sent:'p',sp:{sal:true,id:true,ub:true,eta:true,ci:true},obs:''},
-     {id:'PO-2039',f:'27 abr',svc:'Grúa',dur:220,score:94,sat:5,sent:'p',sp:{sal:true,id:true,ub:true,eta:true,ci:true},obs:''}
-   ]},
-  {id:4,name:'Luis Arias',lt:'L',color:'#6366f1',carril:'Home',pais:'Costa Rica',calls:143,pos:98,aht:312,ahtS:'5:12',sat:71,speech:79,score:72,grade:'C',
-   sent:{p:48,n:28,g:24},durs:[320,290,340,315,360,280,325,295,345,310,330,285,315,300,340],
-   poscores:[68,72,65,70,74,67,71,69,72,66],
-   mejoras:['Reducir AHT: preguntas cerradas','Saludo completo en 100%','Speech compliance: apertura','Manejo clientes molestos','Confirmar datos antes de registrar'],
-   polist:[
-     {id:'PO-2044',f:'28 abr',svc:'Grúa',dur:345,score:68,sat:3,sent:'g',sp:{sal:false,id:true,ub:false,eta:false,ci:true},obs:'Sin saludo. No validó ubicación. AHT elevado.'},
-     {id:'PO-2040',f:'28 abr',svc:'Llanta',dur:310,score:72,sat:3,sent:'n',sp:{sal:true,id:true,ub:true,eta:false,ci:false},obs:'Faltó ETA y cierre'},
-     {id:'PO-2034',f:'27 abr',svc:'Batería',dur:295,score:74,sat:4,sent:'n',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:'ETA no comunicado'},
-     {id:'PO-2028',f:'26 abr',svc:'Grúa',dur:360,score:65,sat:2,sent:'g',sp:{sal:false,id:false,ub:true,eta:false,ci:false},obs:'Cliente molesto. Múltiples omisiones.'}
-   ]},
-  {id:5,name:'Sofía Ramírez',lt:'S',color:'#bf9455',carril:'Road',pais:'México',calls:178,pos:134,aht:245,ahtS:'4:05',sat:88,speech:91,score:87,grade:'B',
-   sent:{p:70,n:22,g:8},durs:[240,255,235,260,245,250,240,265,248,255,242,258,245,252,240],
-   poscores:[86,88,84,89,87,85,88,86,87,84],
-   mejoras:['ETA en el 100% de llamadas','Confirmación de referencia'],
-   polist:[
-     {id:'PO-2042',f:'28 abr',svc:'Road',dur:245,score:87,sat:4,sent:'p',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:'ETA pendiente'},
-     {id:'PO-2035',f:'27 abr',svc:'Grúa',dur:258,score:89,sat:5,sent:'p',sp:{sal:true,id:true,ub:true,eta:true,ci:true},obs:''}
-   ]},
-  {id:6,name:'Andrés Fallas',lt:'A',color:'#0ea5e9',carril:'Concierge',pais:'Costa Rica',calls:156,pos:121,aht:262,ahtS:'4:22',sat:82,speech:86,score:81,grade:'B',
-   sent:{p:65,n:24,g:11},durs:[260,275,250,265,280,255,270,260,275,265,258,272,260,268,252],
-   poscores:[80,83,79,84,82,80,83,81,83,79],
-   mejoras:['Protocolo apertura completo','Comunicar ETA'],
-   polist:[
-     {id:'PO-2043b',f:'28 abr',svc:'Concierge',dur:265,score:81,sat:4,sent:'p',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:'ETA omitido'}
-   ]},
-  {id:7,name:'María Solano',lt:'M',color:'#8b5cf6',carril:'Home',pais:'Colombia',calls:132,pos:89,aht:344,ahtS:'5:44',sat:68,speech:74,score:68,grade:'C',
-   sent:{p:42,n:30,g:28},durs:[350,320,370,340,380,330,355,345,365,335,350,325,360,340,375],
-   poscores:[65,68,63,67,70,64,68,66,69,63],
-   mejoras:['Saludo en 100% llamadas','Reducir AHT','Manejo clientes molestos','Validación datos','Cierre con ETA'],
-   polist:[
-     {id:'PO-2042b',f:'28 abr',svc:'Grúa',dur:355,score:66,sat:3,sent:'g',sp:{sal:false,id:true,ub:true,eta:false,ci:false},obs:'Sin saludo ni cierre'},
-     {id:'PO-2036',f:'27 abr',svc:'Batería',dur:340,score:70,sat:3,sent:'n',sp:{sal:true,id:true,ub:false,eta:false,ci:true},obs:'No validó ubicación'},
-     {id:'PO-2029',f:'26 abr',svc:'Llanta',dur:375,score:63,sat:2,sent:'g',sp:{sal:false,id:false,ub:true,eta:false,ci:false},obs:'Múltiples omisiones. Coaching urgente.'}
-   ]},
-  {id:8,name:'José Quesada',lt:'J',color:'var(--y)',carril:'Road',pais:'Panamá',calls:169,pos:128,aht:258,ahtS:'4:18',sat:86,speech:90,score:85,grade:'B',
-   sent:{p:68,n:24,g:8},durs:[255,270,248,262,275,258,265,260,272,255,260,268,255,265,258],
-   poscores:[84,87,82,86,88,83,86,84,87,82],
-   mejoras:['ETA consistente al cierre','Reducir silencios'],
-   polist:[
-     {id:'PO-2041b',f:'28 abr',svc:'Road',dur:262,score:86,sat:4,sent:'p',sp:{sal:true,id:true,ub:true,eta:false,ci:true},obs:''},
-     {id:'PO-2033',f:'27 abr',svc:'Grúa',dur:275,score:88,sat:5,sent:'p',sp:{sal:true,id:true,ub:true,eta:true,ci:true},obs:''}
-   ]}
-];
+var RA_MOCK=[];
 
 var RC=[
   {agent:'Luis Arias',obj:'Reducir AHT a menos de 4:30',acts:['Preguntas clave en 60s','Role-play apertura','Revisión grabaciones'],dl:'30 abr',pct:35,coach:'Roberto Salas',sessions:3,next:'29 abr'},
