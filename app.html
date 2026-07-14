@@ -3390,6 +3390,39 @@ var _sessionCallCount = 0;
 var _ucQueue = [];  // cola barajada sin repetición
 var _callInProgress = false;
 var _desktopConversation = null; // instancia ElevenLabs activa en desktop
+var _desktopTranscriptLines = []; // acumulador de líneas de la conversación actual
+var _desktopAnalysisTimer   = null; // debounce timer para envío al LLM
+
+// Construye el transcript acumulado y lo manda al cc-rtt para análisis LLM.
+// Se llama con debounce de 3s tras cada onMessage — el LLM ve siempre
+// la conversación completa, no línea por línea.
+function _sendTranscriptToAnalysis() {
+  if (!_desktopTranscriptLines.length) return;
+  // Formatear como diálogo legible para el LLM
+  var fullTranscript = _desktopTranscriptLines.map(function(l) {
+    return (l.speaker === 'agente' ? 'Agente' : 'Cliente') + ': ' + l.text;
+  }).join('\n');
+
+  var payload = {
+    callUniqueId: _desktopCallId,
+    transcript:   fullTranscript,
+    speaker:      'conversacion'
+  };
+
+  fetch(CONFIG.FUNCTION_URL, {
+    method:  'POST',
+    headers: {
+      'Authorization': 'Bearer ' + CONFIG.AUTH_TOKEN,
+      'Content-Type':  'application/json'
+    },
+    body: JSON.stringify(payload)
+  }).catch(function(e) {
+    console.warn('[cc-rtt] Error enviando transcript al LLM:', e);
+  });
+}
+
+// ID único por llamada — identifica la sesión en el backend
+var _desktopCallId = null;
 
 // Barajar array (Fisher-Yates) — sin cambios
 function _shuffle(arr) {
@@ -3427,6 +3460,10 @@ async function triggerSimulatedCall() {
 
   // Limpiar sesión previa antes de iniciar
   _clearSession();
+  // Reset acumulador de transcript y asignar ID único a esta llamada
+  _desktopTranscriptLines = [];
+  clearTimeout(_desktopAnalysisTimer);
+  _desktopCallId = 'EL-' + Date.now();
   _setDemoState(false);
   _showEndCallButton();
   showToast('📞 Conectando llamada de entrenamiento...');
@@ -3456,7 +3493,13 @@ async function triggerSimulatedCall() {
       onMessage: function(msg) {
         // msg.source: 'ai' = cliente simulado | 'user' = agente real
         var speaker = (msg.source === 'ai') ? 'cliente' : 'agente';
-        if (msg.message) appendTranscript(speaker, msg.message);
+        if (!msg.message) return;
+        appendTranscript(speaker, msg.message);
+        // Acumular transcripción y enviar al LLM con debounce (3s)
+        // El LLM necesita el contexto completo, no línea por línea
+        _desktopTranscriptLines.push({ speaker: speaker, text: msg.message });
+        clearTimeout(_desktopAnalysisTimer);
+        _desktopAnalysisTimer = setTimeout(_sendTranscriptToAnalysis, 3000);
       },
       onModeChange: function(data) {
         // 'speaking' = cliente hablando | 'listening' = agente puede hablar
@@ -3482,6 +3525,10 @@ function endCall() {
     _desktopConversation.endSession().catch(function(){});
     _desktopConversation = null;
   }
+  // Forzar análisis final inmediato con todo el transcript acumulado
+  clearTimeout(_desktopAnalysisTimer);
+  _sendTranscriptToAnalysis();
+  _desktopTranscriptLines = [];
   _callInProgress = false;
   _hideEndCallButton();
   _setDemoState(true);
@@ -6578,12 +6625,8 @@ function autoCheckItem(keyword) {
       }
     }
   });
-}IG={
-  NEGOTIATE_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt-client',
-  FUNCTION_URL:'https://cc-services-h6gpc0gzdyfkdabj.eastus2-01.azurewebsites.net/api/cc-rtt?code=-6WX4-0QLQxj85AvLHuI-lADfPDw8wW-zXeJCeCx8r5uAzFuv4Iazw==',
-  AUTH_TOKEN:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiYXVkYXJhLXVzZXIiLCJleHAiOjE2ODk1NDg4MDB9.yRL7N2kx-vUhQYjVYeNRnRbJQbV4PxT0vI_4TzDE4xY',
-  RECONNECT_MS:5000,
-};
+}
+// CONFIG ya definido arriba — no redeclarar
 function showCelebration(done, goal){
   const ov = document.getElementById('celebrate-ov');
   const cnt = document.getElementById('cel-count');
