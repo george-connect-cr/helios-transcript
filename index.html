@@ -383,7 +383,7 @@ html,body{height:100%;font-family:var(--f);background:#f0f2f7;color:var(--t0);}
     <div class="brand">
       <img src="assets/connect-logo.png" alt="Connect" style="height:62px;width:auto;display:block;margin:0 auto 10px;border-radius:6px;"/>
       <div class="brand-sub" style="letter-spacing:6px;font-size:42px;font-weight:300;white-space:nowrap;">KAI ACADEMY</div>
-      <div style="font-family:var(--f);font-size:11px;font-weight:500;color:var(--acc);margin-top:4px;">v0.9.1-beta</div>
+      <div style="font-family:var(--f);font-size:11px;font-weight:500;color:var(--acc);margin-top:4px;">v0.9.0-beta</div>
       <div class="brand-rule"></div>
     </div>
     <div class="form">
@@ -518,11 +518,7 @@ function doGoogleSSO() {
     });
 }
 
-function _lookupAgentInSupabase(email, name, firebaseUid) {
-  // ── Migrado a Connect Auth API v1.0 ──────────────────────────────────────
-  // Ya no hacemos lookup manual a Supabase.
-  // El ID token de Firebase se envía a la Auth API que verifica, resuelve rol
-  // y devuelve los permisos en un solo call.
+function _lookupAgentInSupabase(email, displayName, firebaseUid) {
   firebase.auth().currentUser.getIdToken(true)
     .then(function(idToken) {
       return fetch('https://connect-it-auth-api-cjd8hqduekeagnc0.eastus2-01.azurewebsites.net/api/auth/session', {
@@ -533,59 +529,44 @@ function _lookupAgentInSupabase(email, name, firebaseUid) {
       });
     })
     .then(function(res) {
-      var status = res.status;
-      var ok = res.ok;
-      return res.text().then(function(text) {
-        var body = {};
-        try { body = text ? JSON.parse(text) : {}; } catch(e) { body = {}; }
-        return { ok: ok, status: status, body: body };
+      var status=res.status,ok=res.ok;
+      return res.text().then(function(text){
+        var body={};
+        try{body=text?JSON.parse(text):{};}catch(e){}
+        return{ok:ok,status:status,body:body};
       });
     })
     .then(function(r) {
       document.getElementById('loading').classList.remove('show');
       if (!r.ok) {
-        var code = (r.body.error || {}).code || 'INTERNAL';
-        console.warn('[Auth API] Error code:', code, r.body);
-
-        // Títulos — qué pasó
-        var titles = {
-          MISSING_TOKEN:     'Error de sesión',
-          MISSING_APP_ID:    'Error de configuración',
-          INVALID_TOKEN:     'Sesión expirada',
-          REVOKED_TOKEN:     'Sesión revocada',
+        var code=(r.body.error||{}).code||'INTERNAL';
+        console.warn('[Auth API] Error:',code,r.body);
+        var titles={
+          USER_NOT_FOUND:'Sin acceso al sistema',
           DOMAIN_NOT_ALLOWED:'Dominio no autorizado',
-          ORIGIN_NOT_ALLOWED:'Acceso no permitido',
-          USER_NOT_FOUND:    'Sin acceso al sistema',
-          APP_ACCESS_DENIED: 'Sin acceso a esta aplicación',
-          INTERNAL:          'Error temporal'
+          APP_ACCESS_DENIED:'Sin acceso a esta aplicación',
+          INVALID_TOKEN:'Sesión expirada',
+          REVOKED_TOKEN:'Sesión revocada',
+          INTERNAL:'Error temporal'
         };
-
-        // Detalles — qué hacer
-        var details = {
-          MISSING_TOKEN:     'Hubo un problema al iniciar sesión. Cerrá el navegador e intentá de nuevo.',
-          MISSING_APP_ID:    'Ocurrió un error de configuración. Contactá al equipo de soporte.',
-          INVALID_TOKEN:     'Tu sesión venció o no es válida. Volvé a ingresar con tu cuenta de Google.',
-          REVOKED_TOKEN:     'Tu sesión fue cerrada desde otro dispositivo. Volvé a ingresar.',
-          DOMAIN_NOT_ALLOWED:'Tu correo no pertenece al dominio autorizado para usar KAI Academy. Si creés que es un error, contactá al administrador.',
-          ORIGIN_NOT_ALLOWED:'Esta solicitud no está permitida desde este origen. Contactá al equipo de IT.',
-          USER_NOT_FOUND:    'Tu correo no está registrado en KAI Academy. Solicitá acceso a tu supervisor o al equipo de IT para que activen tu cuenta.',
-          APP_ACCESS_DENIED: 'Tu usuario no tiene permiso para acceder a KAI Academy. Contactá a tu supervisor para que revisen tu perfil de acceso.',
-          INTERNAL:          'Ocurrió un error en el servidor. Esperá unos minutos e intentá de nuevo. Si el problema persiste, contactá a IT.'
+        var details={
+          USER_NOT_FOUND:'Tu correo no está registrado en KAI Academy. Solicitá acceso a tu supervisor o al equipo de IT.',
+          DOMAIN_NOT_ALLOWED:'Tu correo no pertenece al dominio autorizado. Si creés que es un error, contactá al administrador.',
+          APP_ACCESS_DENIED:'Tu usuario no tiene permiso para acceder a KAI Academy. Contactá a tu supervisor.',
+          INVALID_TOKEN:'Tu sesión venció. Volvé a ingresar con tu cuenta de Google.',
+          REVOKED_TOKEN:'Tu sesión fue cerrada desde otro dispositivo. Volvé a ingresar.',
+          INTERNAL:'Error en el servidor. Esperá unos minutos e intentá de nuevo.'
         };
-
         firebase.auth().signOut();
-        _showAccessDenied(
-          titles[code] || 'No pudimos verificar tu acceso',
-          details[code] || 'Ocurrió un error inesperado. Intentá de nuevo o contactá al administrador.'
-        );
+        _showAccessDenied(titles[code]||'No pudimos verificar tu acceso',details[code]||'Intentá de nuevo o contactá al administrador.');
         return;
       }
-      var session = r.body;
-      saveAndRedirect(session.user, session.user.role, session.permissions, null);
+      var session=r.body;
+      saveAndRedirect(session.user,session.user.role,session.permissions,null);
     })
-    .catch(function(err) {
+    .catch(function(err){
       document.getElementById('loading').classList.remove('show');
-      console.error('[Auth API] Error:', err);
+      console.error('[Auth API] Error de red:',err);
       _showLoginErr('No se pudo verificar tu cuenta. Revisá tu conexión e intentá de nuevo.');
     });
 }
@@ -599,7 +580,7 @@ function _showLoginErr(msg) {
   el.textContent = msg;
   var form = document.querySelector('.form');
   if (form) form.appendChild(el);
-  setTimeout(function(){ if(el.parentNode) el.remove(); }, 6000);
+  setTimeout(function(){ el.remove(); }, 6000);
 }
 
 function _showAccessDenied(title, detail) {
@@ -796,36 +777,27 @@ function skipExtension(){
 
 /* ── FINAL: Save session and redirect ── */
 function saveAndRedirect(user, role, permissions, extension){
-  var validRoles = ['agente','demo','formador','supervisor','admin'];
-  if (!role || validRoles.indexOf(role) === -1) {
-    _showAccessDenied('Rol no válido.', 'Tu cuenta tiene un rol no reconocido. Contactá al administrador.');
-    firebase.auth().signOut();
-    return;
+  var validRoles=['agente','demo','formador','supervisor','admin'];
+  if(!role||validRoles.indexOf(role)===-1){
+    _showAccessDenied('Rol no válido.','Tu cuenta tiene un rol no reconocido. Contactá al administrador.');
+    firebase.auth().signOut();return;
   }
   document.getElementById('loading').classList.add('show');
   setTimeout(function(){
-    var session = {
-      user:{
-        name:    user.name    || '',
-        email:   user.email   || '',
-        color:   '#e04500',
-        letter:  (user.name||'U')[0].toUpperCase(),
-        role:    role,
-        country: user.country || 'Costa Rica',
-        lane:    user.lane    || 'Home',
-        extension: extension
-      },
-      permissions: permissions || {},
-      ts: Date.now()
+    var session={
+      user:{name:user.name||'',email:user.email||'',color:'#e04500',
+        letter:(user.name||'U')[0].toUpperCase(),role:role,
+        country:user.country||'',lane:user.lane||'',extension:extension},
+      permissions:permissions||{},
+      ts:Date.now()
     };
-    localStorage.setItem('helios_session', JSON.stringify(session));
-    // Routing basado en permisos de la API
-    var canApp     = !!(permissions && permissions.app);
-    var canReportes= !!(permissions && permissions.reportes);
-    var dest = (canReportes && !canApp) ? 'reportes.html' : 'app.html';
-    window.location.href = dest;
-  }, 900);
+    localStorage.setItem('helios_session',JSON.stringify(session));
+    var p=permissions||{};
+    var dest=p.app?'app.html':p.reportes?'reportes.html':(role==='supervisor'||role==='formador')?'reportes.html':'app.html';
+    window.location.href=dest;
+  },900);
 }
+
 </script>
 
 <!-- Popup ayuda KAI -->
