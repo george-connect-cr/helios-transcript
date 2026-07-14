@@ -294,20 +294,9 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 // DATA
 var RA_MOCK=[];
 
-var RC=[
-  {agent:'Luis Arias',obj:'Reducir AHT a menos de 4:30',acts:['Preguntas clave en 60s','Role-play apertura','Revisión grabaciones'],dl:'30 abr',pct:35,coach:'Roberto Salas',sessions:3,next:'29 abr'},
-  {agent:'María Solano',obj:'Speech compliance al 90%+',acts:['5 grabaciones/semana','Sesión formador semanal','Checklist pre-llamada'],dl:'5 may',pct:20,coach:'Ana Vega',sessions:2,next:'30 abr'},
-  {agent:'Carlos Mora',obj:'ETA en 100% de llamadas',acts:['Checklist visual','Feedback diario','Role-play cierre'],dl:'28 abr',pct:60,coach:'Roberto Salas',sessions:4,next:'28 abr'}
-];
+var RC=[];
 
-var RF=[
-  {agent:'Dayana García',by:'Ana Vega',role:'Supervisora',date:'23 abr',text:'Excelente manejo del cliente molesto en PO-1847. Resolución en menos de 4 min.',tags:['Empatía','Resolución'],pri:'baja',tipo:'pos'},
-  {agent:'Luis Arias',by:'Roberto Salas',role:'Supervisor',date:'22 abr',text:'AHT elevado en turno tarde. Demora confirmando ubicación. Refuerzo en protocolo.',tags:['AHT','Protocolo'],pri:'alta',tipo:'neg'},
-  {agent:'Carlos Mora',by:'Ana Vega',role:'Supervisora',date:'21 abr',text:'No comunica ETA en 3 de 5 llamadas monitoreadas.',tags:['ETA','Cierre'],pri:'media',tipo:'neg'},
-  {agent:'María Solano',by:'Roberto Salas',role:'Supervisor',date:'21 abr',text:'Speech 74%. Omite saludo en 4 de 10 llamadas.',tags:['Speech','Saludo'],pri:'alta',tipo:'neg'},
-  {agent:'Valeria Núñez',by:'Ana Vega',role:'Supervisora',date:'20 abr',text:'Rendimiento consistente. Candidata a mentor de equipo.',tags:['Rendimiento'],pri:'baja',tipo:'pos'},
-  {agent:'Sofía Ramírez',by:'Roberto Salas',role:'Supervisor',date:'19 abr',text:'Mejora notable en speech esta semana. ETA en 80% de llamadas (+20%).',tags:['Mejora','Speech'],pri:'baja',tipo:'pos'}
-];
+var RF=[];
 
 // HELPERS
 var _filters={carril:'',pais:'',grade:'',agente:''};
@@ -1011,6 +1000,10 @@ function agDet(a){
 }
 
 function vCoaching(){
+  if(!RC.length) return '<div class="pt">Planes de coaching activos</div>'+
+    '<div style="text-align:center;padding:48px 24px;color:var(--t3);font-size:13px;font-family:var(--f);">'+
+    '<i class="ti ti-target" style="font-size:32px;margin-bottom:12px;display:block;"></i>'+
+    'Sin planes de coaching activos aún.</div>';
   var h='<div class="pt">Planes de coaching activos</div><div class="ps">'+RC.length+' planes en curso</div>';
   h+=RC.map(function(p){
     var col=p.pct>=70?'var(--g)':p.pct>=40?'var(--y)':'var(--r)';
@@ -1037,6 +1030,10 @@ function vCoaching(){
 
 // FEEDBACK
 function vFeedback(){
+  if(!RF.length) return '<div class="pt">Observaciones del equipo</div>'+
+    '<div style="text-align:center;padding:48px 24px;color:var(--t3);font-size:13px;font-family:var(--f);">'+
+    '<i class="ti ti-message" style="font-size:32px;margin-bottom:12px;display:block;"></i>'+
+    'Sin observaciones registradas aún.</div>';
   var h='<div class="pt">Observaciones del equipo</div><div class="ps">'+RF.length+' observaciones esta semana</div>';
   h+=RF.map(function(f){
     var pc=f.pri==='alta'?'var(--r)':f.pri==='media'?'var(--y)':'var(--g)';
@@ -1061,10 +1058,7 @@ function vFeedback(){
 function vSupervisor(){
   var data=ag();
   var RP=[
-    {icon:'<i class="ti ti-trending-down" style="font-size:14px;color:var(--t3);"></i>',title:'AHT elevado en Road',tipo:'neg',desc:'3 agentes con AHT 18% sobre objetivo.',agents:'Carlos Mora, Luis Arias, José Quesada'},
-    {icon:'<i class="ti ti-star" style="font-size:14px;color:var(--t3);"></i>',title:'Alto rendimiento Concierge',tipo:'pos',desc:'Satisfacción +90% consistente.',agents:'Valeria Núñez, Andrés Fallas'},
-    {icon:'<i class="ti ti-alert-triangle" style="font-size:14px;color:var(--t3);"></i>',title:'Omisión de ETA',tipo:'neg',desc:'40% no comunican ETA al cierre.',agents:'Carlos Mora, Luis Arias, Andrés Fallas'},
-    {icon:'<i class="ti ti-trending-up" style="font-size:14px;color:var(--t3);"></i>',title:'Mejora en speech',tipo:'pos',desc:'Speech compliance +8% vs semana anterior.',agents:'Dayana García, Sofía Ramírez'}
+    // Sin patrones — se generarán desde datos reales
   ];
   var h='<div class="pt">Vista Supervisor</div><div class="ps">Patrones del equipo y ranking</div>';
   h+='<div class="stitle">Patrones detectados</div>';
