@@ -62,10 +62,47 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 }
 .fp:hover{background:transparent;color:var(--t0);}
 .fp.active{color:var(--t0);font-weight:500;border-bottom:2px solid var(--t0);}
-.period-selector{display:flex;gap:3px;background:var(--c2);border-radius:8px;padding:3px;}
-.period-btn{padding:5px 12px;border-radius:6px;border:none;background:transparent;font-family:var(--f);font-size:11px;font-weight:400;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;}
-.period-btn:hover{color:var(--t0);background:var(--c3);}
-.period-btn.active{background:var(--c1);color:var(--t0);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+/* Period dropdown */
+.period-drop-wrap{position:relative;}
+.period-drop-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  height:32px;padding:0 12px;border-radius:8px;
+  border:1.5px solid var(--gb2);background:var(--c1);
+  color:var(--t0);font-family:var(--f);font-size:12px;font-weight:500;
+  cursor:pointer;transition:border-color .15s;
+}
+.period-drop-btn:hover{border-color:var(--a);color:var(--a);}
+.period-drop-btn.active{border-color:var(--a);color:var(--a);}
+.period-drop-menu{
+  position:absolute;top:calc(100% + 6px);left:0;z-index:100;
+  background:var(--c1);border:1px solid var(--gb2);border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.10);min-width:200px;
+  display:none;padding:6px;
+}
+.period-drop-menu.open{display:block;}
+.period-drop-item{
+  padding:8px 12px;border-radius:6px;font-family:var(--f);font-size:12px;
+  color:var(--t1);cursor:pointer;transition:background .12s;
+}
+.period-drop-item:hover{background:var(--c2);color:var(--t0);}
+.period-drop-item.active{color:var(--a);font-weight:500;background:rgba(224,69,0,.06);}
+.period-drop-sep{height:1px;background:var(--gb2);margin:4px 0;}
+.period-drop-range{padding:8px 8px 4px;}
+.period-drop-range-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.period-drop-range-row label{font-family:var(--f);font-size:11px;color:var(--t2);width:38px;flex-shrink:0;}
+.period-drop-range-row input[type=date]{
+  flex:1;height:28px;border:1px solid var(--gb2);border-radius:6px;
+  font-family:var(--f);font-size:11px;color:var(--t0);padding:0 8px;
+  background:var(--c1);outline:none;cursor:pointer;
+}
+.period-drop-range-row input[type=date]:focus{border-color:var(--a);}
+.period-drop-apply{
+  width:100%;height:30px;border-radius:6px;
+  border:1.5px solid var(--a);background:transparent;
+  color:var(--a);font-family:var(--f);font-size:11px;font-weight:500;
+  cursor:pointer;margin-top:2px;transition:background .15s;
+}
+.period-drop-apply:hover{background:rgba(224,69,0,.06);}
 .fp.filtered{color:var(--t0);font-weight:500;}
 .fp.filtered:hover{background:#ffe8d6;}
 .fp-check{font-size:9px;font-weight:500;margin-right:2px;opacity:.8;}
@@ -459,6 +496,10 @@ function selPeriod(el,p){
   window._periodEnd = null;
   if(p==='today'){
     cutoff.setHours(0,0,0,0);
+  } else if(p==='7d'){
+    cutoff.setDate(now.getDate()-6); cutoff.setHours(0,0,0,0);
+  } else if(p==='30d'){
+    cutoff.setDate(now.getDate()-29); cutoff.setHours(0,0,0,0);
   } else if(p==='week'){
     var day = now.getDay()||7;
     cutoff.setDate(now.getDate() - day + 1);
@@ -473,6 +514,13 @@ function selPeriod(el,p){
     cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
   }
   window._periodStart = cutoff;
+  _applyPeriodFilter();
+}
+
+function _applyPeriodFilter(){
+  var cutoff = window._periodStart;
+  var p = _period;
+  if(!cutoff && p!=='range'){ RA = window._RA_FULL||_RA_FULL||[]; go(_cur); return; }
   if(_hasRealData){
     // Filtrar los poscores/polist de cada agente según fecha
     var __FULL = window._RA_FULL || _RA_FULL || [];
@@ -490,8 +538,7 @@ function selPeriod(el,p){
       });
     }).filter(function(a){return a.calls>0;});
     if(!RA.length&&__FULL.length) {
-      RA = _RA_FULL; // fallback: mostrar todos si no hay datos del período
-      showToast('Sin datos en este período — mostrando historial completo');
+      RA = window._RA_FULL||_RA_FULL;
     }
   }
   go(_cur);
@@ -1273,7 +1320,7 @@ var _RA_FULL = []; // copia completa para filtrado por período
     if(_todayEl) selPeriod(_todayEl,'today');
     else go('resumen');
       } else {
-        var _todayBtn = document.querySelector('.period-btn');
+        var _todayBtn = document.getElementById('pdi-today');
     if(_todayBtn) selPeriod(_todayBtn,'today'); else go('resumen');
       }
     } else {
