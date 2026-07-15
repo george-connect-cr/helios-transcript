@@ -236,7 +236,8 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 </div></div>
 
 <div class="fbar">
-  <div class="fp active" onclick="selPeriod(this,'week')">Esta semana</div>
+  <div class="fp active" onclick="selPeriod(this,'today')">Hoy</div>
+  <div class="fp" onclick="selPeriod(this,'week')">Esta semana</div>
   <div class="fp" onclick="selPeriod(this,'prev')">Sem. anterior</div>
   <div class="fp" onclick="selPeriod(this,'month')">Este mes</div>
   <div style="width:1px;height:16px;background:var(--gb);margin:0 2px;"></div>
@@ -433,21 +434,31 @@ function fs(s){return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
 function sc(v){return v>=70?'var(--g)':v>=50?'var(--y)':'var(--r)';}
 
 // FILTERS
-var _period = 'week';
+var _period = 'today';
 function selPeriod(el,p){
+  // Toggle: click en período activo → mostrar todo
+  if(_period === p) {
+    document.querySelectorAll('.filters .fp:not([id])').forEach(function(e){e.classList.remove('active');});
+    _period = 'all';
+    window._periodStart = null;
+    window._periodEnd   = null;
+    RA = window._RA_FULL || _RA_FULL || [];
+    go(_cur);
+    return;
+  }
   document.querySelectorAll('.filters .fp:not([id])').forEach(function(e){e.classList.remove('active');});
   el.classList.add('active');
   _period = p;
-  // Filtrar RA_MOCK o datos reales por período
   var now = new Date();
   var cutoff = new Date();
-  if(p==='week'){
-    // lunes de esta semana
+  window._periodEnd = null;
+  if(p==='today'){
+    cutoff.setHours(0,0,0,0);
+  } else if(p==='week'){
     var day = now.getDay()||7;
     cutoff.setDate(now.getDate() - day + 1);
     cutoff.setHours(0,0,0,0);
   } else if(p==='prev'){
-    // lunes y domingo de semana anterior
     var day2 = now.getDay()||7;
     cutoff.setDate(now.getDate() - day2 - 6);
     cutoff.setHours(0,0,0,0);
@@ -1037,11 +1048,27 @@ function agDet(a){
 }
 
 function vCoaching(){
-  if(!RC.length) return '<div class="pt">Planes de coaching activos</div>'+
+  // Generar coaching desde datos reales: agentes con score < 75
+  var data = ag();
+  var candidatos = data.filter(function(a){ return a.score < 75 && a.calls > 0; });
+  if(!candidatos.length) return '<div class="pt">Planes de coaching activos</div>'+
     '<div style="text-align:center;padding:48px 24px;color:var(--t3);font-size:13px;font-family:var(--f);">'+
     '<i class="ti ti-target" style="font-size:32px;margin-bottom:12px;display:block;"></i>'+
-    'Sin planes de coaching activos aún.</div>';
-  var h='<div class="pt">Planes de coaching activos</div><div class="ps">'+RC.length+' planes en curso</div>';
+    '<div style="font-size:14px;color:var(--t0);margin-bottom:8px;">Sin candidatos de coaching</div>'+
+    '<div>Todos los agentes tienen score ≥ 75 en el período seleccionado.</div></div>';
+
+  var RC_real = candidatos.map(function(a){
+    var mejoras = [];
+    if(a.sat < 70)    mejoras.push('Mejorar satisfacción del cliente (actual: '+Math.round(a.sat)+'%)');
+    if(a.speech < 75) mejoras.push('Reforzar speech compliance (actual: '+Math.round(a.speech)+'%)');
+    if(a.aht > 300)   mejoras.push('Reducir tiempo de llamada (actual: '+fs(a.aht)+')');
+    if(!mejoras.length) mejoras.push('Revisión general de protocolo de atención');
+    return { agent:a.name, score:a.score, calls:a.calls, mejoras:mejoras,
+             sat:Math.round(a.sat), speech:Math.round(a.speech), aht:fs(a.aht) };
+  });
+
+  var h='<div class="pt">Agentes con oportunidad de coaching</div>'+
+    '<div class="ps">'+RC_real.length+' agente'+(RC_real.length!==1?'s':'')+' identificado'+(RC_real.length!==1?'s':'')+' en el período</div>';
   h+=RC.map(function(p){
     var col=p.pct>=70?'var(--g)':p.pct>=40?'var(--y)':'var(--r)';
     var a=RA.find(function(x){return x.name===p.agent;})||{color:'#9ca3af',lt:'?'};
@@ -1067,29 +1094,46 @@ function vCoaching(){
 
 // FEEDBACK
 function vFeedback(){
-  if(!RF.length) return '<div class="pt">Observaciones del equipo</div>'+
+  // Generar observaciones desde datos reales de POs
+  var data = ag();
+  var obs = [];
+  data.forEach(function(a){
+    (a.polist||[]).forEach(function(po){
+      if(po.obs && po.obs.trim()) {
+        obs.push({ agent:a.name, po:po.id, fecha:po.f, obs:po.obs,
+                   score:po.score||0, tipo: po.score>=73?'pos':'neg' });
+      }
+    });
+    // Auto-generar observación si score muy bajo
+    if(a.score < 55 && a.calls > 0) {
+      obs.push({ agent:a.name, po:'—', fecha:'período', tipo:'neg',
+                 obs:'Score promedio bajo ('+a.score+'). Requiere atención inmediata.',
+                 score:a.score });
+    }
+  });
+  if(!obs.length) return '<div class="pt">Observaciones del equipo</div>'+
     '<div style="text-align:center;padding:48px 24px;color:var(--t3);font-size:13px;font-family:var(--f);">'+
     '<i class="ti ti-message" style="font-size:32px;margin-bottom:12px;display:block;"></i>'+
-    'Sin observaciones registradas aún.</div>';
-  var h='<div class="pt">Observaciones del equipo</div><div class="ps">'+RF.length+' observaciones esta semana</div>';
-  h+=RF.map(function(f){
-    var pc=f.pri==='alta'?'var(--r)':f.pri==='media'?'var(--y)':'var(--g)';
+    '<div style="font-size:14px;color:var(--t0);margin-bottom:8px;">Sin observaciones registradas</div>'+
+    '<div>Las observaciones se generan desde el campo de notas al confirmar cada PO.</div></div>';
+  var h='<div class="pt">Observaciones del equipo</div><div class="ps">'+obs.length+' observación'+(obs.length!==1?'es':'')+' en el período</div>';
+  h+=obs.map(function(f){
     var tc=f.tipo==='pos'?'var(--g)':'var(--r)';
-    var a=RA.find(function(x){return x.name===f.agent;})||{color:'#9ca3af',lt:'?'};
-    return'<div class="card" style="border-left:3px solid '+tc+';">'+
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
-        ''+
-        '<div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--t0);">'+f.agent+'</div>'+
-        '<div style="font-size:11px;color:var(--t2);">'+f.by+' · '+f.role+' · '+f.date+'</div></div>'+
-        '<span class="tag" style="color:'+tc+';border-color:'+tc+';background:rgba(0,0,0,.02);">'+(f.tipo==='pos'?'Positivo':'Atención')+'</span>'+
-        '<span class="tag" style="color:'+pc+';border-color:'+pc+';background:rgba(0,0,0,.02);">'+f.pri+'</span>'+
+    return'<div class="card" style="border-left:3px solid '+tc+';margin-bottom:12px;">'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'+
+        '<div style="flex:1;">'+
+          '<div style="font-size:13px;font-weight:500;color:var(--t0);">'+f.agent+'</div>'+
+          '<div style="font-size:11px;color:var(--t2);">PO: '+f.po+' · '+f.fecha+'</div>'+
+        '</div>'+
+        '<span style="font-size:11px;font-weight:500;color:'+tc+';">'+(f.tipo==='pos'?'Positivo':'Atención')+'</span>'+
+        '<span style="font-size:11px;font-family:var(--m);color:'+tc+';margin-left:8px;">'+f.score+'</span>'+
       '</div>'+
-      '<div style="font-size:13px;color:var(--t1);line-height:1.7;margin-bottom:10px;">'+f.text+'</div>'+
-      '<div>'+f.tags.map(function(t){return'<span style="font-size:9px;color:var(--t2);margin-right:6px;">'+t+'</span>';}).join('')+'</div>'+
+      '<div style="font-size:13px;color:var(--t1);line-height:1.6;">'+f.obs+'</div>'+
     '</div>';
   }).join('');
   return h;
 }
+
 
 // SUPERVISOR (admin only)
 function vSupervisor(){
@@ -1217,7 +1261,10 @@ var _RA_FULL = []; // copia completa para filtrado por período
         go('agente_v');
       } else if(_matchAg && !_hasRealData){
         // Solo mock — mostrar pantalla de bienvenida
-        go('resumen');
+        // Aplicar filtro "Hoy" por defecto
+    var _todayEl = document.querySelector('.filters .fp:first-child');
+    if(_todayEl) selPeriod(_todayEl,'today');
+    else go('resumen');
       } else {
         go('resumen');
       }
