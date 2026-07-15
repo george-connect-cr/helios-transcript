@@ -2591,7 +2591,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.4-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.5-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3577,9 +3577,12 @@ var _sessionCallCount = 0;
 var _ucQueue = [];  // cola barajada sin repetición
 var _callInProgress = false;
 function _resetCallState() {
-  _currentCallPONum = null;  // nuevo PO para la próxima llamada
+  _currentCallPONum = null;
   _desktopCallId    = null;
   _desktopTranscriptLines = [];
+  if (typeof _guiaReset === 'function') _guiaReset();
+  if (typeof ServiceDetector !== 'undefined') ServiceDetector.reset();
+  window.lastAnalysis = null;
 }
 var _desktopConversation = null; // instancia ElevenLabs activa en desktop
 var _desktopTranscriptLines = []; // acumulador de líneas de la conversación actual
@@ -3973,6 +3976,11 @@ function appendTranscript(speaker,text){
     _hideScrollArrow();
   }
   if(typeof CallTimer!=='undefined') CallTimer.start();
+  // Mostrar botón finalizar si hay llamada activa
+  if (!_callInProgress) {
+    _callInProgress = true;
+    _showEndCallButton();
+  }
   if(typeof ServiceDetector!=='undefined') ServiceDetector.analyze(text);
   // Extracción rápida de datos del cliente sin esperar el LLM
   if(!isAg && typeof quickExtractFromTranscript==='function') {
@@ -6689,6 +6697,11 @@ function _dismissKBPill(itemId){
 // ── Guía de llamada — renderizado en col-r ───────────────────────────
 // ── GUÍA DINÁMICA — detección por transcript, sin orden fijo ──────────────
 var _guiaItems  = [];  // [{id, txt, keywords, done, autoDetected}]
+function _guiaReset() {
+  _guiaItems = []; _guiaProto = []; _guiaQual = []; _guiaCursor = 0;
+  _kbSvcId = null; _kbState = {};
+  _guiaRender();
+}
 var _guiaProto  = [];  // legacy compat
 var _guiaQual   = [];  // legacy compat
 
@@ -6872,8 +6885,7 @@ function checkKBFromTranscript(transcriptText) {
 function renderKBSugs(sugs) {
   // Si llega array de strings (de KB.sugerenciasParaServicio), cargarlo
   if (!sugs || !sugs.length) return;
-  // Si _guiaLoad ya cargó desde KB_CHECKS, ignorar
-  if (_guiaItems.length) return;
+  // Siempre recargar si llegan nuevas sugerencias
   _guiaProto = sugs.map(function(){ return false; });
   _guiaItems = sugs.map(function(s, i) {
     return { id:'proto_'+i, txt:s, keywords:[], done:false, autoDetected:false };
