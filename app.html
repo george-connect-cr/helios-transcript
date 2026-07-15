@@ -2605,7 +2605,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.9-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.7-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3325,8 +3325,7 @@ var AUTH = {
     try {
       var _s3=JSON.parse(localStorage.getItem('helios_session')||'{}');
       var _e3=(_s3.user||{}).email||'anon';
-      var _ld3=(function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
-      var _k3='helios_po_'+_e3+'_'+_ld3;
+      var _k3='helios_po_'+_e3+'_'+new Date().toISOString().slice(0,10);
       localStorage.removeItem(_k3);
     } catch(e){}
     localStorage.removeItem('helios_session');
@@ -4274,9 +4273,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     }
 
     // ── Restaurar _poList del turno actual desde localStorage ──────────
-    // Fecha local (no UTC) para evitar desfase de timezone
-    var _localDate = (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
-    var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + _localDate;
+    var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + new Date().toISOString().slice(0,10);
     try {
       var _savedPOs = localStorage.getItem(_poKey);
       if (_savedPOs) {
@@ -4289,28 +4286,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
         AgentBar.init();
       }
     } catch(e) { _poList = []; }
-    // Si _poList sigue vacío, intentar desde Supabase
-    if(!_poList.length && SUPABASE_CONFIG.url && (_u.email||'') !== 'anon') {
-      var _SBu=SUPABASE_CONFIG.url, _SBk=SUPABASE_CONFIG.anonKey;
-      fetch(_SBu+'/rest/v1/call_sessions?agent_email=eq.'+encodeURIComponent(_u.email)+'&session_date=eq.'+_localDate+'&order=created_at.desc&select=*',{
-        headers:{'apikey':_SBk,'Authorization':'Bearer '+_SBk}
-      }).then(function(r){return r.ok?r.json():[];})
-      .then(function(rows){
-        if(!rows||!rows.length) return;
-        rows.forEach(function(s){
-          if(!_poList.find(function(p){return p.num===s.po_number;})){
-            _poList.push({num:s.po_number,ts:s.session_date||_localDate,
-              data:{nombre_cliente:s.customer_name||'',placa:s.plate||'',tipo_asistencia:s.service_type||'',ubicación:s.location_origin||'',marca:s.vehicle_brand||'',modelo:s.vehicle_model||'',año:s.vehicle_year||''},
-              meta:{callDuration:s.call_duration_fmt||'—',sentVal:s.sentiment_val||0,scores:{satisfaction:s.score_satisfaction||0,ahtScore:s.score_efficiency||0,completeness:s.score_completeness||0,speechScore:s.score_speech||0}}});
-          }
-        });
-        _poCount=_poList.length;
-        var _c=document.getElementById('po-count-num');
-        var _ct=document.getElementById('po-counter');
-        if(_c) _c.textContent=_poCount;
-        if(_poCount>0&&_ct) _ct.classList.add('show');
-      }).catch(function(){});
-    }
     var _ne=document.getElementById('ag-name');
     if(_ne&&_u.name)_ne.textContent=_u.name.split(' ')[0];
     document.getElementById('btn-logout')&&document.getElementById('btn-logout').addEventListener('click',function(){
@@ -5774,8 +5749,7 @@ function confirmPO(){
     try {
       var _sess2 = JSON.parse(localStorage.getItem('helios_session')||'{}');
       var _email2 = (_sess2.user||{}).email||'anon';
-      var _ld2 = (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
-      var _poKey2 = 'helios_po_' + _email2 + '_' + _ld2;
+      var _poKey2 = 'helios_po_' + _email2 + '_' + new Date().toISOString().slice(0,10);
       localStorage.setItem(_poKey2, JSON.stringify(_poList));
     } catch(e) {}
     _poCount = _poList.length;
@@ -5884,7 +5858,7 @@ function renderDrawer(){
     var KEY = SUPABASE_CONFIG.anonKey;
     try {
       var _u2 = (JSON.parse(localStorage.getItem('helios_session')||'{}').user)||{};
-      var today = (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+      var today = new Date().toISOString().slice(0,10);
       fetch(SB+'/rest/v1/call_sessions?agent_email=eq.'+encodeURIComponent(_u2.email||'')+'&session_date=eq.'+today+'&order=created_at.desc&select=*',{
         headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}
       }).then(function(r){return r.ok?r.json():[];})
@@ -7269,7 +7243,6 @@ function showCallRating(){
     _lastTranscriptText='';
     _clearSession();
     setWave('idle'); setStatus('coaching_p','#6366f1','Coaching','🎯');
-    setTimeout(function(){if(typeof openDashboard==='function')openDashboard();},300);
   };
   var bs=document.createElement('button');bs.style.cssText='flex:2;padding:10px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;';bs.textContent='Guardar calificación';bs.onclick=function(){
     ov.remove();
