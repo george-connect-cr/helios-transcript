@@ -472,10 +472,49 @@ function sc(v){return v>=70?'var(--g)':v>=50?'var(--y)':'var(--r)';}
 
 // FILTERS
 var _period = 'today';
+
+function togglePeriodDrop(){
+  var menu = document.getElementById('period-drop-menu');
+  var btn  = document.getElementById('period-drop-trigger');
+  var chev = document.getElementById('period-chevron');
+  if(!menu) return;
+  var open = menu.classList.toggle('open');
+  if(btn)  btn.classList.toggle('active', open);
+  if(chev) chev.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#period-drop-wrap')){
+    var menu = document.getElementById('period-drop-menu');
+    var btn  = document.getElementById('period-drop-trigger');
+    var chev = document.getElementById('period-chevron');
+    if(menu) menu.classList.remove('open');
+    if(btn && _period!=='range') btn.classList.remove('active');
+    if(chev) chev.style.transform = '';
+  }
+});
+
+function selPeriodRange(apply){
+  var from = document.getElementById('period-from') ? document.getElementById('period-from').value : '';
+  var to   = document.getElementById('period-to')   ? document.getElementById('period-to').value   : '';
+  if(apply && (!from || !to)){ showToast('Seleccioná ambas fechas'); return; }
+  if(from || to){
+    _period = 'range';
+    document.querySelectorAll('.period-drop-item').forEach(function(e){e.classList.remove('active');});
+    var lbl = (from||'') + (from&&to?' → ':'') + (to||'');
+    var el = document.getElementById('period-drop-label');
+    if(el) el.textContent = lbl;
+    window._periodStart = from ? new Date(from+'T00:00:00') : null;
+    window._periodEnd   = to   ? new Date(to+'T23:59:59')   : null;
+    _applyPeriodFilter();
+    if(apply){ var m=document.getElementById('period-drop-menu'); if(m) m.classList.remove('open'); }
+  }
+}
+
 function selPeriod(el,p){
   // Toggle: click en período activo → mostrar todo
   if(_period === p) {
-    document.querySelectorAll('.filters .fp:not([id])').forEach(function(e){e.classList.remove('active');});
+    document.querySelectorAll('.period-drop-item').forEach(function(e){e.classList.remove('active');});
     _period = 'all';
     window._periodStart = null;
     window._periodEnd   = null;
@@ -483,14 +522,27 @@ function selPeriod(el,p){
     go(_cur);
     return;
   }
-  document.querySelectorAll('.filters .fp:not([id])').forEach(function(e){e.classList.remove('active');});
-  el.classList.add('active');
+  document.querySelectorAll('.period-drop-item').forEach(function(e){e.classList.remove('active');});
+  if(el && el.classList) el.classList.add('active');
   _period = p;
+  // Actualizar label del botón
+  var labels = {today:'Hoy','7d':'7 días','30d':'30 días',week:'Esta semana',prev:'Sem. anterior',month:'Este mes'};
+  var lbl = document.getElementById('period-drop-label');
+  if(lbl) lbl.textContent = labels[p] || 'Ver informe';
+  // Cerrar el dropdown
+  var menu = document.getElementById('period-drop-menu');
+  if(menu) menu.classList.remove('open');
+  var btn = document.getElementById('period-drop-trigger');
+  if(btn) btn.classList.remove('active');
   var now = new Date();
   var cutoff = new Date();
   window._periodEnd = null;
   if(p==='today'){
     cutoff.setHours(0,0,0,0);
+  } else if(p==='7d'){
+    cutoff.setDate(now.getDate()-6); cutoff.setHours(0,0,0,0);
+  } else if(p==='30d'){
+    cutoff.setDate(now.getDate()-29); cutoff.setHours(0,0,0,0);
   } else if(p==='week'){
     var day = now.getDay()||7;
     cutoff.setDate(now.getDate() - day + 1);
