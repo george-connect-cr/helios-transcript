@@ -62,6 +62,10 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 }
 .fp:hover{background:transparent;color:var(--t0);}
 .fp.active{color:var(--t0);font-weight:500;border-bottom:2px solid var(--t0);}
+.period-selector{display:flex;gap:3px;background:var(--c2);border-radius:8px;padding:3px;}
+.period-btn{padding:5px 12px;border-radius:6px;border:none;background:transparent;font-family:var(--f);font-size:11px;font-weight:400;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.period-btn:hover{color:var(--t0);background:var(--c3);}
+.period-btn.active{background:var(--c1);color:var(--t0);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08);}
 .fp.filtered{color:var(--t0);font-weight:500;}
 .fp.filtered:hover{background:#ffe8d6;}
 .fp-check{font-size:9px;font-weight:500;margin-right:2px;opacity:.8;}
@@ -226,7 +230,7 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
   <span class="hd-title">Reportes & Analytics</span>
   <span class="hd-role" id="hd-role">Formador</span>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-    <a id="btn-back-app" href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:30px;font-size:12px;">← App</a>
+    <a id="btn-back-app" href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" style="display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:6px;border:1.5px solid var(--a);color:var(--a);font-family:var(--f);font-size:11px;font-weight:500;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='rgba(224,69,0,.06)'" onmouseout="this.style.background=''"><i class="ti ti-arrow-left" style="font-size:11px;"></i> Regresar</a>
     <button onclick="
       localStorage.removeItem('helios_session');
       if(typeof firebase!=='undefined'&&firebase.auth){
@@ -1051,6 +1055,7 @@ function agDet(a){
 function vCoaching(){
   // Generar coaching desde datos reales: agentes con score < 75
   var data = ag();
+  if(!data.length) data = window._RA_FULL || _RA_FULL || [];
   var candidatos = data.filter(function(a){ return a.score < 75 && a.calls > 0; });
   if(!candidatos.length) return '<div class="pt">Planes de coaching activos</div>'+
     '<div style="text-align:center;padding:48px 24px;color:var(--t3);font-size:13px;font-family:var(--f);">'+
@@ -1097,6 +1102,7 @@ function vCoaching(){
 function vFeedback(){
   // Generar observaciones desde datos reales de POs
   var data = ag();
+  if(!data.length) data = window._RA_FULL || _RA_FULL || [];
   var obs = [];
   data.forEach(function(a){
     (a.polist||[]).forEach(function(po){
@@ -1267,7 +1273,8 @@ var _RA_FULL = []; // copia completa para filtrado por período
     if(_todayEl) selPeriod(_todayEl,'today');
     else go('resumen');
       } else {
-        go('resumen');
+        var _todayBtn = document.querySelector('.period-btn');
+    if(_todayBtn) selPeriod(_todayBtn,'today'); else go('resumen');
       }
     } else {
       go('resumen');
