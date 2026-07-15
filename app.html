@@ -3909,7 +3909,9 @@ async function connectWebPubSub(){
 
 function handleMessage(p){
   if(!p)return;
-  if(p.transcript&&p.speaker){appendTranscript(p.speaker,p.transcript);return;}
+  // Ignorar transcripts acumulados enviados al LLM (speaker='conversacion')
+  // — son el payload completo para análisis, no una línea individual
+  if(p.transcript&&p.speaker&&p.speaker!=='conversacion'){appendTranscript(p.speaker,p.transcript);return;}
   if(p.type==='analysis'&&p.data){
     try{
       const parsed=JSON.parse(p.data.replace(/```json|```/g,'').trim());
@@ -3933,7 +3935,9 @@ function handleMessage(p){
 }
 
 function appendTranscript(speaker,text){
-  // Actualizar onda de audio según quién habla
+  // Strip etiquetas de emoción/acción de ElevenLabs: [frustrated], [laughing], [sighs], etc.
+  text = (text||'').replace(/\[[^\]]*\]/g, '').replace(/\s{2,}/g, ' ').trim();
+  if (!text) return; // descartar si quedó vacío
   var spkLow=(speaker||'').toLowerCase();
   var spkIsAg=spkLow.includes('agent')||spkLow==='agente';
   setWave(spkIsAg?'agent':'client');
