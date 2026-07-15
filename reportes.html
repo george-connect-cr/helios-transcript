@@ -459,7 +459,8 @@ function selPeriod(el,p){
   window._periodStart = cutoff;
   if(_hasRealData){
     // Filtrar los poscores/polist de cada agente según fecha
-    RA = _RA_FULL.map(function(a){
+    var __FULL = window._RA_FULL || _RA_FULL || [];
+    RA = __FULL.map(function(a){
       var filteredPO = (a._allPO||a.polist||[]).filter(function(po){
         if(!po._date) return true;
         var d = new Date(po._date);
@@ -472,7 +473,7 @@ function selPeriod(el,p){
         poscores: filteredPO.map(function(po){return po.score||0;})
       });
     }).filter(function(a){return a.calls>0;});
-    if(!RA.length) {
+    if(!RA.length&&__FULL.length) {
       RA = _RA_FULL; // fallback: mostrar todos si no hay datos del período
       showToast('Sin datos en este período — mostrando historial completo');
     }
@@ -553,7 +554,8 @@ function vResumen(){
     '</div>';
   }
   // Supervisor/formador sin datos reales — pantalla limpia
-  if((_role==='supervisor'||_role==='formador'||_role==='admin') && !_hasRealData && !(_RA_FULL&&_RA_FULL.length)){
+  var _raFull = window._RA_FULL || _RA_FULL || [];
+  if((_role==='supervisor'||_role==='formador'||_role==='admin') && !_hasRealData && !(_raFull&&_raFull.length)){
     return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;">'+
       '<div><i class="ti ti-users" style="font-size:36px;color:var(--t3);"></i></div>'+
       '<div style="font-family:var(--f);font-size:18px;font-weight:400;color:var(--t0);">Sin datos del equipo aún</div>'+
@@ -1133,6 +1135,11 @@ try{
   });
 })();
 
+// Supabase config — debe estar antes del IIFE que llama loadSupabaseData
+var _SB_URL = 'https://dednkgonnirybnpktbzp.supabase.co';
+var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
+var _RA_FULL = []; // copia completa para filtrado por período
+
 (function(){
   try{
     var _sess=JSON.parse(localStorage.getItem('helios_session')||'null');
@@ -1190,9 +1197,6 @@ try{
 
 
 // ── Supabase — cargar datos reales ───────────────────────────────
-var _SB_URL = 'https://dednkgonnirybnpktbzp.supabase.co';
-var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZG5rZ29ubmlyeWJucGt0YnpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzM3MTQsImV4cCI6MjA5NTU0OTcxNH0.uesxb4ph8SYKOHR5y6lWBCcl4P3BTOGSpQXZWDoASRQ';
-
 function loadSupabaseData(callback){
   // Mostrar indicador de carga en el área principal
   var main = document.getElementById('main-content');
@@ -1306,7 +1310,7 @@ function loadSupabaseData(callback){
         });
       });
       RA = newRA;
-      window._RA_FULL = newRA; // copia completa para filtrado por período
+      window._RA_FULL = newRA; _RA_FULL = newRA; // copia completa para filtrado por período
       _hasRealData = true;
       console.log('[Reportes] '+newRA.length+' agente(s) cargados desde Supabase');
     }
