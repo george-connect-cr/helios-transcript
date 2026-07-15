@@ -2423,7 +2423,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.3-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.4-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3347,7 +3347,7 @@ function savePOToSupabase(entry) {
       raw_data:           entry
     };
 
-    fetch(SB + '/rest/v1/call_sessions', {
+    fetch(SB + '/rest/v1/call_sessions?on_conflict=po_number', {
       method: 'POST',
       headers: Object.assign({}, hdrs, {'Prefer': 'return=representation'}),
       body: JSON.stringify(sessionPayload)
@@ -3408,6 +3408,11 @@ var SESSION_MAX_CALLS = 5;
 var _sessionCallCount = 0;
 var _ucQueue = [];  // cola barajada sin repetición
 var _callInProgress = false;
+function _resetCallState() {
+  _currentCallPONum = null;  // nuevo PO para la próxima llamada
+  _desktopCallId    = null;
+  _desktopTranscriptLines = [];
+}
 var _desktopConversation = null; // instancia ElevenLabs activa en desktop
 var _desktopTranscriptLines = []; // acumulador de líneas de la conversación actual
 var _desktopAnalysisTimer   = null; // debounce timer para envío al LLM
@@ -3442,6 +3447,7 @@ function _sendTranscriptToAnalysis() {
 
 // ID único por llamada — identifica la sesión en el backend
 var _desktopCallId = null;
+var _currentCallPONum = null; // PO único por llamada — se reutiliza si se confirma de nuevo
 
 // Barajar array (Fisher-Yates) — sin cambios
 function _shuffle(arr) {
@@ -3474,6 +3480,7 @@ async function triggerSimulatedCall() {
     return;
   }
 
+  _resetCallState();  // limpiar estado de llamada anterior
   _callInProgress = true;
   var agent = _nextUC();
 
@@ -5454,7 +5461,11 @@ function confirmPO(){
     if(noteEl && noteEl.value.trim()) data.nota = noteEl.value.trim();
     if(notaFromPopup) data.nota = notaFromPopup;
 
-    const num = 'PO-' + Math.floor(100000+Math.random()*900000);
+    // Reusar el número de PO si ya se creó uno en esta llamada
+    if (!_currentCallPONum) {
+      _currentCallPONum = 'PO-' + Math.floor(100000+Math.random()*900000);
+    }
+    const num = _currentCallPONum;
     const now = new Date();
     const ts  = now.toLocaleString('es-CR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 
@@ -5472,7 +5483,13 @@ function confirmPO(){
     const poEntry = {num, ts, data:{...data},
       meta:{callDuration, sentVal:sent?Number(sent.valor):0,
             waitTime:WAIT[svcId]||15, scores}};
-    _poList.push(poEntry);
+    // Si ya existe este PO en _poList, actualizarlo; si no, agregarlo
+    var _existingIdx = _poList.findIndex(function(p){ return p.num === num; });
+    if (_existingIdx >= 0) {
+      _poList[_existingIdx] = poEntry; // actualizar
+    } else {
+      _poList.push(poEntry); // agregar
+    }
     savePOToSupabase(poEntry);
     if (_demoActive) _demoPOsaved++;
     // Persistir en localStorage para sobrevivir navegación
@@ -5532,6 +5549,23 @@ function confirmPO(){
     POBuilder.reset();
     AgentBar.increment();
     showToast('PO '+num+' creado');
+    // Limpiar pantalla para próxima llamada
+    setTimeout(function(){
+      // Limpiar transcript
+      var tbody = document.getElementById('t-body');
+      if(tbody) tbody.innerHTML = '';
+      // Resetear guía
+      if(typeof _guiaReset === 'function') _guiaReset();
+      // Resetear sentimiento
+      var sentLbl = document.getElementById('sentiment-label');
+      var sentFill = document.getElementById('sentiment-fill');
+      if(sentLbl){ sentLbl.textContent = '—'; sentLbl.style.color = 'var(--t2)'; }
+      if(sentFill){ sentFill.style.width = '0%'; }
+      // Resetear ServiceDetector
+      if(typeof ServiceDetector !== 'undefined') ServiceDetector.reset();
+      // Limpiar análisis
+      window.lastAnalysis = null;
+    }, 800);
   }catch(err){
     console.error('confirmPO error:', err);
     showToast('Error al crear PO: '+err.message);
