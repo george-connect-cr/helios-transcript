@@ -2423,7 +2423,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.8-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.9-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3239,6 +3239,18 @@ var SUPABASE_CONFIG = {
   table:   'call_sessions'
 };
 
+
+// Mapeo servicio → carril Connect
+function _laneFromService(serviceType) {
+  if (!serviceType) return '';
+  var s = serviceType.toLowerCase();
+  var road = ['grúa','grua','remolque','llanta','rueda','gasolina','combustible','mecánica','mecanica','rescate','accidente'];
+  var home = ['batería','bateria','corriente','jump','llave','cerrajería','cerrajeria','apertura','encendido'];
+  if (road.some(function(k){ return s.includes(k); })) return 'Road';
+  if (home.some(function(k){ return s.includes(k); })) return 'Home';
+  return 'Road'; // default Road para asistencia en carretera
+}
+
 function savePOToSupabase(entry) {
   if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) return;
 
@@ -3294,7 +3306,7 @@ function savePOToSupabase(entry) {
         name:    _usr.name    || '',
         role:    _usr.role    || 'agente',
         country: _usr.country || '',
-        lane:    _usr.lane    || ''
+        lane:    _laneFromService((entry.data&&entry.data.tipo_asistencia)||'') || _usr.lane || ''
       })
     }).catch(function(){});
 
@@ -3308,7 +3320,7 @@ function savePOToSupabase(entry) {
       agent_name:         _usr.name    || '',
       agent_role:         _usr.role    || '',
       country:            _usr.country || '',
-      lane:               _usr.lane    || '',
+      lane:               _laneFromService((entry.data&&entry.data.tipo_asistencia)||'') || _usr.lane || '',
       call_duration_secs: durSecs,
       wait_time_min:      (entry.meta && entry.meta.waitTime) || 0,
       service_type:       (entry.data && entry.data.tipo_asistencia) || '',

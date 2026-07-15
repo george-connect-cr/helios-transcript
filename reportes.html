@@ -1245,10 +1245,21 @@ function loadSupabaseData(callback){
     sessions.forEach(function(s){
       var k=s.agent_email; if(!k)return;
       if(!map[k]){
+        // Calcular carril desde servicio si lane está vacío
+        function _laneFrom(svc) {
+          if (!svc) return s.lane||'Road';
+          var sv = svc.toLowerCase();
+          var road = ['grú','gru','remolque','llanta','gasolina','combustible','mecán','rescate','rueda'];
+          var home = ['bater','corriente','llave','cerrajer','apertura','jump'];
+          if (road.some(function(k){ return sv.includes(k); })) return 'Road';
+          if (home.some(function(k){ return sv.includes(k); })) return 'Home';
+          return s.lane||'Road';
+        }
+        var _carril = s.lane && s.lane.trim() ? s.lane : _laneFrom(s.service_type);
         map[k]={
           name:s.agent_name||k,email:s.agent_email,
           country:s.country||'Costa Rica',
-          carril:(s.lane||'Home'),ss:[]
+          carril:_carril,ss:[]
         };
       }
       map[k].ss.push(s);
