@@ -3793,6 +3793,8 @@ function endCall() {
     _desktopConversation.endSession().catch(function(){});
     _desktopConversation = null;
   }
+  // Detener timer de llamada inmediatamente
+  if (typeof CallTimer !== 'undefined' && CallTimer.reset) CallTimer.reset();
   // Forzar análisis final inmediato con todo el transcript acumulado
   clearTimeout(_desktopAnalysisTimer);
   _sendTranscriptToAnalysis();
@@ -6020,6 +6022,9 @@ function openDashboard(){_buildDashboard();document.getElementById('dash-ov').cl
 
 function closeDashboard(){
   document.getElementById('dash-ov').classList.remove('show');
+  // Limpiar pantalla de transcripción y volver a Coaching
+  _clearSession();
+  setWave('idle'); setStatus('coaching_p','#6366f1','Coaching','🎯');
   // Caso: el usuario guardó el PO antes de entrar a Demo — arrancar ahora
   if (_demoEnterPending) {
     _demoEnterPending = false;
@@ -7233,8 +7238,21 @@ function showCallRating(){
     '<div style="margin-bottom:16px;"><div style="font-family:var(--f);font-size:8px;color:var(--t2);letter-spacing:.01em;margin-bottom:6px;">Observaciones</div><textarea placeholder="Agrega una observación..." style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--gb2);background:var(--c2);color:var(--t0);font-family:var(--f);font-size:12px;resize:none;height:60px;outline:none;box-sizing:border-box;"></textarea></div>'+
     '<div style="display:flex;gap:8px;" id="cr-btns"></div>';
   var row=card.querySelector('#cr-btns')||card;
-  var bd=document.createElement('button');bd.style.cssText='flex:1;padding:10px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:12px;cursor:pointer;';bd.textContent='Descartar';bd.onclick=function(){ov.remove();_lastTranscriptText='';setTimeout(function(){if(typeof openDashboard==='function')openDashboard();},300);};
-  var bs=document.createElement('button');bs.style.cssText='flex:2;padding:10px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;';bs.textContent='Guardar calificación';bs.onclick=function(){ov.remove();_lastTranscriptText='';showToast('✓ Calificación guardada');setTimeout(function(){if(typeof openDashboard==='function')openDashboard();},500);};
+  var bd=document.createElement('button');bd.style.cssText='flex:1;padding:10px;border-radius:8px;border:1px solid var(--gb2);background:transparent;color:var(--t1);font-family:var(--f);font-size:12px;cursor:pointer;';bd.textContent='Descartar';bd.onclick=function(){
+    ov.remove();
+    _lastTranscriptText='';
+    _clearSession();
+    setWave('idle'); setStatus('coaching_p','#6366f1','Coaching','🎯');
+    setTimeout(function(){if(typeof openDashboard==='function')openDashboard();},300);
+  };
+  var bs=document.createElement('button');bs.style.cssText='flex:2;padding:10px;border-radius:8px;border:none;background:var(--a);color:#fff;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;';bs.textContent='Guardar calificación';bs.onclick=function(){
+    ov.remove();
+    _lastTranscriptText='';
+    _clearSession();
+    setWave('idle'); setStatus('coaching_p','#6366f1','Coaching','🎯');
+    showToast('✓ Calificación guardada');
+    setTimeout(function(){if(typeof openDashboard==='function')openDashboard();},500);
+  };
   row.appendChild(bd);row.appendChild(bs);
   ov.appendChild(card);document.body.appendChild(ov);
   ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();_lastTranscriptText='';}});
