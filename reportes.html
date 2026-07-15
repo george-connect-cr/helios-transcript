@@ -1384,12 +1384,20 @@ function showPODetail(regKey) {
   var stars='';
   for(var si=0;si<5;si++) stars+='<span style="color:'+(si<(p.sat||0)?'var(--y)':'var(--c3)')+';font-size:13px;line-height:1;">★</span>';
 
-  // Estimate sub-scores from available data (or use if present)
-  var satScore = typeof p.satisfaction !== 'undefined' ? p.satisfaction : (p.sat>=4?92:p.sat>=3?70:38);
-  var effScore = typeof p.efficiency   !== 'undefined' ? p.efficiency   : Math.min(100,Math.max(20,80-Math.abs((p.dur||240)/60-5)*8));
-  var compScore= typeof p.completeness !== 'undefined' ? p.completeness : Math.round(sc*0.9);
-  var spkScore = typeof p.speechScore  !== 'undefined' ? p.speechScore  :
-    (p.sp ? Math.round(Object.values(p.sp).filter(Boolean).length/Object.values(p.sp).length*100) : 80);
+  // Usar scores reales de Supabase — fallback a estimación solo si no hay datos
+  var satScore  = Math.round(typeof p.satisfaction !== 'undefined' ? p.satisfaction :
+                  typeof p.score_satisfaction !== 'undefined' ? p.score_satisfaction :
+                  (p.sat>=4?92:p.sat>=3?70:38));
+  var effScore  = Math.round(typeof p.efficiency !== 'undefined' ? p.efficiency :
+                  typeof p.score_aht !== 'undefined' ? p.score_aht :
+                  typeof p.score_efficiency !== 'undefined' ? p.score_efficiency :
+                  (function(){var m=(p.dur||240)/60;return m<=5?95:m<=8?80:m<=12?60:40;})());
+  var compScore = Math.round(typeof p.completeness !== 'undefined' ? p.completeness :
+                  typeof p.score_completeness !== 'undefined' ? p.score_completeness :
+                  (sc*0.9));
+  var spkScore  = Math.round(typeof p.speechScore !== 'undefined' ? p.speechScore :
+                  typeof p.score_speech !== 'undefined' ? p.score_speech :
+                  (p.sp ? Math.round(Object.values(p.sp).filter(Boolean).length/Math.max(Object.values(p.sp).length,1)*100) : 0));
 
   var _bg='linear-gradient(to right,rgba(91,134,245,.4),rgba(71,110,225,.85))';
   var bars = [
