@@ -2409,6 +2409,174 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
 .mob-act-end-lbl{font-size:10px;color:#555;}
 .mob-act-avatar{display:none;}
 
+
+/* ── Desktop Incoming Call Overlay ──────────────────────────── */
+#desk-incoming {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  animation: dsk-inc-fadein .25s ease;
+}
+#desk-incoming.visible { display: flex; }
+@keyframes dsk-inc-fadein { from { opacity:0; } to { opacity:1; } }
+
+.dsk-inc-card {
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  border-radius: 24px;
+  padding: 44px 52px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 340px;
+  max-width: 400px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+  animation: dsk-inc-slidein .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes dsk-inc-slidein {
+  from { transform: scale(.88) translateY(20px); opacity:0; }
+  to   { transform: scale(1)   translateY(0);    opacity:1; }
+}
+
+/* Avatar pulsante */
+.dsk-inc-avatar-wrap {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 24px;
+}
+.dsk-inc-pulse {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  border: 2px solid rgba(34,197,94,.35);
+  animation: dsk-pulse 1.8s ease-out infinite;
+}
+.dsk-inc-pulse:nth-child(2) { animation-delay: .6s; inset: -26px; border-color: rgba(34,197,94,.2); }
+.dsk-inc-pulse:nth-child(3) { animation-delay: 1.2s; inset: -38px; border-color: rgba(34,197,94,.1); }
+@keyframes dsk-pulse {
+  0%   { transform: scale(.85); opacity:1; }
+  100% { transform: scale(1.1); opacity:0; }
+}
+.dsk-inc-avatar {
+  position: relative;
+  z-index: 1;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f2340 100%);
+  border: 2px solid rgba(255,255,255,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #7cb9e8;
+}
+
+.dsk-inc-label {
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #22c55e;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.dsk-inc-name {
+  font-size: 22px;
+  font-weight: 300;
+  color: #f0f0f5;
+  letter-spacing: -.3px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.dsk-inc-sub {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+/* Barra de ondas animada */
+.dsk-inc-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 28px;
+  margin-bottom: 36px;
+}
+.dsk-inc-wave span {
+  width: 3px;
+  border-radius: 2px;
+  background: #2a2a4a;
+  animation: dsk-inc-wv 1.4s ease-in-out infinite;
+}
+.dsk-inc-wave span:nth-child(1){height:4px;animation-delay:0s}
+.dsk-inc-wave span:nth-child(2){height:9px;animation-delay:.1s}
+.dsk-inc-wave span:nth-child(3){height:16px;animation-delay:.2s}
+.dsk-inc-wave span:nth-child(4){height:22px;animation-delay:.3s}
+.dsk-inc-wave span:nth-child(5){height:28px;animation-delay:.4s}
+.dsk-inc-wave span:nth-child(6){height:22px;animation-delay:.5s}
+.dsk-inc-wave span:nth-child(7){height:16px;animation-delay:.6s}
+.dsk-inc-wave span:nth-child(8){height:9px;animation-delay:.7s}
+.dsk-inc-wave span:nth-child(9){height:4px;animation-delay:.8s}
+@keyframes dsk-inc-wv {
+  0%,100% { transform:scaleY(.25); opacity:.25; }
+  50%      { transform:scaleY(1);   opacity:.8; }
+}
+
+/* Botones contestar/rechazar */
+.dsk-inc-actions {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+}
+.dsk-inc-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.dsk-inc-circle {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #fff;
+  transition: transform .12s, opacity .12s, box-shadow .12s;
+}
+.dsk-inc-circle:hover  { transform: scale(1.08); opacity: .9; }
+.dsk-inc-circle:active { transform: scale(.92);  opacity: .8; }
+.dsk-inc-circle.decline {
+  background: #ef4444;
+  box-shadow: 0 8px 24px rgba(239,68,68,.35);
+}
+.dsk-inc-circle.answer {
+  background: #22c55e;
+  box-shadow: 0 8px 24px rgba(34,197,94,.35);
+  animation: dsk-answer-pulse 1.4s ease-in-out infinite;
+}
+@keyframes dsk-answer-pulse {
+  0%,100% { box-shadow: 0 8px 24px rgba(34,197,94,.35); }
+  50%      { box-shadow: 0 8px 36px rgba(34,197,94,.65); }
+}
+.dsk-inc-lbl {
+  font-size: 11px;
+  color: #555;
+  font-weight: 500;
+}
 </style>
 <!-- Firebase SDK — RBAC auth guard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -3464,6 +3632,41 @@ function _nextUC() {
   return _ucQueue.shift();
 }
 
+// ── Desktop incoming call — ring engine (reutiliza el de mobile) ──
+var _deskRingCtx      = null;
+var _deskRingInterval = null;
+
+function _deskRingOnce() {
+  try {
+    if (!_deskRingCtx) _deskRingCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var ctx = _deskRingCtx;
+    function beep(freq, t, d) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination); o.type = 'sine';
+      o.frequency.setValueAtTime(freq, ctx.currentTime + t);
+      g.gain.setValueAtTime(0, ctx.currentTime + t);
+      g.gain.linearRampToValueAtTime(0.28, ctx.currentTime + t + 0.02);
+      g.gain.setValueAtTime(0.28, ctx.currentTime + t + d - 0.04);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime + t + d);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + d);
+    }
+    beep(440, 0.0,  0.4); beep(480, 0.0,  0.4);
+    beep(440, 0.55, 0.4); beep(480, 0.55, 0.4);
+  } catch(e) {}
+}
+function _deskStartRing() {
+  _deskRingOnce();
+  _deskRingInterval = setInterval(_deskRingOnce, 2200);
+}
+function _deskStopRing() {
+  clearInterval(_deskRingInterval); _deskRingInterval = null;
+  if (_deskRingCtx) { try { _deskRingCtx.suspend(); } catch(e) {} }
+}
+
+// UC pendiente de contestar (asignado al mostrar el incoming)
+var _deskPendingAgent = null;
+
+// FASE 1 — Mostrar overlay de llamada entrante (no conecta SDK todavía)
 async function triggerSimulatedCall() {
   if (_sessionCallCount >= SESSION_MAX_CALLS) {
     showToast('Sesión completa — ' + SESSION_MAX_CALLS + ' llamadas de entrenamiento realizadas');
@@ -3471,7 +3674,7 @@ async function triggerSimulatedCall() {
     return;
   }
 
-  // Solicitar acceso al micrófono antes de mostrar cualquier UI
+  // Pedir micrófono antes de mostrar el overlay
   try {
     await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch(e) {
@@ -3480,19 +3683,37 @@ async function triggerSimulatedCall() {
     return;
   }
 
-  _resetCallState();  // limpiar estado de llamada anterior
-  _callInProgress = true;
-  var agent = _nextUC();
+  _deskPendingAgent = _nextUC();
 
-  // Limpiar sesión previa antes de iniciar
+  // Actualizar nombre/subtítulo del overlay
+  var nameEl = document.getElementById('desk-inc-name');
+  var subEl  = document.getElementById('desk-inc-sub');
+  if (nameEl) nameEl.textContent = _deskPendingAgent.label || 'Cliente Connect';
+  if (subEl)  subEl.textContent  = 'Asistencia vial · Connect';
+
+  // Mostrar overlay y arrancar ring
+  document.getElementById('desk-incoming').classList.add('visible');
+  _deskStartRing();
+}
+
+// FASE 2a — Agente contesta: detener ring, ocultar overlay y conectar SDK
+async function deskAnswer() {
+  if (!_deskPendingAgent) return;
+  _deskStopRing();
+  document.getElementById('desk-incoming').classList.remove('visible');
+
+  var agent = _deskPendingAgent;
+  _deskPendingAgent = null;
+
+  _resetCallState();
+  _callInProgress = true;
   _clearSession();
-  // Reset acumulador de transcript y asignar ID único a esta llamada
   _desktopTranscriptLines = [];
   clearTimeout(_desktopAnalysisTimer);
   _desktopCallId = 'EL-' + Date.now();
   _setDemoState(false);
   _showEndCallButton();
-  showToast('📞 Conectando llamada de entrenamiento...');
+  showToast('📞 Conectando...');
 
   var ELConv = window.__EL_Conversation;
   if (!ELConv || typeof ELConv.startSession !== 'function') {
@@ -3508,27 +3729,22 @@ async function triggerSimulatedCall() {
       connectionType: 'webrtc',
       onConnect: function(data) {
         _sessionCallCount++;
-        showToast('🎯 Llamada entrante — ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
+        showToast('🎯 En llamada — ' + _sessionCallCount + '/' + SESSION_MAX_CALLS);
         console.log('[ElevenLabs Desktop] ✅ Conectado | id:', data && data.conversationId, '| agent:', agent.label);
       },
       onDisconnect: function() {
         console.log('[ElevenLabs Desktop] Desconectado');
-        // endCall() solo si la llamada sigue activa (no fue el agente quien colgó)
         if (_callInProgress) endCall();
       },
       onMessage: function(msg) {
-        // msg.source: 'ai' = cliente simulado | 'user' = agente real
         var speaker = (msg.source === 'ai') ? 'cliente' : 'agente';
         if (!msg.message) return;
         appendTranscript(speaker, msg.message);
-        // Acumular transcripción y enviar al LLM con debounce (3s)
-        // El LLM necesita el contexto completo, no línea por línea
         _desktopTranscriptLines.push({ speaker: speaker, text: msg.message });
         clearTimeout(_desktopAnalysisTimer);
         _desktopAnalysisTimer = setTimeout(_sendTranscriptToAnalysis, 3000);
       },
       onModeChange: function(data) {
-        // 'speaking' = cliente hablando | 'listening' = agente puede hablar
         setWave(data.mode === 'speaking' ? 'client' : 'agent');
       },
       onError: function(err) {
@@ -3542,6 +3758,15 @@ async function triggerSimulatedCall() {
     setStatus('disponible', '#6aaa90', 'Disponible', '🟢');
     console.warn('[ElevenLabs Desktop] Error al iniciar sesión:', err);
   }
+}
+
+// FASE 2b — Agente rechaza: detener ring, ocultar overlay y volver a Coaching
+function deskDecline() {
+  _deskStopRing();
+  document.getElementById('desk-incoming').classList.remove('visible');
+  _deskPendingAgent = null;
+  setStatus('coaching_p', '#6366f1', 'Coaching', '🎯');
+  showToast('📵 Llamada rechazada');
 }
 
 function endCall() {
@@ -7485,6 +7710,41 @@ document.addEventListener('DOMContentLoaded', function(){ _initMobileLayout(); _
 </div>
 
 <!-- ══ MOBILE LLAMADA ENTRANTE ══════════════════════════════ -->
+<!-- ══ DESKTOP INCOMING CALL OVERLAY ════════════════════════ -->
+<div id="desk-incoming">
+  <div class="dsk-inc-card">
+    <!-- Avatar con pulsos -->
+    <div class="dsk-inc-avatar-wrap">
+      <div class="dsk-inc-pulse"></div>
+      <div class="dsk-inc-pulse"></div>
+      <div class="dsk-inc-pulse"></div>
+      <div class="dsk-inc-avatar">
+        <i class="ti ti-user"></i>
+      </div>
+    </div>
+    <!-- Info -->
+    <div class="dsk-inc-label">Llamada entrante</div>
+    <div class="dsk-inc-name" id="desk-inc-name">Cliente Connect</div>
+    <div class="dsk-inc-sub" id="desk-inc-sub">Asistencia vial</div>
+    <!-- Onda animada -->
+    <div class="dsk-inc-wave">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <!-- Acciones -->
+    <div class="dsk-inc-actions">
+      <button class="dsk-inc-action" onclick="deskDecline()">
+        <div class="dsk-inc-circle decline"><i class="ti ti-phone-off"></i></div>
+        <span class="dsk-inc-lbl">Rechazar</span>
+      </button>
+      <button class="dsk-inc-action" onclick="deskAnswer()">
+        <div class="dsk-inc-circle answer"><i class="ti ti-phone"></i></div>
+        <span class="dsk-inc-lbl">Contestar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="mob-incoming">
   <div class="mob-inc-top">
     <div class="mob-inc-label">Llamada entrante</div>
