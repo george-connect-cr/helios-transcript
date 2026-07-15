@@ -2605,7 +2605,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.7-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.8-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3325,7 +3325,8 @@ var AUTH = {
     try {
       var _s3=JSON.parse(localStorage.getItem('helios_session')||'{}');
       var _e3=(_s3.user||{}).email||'anon';
-      var _k3='helios_po_'+_e3+'_'+new Date().toISOString().slice(0,10);
+      var _ld3=(function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+      var _k3='helios_po_'+_e3+'_'+_ld3;
       localStorage.removeItem(_k3);
     } catch(e){}
     localStorage.removeItem('helios_session');
@@ -4273,7 +4274,9 @@ window.addEventListener('DOMContentLoaded', ()=>{
     }
 
     // ── Restaurar _poList del turno actual desde localStorage ──────────
-    var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + new Date().toISOString().slice(0,10);
+    // Fecha local (no UTC) para evitar desfase de timezone
+    var _localDate = (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+    var _poKey = 'helios_po_' + (_u.email||'anon') + '_' + _localDate;
     try {
       var _savedPOs = localStorage.getItem(_poKey);
       if (_savedPOs) {
@@ -5749,7 +5752,8 @@ function confirmPO(){
     try {
       var _sess2 = JSON.parse(localStorage.getItem('helios_session')||'{}');
       var _email2 = (_sess2.user||{}).email||'anon';
-      var _poKey2 = 'helios_po_' + _email2 + '_' + new Date().toISOString().slice(0,10);
+      var _ld2 = (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+      var _poKey2 = 'helios_po_' + _email2 + '_' + _ld2;
       localStorage.setItem(_poKey2, JSON.stringify(_poList));
     } catch(e) {}
     _poCount = _poList.length;
@@ -5858,7 +5862,7 @@ function renderDrawer(){
     var KEY = SUPABASE_CONFIG.anonKey;
     try {
       var _u2 = (JSON.parse(localStorage.getItem('helios_session')||'{}').user)||{};
-      var today = new Date().toISOString().slice(0,10);
+      var today = (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
       fetch(SB+'/rest/v1/call_sessions?agent_email=eq.'+encodeURIComponent(_u2.email||'')+'&session_date=eq.'+today+'&order=created_at.desc&select=*',{
         headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}
       }).then(function(r){return r.ok?r.json():[];})
