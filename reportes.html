@@ -472,7 +472,10 @@ function selPeriod(el,p){
         poscores: filteredPO.map(function(po){return po.score||0;})
       });
     }).filter(function(a){return a.calls>0;});
-    if(!RA.length) RA = _RA_FULL; // fallback: todos si no hay datos del período
+    if(!RA.length) {
+      RA = _RA_FULL; // fallback: mostrar todos si no hay datos del período
+      showToast('Sin datos en este período — mostrando historial completo');
+    }
   }
   go(_cur);
 }
@@ -550,7 +553,7 @@ function vResumen(){
     '</div>';
   }
   // Supervisor/formador sin datos reales — pantalla limpia
-  if((_role==='supervisor'||_role==='formador'||_role==='admin') && !_hasRealData){
+  if((_role==='supervisor'||_role==='formador'||_role==='admin') && !_hasRealData && !(_RA_FULL&&_RA_FULL.length)){
     return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;text-align:center;">'+
       '<div><i class="ti ti-users" style="font-size:36px;color:var(--t3);"></i></div>'+
       '<div style="font-family:var(--f);font-size:18px;font-weight:400;color:var(--t0);">Sin datos del equipo aún</div>'+

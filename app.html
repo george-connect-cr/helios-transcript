@@ -2423,7 +2423,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.5-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v0.9.6-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3263,7 +3263,7 @@ function savePOToSupabase(entry) {
     var sat  = sc.satisfaction  || sc.score_satisfaction || 0;
     var eff  = sc.ahtScore      || sc.score_aht          || 0;
     var comp = sc.completeness  || sc.score_completeness  || 0;
-    var qual = sc.qualityScore  || sc.score_quality       || sc.speechScore || 0;
+    var qual = sc.qualityScore  || sc.score_quality       || Math.round((sc.completeness||0)*0.5+(sc.speechScore||0)*0.5) || 0;
     var prot = sc.protocolScore || sc.score_protocol      || 0;
     var total = Math.round(sat*0.30 + eff*0.15 + comp*0.20 + qual*0.25 + prot*0.10);
     var grade = total>=88?'A+':total>=73?'A':total>=55?'B':'C';
@@ -6010,34 +6010,58 @@ function _toggleDPO(idx){
 }
 
 function _buildScores(data,sent,proto,callDuration){
-  // Satisfaction: based on sentiment valor
+  // ── Satisfacción: sentimiento detectado por KAI ──────────────────────────
   const sentVal=sent?Number(sent.valor):0;
   const satisfaction=sentVal===1?92:sentVal===0?70:38;
 
-  // AHT score: based on call duration — ideal 2-5 min
+  // ── AHT Score: duración ideal 2-5 min (penalizar fuera de rango) ─────────
   let ahtScore=80;
   if(callDuration&&callDuration!=='—'){
     const parts=callDuration.split(':');
     const mins=parseInt(parts[0]||0);
-
-    if(mins<3||mins>8){ ahtScore=Math.max(20, ahtScore-(Math.abs(mins-5)*8)); }
+    const secs=parseInt(parts[1]||0);
+    const total=mins+(secs/60);
+    if(total<2)       ahtScore=60; // muy corta
+    else if(total<=5) ahtScore=95; // ideal
+    else if(total<=8) ahtScore=80; // aceptable
+    else if(total<=12)ahtScore=60; // elevado
+    else              ahtScore=40; // muy elevado
   }
-  const required=['nombre_cliente','ubicación','tipo_asistencia','placa','tablilla','marca','modelo'];
-  const filled=required.filter(k=>data[k]&&String(data[k]).trim());
 
-  // Speech compliance: protocol + data
-  const proto_ok=proto?.cumple===true;
-  const speechItems=[
-    {label:'Saludo de bienvenida',       ok: proto_ok },
-    {label:'Identificación del cliente', ok: !!data.nombre_cliente },
-    {label:'Validación de ubicación',    ok: !!data.ubicación },
-    {label:'Confirmación del servicio',  ok: !!data.tipo_asistencia },
-    {label:'ETA comunicado al cliente',  ok: proto_ok && !!data.ubicación && !!data.tipo_asistencia },
+  // ── Completitud: campos obligatorios del PO ──────────────────────────────
+  const required=[
+    {k:'nombre_cliente',  label:'Nombre del cliente'},
+    {k:'ubicación',       label:'Ubicación'},
+    {k:'tipo_asistencia', label:'Tipo de servicio'},
+    {k:'placa',           label:'Placa'},
+    {k:'marca',           label:'Marca del vehículo'},
+    {k:'modelo',          label:'Modelo del vehículo'},
+    {k:'año',             label:'Año del vehículo'},
   ];
-  const speechScore=Math.round(speechItems.filter(i=>i.ok).length/speechItems.length*100);
+  const filled=required.filter(r=>data[r.k]&&String(data[r.k]).trim()&&String(data[r.k]).trim()!=='—');
   const completeness=Math.round(filled.length/required.length*100);
 
-  return{satisfaction,ahtScore,completeness,speechScore,speechItems};
+  // ── Speech compliance: protocolo detectado por KAI + datos del PO ────────
+  // Si proto viene del análisis LLM lo usamos; si no, inferimos de los datos
+  const proto_ok = proto?.cumple===true;
+  const hasName  = !!data.nombre_cliente;
+  const hasUbic  = !!data.ubicación;
+  const hasSvc   = !!data.tipo_asistencia;
+  const hasPlate = !!(data.placa||data.tablilla);
+
+  const speechItems=[
+    {label:'Saludo de bienvenida',       ok: proto_ok || (filled.length>=2) },
+    {label:'Identificación del cliente', ok: hasName },
+    {label:'Validación de ubicación',    ok: hasUbic },
+    {label:'Confirmación del servicio',  ok: hasSvc },
+    {label:'ETA comunicado al cliente',  ok: proto_ok||(hasUbic&&hasSvc&&hasPlate) },
+  ];
+  const speechScore=Math.round(speechItems.filter(i=>i.ok).length/speechItems.length*100);
+
+  // ── Quality score: basado en completitud + speech ────────────────────────
+  const qualityScore=Math.round(completeness*0.5+speechScore*0.5);
+
+  return{satisfaction,ahtScore,completeness,speechScore,qualityScore,speechItems};
 }
 
 AgentBar.init()
