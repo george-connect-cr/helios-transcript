@@ -7391,6 +7391,8 @@ function _updatePOProgress() {
 
 // ── KAI Academy Wizard ──────────────────────────────
 function showWizard() {
+  // Respetar preferencia "No volver a mostrar"
+  if (localStorage.getItem('kai_wizard_no_show') === '1') return;
   var ov = document.getElementById('kai-wizard-ov');
   if (!ov) return;
   var isMob = window.innerWidth <= 768;
@@ -7407,6 +7409,9 @@ function showWizard() {
 function closeWizard() {
   var ov = document.getElementById('kai-wizard-ov');
   if (ov) {
+    // Guardar preferencia del checkbox al cerrar
+    var cb = document.getElementById('wizard-no-show');
+    if (cb) localStorage.setItem('kai_wizard_no_show', cb.checked ? '1' : '0');
     ov.style.opacity = '0';
     ov.style.transition = 'opacity .2s';
     setTimeout(function() { ov.style.display = 'none'; }, 200);
