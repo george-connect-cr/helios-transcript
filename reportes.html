@@ -61,6 +61,14 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 }
 .fp:hover{background:transparent;color:var(--t0);}
 .fp.active{color:var(--t0);font-weight:500;border-bottom:2px solid var(--t0);}
+.period-selector{display:flex;gap:3px;background:var(--c2);border-radius:8px;padding:3px;}
+.period-btn{
+  padding:5px 12px;border-radius:6px;border:none;background:transparent;
+  font-family:var(--f);font-size:11px;font-weight:400;color:var(--t2);
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.period-btn:hover{color:var(--t0);background:var(--c3);}
+.period-btn.active{background:var(--c1);color:var(--t0);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08);}
 .fp.filtered{color:var(--t0);font-weight:500;}
 .fp.filtered:hover{background:#ffe8d6;}
 .fp-check{font-size:9px;font-weight:500;margin-right:2px;opacity:.8;}
@@ -225,7 +233,7 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
   <span class="hd-title">Reportes & Analytics</span>
   <span class="hd-role" id="hd-role">Formador</span>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-    <a id="btn-back-app" href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" class="btn" style="height:30px;font-size:12px;">← App</a>
+    <a id="btn-back-app" href="app.html" onclick="sessionStorage.setItem('from_reportes','1')" style="display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:6px;border:1.5px solid var(--a);color:var(--a);font-family:var(--f);font-size:11px;font-weight:500;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='rgba(224,69,0,.06)'" onmouseout="this.style.background=''"><i class="ti ti-arrow-left" style="font-size:11px;"></i> Regresar</a>
     <button onclick="
       localStorage.removeItem('helios_session');
       if(typeof firebase!=='undefined'&&firebase.auth){
@@ -236,10 +244,12 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
 </div></div>
 
 <div class="fbar">
-  <div class="fp active" onclick="selPeriod(this,'today')">Hoy</div>
-  <div class="fp" onclick="selPeriod(this,'week')">Esta semana</div>
-  <div class="fp" onclick="selPeriod(this,'prev')">Sem. anterior</div>
-  <div class="fp" onclick="selPeriod(this,'month')">Este mes</div>
+  <div class="period-selector">
+    <button class="period-btn active" onclick="selPeriod(this,'today')">Hoy</button>
+    <button class="period-btn" onclick="selPeriod(this,'week')">Semana</button>
+    <button class="period-btn" onclick="selPeriod(this,'prev')">Sem. ant.</button>
+    <button class="period-btn" onclick="selPeriod(this,'month')">Mes</button>
+  </div>
   <div style="width:1px;height:16px;background:var(--gb);margin:0 2px;"></div>
   <div class="fp" id="f-agente" onclick="toggleDrop(this,event)">Agente ▾ <div class="fdrop" id="fdrop-agente">
       <div class="fdrop-item" onclick="setF('agente','',event)">Todos</div>
@@ -438,7 +448,7 @@ var _period = 'today';
 function selPeriod(el,p){
   // Toggle: click en período activo → mostrar todo
   if(_period === p) {
-    document.querySelectorAll('.filters .fp:not([id])').forEach(function(e){e.classList.remove('active');});
+    document.querySelectorAll('.period-btn').forEach(function(e){e.classList.remove('active');});
     _period = 'all';
     window._periodStart = null;
     window._periodEnd   = null;
@@ -446,7 +456,7 @@ function selPeriod(el,p){
     go(_cur);
     return;
   }
-  document.querySelectorAll('.filters .fp:not([id])').forEach(function(e){e.classList.remove('active');});
+  document.querySelectorAll('.period-btn').forEach(function(e){e.classList.remove('active');});
   el.classList.add('active');
   _period = p;
   var now = new Date();
@@ -1050,6 +1060,8 @@ function agDet(a){
 function vCoaching(){
   // Generar coaching desde datos reales: agentes con score < 75
   var data = ag();
+  // Si el período actual no tiene datos, usar historial completo
+  if(!data.length) data = window._RA_FULL || _RA_FULL || [];
   var candidatos = data.filter(function(a){ return a.score < 75 && a.calls > 0; });
   if(!candidatos.length) return '<div class="pt">Planes de coaching activos</div>'+
     '<div style="text-align:center;padding:48px 24px;color:var(--t3);font-size:13px;font-family:var(--f);">'+
@@ -1096,6 +1108,7 @@ function vCoaching(){
 function vFeedback(){
   // Generar observaciones desde datos reales de POs
   var data = ag();
+  if(!data.length) data = window._RA_FULL || _RA_FULL || [];
   var obs = [];
   data.forEach(function(a){
     (a.polist||[]).forEach(function(po){
@@ -1138,11 +1151,20 @@ function vFeedback(){
 // SUPERVISOR (admin only)
 function vSupervisor(){
   var data=ag();
-  var RP=[
-    // Sin patrones — se generarán desde datos reales
-  ];
+  var _allData = (ag().length ? ag() : window._RA_FULL || _RA_FULL || []);
+  // Generar patrones automáticamente desde datos reales
+  var RP = [];
+  var _highAHT = _allData.filter(function(a){ return a.aht>300 && a.calls>0; });
+  var _lowSat  = _allData.filter(function(a){ return a.sat<65 && a.calls>0; });
+  var _highSp  = _allData.filter(function(a){ return a.speech>=90 && a.calls>0; });
+  var _highScore= _allData.filter(function(a){ return a.score>=85 && a.calls>0; });
+  if(_highAHT.length) RP.push({icon:'<i class="ti ti-trending-down" style="font-size:14px;color:var(--t3);"></i>',title:'AHT elevado',tipo:'neg',desc:_highAHT.length+' agente'+(+(_highAHT.length!==1)?'s':'')+' con AHT sobre meta.',agents:_highAHT.map(function(a){return a.name;}).join(', ')});
+  if(_lowSat.length)  RP.push({icon:'<i class="ti ti-mood-sad" style="font-size:14px;color:var(--t3);"></i>',title:'Satisfacción baja',tipo:'neg',desc:'Satisfacción < 65% detectada.',agents:_lowSat.map(function(a){return a.name;}).join(', ')});
+  if(_highSp.length)  RP.push({icon:'<i class="ti ti-microphone" style="font-size:14px;color:var(--t3);"></i>',title:'Alto speech compliance',tipo:'pos',desc:'Speech ≥ 90% consistente.',agents:_highSp.map(function(a){return a.name;}).join(', ')});
+  if(_highScore.length) RP.push({icon:'<i class="ti ti-star" style="font-size:14px;color:var(--t3);"></i>',title:'Alto rendimiento',tipo:'pos',desc:'Score ≥ 85 en el período.',agents:_highScore.map(function(a){return a.name;}).join(', ')});
   var h='<div class="pt">Vista Supervisor</div><div class="ps">Patrones del equipo y ranking</div>';
   h+='<div class="stitle">Patrones detectados</div>';
+  if(!RP.length) h+='<div style="color:var(--t3);font-size:13px;padding:16px 0;">Sin patrones detectados en el período.</div>';
   h+=RP.map(function(p){
     var c=p.tipo==='pos'?'var(--g)':'var(--r)';
     return'<div class="pat-card '+(p.tipo==='pos'?'pat-pos':'pat-neg')+'">'+
@@ -1262,7 +1284,7 @@ var _RA_FULL = []; // copia completa para filtrado por período
       } else if(_matchAg && !_hasRealData){
         // Solo mock — mostrar pantalla de bienvenida
         // Aplicar filtro "Hoy" por defecto
-    var _todayEl = document.querySelector('.filters .fp:first-child');
+    var _todayEl = document.querySelector('.period-btn');
     if(_todayEl) selPeriod(_todayEl,'today');
     else go('resumen');
       } else {
