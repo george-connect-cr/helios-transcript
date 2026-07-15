@@ -3705,8 +3705,8 @@ async function triggerSimulatedCall() {
   // Actualizar nombre/subtítulo del overlay
   var nameEl = document.getElementById('desk-inc-name');
   var subEl  = document.getElementById('desk-inc-sub');
-  if (nameEl) nameEl.textContent = _deskPendingAgent.label || 'Cliente Connect';
-  if (subEl)  subEl.textContent  = 'Asistencia vial · Connect';
+  if (nameEl) nameEl.textContent = 'Asistencia en carretera';
+  if (subEl)  subEl.textContent  = 'Connect · Llamada entrante';
 
   // Mostrar overlay y arrancar ring
   document.getElementById('desk-incoming').classList.add('visible');
