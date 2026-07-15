@@ -1243,7 +1243,7 @@ function loadSupabaseData(callback){
       map[k].ss.push(s);
     });
     var avg=function(arr,fn){
-      var v=arr.map(fn).filter(function(x){return x>0;});
+      var v=arr.map(fn).filter(function(x){return typeof x==='number'&&!isNaN(x);});
       return v.length?Math.round(v.reduce(function(a,b){return a+b;},0)/v.length):0;
     };
     var colors=['#E8440A','#7048E8','#3B6EF8','#0EA874','#F0900A','#e84040'];
