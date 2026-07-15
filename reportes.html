@@ -574,13 +574,45 @@ function vResumen(){
     '<div style="font-size:12px;color:var(--t2);">'+data.length+' agentes'+(_filters.carril||_filters.pais||_filters.grade?' · filtrado':'')+'</div>'+
   '</div>';
 
-  // ── KPI strip — tint cards ──
+  // ── KPI strip — deltas calculados vs período anterior ──
+  function _calcDelta(curr, prev, higherIsBetter) {
+    if (!prev || prev===0) return '';
+    var diff = Math.round((curr - prev) / prev * 100);
+    if (diff === 0) return '';
+    var up = diff > 0;
+    var positive = higherIsBetter ? up : !up;
+    return (up?'▲ ':'▼ ')+Math.abs(diff)+'%';
+  }
+  // Calcular métricas del período anterior para deltas reales
+  var _prevRA = window._RA_FULL || [];
+  var _tp = {calls:0,pos:0,sat:0,sp:0,sc:0,aht:0,n:0};
+  // Usar sesiones de hace 7 días como base de comparación
+  var _weekAgo = new Date(); _weekAgo.setDate(_weekAgo.getDate()-7);
+  var _weekAgoStr = _weekAgo.toISOString().slice(0,10);
+  if (_prevRA.length) {
+    _prevRA.forEach(function(a){
+      (a._allPO||a.polist||[]).forEach(function(po){
+        if (po._date && po._date < _weekAgoStr) {
+          _tp.calls++; _tp.sat += (a.sat||0); _tp.sp += (a.speech||0);
+          _tp.sc += (a.score||0); _tp.aht += (a.aht||0); _tp.n++;
+        }
+      });
+    });
+  }
+  var _pn = _tp.n || 1;
+  var _satAvg   = Math.round(t.sat/n);
+  var _spAvg    = Math.round(t.sp/n);
+  var _ahtAvg   = Math.round(t.aht/n);
+  var _satPrev  = _tp.n ? Math.round(_tp.sat/_pn) : _satAvg;
+  var _spPrev   = _tp.n ? Math.round(_tp.sp/_pn)  : _spAvg;
+  var _ahtPrev  = _tp.n ? Math.round(_tp.aht/_pn) : _ahtAvg;
+
   var kpiDefs=[
-    {ico:'<i class="ti ti-phone" style="font-size:15px;color:var(--t3);"></i>',lbl:'Llamadas', val:t.calls,                   delta:'▲ 12%',cls:'bl',col:'var(--t0)'},
-    {ico:'<i class="ti ti-clipboard-text" style="font-size:15px;color:var(--t3);"></i>',lbl:'POs',      val:t.pos,                     delta:'▲ 8%', cls:'bl',col:'var(--t0)'},
-    {ico:'<i class="ti ti-star" style="font-size:15px;color:var(--t3);"></i>',lbl:'Satisf.',  val:Math.round(t.sat/n)+'%',   delta:'▲ 2%', cls:'bl',col:rcSent(Math.round(t.sat/n))},
-    {ico:'<i class="ti ti-microphone" style="font-size:15px;color:var(--t3);"></i>',lbl:'Speech',   val:Math.round(t.sp/n)+'%',    delta:'▲ 5%', cls:'bl',col:'var(--t0)'},
-    {ico:'<i class="ti ti-clock" style="font-size:15px;color:var(--t3);"></i>',lbl:'AHT prom.',val:fs(Math.round(t.aht/n)),   delta:'▼ 3%', cls:'bl',col:'var(--t0)'}
+    {ico:'<i class="ti ti-phone" style="font-size:15px;color:var(--t3);"></i>',lbl:'Llamadas', val:t.calls, delta:_calcDelta(t.calls,_tp.calls,true), cls:'bl',col:'var(--t0)'},
+    {ico:'<i class="ti ti-clipboard-text" style="font-size:15px;color:var(--t3);"></i>',lbl:'POs', val:t.pos, delta:_calcDelta(t.pos,_tp.calls,true), cls:'bl',col:'var(--t0)'},
+    {ico:'<i class="ti ti-star" style="font-size:15px;color:var(--t3);"></i>',lbl:'Satisf.', val:_satAvg+'%', delta:_calcDelta(_satAvg,_satPrev,true), cls:'bl',col:rcSent(_satAvg)},
+    {ico:'<i class="ti ti-microphone" style="font-size:15px;color:var(--t3);"></i>',lbl:'Speech', val:_spAvg+'%', delta:_calcDelta(_spAvg,_spPrev,true), cls:'bl',col:'var(--t0)'},
+    {ico:'<i class="ti ti-clock" style="font-size:15px;color:var(--t3);"></i>',lbl:'AHT prom.', val:fs(_ahtAvg), delta:_calcDelta(_ahtAvg,_ahtPrev,false), cls:'bl',col:'var(--t0)'}
   ];
   h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">';
   kpiDefs.forEach(function(k){
