@@ -2423,7 +2423,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.2-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.3-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -5095,7 +5095,17 @@ const POBuilder = (() => {
     if (typeof showDestinoField === 'function') {
       showDestinoField(svcId === 'grua');
     }
-    if(typeof initKBChecklist !== 'undefined') initKBChecklist(svcId);
+    // Mapeo nombre → id para fallback en KB_CHECKS
+    var _svcIdMap = {
+      'cerrajería':'llaves','cerrajeria':'llaves','apertura':'llaves',
+      'grúa':'grua','remolque':'grua',
+      'batería':'bat','bateria':'bat',
+      'llanta ponchada':'llanta','llanta':'llanta',
+      'gasolina':'gas','combustible':'gas',
+      'mecánica':'mec','mecanica':'mec'
+    };
+    var _kbId = svcId || _svcIdMap[svcName.toLowerCase()] || svcName.toLowerCase();
+    if(typeof initKBChecklist !== 'undefined') initKBChecklist(_kbId);
     const isNew = _currentService !== svcId;
     _currentService=svcId; _data.tipo_asistencia=svcName;
     _setFldValue('tipo_svc', svcName); // sincronizar campo visible del formulario
