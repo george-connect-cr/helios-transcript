@@ -1206,20 +1206,23 @@ function loadSupabaseData(callback){
   if (_usr.role === 'agente' && _usr.email) {
     _roleFilter = '&agent_email=eq.' + encodeURIComponent(_usr.email);
   }
-  fetch(_SB_URL+'/rest/v1/call_sessions?select=*,quality_scores(*)&order=created_at.desc&limit=1000'+_roleFilter,{
+  fetch(_SB_URL+'/rest/v1/call_sessions?select=*&order=created_at.desc&limit=1000'+_roleFilter,{
     headers:{
       'apikey': _SB_KEY,
-      'Authorization': 'Bearer ' + _SB_KEY,
-      'Prefer': 'return=representation'
+      'Authorization': 'Bearer ' + _SB_KEY
     }
   })
-  .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
+  .then(function(r){
+    if(!r.ok){ console.error('[Reportes] Supabase HTTP',r.status); return Promise.reject(r.status); }
+    return r.json();
+  })
   .then(function(sessions){
+    console.log('[Reportes] Supabase retornó',sessions?sessions.length:0,'sesiones');
     if(!sessions||!sessions.length){callback();return;}
 
-    // Normalizar — prioridad: quality_scores → call_sessions → raw_data.meta.scores
+    // Normalizar — prioridad: call_sessions scores → raw_data.meta.scores
     sessions = sessions.map(function(s) {
-      var qs  = (s.quality_scores && s.quality_scores[0]) || {};
+      var qs  = {}; // quality_scores no se trae en el select simplificado
       var raw = (s.raw_data && s.raw_data.meta && s.raw_data.meta.scores) || {};
       return Object.assign({}, s, {
         score_total:        qs.score_total        || s.score_total        || 0,
@@ -1310,7 +1313,7 @@ function loadSupabaseData(callback){
     callback();
   })
   .catch(function(e){
-    console.warn('[Reportes] Supabase no disponible, usando datos de demostración',e);
+    console.error('[Reportes] Error Supabase:',e);
     callback();
   });
 }
