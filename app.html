@@ -2591,7 +2591,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.5-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.0.6-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -5782,23 +5782,17 @@ function confirmPO(){
     POBuilder.reset();
     AgentBar.increment();
     showToast('PO '+num+' creado');
-    // Limpiar pantalla para próxima llamada
+    // Limpiar pantalla para próxima llamada — pero DESPUÉS del dashboard
     setTimeout(function(){
-      // Limpiar transcript
+      // Limpiar transcript visual
       var tbody = document.getElementById('t-body');
       if(tbody) tbody.innerHTML = '';
-      // Resetear guía
+      // Resetear guía para próxima llamada
       if(typeof _guiaReset === 'function') _guiaReset();
-      // Resetear sentimiento
-      var sentLbl = document.getElementById('sentiment-label');
-      var sentFill = document.getElementById('sentiment-fill');
-      if(sentLbl){ sentLbl.textContent = '—'; sentLbl.style.color = 'var(--t2)'; }
-      if(sentFill){ sentFill.style.width = '0%'; }
-      // Resetear ServiceDetector
+      // Resetear ServiceDetector para próxima llamada
       if(typeof ServiceDetector !== 'undefined') ServiceDetector.reset();
-      // Limpiar análisis
-      window.lastAnalysis = null;
-    }, 800);
+      // NO limpiar lastAnalysis ni _poList — el dashboard los necesita
+    }, 2000); // 2s para que el dashboard cargue primero
   }catch(err){
     console.error('confirmPO error:', err);
     showToast('Error al crear PO: '+err.message);
@@ -5838,7 +5832,37 @@ function renderDrawer(){
   const cnt   = document.getElementById('pdh-count');
   if(cnt) cnt.textContent = _poList.length + ' POs';
   if(!list) return;
+  // Si _poList está vacío, intentar cargar desde Supabase
   if(!_poList.length){
+    var SB  = SUPABASE_CONFIG.url;
+    var KEY = SUPABASE_CONFIG.anonKey;
+    try {
+      var _u2 = (JSON.parse(localStorage.getItem('helios_session')||'{}').user)||{};
+      var today = new Date().toISOString().slice(0,10);
+      fetch(SB+'/rest/v1/call_sessions?agent_email=eq.'+encodeURIComponent(_u2.email||'')+'&session_date=eq.'+today+'&order=created_at.desc&select=*',{
+        headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}
+      }).then(function(r){return r.ok?r.json():[];})
+      .then(function(rows){
+        if(!rows||!rows.length){ if(empty) empty.style.display='flex'; return; }
+        rows.forEach(function(s){
+          var exists = _poList.find(function(p){ return p.num===s.po_number; });
+          if(!exists){
+            _poList.push({
+              num: s.po_number,
+              ts:  s.session_date||today,
+              data:{ nombre_cliente:s.customer_name||'', placa:s.plate||'',
+                     tipo_asistencia:s.service_type||'', ubicación:s.location_origin||'',
+                     marca:s.vehicle_brand||'', modelo:s.vehicle_model||'', año:s.vehicle_year||'' },
+              meta:{ callDuration:s.call_duration_fmt||'—', sentVal:s.sentiment_val||0,
+                     scores:{ satisfaction:s.score_satisfaction||0, ahtScore:s.score_efficiency||0,
+                              completeness:s.score_completeness||0, speechScore:s.score_speech||0 }}
+            });
+          }
+        });
+        if(cnt) cnt.textContent = _poList.length + ' POs';
+        renderDrawer(); // re-render con datos
+      }).catch(function(){});
+    } catch(e){}
     if(empty) empty.style.display='flex';
     list.innerHTML='';
     return;
