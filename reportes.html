@@ -1214,18 +1214,19 @@ function loadSupabaseData(callback){
   .then(function(sessions){
     if(!sessions||!sessions.length){callback();return;}
 
-    // Normalizar — aplanar quality_scores al objeto de sesión
+    // Normalizar — prioridad: quality_scores → call_sessions → raw_data.meta.scores
     sessions = sessions.map(function(s) {
-      var qs = (s.quality_scores && s.quality_scores[0]) || {};
+      var qs  = (s.quality_scores && s.quality_scores[0]) || {};
+      var raw = (s.raw_data && s.raw_data.meta && s.raw_data.meta.scores) || {};
       return Object.assign({}, s, {
         score_total:        qs.score_total        || s.score_total        || 0,
-        score_satisfaction: qs.score_satisfaction || s.score_satisfaction || 0,
-        score_aht:          qs.score_aht          || s.score_efficiency   || 0,
-        score_completeness: qs.score_completeness || s.score_completeness || 0,
-        score_quality:      qs.score_quality      || s.score_speech       || 0,
+        score_satisfaction: qs.score_satisfaction || s.score_satisfaction || raw.satisfaction    || 0,
+        score_aht:          qs.score_aht          || s.score_efficiency   || raw.ahtScore        || 0,
+        score_completeness: qs.score_completeness || s.score_completeness || raw.completeness    || 0,
+        score_quality:      qs.score_quality      || s.score_speech       || raw.speechScore     || 0,
         score_protocol:     qs.score_protocol     || 0,
         score_grade:        qs.score_grade        || s.score_grade        || '—',
-        quality_items:      qs.quality_items      || s.speech_items       || [],
+        quality_items:      qs.quality_items      || s.speech_items       || raw.speechItems     || [],
         protocol_items:     qs.protocol_items     || []
       });
     });
