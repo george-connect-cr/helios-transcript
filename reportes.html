@@ -501,6 +501,12 @@ function clearPeriodFilter(){
   if(to)   to.value   = '';
   document.querySelectorAll('.period-drop-item').forEach(function(e){e.classList.remove('active');});
   RA = window._RA_FULL || _RA_FULL || [];
+  // Refrescar _selAg con datos completos
+  if(_selAg){
+    var _refreshed = RA.find(function(a){ return a.email===_selAg.email; });
+    if(_refreshed) _selAg = _refreshed;
+  }
+  if(typeof showToast==='function') showToast('Filtro eliminado — mostrando todos los datos');
   go(_cur);
 }
 
