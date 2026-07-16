@@ -509,6 +509,8 @@ function _showFilterActive(label){
   if(lbl) lbl.textContent = label;
   if(btn) { btn.classList.remove('active'); btn.classList.add('filtered'); }
   if(clr) clr.style.display = 'inline-flex';
+  // Toast de confirmación
+  if(typeof showToast==='function') showToast('Filtro aplicado: ' + label);
 }
 
 function togglePeriodDrop(){
@@ -595,28 +597,48 @@ function selPeriod(el,p){
   _applyPeriodFilter();
 }
 function _applyPeriodFilter(){
-  var cutoff=window._periodStart;
-  var p=_period;
-  if(!cutoff&&p!=='range'){RA=window._RA_FULL||_RA_FULL||[];go(_cur);return;}
-  if(_hasRealData){
-    // Filtrar los poscores/polist de cada agente según fecha
-    var __FULL = window._RA_FULL || _RA_FULL || [];
-    RA = __FULL.map(function(a){
-      var filteredPO = (a._allPO||a.polist||[]).filter(function(po){
-        if(!po._date) return false; // Sin fecha no filtra — excluir
-        var d = new Date(po._date+'T12:00:00'); // noon para evitar timezone issues
-        if(p==='range') return d>=(window._periodStart||new Date(0)) && d<=(window._periodEnd||now);
-        if(p==='prev') return d>=cutoff && d<=(window._periodEnd||now);
-        return d>=cutoff && d<=now;
-      });
-      return Object.assign({},a,{
-        polist: filteredPO.slice(0,15),
-        calls:  filteredPO.length || 1,
-        poscores: filteredPO.map(function(po){return po.score||0;})
-      });
-    }).filter(function(a){return a.calls>0;});
-    // No fallback — si el período no tiene datos, mostrar vacío es correcto
+  var cutoff = window._periodStart;
+  var pEnd   = window._periodEnd;
+  var p      = _period;
+  var now    = new Date();
+  var __FULL = window._RA_FULL || _RA_FULL || [];
+
+  // Sin filtro activo → mostrar todo
+  if(p==='all' || (!cutoff && p!=='range')){
+    RA = __FULL;
+    go(_cur);
+    return;
   }
+
+  // Filtrar por período
+  RA = __FULL.map(function(a){
+    var allPOs = a._allPO || a.polist || [];
+    var filtered = allPOs.filter(function(po){
+      if(!po._date) return false;
+      var d = new Date(po._date + 'T12:00:00');
+      if(p==='range'){
+        return d >= (cutoff||new Date(0)) && d <= (pEnd||now);
+      }
+      return d >= cutoff && d <= now;
+    });
+    // Recalcular métricas del agente con los POs filtrados
+    var avgSat  = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.sat*20||50);},0)/filtered.length) : 0;
+    var avgSp   = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.speech||a.speech||0);},0)/filtered.length) : 0;
+    var avgSc   = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.score||0);},0)/filtered.length) : 0;
+    var avgAht  = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.dur||0);},0)/filtered.length) : 0;
+    return Object.assign({},a,{
+      polist:   filtered.slice(0,15),
+      _allPO:   filtered,
+      calls:    filtered.length,
+      pos:      filtered.length,
+      sat:      avgSat || a.sat,
+      speech:   avgSp  || a.speech,
+      score:    avgSc  || a.score,
+      aht:      avgAht || a.aht,
+      poscores: filtered.map(function(po){return po.score||0;})
+    });
+  }).filter(function(a){ return a.calls > 0; });
+
   go(_cur);
 }
 
