@@ -1373,10 +1373,23 @@ function vFeedback(){
 
 // SUPERVISOR (admin only)
 function vSupervisor(){
-  var data=ag();
-  var RP=[
-    // Sin patrones — se generarán desde datos reales
-  ];
+  var data = ag();
+  if(!data.length) data = window._RA_FULL || _RA_FULL || [];
+
+  // Generar patrones automáticamente desde datos reales
+  var RP = [];
+  var _highAHT  = data.filter(function(a){ return a.aht>300 && a.calls>0; });
+  var _lowSat   = data.filter(function(a){ return a.sat<65  && a.calls>0; });
+  var _highSp   = data.filter(function(a){ return a.speech>=90 && a.calls>0; });
+  var _highScore= data.filter(function(a){ return a.score>=85 && a.calls>0; });
+  var _lowScore = data.filter(function(a){ return a.score<60  && a.calls>0; });
+
+  if(_highAHT.length)   RP.push({icon:'<i class="ti ti-trending-down" style="font-size:14px;color:var(--t3);"></i>',title:'AHT elevado',tipo:'neg',desc:_highAHT.length+' agente'+(+(_highAHT.length!==1)?'s':'')+' con tiempo de llamada sobre meta.',agents:_highAHT.map(function(a){return a.name;}).join(', ')});
+  if(_lowSat.length)    RP.push({icon:'<i class="ti ti-mood-sad" style="font-size:14px;color:var(--t3);"></i>',title:'Satisfacción baja',tipo:'neg',desc:'Satisfacción menor al 65% detectada.',agents:_lowSat.map(function(a){return a.name;}).join(', ')});
+  if(_lowScore.length)  RP.push({icon:'<i class="ti ti-alert-triangle" style="font-size:14px;color:var(--t3);"></i>',title:'Score crítico',tipo:'neg',desc:'Score menor a 60 — requiere atención inmediata.',agents:_lowScore.map(function(a){return a.name;}).join(', ')});
+  if(_highSp.length)    RP.push({icon:'<i class="ti ti-microphone" style="font-size:14px;color:var(--t3);"></i>',title:'Alto speech compliance',tipo:'pos',desc:'Speech ≥ 90% consistente en el período.',agents:_highSp.map(function(a){return a.name;}).join(', ')});
+  if(_highScore.length) RP.push({icon:'<i class="ti ti-star" style="font-size:14px;color:var(--t3);"></i>',title:'Alto rendimiento',tipo:'pos',desc:'Score ≥ 85 en el período seleccionado.',agents:_highScore.map(function(a){return a.name;}).join(', ')});
+
   var h='<div class="pt">Vista Supervisor</div><div class="ps">Patrones del equipo y ranking</div>';
   h+='<div class="stitle">Patrones detectados</div>';
   h+=RP.map(function(p){
