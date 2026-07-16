@@ -1127,16 +1127,15 @@ function agDet(a){
   var qaHtml=typeof qaSection==='function'?qaSection(a.name):'';
 
   return'<div style="margin-bottom:12px;">'+hdr+'</div>'+kstr+
-    '<div class="g2">'+
-      '<div>'+poCard+mejCard+'</div>'+
-      '<div>'+durCard+sentCard+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">'+
+      '<div style="display:flex;flex-direction:column;gap:16px;">'+
+        poCard+mejCard+spCard+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column;gap:16px;">'+
+        durCard+sentCard+obsCard+planCard+
+      '</div>'+
     '</div>'+
-    qaHtml+
-    '<div class="g2">'+
-      '<div>'+spCard+'</div>'+
-      '<div>'+obsCard+planCard+'</div>'+
-    '</div>'+
-    poTbl;
+    qaHtml+poTbl;
 }
 
 function vCoaching(){
