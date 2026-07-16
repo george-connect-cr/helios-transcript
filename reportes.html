@@ -1127,24 +1127,39 @@ function agDet(a){
   var qaHtml=typeof qaSection==='function'?qaSection(a.name):'';
 
   // Layout en grid de 2 columnas con filas balanceadas
-  var g = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:stretch;">';
-
-  // Función helper para envolver card en contenedor flex que se estira
-  function wrapCol(content) {
-    return '<div style="display:flex;flex-direction:column;">'+content+'</div>';
+  // Helper: extrae el stitle de una card string y retorna [titulo, card_sin_titulo]
+  function splitTitle(html) {
+    var m = html.match(/^(<div class="stitle">[^<]*<\/div>)([\s\S]*)$/);
+    return m ? [m[1], m[2]] : ['', html];
+  }
+  // Cada celda: stitle arriba + card flex:1 abajo → todas las filas alineadas
+  function cell(html, extra) {
+    var parts = splitTitle(html);
+    return '<div style="display:flex;flex-direction:column;'+(extra||'')+'">'+
+      parts[0]+
+      '<div style="display:flex;flex-direction:column;flex:1;">'+parts[1]+'</div>'+
+    '</div>';
   }
 
+  var g = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:stretch;">';
+
   // Fila 1: Calificación | Duración
-  g += wrapCol(poCard);
-  g += wrapCol(durCard);
+  g += cell(poCard);
+  g += cell(durCard);
 
   // Fila 2: Speech | Sentimiento
-  g += wrapCol(spCard);
-  g += wrapCol(sentCard);
+  g += cell(spCard);
+  g += cell(sentCard);
 
   // Fila 3: Puntos de mejora | Observaciones + Plan
-  g += wrapCol(mejCard);
-  g += '<div style="display:flex;flex-direction:column;gap:16px;">'+obsCard+planCard+'</div>';
+  g += cell(mejCard);
+  g += '<div style="display:flex;flex-direction:column;">'+
+    splitTitle(obsCard)[0]+
+    '<div style="flex:1;display:flex;flex-direction:column;gap:16px;">'+
+      '<div style="flex:1;display:flex;flex-direction:column;">'+splitTitle(obsCard)[1]+'</div>'+
+      '<div>'+planCard+'</div>'+
+    '</div>'+
+  '</div>';
 
   g += '</div>';
 
