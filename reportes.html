@@ -1126,16 +1126,24 @@ function agDet(a){
   // ── QA section from localStorage ──
   var qaHtml=typeof qaSection==='function'?qaSection(a.name):'';
 
-  return'<div style="margin-bottom:12px;">'+hdr+'</div>'+kstr+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">'+
-      '<div style="display:flex;flex-direction:column;gap:16px;">'+
-        poCard+mejCard+spCard+
-      '</div>'+
-      '<div style="display:flex;flex-direction:column;gap:16px;">'+
-        durCard+sentCard+obsCard+planCard+
-      '</div>'+
-    '</div>'+
-    qaHtml+poTbl;
+  // Layout en grid de 2 columnas con filas balanceadas
+  var g = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start;">';
+
+  // Fila 1: Calificación | Duración
+  g += '<div>'+poCard+'</div>';
+  g += '<div>'+durCard+'</div>';
+
+  // Fila 2: Speech | Sentimiento
+  g += '<div>'+spCard+'</div>';
+  g += '<div>'+sentCard+'</div>';
+
+  // Fila 3: Puntos de mejora | Observaciones + Plan
+  g += '<div>'+mejCard+'</div>';
+  g += '<div style="display:flex;flex-direction:column;gap:16px;">'+obsCard+planCard+'</div>';
+
+  g += '</div>';
+
+  return'<div style="margin-bottom:12px;">'+hdr+'</div>'+kstr+g+qaHtml+poTbl;
 }
 
 function vCoaching(){
