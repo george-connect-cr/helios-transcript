@@ -2605,7 +2605,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.0-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.1-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3788,12 +3788,15 @@ function deskDecline() {
 
 function endCall() {
   if (!_callInProgress) return; // Evitar doble disparo
+  // Guardar duración ANTES de resetear el timer
+  var _timerEl = document.getElementById('call-timer-val');
+  window._lastCallDuration = _timerEl ? _timerEl.textContent : '—';
   // Cerrar sesión ElevenLabs si hay una activa
   if (_desktopConversation && typeof _desktopConversation.endSession === 'function') {
     _desktopConversation.endSession().catch(function(){});
     _desktopConversation = null;
   }
-  // Detener timer de llamada inmediatamente
+  // Detener timer de llamada
   if (typeof CallTimer !== 'undefined' && CallTimer.reset) CallTimer.reset();
   // Forzar análisis final inmediato con todo el transcript acumulado
   clearTimeout(_desktopAnalysisTimer);
@@ -5380,14 +5383,16 @@ const POBuilder = (() => {
     }
     // Mapeo nombre → id para fallback en KB_CHECKS
     var _svcIdMap = {
-      'cerrajería':'llaves','cerrajeria':'llaves','apertura':'llaves',
-      'grúa':'grua','remolque':'grua',
-      'batería':'bat','bateria':'bat',
-      'llanta ponchada':'llanta','llanta':'llanta',
-      'gasolina':'gas','combustible':'gas',
-      'mecánica':'mec','mecanica':'mec'
+      'cerrajería':'llaves','cerrajeria':'llaves','apertura':'llaves','cerrajero':'llaves',
+      'grúa':'grua','grua':'grua','remolque':'grua','servicio de grúa':'grua','envio de grúa':'grua','envío de grúa':'grua',
+      'batería':'bat','bateria':'bat','batería descargada':'bat','bateria descargada':'bat',
+      'llanta ponchada':'llanta','llanta':'llanta','llanta desinflada':'llanta',
+      'gasolina':'gas','combustible':'gas','sin gasolina':'gas',
+      'mecánica':'mec','mecanica':'mec','asistencia mecánica':'mec'
     };
-    var _kbId = svcId || _svcIdMap[svcName.toLowerCase()] || svcName.toLowerCase();
+    var _svcLower = (svcName||'').toLowerCase().trim();
+    var _kbId = svcId || _svcIdMap[_svcLower] || _svcLower;
+    console.log('[KB] Servicio detectado:', svcName, '→ kbId:', _kbId);
     if(typeof initKBChecklist !== 'undefined') initKBChecklist(_kbId);
     const isNew = _currentService !== svcId;
     _currentService=svcId; _data.tipo_asistencia=svcName;
@@ -5745,8 +5750,8 @@ function confirmPO(){
     const now = new Date();
     const ts  = now.toLocaleString('es-CR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 
-    const timerEl = document.getElementById('call-timer-val');
-    const callDuration = timerEl ? timerEl.textContent : '—';
+    // Usar duración guardada al finalizar la llamada (antes del reset del timer)
+    const callDuration = window._lastCallDuration || (document.getElementById('call-timer-val') ? document.getElementById('call-timer-val').textContent : '—');
 
     const sent  = lastAnalysis?.sentimiento_cliente || null;
     const proto = lastAnalysis?.protocolo_agente    || null;
