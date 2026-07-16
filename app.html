@@ -2605,7 +2605,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.1-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.2-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -5384,14 +5384,27 @@ const POBuilder = (() => {
     // Mapeo nombre → id para fallback en KB_CHECKS
     var _svcIdMap = {
       'cerrajería':'llaves','cerrajeria':'llaves','apertura':'llaves','cerrajero':'llaves',
-      'grúa':'grua','grua':'grua','remolque':'grua','servicio de grúa':'grua','envio de grúa':'grua','envío de grúa':'grua',
+      'rejería':'llaves','rejeria':'llaves','abrir rejería':'llaves','servicio para abrir rejería':'llaves',
+      'abrir carro':'llaves','abrir vehículo':'llaves','llaves perdidas':'llaves',
+      'grúa':'grua','grua':'grua','remolque':'grua','servicio de grúa':'grua',
+      'envio de grúa':'grua','envío de grúa':'grua','servicio de grua':'grua',
       'batería':'bat','bateria':'bat','batería descargada':'bat','bateria descargada':'bat',
       'llanta ponchada':'llanta','llanta':'llanta','llanta desinflada':'llanta',
       'gasolina':'gas','combustible':'gas','sin gasolina':'gas',
       'mecánica':'mec','mecanica':'mec','asistencia mecánica':'mec'
     };
     var _svcLower = (svcName||'').toLowerCase().trim();
-    var _kbId = svcId || _svcIdMap[_svcLower] || _svcLower;
+    // Buscar coincidencia parcial si no hay exacta
+    var _kbId = svcId || _svcIdMap[_svcLower];
+    if(!_kbId){
+      var _keys = Object.keys(_svcIdMap);
+      for(var _ki=0;_ki<_keys.length;_ki++){
+        if(_svcLower.includes(_keys[_ki])||_keys[_ki].includes(_svcLower)){
+          _kbId = _svcIdMap[_keys[_ki]]; break;
+        }
+      }
+    }
+    _kbId = _kbId || _svcLower;
     console.log('[KB] Servicio detectado:', svcName, '→ kbId:', _kbId);
     if(typeof initKBChecklist !== 'undefined') initKBChecklist(_kbId);
     const isNew = _currentService !== svcId;
