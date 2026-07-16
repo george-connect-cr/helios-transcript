@@ -64,7 +64,8 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--t0);height:100%;
 .period-drop-wrap{position:relative;}
 .period-drop-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1.5px solid var(--gb2);background:var(--c1);color:var(--t0);font-family:var(--f);font-size:12px;font-weight:500;cursor:pointer;transition:border-color .15s;}
 .period-drop-btn:hover{border-color:var(--a);color:var(--a);}
-.period-drop-btn.active{border-color:var(--a);color:var(--a);}
+.period-drop-btn.active{border-color:var(--a);color:var(--a);background:rgba(224,69,0,.06);}
+.period-drop-btn.filtered{border-color:var(--a);color:var(--a);background:rgba(224,69,0,.08);font-weight:600;}
 .period-drop-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:100;background:var(--c1);border:1px solid var(--gb2);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);min-width:200px;display:none;padding:6px;}
 .period-drop-menu.open{display:block;}
 .period-drop-item{padding:8px 12px;border-radius:6px;font-family:var(--f);font-size:12px;color:var(--t1);cursor:pointer;transition:background .12s;}
@@ -260,8 +261,12 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
   <div class="period-drop-wrap" id="period-drop-wrap">
     <button class="period-drop-btn" onclick="togglePeriodDrop()" id="period-drop-trigger">
       <i class="ti ti-calendar-stats" style="font-size:13px;"></i>
-      <span id="period-drop-label">Hoy</span>
+      <span id="period-drop-label">Ver informe</span>
       <i class="ti ti-chevron-down" style="font-size:11px;margin-left:2px;" id="period-chevron"></i>
+    </button>
+    <button id="period-clear-btn" onclick="clearPeriodFilter()" title="Quitar filtro"
+      style="display:none;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:none;background:var(--a);color:#fff;cursor:pointer;margin-left:4px;font-size:11px;">
+      <i class="ti ti-x" style="font-size:11px;"></i>
     </button>
     <div class="period-drop-menu" id="period-drop-menu">
       <div class="period-drop-item active" onclick="selPeriod(this,'today')" id="pdi-today">Hoy</div>
@@ -477,6 +482,35 @@ function sc(v){return v>=70?'var(--g)':v>=50?'var(--y)':'var(--r)';}
 // FILTERS
 var _period = 'today';
 
+function clearPeriodFilter(){
+  _period = 'all';
+  window._periodStart = null;
+  window._periodEnd   = null;
+  // Reset UI
+  var lbl  = document.getElementById('period-drop-label');
+  var btn  = document.getElementById('period-drop-trigger');
+  var clr  = document.getElementById('period-clear-btn');
+  var from = document.getElementById('period-from');
+  var to   = document.getElementById('period-to');
+  if(lbl)  lbl.textContent = 'Ver informe';
+  if(btn)  { btn.classList.remove('active','filtered'); }
+  if(clr)  clr.style.display = 'none';
+  if(from) from.value = '';
+  if(to)   to.value   = '';
+  document.querySelectorAll('.period-drop-item').forEach(function(e){e.classList.remove('active');});
+  RA = window._RA_FULL || _RA_FULL || [];
+  go(_cur);
+}
+
+function _showFilterActive(label){
+  var lbl = document.getElementById('period-drop-label');
+  var btn = document.getElementById('period-drop-trigger');
+  var clr = document.getElementById('period-clear-btn');
+  if(lbl) lbl.textContent = label;
+  if(btn) { btn.classList.remove('active'); btn.classList.add('filtered'); }
+  if(clr) clr.style.display = 'inline-flex';
+}
+
 function togglePeriodDrop(){
   var menu = document.getElementById('period-drop-menu');
   var btn  = document.getElementById('period-drop-trigger');
@@ -530,14 +564,11 @@ function selPeriod(el,p){
   if(el && el.classList) el.classList.add('active');
   _period = p;
   // Actualizar label del botón
-  var labels = {today:'Hoy','7d':'7 días','30d':'30 días',week:'Esta semana',prev:'Sem. anterior',month:'Este mes'};
-  var lbl = document.getElementById('period-drop-label');
-  if(lbl) lbl.textContent = labels[p] || 'Ver informe';
+  var labels = {today:'Hoy','7d':'Últimos 7 días','30d':'Últimos 30 días',week:'Esta semana',prev:'Sem. anterior',month:'Este mes'};
+  _showFilterActive(labels[p] || 'Ver informe');
   // Cerrar el dropdown
   var menu = document.getElementById('period-drop-menu');
   if(menu) menu.classList.remove('open');
-  var btn = document.getElementById('period-drop-trigger');
-  if(btn) btn.classList.remove('active');
   var now = new Date();
   var cutoff = new Date();
   window._periodEnd = null;
