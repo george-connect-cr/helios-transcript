@@ -1127,18 +1127,23 @@ function agDet(a){
   var qaHtml=typeof qaSection==='function'?qaSection(a.name):'';
 
   // Layout en grid de 2 columnas con filas balanceadas
-  var g = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start;">';
+  var g = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:stretch;">';
+
+  // Función helper para envolver card en contenedor flex que se estira
+  function wrapCol(content) {
+    return '<div style="display:flex;flex-direction:column;">'+content+'</div>';
+  }
 
   // Fila 1: Calificación | Duración
-  g += '<div>'+poCard+'</div>';
-  g += '<div>'+durCard+'</div>';
+  g += wrapCol(poCard);
+  g += wrapCol(durCard);
 
   // Fila 2: Speech | Sentimiento
-  g += '<div>'+spCard+'</div>';
-  g += '<div>'+sentCard+'</div>';
+  g += wrapCol(spCard);
+  g += wrapCol(sentCard);
 
   // Fila 3: Puntos de mejora | Observaciones + Plan
-  g += '<div>'+mejCard+'</div>';
+  g += wrapCol(mejCard);
   g += '<div style="display:flex;flex-direction:column;gap:16px;">'+obsCard+planCard+'</div>';
 
   g += '</div>';
