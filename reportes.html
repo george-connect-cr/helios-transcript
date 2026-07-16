@@ -1139,9 +1139,10 @@ function agDet(a){
   // Cada celda: stitle arriba + card flex:1 abajo → todas las filas alineadas
   function cell(html, extra) {
     var parts = splitTitle(html);
+    var inner = parts[1].replace('<div class="card">', '<div class="card" style="flex:1;">');
     return '<div style="display:flex;flex-direction:column;'+(extra||'')+'">'+
       parts[0]+
-      '<div style="display:flex;flex-direction:column;flex:1;">'+parts[1]+'</div>'+
+      '<div style="display:flex;flex-direction:column;flex:1;">'+inner+'</div>'+
     '</div>';
   }
 
