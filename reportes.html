@@ -685,6 +685,12 @@ function _applyPeriodFilter(){
     });
   }).filter(function(a){ return a !== null; });
 
+  // Refrescar _selAg con versión filtrada del agente activo
+  if(_selAg){
+    var _refreshed = RA.find(function(a){ return a.email===_selAg.email; });
+    if(_refreshed) _selAg = _refreshed;
+  }
+
   go(_cur);
 }
 
