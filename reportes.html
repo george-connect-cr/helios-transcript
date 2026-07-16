@@ -572,10 +572,11 @@ function _applyPeriodFilter(){
     var __FULL = window._RA_FULL || _RA_FULL || [];
     RA = __FULL.map(function(a){
       var filteredPO = (a._allPO||a.polist||[]).filter(function(po){
-        if(!po._date) return true;
-        var d = new Date(po._date);
+        if(!po._date) return false; // Sin fecha no filtra — excluir
+        var d = new Date(po._date+'T12:00:00'); // noon para evitar timezone issues
+        if(p==='range') return d>=(window._periodStart||new Date(0)) && d<=(window._periodEnd||now);
         if(p==='prev') return d>=cutoff && d<=(window._periodEnd||now);
-        return d>=cutoff;
+        return d>=cutoff && d<=now;
       });
       return Object.assign({},a,{
         polist: filteredPO.slice(0,15),
@@ -583,7 +584,7 @@ function _applyPeriodFilter(){
         poscores: filteredPO.map(function(po){return po.score||0;})
       });
     }).filter(function(a){return a.calls>0;});
-    if(!RA.length&&__FULL.length){RA=window._RA_FULL||_RA_FULL||[];}
+    // No fallback — si el período no tiene datos, mostrar vacío es correcto
   }
   go(_cur);
 }
@@ -1504,6 +1505,7 @@ function loadSupabaseData(callback){
           return{
             id:s.po_number||'—',
             f:(s.session_date||'').slice(5).replace('-','/'),
+            _date:s.session_date||null,
             svc:s.service_type||'—',
             dur:s.call_duration_secs||0,
             score:s.score_total||0,
@@ -1518,9 +1520,12 @@ function loadSupabaseData(callback){
     if(newRA.length>0){
       // Enriquecer polist con _date para filtrado por período
       newRA.forEach(function(a){
-        a._allPO = (a.polist||[]).map(function(po,i){
-          var s = a._ss ? a._ss[i] : null;
-          po._date = (s && s.session_date) ? s.session_date : po.f ? ('2026-'+po.f.replace('/','-')) : null;
+        // _date ya está en cada po desde la construcción del polist
+        a._allPO = (a.polist||[]).map(function(po){
+          // Fallback: inferir de po.f si _date no existe
+          if(!po._date && po.f) {
+            po._date = '2026-' + po.f.replace('/','-');
+          }
           return po;
         });
       });
