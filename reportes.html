@@ -269,21 +269,23 @@ tr[data-po]:hover td{background:rgba(0,0,0,.02);}
       <i class="ti ti-x" style="font-size:11px;"></i>
     </button>
     <div class="period-drop-menu" id="period-drop-menu">
-      <div class="period-drop-item active" onclick="selPeriod(this,'today')" id="pdi-today">Hoy</div>
-      <div class="period-drop-item" onclick="selPeriod(this,'7d')" id="pdi-7d">Últimos 7 días</div>
-      <div class="period-drop-item" onclick="selPeriod(this,'30d')" id="pdi-30d">Últimos 30 días</div>
+      <div class="period-drop-item active" onclick="markPeriod(this,'today')" id="pdi-today">Hoy</div>
+      <div class="period-drop-item" onclick="markPeriod(this,'7d')" id="pdi-7d">Últimos 7 días</div>
+      <div class="period-drop-item" onclick="markPeriod(this,'30d')" id="pdi-30d">Últimos 30 días</div>
       <div class="period-drop-sep"></div>
       <div class="period-drop-range">
         <div class="period-drop-range-row">
           <label>Desde</label>
-          <input type="date" id="period-from" onchange="selPeriodRange()">
+          <input type="date" id="period-from">
         </div>
         <div class="period-drop-range-row">
           <label>Hasta</label>
-          <input type="date" id="period-to" onchange="selPeriodRange()">
+          <input type="date" id="period-to">
         </div>
-        <button class="period-drop-apply" onclick="selPeriodRange(true)">Aplicar rango</button>
       </div>
+      <button class="period-drop-apply" onclick="applyPeriodFilter()" style="margin-top:8px;">
+        <i class="ti ti-check" style="font-size:11px;margin-right:4px;"></i>Aplicar filtro
+      </button>
     </div>
   </div>
   <div style="width:1px;height:16px;background:var(--gb);margin:0 2px;"></div>
@@ -551,6 +553,42 @@ function selPeriodRange(apply){
   }
 }
 
+// markPeriod — solo marca la selección visual, NO aplica el filtro
+var _pendingPeriod = 'today'; // período pendiente de aplicar
+function markPeriod(el, p){
+  document.querySelectorAll('.period-drop-item').forEach(function(e){e.classList.remove('active');});
+  if(el) el.classList.add('active');
+  _pendingPeriod = p;
+  // Limpiar fechas si se selecciona un preset
+  var from = document.getElementById('period-from');
+  var to   = document.getElementById('period-to');
+  if(from) from.value = '';
+  if(to)   to.value   = '';
+}
+
+// applyPeriodFilter — ejecuta el filtro con lo seleccionado
+function applyPeriodFilter(){
+  var from = document.getElementById('period-from') ? document.getElementById('period-from').value : '';
+  var to   = document.getElementById('period-to')   ? document.getElementById('period-to').value   : '';
+  // Si hay fechas manuales, usar rango
+  if(from || to){
+    if(!from || !to){ showToast('Seleccioná ambas fechas para el rango'); return; }
+    _period = 'range';
+    window._periodStart = new Date(from+'T00:00:00');
+    window._periodEnd   = new Date(to+'T23:59:59');
+    _showFilterActive(from+' → '+to);
+  } else {
+    // Usar preset seleccionado
+    var activeEl = document.querySelector('.period-drop-item.active');
+    selPeriod(activeEl, _pendingPeriod);
+    return;
+  }
+  // Cerrar dropdown y aplicar
+  var menu = document.getElementById('period-drop-menu');
+  if(menu) menu.classList.remove('open');
+  _applyPeriodFilter();
+}
+
 function selPeriod(el,p){
   // Toggle: click en período activo → mostrar todo
   if(_period === p) {
@@ -568,9 +606,9 @@ function selPeriod(el,p){
   // Actualizar label del botón
   var labels = {today:'Hoy','7d':'Últimos 7 días','30d':'Últimos 30 días',week:'Esta semana',prev:'Sem. anterior',month:'Este mes'};
   _showFilterActive(labels[p] || 'Ver informe');
-  // Cerrar el dropdown
   var menu = document.getElementById('period-drop-menu');
   if(menu) menu.classList.remove('open');
+  _pendingPeriod = p;
   var now = new Date();
   var cutoff = new Date();
   window._periodEnd = null;
