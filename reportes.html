@@ -639,43 +639,51 @@ function _applyPeriodFilter(){
   var pEnd   = window._periodEnd;
   var p      = _period;
   var now    = new Date();
-  var __FULL = window._RA_FULL || _RA_FULL || [];
+  // Siempre usar _RA_FULL como fuente — nunca mutar el original
+  var __FULL = (window._RA_FULL || _RA_FULL || []).map(function(a){ return Object.assign({},a); });
 
   // Sin filtro activo → mostrar todo
   if(p==='all' || (!cutoff && p!=='range')){
-    RA = __FULL;
+    RA = window._RA_FULL || _RA_FULL || [];
     go(_cur);
     return;
   }
 
   // Filtrar por período
   RA = __FULL.map(function(a){
-    var allPOs = a._allPO || a.polist || [];
+    // Usar siempre el polist original (guardado en _RA_FULL)
+    var origAgent = (window._RA_FULL || _RA_FULL || []).find(function(x){ return x.email===a.email; });
+    var allPOs = (origAgent && origAgent._allPO) || a._allPO || a.polist || [];
+
     var filtered = allPOs.filter(function(po){
       if(!po._date) return false;
       var d = new Date(po._date + 'T12:00:00');
       if(p==='range'){
-        return d >= (cutoff||new Date(0)) && d <= (pEnd||now);
+        var start = cutoff || new Date(0);
+        var end   = pEnd   || now;
+        return d >= start && d <= end;
       }
       return d >= cutoff && d <= now;
     });
-    // Recalcular métricas del agente con los POs filtrados
-    var avgSat  = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.sat*20||50);},0)/filtered.length) : 0;
-    var avgSp   = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.speech||a.speech||0);},0)/filtered.length) : 0;
-    var avgSc   = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.score||0);},0)/filtered.length) : 0;
-    var avgAht  = filtered.length ? Math.round(filtered.reduce(function(s,po){return s+(po.dur||0);},0)/filtered.length) : 0;
-    return Object.assign({},a,{
+
+    if(!filtered.length) return null; // excluir agente sin POs en el período
+
+    // Recalcular métricas solo con POs filtrados
+    var n = filtered.length;
+    var avgSc  = Math.round(filtered.reduce(function(s,po){return s+(po.score||0);},0)/n);
+    var avgSat = Math.round(filtered.reduce(function(s,po){return s+(po.sat||3)*20;},0)/n);
+    var avgAht = Math.round(filtered.reduce(function(s,po){return s+(po.dur||0);},0)/n);
+
+    return Object.assign({}, origAgent||a, {
       polist:   filtered.slice(0,15),
-      _allPO:   filtered,
-      calls:    filtered.length,
-      pos:      filtered.length,
-      sat:      avgSat || a.sat,
-      speech:   avgSp  || a.speech,
-      score:    avgSc  || a.score,
-      aht:      avgAht || a.aht,
+      calls:    n,
+      pos:      n,
+      score:    avgSc,
+      sat:      avgSat,
+      aht:      avgAht,
       poscores: filtered.map(function(po){return po.score||0;})
     });
-  }).filter(function(a){ return a.calls > 0; });
+  }).filter(function(a){ return a !== null; });
 
   go(_cur);
 }
