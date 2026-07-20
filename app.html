@@ -6798,6 +6798,7 @@ var _guiaQual   = [];  // legacy compat
 // Inicializar desde KB_CHECKS — todos pendientes, sin orden impuesto
 function _guiaLoad(svcId) {
   var checks = KB_CHECKS[svcId] || [];
+  console.log('[Guía] _guiaLoad svcId:', svcId, '| KB_CHECKS ítems:', checks.length);
   _guiaItems = checks.map(function(c) {
     return { id:c.id, txt:c.txt, keywords:c.keywords||[], done:false, autoDetected:false };
   });
@@ -6834,6 +6835,7 @@ function _guiaRender() {
   var pending   = _guiaItems.filter(function(x){ return !x.done; });
   var pct       = total > 0 ? Math.round(doneItems.length / total * 100) : 0;
 
+  console.log('[Guía] _guiaRender total:', total, '_kbSvcId:', _kbSvcId);
   if (total === 0) {
     wrap.style.display = 'none';
     if (doneEl) doneEl.style.display = 'none';
@@ -7002,6 +7004,7 @@ function renderKBQual(items) { /* absorbido en _guiaLoad */ }
 
 // Inicializar desde KB_CHECKS + QUALITY_MATRIX cuando se detecta servicio
 function initKBChecklist(svcId) {
+  console.log('[Guía] initKBChecklist llamado con svcId:', svcId);
   _kbSvcId = svcId;
   _kbState = {};
   // Items del protocolo por servicio (KB_CHECKS)
