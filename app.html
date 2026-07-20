@@ -2605,7 +2605,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.3-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.4-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -6801,6 +6801,22 @@ function _guiaLoad(svcId) {
   _guiaItems = checks.map(function(c) {
     return { id:c.id, txt:c.txt, keywords:c.keywords||[], done:false, autoDetected:false };
   });
+
+  // Agregar ítems de QUALITY_MATRIX — aplican en todas las llamadas
+  if(typeof QUALITY_MATRIX !== 'undefined') {
+    QUALITY_MATRIX.forEach(function(q) {
+      _guiaItems.push({
+        id:      'qm_'+q.id,
+        txt:     q.descripcion,
+        keywords: q.keywords||[],
+        done:    false,
+        autoDetected: false,
+        categoria: q.categoria,
+        puntaje:   q.puntaje
+      });
+    });
+  }
+
   _guiaProto = _guiaItems.map(function(){ return false; });
   _guiaQual  = [];
   _guiaRender();
@@ -6984,33 +7000,55 @@ function renderKBSugs(sugs) {
 }
 function renderKBQual(items) { /* absorbido en _guiaLoad */ }
 
-// Inicializar desde KB_CHECKS cuando se detecta servicio
+// Inicializar desde KB_CHECKS + QUALITY_MATRIX cuando se detecta servicio
 function initKBChecklist(svcId) {
   _kbSvcId = svcId;
   _kbState = {};
+  // Items del protocolo por servicio (KB_CHECKS)
   (KB_CHECKS[svcId]||[]).forEach(function(c){ _kbState[c.id] = 'pending'; });
+  // Items de calidad de la matriz (QUALITY_MATRIX) — aplican a todas las llamadas
+  if(typeof QUALITY_MATRIX !== 'undefined') {
+    QUALITY_MATRIX.forEach(function(q){
+      _kbState['qm_'+q.id] = 'pending';
+    });
+  }
   _guiaLoad(svcId);
 }
 
-// checkKBTranscript — ahora alimenta la guía dinámica
+// checkKBTranscript — chequea KB_CHECKS + QUALITY_MATRIX contra el transcript
 function checkKBTranscript(transcriptText) {
   if (!_kbSvcId) return;
-  var checks = KB_CHECKS[_kbSvcId] || [];
   var t = transcriptText.toLowerCase();
+  var changed = false;
+
+  // 1. Chequear ítems de protocolo (KB_CHECKS)
+  var checks = KB_CHECKS[_kbSvcId] || [];
   checks.forEach(function(c) {
     if (_kbState[c.id] === 'pending') {
       if (c.keywords.some(function(k){ return t.includes(k); })) {
         _kbState[c.id] = 'done';
-        // Marcar en guía dinámica
         var item = _guiaItems.find(function(x){ return x.id === c.id; });
-        if (item && !item.done) {
-          item.done = true;
-          item.autoDetected = true;
-          _guiaRender();
-        }
+        if (item && !item.done) { item.done = true; item.autoDetected = true; changed = true; }
       }
     }
   });
+
+  // 2. Chequear ítems de QUALITY_MATRIX
+  if(typeof QUALITY_MATRIX !== 'undefined') {
+    QUALITY_MATRIX.forEach(function(q) {
+      var stateKey = 'qm_'+q.id;
+      if (_kbState[stateKey] === 'pending') {
+        var kws = q.keywords || [];
+        if (kws.some(function(k){ return t.includes(k.toLowerCase()); })) {
+          _kbState[stateKey] = 'done';
+          var item = _guiaItems.find(function(x){ return x.id === stateKey; });
+          if (item && !item.done) { item.done = true; item.autoDetected = true; changed = true; }
+        }
+      }
+    });
+  }
+
+  if(changed) _guiaRender();
 }
 
 function toggleCheckItem(el) { /* legacy no-op */ }
