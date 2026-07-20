@@ -554,11 +554,22 @@ function doGoogleSSO() {
       _lookupAgentInSupabase(email, fbUser.displayName, fbUser.uid);
     })
     .catch(function(err) {
-      var msg = err.code === 'auth/popup-closed-by-user'
-        ? 'Ventana cerrada antes de completar el ingreso.'
-        : err.code === 'auth/unauthorized-domain'
-        ? 'Dominio no autorizado. Contactá al administrador.'
-        : 'Error al ingresar con Google: ' + err.message;
+      var msg;
+      switch(err.code) {
+        case 'auth/popup-closed-by-user':
+        case 'auth/cancelled-popup-request':
+          msg = 'Ingreso cancelado. Intentá de nuevo.'; break;
+        case 'auth/unauthorized-domain':
+          msg = 'Este dominio no está autorizado. Contactá al administrador.'; break;
+        case 'auth/popup-blocked':
+          msg = 'El navegador bloqueó la ventana de ingreso. Permití popups e intentá de nuevo.'; break;
+        case 'auth/network-request-failed':
+          msg = 'Sin conexión a internet. Revisá tu red e intentá de nuevo.'; break;
+        case 'auth/too-many-requests':
+          msg = 'Demasiados intentos. Esperá unos minutos e intentá de nuevo.'; break;
+        default:
+          msg = 'No se pudo completar el ingreso. Intentá de nuevo.';
+      }
       _showLoginErr(msg);
     });
 }
