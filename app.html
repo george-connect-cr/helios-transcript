@@ -2605,7 +2605,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.4-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.5-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -3724,6 +3724,8 @@ async function deskAnswer() {
 
   _resetCallState();
   _callInProgress = true;
+  // Cancelar cualquier limpieza pendiente del PO anterior
+  if(window._lastCleanTimer) { clearTimeout(window._lastCleanTimer); window._lastCleanTimer = null; }
   _clearSession();
   _desktopTranscriptLines = [];
   clearTimeout(_desktopAnalysisTimer);
@@ -5846,16 +5848,15 @@ function confirmPO(){
     AgentBar.increment();
     showToast('PO '+num+' creado');
     // Limpiar pantalla para próxima llamada — pero DESPUÉS del dashboard
-    setTimeout(function(){
-      // Limpiar transcript visual
+    // y solo si no hay otra llamada en progreso
+    var _cleanTimer = setTimeout(function(){
+      if(_callInProgress) return; // no limpiar si ya hay una llamada nueva
       var tbody = document.getElementById('t-body');
       if(tbody) tbody.innerHTML = '';
-      // Resetear guía para próxima llamada
       if(typeof _guiaReset === 'function') _guiaReset();
-      // Resetear ServiceDetector para próxima llamada
       if(typeof ServiceDetector !== 'undefined') ServiceDetector.reset();
-      // NO limpiar lastAnalysis ni _poList — el dashboard los necesita
-    }, 2000); // 2s para que el dashboard cargue primero
+    }, 2000);
+    window._lastCleanTimer = _cleanTimer;
   }catch(err){
     console.error('confirmPO error:', err);
     showToast('Error al crear PO: '+err.message);
