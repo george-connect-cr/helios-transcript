@@ -2605,7 +2605,7 @@ body.dark .pm-theme-thumb { transform:translateX(16px);background:#fff; }
       <div style="display:flex;flex-direction:column;gap:1px;line-height:1;">
         <div style="display:flex;align-items:baseline;gap:7px;">
           <span style="font-family:var(--f);font-size:16px;font-weight:600;color:var(--t0);letter-spacing:-.3px;">KAI Academy</span>
-          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.5-beta</span>
+          <span style="font-family:var(--f);font-size:10px;font-weight:600;color:var(--a);letter-spacing:.02em;">v1.2.6-beta</span>
         </div>
         <span style="font-family:var(--f);font-size:10px;font-weight:500;color:var(--t2);">Portal de entrenamiento</span>
       </div>
@@ -6729,8 +6729,8 @@ const KB_CHECKS = {
   ],
 };
 
-let _kbState = {};   // { itemId: 'pending' | 'done' }
-let _kbSvcId = null;
+var _kbState = {};   // { itemId: 'pending' | 'done' }
+var _kbSvcId = null;
 
 // initKBChecklist consolidated below in guia section
 
@@ -6787,7 +6787,7 @@ function _dismissKBPill(itemId){
 
 // ── Guía de llamada — renderizado en col-r ───────────────────────────
 // ── GUÍA DINÁMICA — detección por transcript, sin orden fijo ──────────────
-var _guiaItems  = [];  // [{id, txt, keywords, done, autoDetected}]
+var _guiaItems  = [];
 function _guiaReset() {
   _guiaItems = []; _guiaProto = []; _guiaQual = []; _guiaCursor = 0;
   _kbSvcId = null; _kbState = {};
@@ -6836,7 +6836,7 @@ function _guiaRender() {
   var pending   = _guiaItems.filter(function(x){ return !x.done; });
   var pct       = total > 0 ? Math.round(doneItems.length / total * 100) : 0;
 
-  console.log('[Guía] _guiaRender total:', total, '_kbSvcId:', _kbSvcId);
+  console.log('[Guía] _guiaRender total:', total, '| _kbSvcId:', _kbSvcId, '| wrap el:', !!wrap, '| empty el:', !!empty);
   if (total === 0) {
     wrap.style.display = 'none';
     if (doneEl) doneEl.style.display = 'none';
@@ -6855,6 +6855,7 @@ function _guiaRender() {
     _guiaUpdateHeader(pct, 0, total); return;
   }
 
+  console.log('[Guía] MOSTRANDO wrap con', pending.length, 'pendientes');
   wrap.style.display = '';
   if (empty)  empty.style.display  = 'none';
   if (doneEl) doneEl.style.display = 'none';
